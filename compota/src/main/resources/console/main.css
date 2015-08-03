@@ -1,0 +1,65 @@
+/*
+ * Base structure
+ */
+
+/* Move down content because we have a fixed navbar that is 50px tall */
+body {
+  padding-top: 10px;
+}
+
+
+/*
+ * Global add-ons
+ */
+
+.vspace20 {
+    height: 20px;
+}
+
+.sidebar {
+  background-color: #f5f5f5;
+  padding: 0px;
+  border-right: 1px solid #eee;
+  position: fixed;
+  top: 1px;
+  bottom: 0;
+  left: 0;
+  z-index: 1000;
+  display: block;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.showMessages {
+    margin-bottom: 40px;
+}
+
+
+/* Sidebar navigation */
+.nav-sidebar {
+  margin-bottom: 20px;
+
+}
+.nav-sidebar > li > a {
+
+}
+.nav-sidebar > .active > a {
+  color: #fff;
+  background-color: #428bca;
+}
+
+.topMargin20 {
+   margin-top: 20px;
+   border-bottom: 1px solid #ddd;
+
+}
+
+.alert {
+  padding: 10px;
+}
+
+.smallBody {
+    max-height: 400px !important;
+    overflow-y: scroll;
+}
+
