@@ -1,6 +1,6 @@
 Nice.scalaProject
 
-name := "metapasta"
+name := "metapasta-congelado"
 
 description := "metapasta project"
 
@@ -38,4 +38,3 @@ dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.1.
 dependencyOverrides += "jline" % "jline" % "2.6"
 
 dependencyOverrides += "org.slf4j" % "slf4j-api" % "1.7.5"
-
