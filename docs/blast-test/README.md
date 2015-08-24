@@ -53,6 +53,13 @@ Test 2
 ./ncbi-blast-2.2.31+/bin/blastn -db era7.16S.reference.sequences.0.1.0.fasta -query reads.fasta -out blastn.test2.out.txt -outfmt "7 qseqid qlen sseqid sgi sacc slen qstart qend sstart send evalue"  -num_alignments 10
 ```
 
+Test 3
+
+```bash
+./ncbi-blast-2.2.31+/bin/blastn -db era7.16S.reference.sequences.0.1.0.fasta -query reads.fasta -out blastn.test3.out.txt -outfmt "10 qseqid qlen sseqid sgi sacc slen qstart qend sstart send evalue"  -num_alignments 10
+```
+
+
 
 **Output**
 
