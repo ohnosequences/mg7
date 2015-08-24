@@ -65,3 +65,4 @@ Test 3
 
 - `s3://era7p/metagenomica/data/out/blast-test/blastn.test.out.txt`
 - `s3://era7p/metagenomica/data/out/blast-test/blastn.test2.out.txt`
+- `s3://era7p/metagenomica/data/out/blast-test/blastn.test3.out.txt`
