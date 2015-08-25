@@ -7,9 +7,12 @@ The idea is to have different nisperos for each step and a global configuration 
 - auth (keys, profiles, whatever)
 - base S3 bucket + folder
 - input (two FASTQ files per sample)
--
 
-We create task providers at this level. This is important, as it actually guarantees that names do match. we can also check if all output files are there at the end etc.
+We create task providers at this level. This is important, as it actually guarantees that names do match. we can also check if all output files are there at the end etc. We should have data types and datasets for all the stuff involved:
+
+- merged reads
+- BLAST results
+- ...
 
 ### Nisperos
 
