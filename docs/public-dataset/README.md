@@ -1,43 +1,42 @@
 # Public dataset for testing purposes
 
-We are using the public data from this 16S project [http://www.ebi.ac.uk/ena/data/view/PRJEB6070](http://www.ebi.ac.uk/ena/data/view/PRJEB6070)
+We are using the public data from this 16S project [http://www.ebi.ac.uk/ena/data/view/PRJEB6592](http://www.ebi.ac.uk/ena/data/view/PRJEB6592)
 
 **Project ID**
 
-ERP005534
-PRJEB6070
+PRJEB6592
 
 **Project title** (from the ENA project entry)
 
-Potential of fecal microbiota for early stage detection of colorectal cancer
+Illumina 16S bias evaluation
 
 **Project description** (from the ENA project entry)
 
-> Several bacterial species have been implicated in the development of colorectal carcinoma (CRC), but CRC-associated changes of fecal microbiota and their potential for cancer screening remain to be explored. Here we used metagenomic sequencing of fecal samples to identify taxonomic markers that distinguished CRC patients from tumor-free controls in a study population of 156 participants. Accuracy of metagenomic CRC detection was similar to the standard fecal occult blood test (FOBT) and when both approaches were combined, sensitivity improved >45% relative to the FOBT while maintaining its specificity. Accuracy of metagenomic CRC detection did not differ significantly between early and late-stage cancer and could be validated in independent patient and control populations (N=335) from different countries. CRC-associated changes in the fecal microbiome at least partially reflected microbial community composition at the tumor itself, indicating that observed gene pool differences may reveal tumor-related host-microbe interactions. Indeed, we deduced a metabolic shift from fiber degradation in controls to utilization of host carbohydrates and amino acids in CRC patients accompanied by an increase of lipopolysaccharide metabolism.
+> Massively parallel sequencing of 16S rRNA genes enables the comparison of terrestrial, aquatic, and host-associated microbial communities with sufficient sequencing depth for robust assessments of both alpha and beta diversity. Establishing standardized protocols for the analysis of microbial communities is dependent on increasing the reproducibility of PCR-based molecular surveys by minimizing sources of methodological bias. In this study, we tested the effects of template concentration, pooling of PCR amplicons, and sample preparation/inter-lane sequencing on the reproducibility associated with paired-end Illumina sequencing of bacterial 16S rRNA genes. Using DNA extracts from soils and fecal samples as templates, we sequenced pooled amplicons and individual reactions for both high (5-10 ng) and low (0.1 ng) template concentrations. In addition, all experimental manipulations were repeated on two separate days and sequenced on two different MiSeq lanes. Although within-sample sequence profiles were highly consistent, template concentration had a significant impact on sample profile variability. Pooling of multiple PCR amplicons influenced the separation of all profiles from each sample and reduced within-sample heterogeneity, although these effects were not always significant. By comparison, sample preparation and inter-lane variability did not influence sample sequence data significantly. This systematic analysis underlines the importance of optimizing template concentration in order to minimize variability in microbial community surveys and indicates that the practice of pooling multiple PCR amplicons prior to sequencing contributes proportionally less to reducing bias in 16S rRNA gene surveys with next-generation sequencing.
 
-Article describing the dataset [http://www.ncbi.nlm.nih.gov/pubmed/25432777](http://www.ncbi.nlm.nih.gov/pubmed/25432777)
+Article describing the dataset [http://aem.asm.org/content/80/18/5717.full.pdf](http://aem.asm.org/content/80/18/5717.full.pdf)
 
 
 Script used to get the data and put it in S3
 
 ```bash
-wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR475/ERR475467/ERR475467_1.fastq.gz
-wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR475/ERR475467/ERR475467_2.fastq.gz
-wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR475/ERR475472/ERR475472_1.fastq.gz
-wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR475/ERR475472/ERR475472_2.fastq.gz
-wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR475/ERR475468/ERR475468_1.fastq.gz
-wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR475/ERR475468/ERR475468_2.fastq.gz
-wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR475/ERR475469/ERR475469_1.fastq.gz
-wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR475/ERR475469/ERR475469_2.fastq.gz
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR567/ERR567374/ERR567374_1.fastq.gz
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR567/ERR567374/ERR567374_2.fastq.gz
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR567/ERR567375/ERR567375_1.fastq.gz
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR567/ERR567375/ERR567375_2.fastq.gz
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR567/ERR567384/ERR567384_1.fastq.gz
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR567/ERR567384/ERR567384_2.fastq.gz
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR567/ERR567385/ERR567385_1.fastq.gz
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR567/ERR567385/ERR567385_2.fastq.gz
 
-aws s3 cp --region eu-west-1 ./ s3://resources.ohnosequences.com/16s/public-datasets/PRJEB6070/reads/ --recursive
+aws s3 cp --region eu-west-1 ./ s3://resources.ohnosequences.com/16s/public-datasets/PRJEB6592/reads/ --recursive
 ```
 
 Reads metadata
 
-| Sample ID      | Diagnosis         | Run           |
+| Sample ID      | Source            | Run           |
 | :----          | --------:         |  --------:    |
-| SAMEA2448331   | Small adenoma     | ERR475467     |
-| SAMEA2448336   | Large adenoma     | ERR475472     |
-| SAMEA2448332   | Normal            | ERR475468     |
-| SAMEA2448333   | Normal            | ERR475469     |
+|  SAMEA2661455  |    gut            |   ERR567374   |
+|  SAMEA2661456  |    gut            |   ERR567375   |
+|  SAMEA2661465  |    soil           |   ERR567384   |
+|  SAMEA2661466  |    soil           |   ERR567385   |
