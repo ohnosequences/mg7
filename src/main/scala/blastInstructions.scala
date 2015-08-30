@@ -12,8 +12,10 @@ import ohnosequences.blast._, api._, data._, outputFields._
 case object blastInstructions {
 
   // TODO with great power comes great responsibility. Move to conf
+
   case object outRec extends BlastOutputRecord(qseqid :&: sseqid :&: □)
-  case object outputType extends BlastOutputType(outRec) { val label = toString }
+  case object blastExprType extends BlastExpressionType(blastn)(outRec)
+  case object outputType extends BlastOutputType(blastExprType, "blastn.blablabla")
 
   trait AnyBlastProcess extends AnyDataProcessingBundle {
 
@@ -76,8 +78,8 @@ case object blastInstructions {
     }
   }
 
-  private def blastExpr(args: ValueOf[blastn.Arguments]): BlastExpression[blastn, outRec.type] =
-    BlastExpression(blastn)(outRec)(
+  private def blastExpr(args: ValueOf[blastn.Arguments]): BlastExpression[blastExprType.type] =
+    BlastExpression(blastExprType)(
       argumentValues  = args,
       // TODO whatever
       optionValues    = blastn.defaults update (num_threads(24) :~: ∅)
