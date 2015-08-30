@@ -1,6 +1,6 @@
 package ohnosequences.metagenomica.flash
 
-import data._
+import flashDataProcessing._
 
 import ohnosequences.datasets._, s3Locations._, illumina._, reads._
 
@@ -15,25 +15,34 @@ import ohnosequences.statika.aws._, api._, amazonLinuxAMIs._
 import ohnosequences.awstools._, regions.Region._, s3.ObjectAddress, ec2.InstanceType._
 import ohnosequences.awstools.autoscaling._
 
-// import java.io.File
+import ohnosequences.flash.api._
+import ohnosequences.flash.data._
+
 import era7.project.loquats._
 
 
 case object flashTest {
   val readsType = illumina.PairedEnd(bp300, InsertSize(3000))
+
   case object reads1 extends PairedEnd1Fastq(readsType, "ERR567374_1.fastq.gz")
   case object reads2 extends PairedEnd2Fastq(readsType, "ERR567374_2.fastq.gz")
 
-  case object testData extends FlashData(readsType, reads1, reads2)
+  lazy val flashOptions = flash.defaults update (
+    read_len(readsType.length.length)   :~:
+    max_overlap(readsType.length.length) :~: ∅
+  )
 
-  case object testInstructions extends FlashInstructions(testData)
+  case object merged extends MergedReads(readsType, reads1, reads2, flashOptions)
+  case object stats extends MergedReadsStats(merged)
+
+  case object testInstructions extends FlashInstructions(readsType, reads1, reads2, merged, stats, flashOptions)
 
   case object testConfig extends Era7LoquatConfig {
 
     // type FlashInstructions <: AnyFlashInstructions
     // val  flashInstructions: FlashInstructions
 
-    // val metadata: AnyArtifactMetadata = generated.metadata.metagenomica
+    val metadata: AnyArtifactMetadata = generated.metadata.Metagenomica
 
     val managerConfig = ManagerConfig(
       instanceType = m3_medium,
@@ -55,24 +64,17 @@ case object flashTest {
           id = "ERR567374_1",
           dataProcessing = testInstructions
         )(remoteInput =
-            testInstructions.data.reads1.atS3(ObjectAddress("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/reads/ERR567374_1.fastq.gz")) :~:
-            testInstructions.data.reads2.atS3(ObjectAddress("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/reads/ERR567374_2.fastq.gz")) :~:
+            testInstructions.reads1.atS3(ObjectAddress("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/reads/ERR567374_1.fastq.gz")) :~:
+            testInstructions.reads2.atS3(ObjectAddress("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/reads/ERR567374_2.fastq.gz")) :~:
             ∅,
           remoteOutput =
-            testInstructions.data.merged.atS3(ObjectAddress("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/flash-test/ERR567374_1.merged.fastq")) :~:
-            testInstructions.data.stats.atS3(ObjectAddress("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/flash-test/ERR567374_1.stats.txt")) :~:
+            testInstructions.merged.atS3(ObjectAddress("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/flash-test/ERR567374_1.merged.fastq")) :~:
+            testInstructions.stats.atS3(ObjectAddress("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/flash-test/ERR567374_1.stats.txt")) :~:
             ∅
         )
       )
 
   }
-
-
-  // case object testConfig extends flashConfigTest {
-  //
-  //   type FlashInstructions = testInstructions.type
-  //   val  flashInstructions = testInstructions
-  // }
 
   case object testLoquat extends Loquat(testConfig, testInstructions)
 }
