@@ -1,6 +1,6 @@
 package ohnosequences.metagenomica
 
-import ohnosequences.loquat.instructions._
+import ohnosequences.loquat._, dataProcessing._
 import ohnosequences.statika.instructions._
 import ohnosequences.flash._, api._, data._
 import ohnosequences.cosas._, typeSets._, types._
@@ -9,7 +9,7 @@ import java.io.File
 
 case object flashInstructions {
 
-  trait AnyFlashInstructions extends AnyInstructionsBundle { instr =>
+  trait AnyFlashInstructions extends AnyDataProcessingBundle { instr =>
 
     // Paired end reads as input
     type ReadsType <: AnyReadsType { type EndType = pairedEndType }
@@ -40,13 +40,13 @@ case object flashInstructions {
 
     final def processData(
       dataMappingId: String,
-      inputFiles: InputFiles
-    ): AnyInstructions.withOut[OutputFiles] = {
+      context: Context
+    ): Instructions[OutputFiles] = {
 
       // define input
       lazy val flashInput = FlashInputAt(
-        getFile(inputFiles, reads1),
-        getFile(inputFiles, reads2)
+        context.file(reads1),
+        context.file(reads2)
       )
 
       // define output
