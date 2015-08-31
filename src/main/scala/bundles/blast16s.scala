@@ -40,3 +40,17 @@ case object blast16s extends Bundle() {
 
   }
 }
+
+
+case object blast16sTest {
+
+  import ohnosequences.statika.aws._, api._, amazonLinuxAMIs._
+  import ohnosequences.awstools.regions.Region._
+
+  case object blast16sCompat extends Compatible(
+    amzn_ami_64bit(Ireland, Virtualization.HVM)(1),
+    blast16s,
+    generated.metadata.Metagenomica
+  )
+
+}
