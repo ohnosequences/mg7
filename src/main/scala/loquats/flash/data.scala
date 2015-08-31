@@ -1,4 +1,4 @@
-package ohnosequences.metagenomica.flash
+package ohnosequences.metagenomica.loquats.flash
 
 import ohnosequences.loquat._, utils._, dataProcessing._
 import ohnosequences.statika._, bundles._, instructions._
