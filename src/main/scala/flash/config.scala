@@ -1,8 +1,6 @@
 package ohnosequences.metagenomica.flash
 
-import flashDataProcessing._
-
-import ohnosequences.datasets._, s3Locations._, illumina._, reads._
+import ohnosequences.datasets._, dataSets._, fileLocations._, s3Locations._, illumina._, reads._
 
 import ohnosequences.cosas._, typeSets._, types._
 import ohnosequences.cosas.ops.typeSets._
@@ -20,27 +18,38 @@ import ohnosequences.flash.data._
 
 import era7.project.loquats._
 
+import java.io.File
+
+
+
+trait AnyFlashConfig extends Era7LoquatConfig { config =>
+
+  type DataProcessing <: AnyFlashDataProcessing
+  val  dataProcessing: DataProcessing
+
+  type FlashDataMappring = AnyDataMapping { type DataProcessing = config.DataProcessing }
+  val  dataMappings: List[FlashDataMappring]
+}
+
+abstract class FlashConfig[D <: AnyFlashDataProcessing](val dataProcessing: D) extends AnyFlashConfig {
+
+  type DataProcessing = D
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
 
 case object flashTest {
-  val readsType = illumina.PairedEnd(bp300, InsertSize(3000))
 
-  case object reads1 extends PairedEnd1Fastq(readsType, "ERR567374_1.fastq.gz")
-  case object reads2 extends PairedEnd2Fastq(readsType, "ERR567374_2.fastq.gz")
+  // TODO: move it to datasets
+  implicit def genericParser[D <: AnyData](implicit d: D): DenotationParser[D, FileDataLocation, File] =
+    new DenotationParser(d, d.label)({ f: File => Some(FileDataLocation(f)) })
 
-  lazy val flashOptions = flash.defaults update (
-    read_len(readsType.length.length)   :~:
-    max_overlap(readsType.length.length) :~: ∅
-  )
 
-  case object merged extends MergedReads(readsType, reads1, reads2, flashOptions)
-  case object stats extends MergedReadsStats(merged)
+  case object testData extends FlashData(illumina.PairedEnd(bp300, InsertSize(3000)))
 
-  case object testInstructions extends FlashInstructions(readsType, reads1, reads2, merged, stats, flashOptions)
+  case object testDataProcessing extends FlashDataProcessing(testData)
 
-  case object testConfig extends Era7LoquatConfig {
-
-    // type FlashInstructions <: AnyFlashInstructions
-    // val  flashInstructions: FlashInstructions
+  case object testConfig extends FlashConfig(testDataProcessing) {
 
     val metadata: AnyArtifactMetadata = generated.metadata.Metagenomica
 
@@ -59,22 +68,23 @@ case object flashTest {
       terminateAfterInitialDataMappings = true
     )
 
-    val dataMappings: List[AnyDataMapping] = List(
+    val dataMappings: List[FlashDataMappring] =
+      List(
         DataMapping(
-          id = "ERR567374_1",
-          dataProcessing = testInstructions
+          "ERR567374_1",
+          dataProcessing
         )(remoteInput =
-            testInstructions.reads1.atS3(ObjectAddress("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/reads/ERR567374_1.fastq.gz")) :~:
-            testInstructions.reads2.atS3(ObjectAddress("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/reads/ERR567374_2.fastq.gz")) :~:
+            dataProcessing.data.reads1.atS3(ObjectAddress("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/reads/ERR567374_1.fastq.gz")) :~:
+            dataProcessing.data.reads2.atS3(ObjectAddress("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/reads/ERR567374_2.fastq.gz")) :~:
             ∅,
           remoteOutput =
-            testInstructions.merged.atS3(ObjectAddress("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/flash-test/ERR567374_1.merged.fastq")) :~:
-            testInstructions.stats.atS3(ObjectAddress("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/flash-test/ERR567374_1.stats.txt")) :~:
+            dataProcessing.data.merged.atS3(ObjectAddress("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/flash-test/ERR567374_1.merged.fastq")) :~:
+            dataProcessing.data.stats.atS3(ObjectAddress("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/flash-test/ERR567374_1.stats.txt")) :~:
             ∅
         )
       )
 
   }
 
-  case object testLoquat extends Loquat(testConfig, testInstructions)
+  case object testLoquat extends Loquat(testConfig, testDataProcessing)
 }
