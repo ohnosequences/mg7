@@ -12,8 +12,50 @@ import ohnosequences.blast._, api._, data._, outputFields._
 case object blastInstructions {
 
   // TODO with great power comes great responsibility. Move to conf
+  // TODO this needs at least sgi or something like that (the GI field!)
   case object outRec extends BlastOutputRecord(qseqid :&: sseqid :&: □)
-  case object outputType extends BlastOutputType(outRec) { val label = toString }
+  case object blastExprType extends BlastExpressionType(blastn)(outRec)
+  case object outputType extends BlastOutputType(blastExprType, "blastn.blablabla")
+
+  def runBLAST(mergedReads: File, refDB: File, totalOutput: File): File = {
+
+    lazy val quartets = io.Source.fromFile( mergedReads ).getLines.grouped(4)
+
+    quartets map {
+
+      quartet => {
+
+        // we only care about the id and the seq here
+        val read = FASTA(
+            header(FastqId(quartet(0)).toFastaHeader) :~:
+            fasta.sequence(FastaLines(quartet(1)))    :~: ∅
+          )
+
+        val readFile  = writeFastaToFile(read, new File("read.fa"))
+        val outFile   = new File("read.blast")
+
+        val args = blastn.arguments(
+          db(refDB)       :~:
+          query(readFile) :~:
+          out(outFile)    :~: ∅
+        )
+
+        val expr = blastExpr(args)
+
+        // run!
+        import scala.sys.process._
+        expr.cmd.!
+
+        // we should have something in args getV out now. Append it!
+        appendTo(expr.argumentValues getV out, totalOutput)
+
+        // clean
+        readFile.delete; outFile.delete
+      }
+    }
+
+    totalOutput
+  }
 
   trait AnyBlastProcess extends AnyDataProcessingBundle {
 
@@ -76,8 +118,8 @@ case object blastInstructions {
     }
   }
 
-  private def blastExpr(args: ValueOf[blastn.Arguments]): BlastExpression[blastn, outRec.type] =
-    BlastExpression(blastn)(outRec)(
+  private def blastExpr(args: ValueOf[blastn.Arguments]): BlastExpression[blastExprType.type] =
+    BlastExpression(blastExprType)(
       argumentValues  = args,
       // TODO whatever
       optionValues    = blastn.defaults update (num_threads(24) :~: ∅)
