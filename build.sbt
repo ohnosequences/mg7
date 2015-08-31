@@ -14,16 +14,17 @@ resolvers := Seq(
 ) ++ resolvers.value
 
 libraryDependencies ++= Seq(
-  "ohnosequences" %% "flash"       % "0.1.0-SNAPSHOT",
-  "ohnosequences" %% "blast"       % "0.1.0-SNAPSHOT",
-  "ohnosequences" %% "datasets"    % "0.1.0-SNAPSHOT",
-  "ohnosequences" %% "loquat"      % "2.0.0-SNAPSHOT",
-  "ohnosequences" %% "fastarious"  % "0.1.0-SNAPSHOT"
-  "ohnosequences" %% "cosas"       % "0.7.0-SNAPSHOT",
-  "ohnosequences" %% "statika"     % "2.0.0-new-instructions-SNAPSHOT",
-  "ohnosequences" %% "aws-statika" % "2.0.0-new-instructions-SNAPSHOT",
-  "era7"          %% "project-utils" % "0.1.0-SNAPSHOT",
-  "org.scalatest" %% "scalatest"   % "2.2.5" % Test
+  "ohnosequences"         %% "flash"         % "0.1.0-SNAPSHOT",
+  "ohnosequences"         %% "blast"         % "0.1.0-SNAPSHOT",
+  "ohnosequences"         %% "datasets"      % "0.1.0-SNAPSHOT",
+  "ohnosequences"         %% "loquat"        % "2.0.0-SNAPSHOT",
+  "ohnosequences"         %% "fastarious"    % "0.1.0-SNAPSHOT"
+  "ohnosequences"         %% "cosas"         % "0.7.0-SNAPSHOT",
+  "ohnosequences"         %% "statika"       % "2.0.0-new-instructions-SNAPSHOT",
+  "ohnosequences"         %% "aws-statika"   % "2.0.0-new-instructions-SNAPSHOT",
+  "ohnosequences-bundles" %% "flash"         % "0.1.0-SNAPSHOT",
+  "era7"                  %% "project-utils" % "0.1.0-SNAPSHOT",
+  "org.scalatest"         %% "scalatest"     % "2.2.5"                            % Test
 )
 
 dependencyOverrides += "org.scala-lang.modules" %% "scala-xml" % "1.0.4"
