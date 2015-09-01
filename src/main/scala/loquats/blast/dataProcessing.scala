@@ -19,7 +19,18 @@ case object blastInstructions {
 
   // TODO with great power comes great responsibility. Move to conf
   // TODO this needs at least sgi or something like that (the GI field!)
-  case object outRec extends BlastOutputRecord(qseqid :&: sseqid :&: □)
+  case object outRec extends BlastOutputRecord(
+    qseqid    :&:
+    qlen      :&:
+    qstart    :&:
+    qend      :&:
+    sseqid    :&:
+    slen      :&:
+    sstart    :&:
+    send      :&:
+    bitscore  :&:
+    sgi       :&: □
+  )
   case object blastExprType extends BlastExpressionType(blastn)(outRec)
   case object outputType extends BlastOutputType(blastExprType, "blastn.blablabla")
 
