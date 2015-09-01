@@ -5,6 +5,7 @@ import  ohnosequences.metagenomica._, bundles._
 import ohnosequences.loquat._, dataProcessing._
 import ohnosequences.statika.bundles._
 import ohnosequences.statika.instructions._
+import ohnosequencesBundles.statika.Blast
 import ohnosequences.blast._, api._, data._
 import ohnosequences.cosas._, typeSets._, types._, properties._
 import ohnosequences.datasets._, dataSets._, fileLocations._, illumina._, reads._
@@ -13,6 +14,8 @@ import ohnosequences.fastarious._, fasta._, fastq._
 import ohnosequences.blast._, api._, data._, outputFields._
 
 case object blastInstructions {
+
+  case object blastBundle extends Blast("2.2.31")
 
   // TODO with great power comes great responsibility. Move to conf
   // TODO this needs at least sgi or something like that (the GI field!)
@@ -53,7 +56,7 @@ case object blastInstructions {
 
     def instructions: AnyInstructions = say("Let the blasting begin!")
 
-    val bundleDependencies: List[AnyBundle] = List(blast16s)
+    val bundleDependencies: List[AnyBundle] = List[AnyBundle](blastBundle, blast16s)
 
     type FastqInput <: AnyData
     val  fastqInput: FastqInput
