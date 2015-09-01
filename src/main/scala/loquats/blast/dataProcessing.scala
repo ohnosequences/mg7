@@ -18,7 +18,6 @@ case object blastInstructions {
   case object blastBundle extends Blast("2.2.31")
 
   // TODO with great power comes great responsibility. Move to conf
-  // TODO this needs at least sgi or something like that (the GI field!)
   case object outRec extends BlastOutputRecord(
     qseqid    :&:
     qlen      :&:
