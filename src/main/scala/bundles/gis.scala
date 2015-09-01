@@ -11,14 +11,13 @@ import com.amazonaws.services.s3.transfer._
 import java.io.File
 
 
-case object blast16s extends Bundle() {
-  // val region = "eu-west-1"
+case object gis extends Bundle() {
   val bucket = "resources.ohnosequences.com"
-  val name = "era7.16S.reference.sequences.0.1.0"
+  // FIXME: this is wrong file:
+  val name = "era7.16S.reference.sequences.blastdb"
   val key = s"16s/${name}.tgz"
 
   val destination: File = new File(s"${name}.tgz")
-
   val location: File = new File(name)
 
   def instructions: AnyInstructions = {
@@ -35,20 +34,57 @@ case object blast16s extends Bundle() {
       transfer.waitForCompletion
     } -&-
     cmd("tar")("xvf", destination.getCanonicalPath) -&-
-    say(s"Reference database ${name} was dowloaded to ${location.getCanonicalPath}")
+    say(s"GIs database ${name} was dowloaded and unpacked to ${location.getCanonicalPath}")
+  }
 
+  def giTaxIdMap: Map[Int, Int] = {
+    // just two numbers separated with spaces
+    val pattern = """(\d+)\s+(\d+).*""".r
+
+    io.Source.fromFile(location).getLines.map {
+      case pattern(gi, taxId) => gi.toInt -> taxId.toInt
+      // throwing an error, what else can we do...
+      case _ => throw new Error("Wrong GIs file, can't parse something")
+    }.toMap
   }
 }
 
 
-case object blast16sTest {
+case object gisTest {
 
   import ohnosequences.statika.aws._, api._, amazonLinuxAMIs._
   import ohnosequences.awstools.regions.Region._
 
-  case object blast16sCompat extends Compatible(
+  // just head of that dmp
+  val testMap: Map[Int, Int] = Map(
+    2  -> 9913,
+    3  -> 9913,
+    4  -> 9646,
+    5  -> 9913,
+    7  -> 9913,
+    9  -> 9913,
+    11 -> 9913,
+    13 -> 9913,
+    15 -> 9915,
+    16 -> 9771
+  )
+
+  case object gisMapTest extends Bundle(gis) {
+
+    def instructions: AnyInstructions = {
+      lazy val bigMap = gis.giTaxIdMap
+      testMap.forall { case (k, v) =>
+        bigMap(k) == v
+      } match {
+        case true  => say("everything's cool!")
+        case false => failure("something's wrong!")
+      }
+    }
+  }
+
+  case object gisCompat extends Compatible(
     amzn_ami_64bit(Ireland, Virtualization.HVM)(1),
-    blast16s,
+    gisMapTest,
     generated.metadata.Metagenomica
   )
 

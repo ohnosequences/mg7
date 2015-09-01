@@ -1,6 +1,6 @@
 package ohnosequences.metagenomica.tests
 
-import ohnosequences.metagenomica.bundles._, blast16sTest._
+import ohnosequences.metagenomica.bundles._
 
 import ohnosequences.statika._, aws._, bundles._
 
@@ -48,7 +48,9 @@ class ApplicationTest extends FunSuite with ParallelTestExecution {
     }
   }
 
-  test("testing blast16s bundle") {
+  ignore("testing blast16s bundle") {
+    import blast16sTest._
+
     val specs = blast16sCompat.instanceSpecs(
       instanceType = m3_medium,
       user.awsAccount.keypair.name,
@@ -56,6 +58,20 @@ class ApplicationTest extends FunSuite with ParallelTestExecution {
     )
 
     val instances = launchAndWait(ec2, blast16sCompat.name, specs)
+    // instances.foreach{ _.terminate }
+    assert{ instances.length == 1 }
+  }
+
+  test("testing gis bundle") {
+    import gisTest._
+
+    val specs = gisCompat.instanceSpecs(
+      instanceType = m3_medium,
+      user.awsAccount.keypair.name,
+      Some(era7.aws.roles.projects.name)
+    )
+
+    val instances = launchAndWait(ec2, gisCompat.name, specs)
     // instances.foreach{ _.terminate }
     assert{ instances.length == 1 }
   }
