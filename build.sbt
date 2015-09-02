@@ -18,6 +18,7 @@ libraryDependencies ++= Seq(
   "ohnosequences"         %% "flash"         % "0.1.0-SNAPSHOT",
   "ohnosequences"         %% "blast"         % "0.1.0-SNAPSHOT",
   "ohnosequences"         %% "fastarious"    % "0.1.0-SNAPSHOT",
+  "bio4j"                 %  "bio4j"         % "0.12.0-RC1",
   // generic tools:
   "ohnosequences"         %% "cosas"         % "0.7.0-SNAPSHOT",
   "ohnosequences"         %% "loquat"        % "2.0.0-SNAPSHOT",
@@ -27,13 +28,21 @@ libraryDependencies ++= Seq(
   // bundles:
   "ohnosequences-bundles" %% "flash"         % "0.1.0-SNAPSHOT",
   "ohnosequences-bundles" %% "blast"         % "0.2.0-SNAPSHOT",
+  "ohnosequences-bundles" %% "bio4j-dist"    % "0.1.0-SNAPSHOT",
   // utils:
   "era7"                  %% "project-utils" % "0.1.0-SNAPSHOT",
   // testing:
-  "org.scalatest"         %% "scalatest"     % "2.2.5"                            % Test
+  "org.scalatest"         %% "scalatest"     % "2.2.5" % Test
 )
 
-dependencyOverrides += "org.scala-lang.modules" %% "scala-xml" % "1.0.4"
+dependencyOverrides ++= Set(
+  "com.fasterxml.jackson.core" % "jackson-core"        % "2.3.2",
+  "com.fasterxml.jackson.core" % "jackson-databind"    % "2.3.2",
+  "com.fasterxml.jackson.core" % "jackson-annotations" % "2.3.2",
+  "commons-logging"            % "commons-logging"     % "1.1.3",
+  "org.apache.httpcomponents"  % "httpclient"          % "4.3.4",
+  "org.scala-lang.modules"     %% "scala-xml"          % "1.0.4"
+)
 
 
 fatArtifactSettings
