@@ -13,12 +13,11 @@ import java.io.File
 
 case object gis extends Bundle() {
   val bucket = "resources.ohnosequences.com"
-  // FIXME: this is wrong file:
-  val name = "era7.16S.reference.sequences.blastdb"
-  val key = s"16s/${name}.tgz"
+  val name = "gi_taxid_nucl.dmp"
+  val key = s"16s/${name}"
 
-  val destination: File = new File(s"${name}.tgz")
-  val location: File = new File(name)
+  val destination: File = new File(name)
+  val location: File = destination
 
   def instructions: AnyInstructions = {
 
@@ -33,7 +32,6 @@ case object gis extends Bundle() {
       val transfer = transferManager.download(bucket, key, destination)
       transfer.waitForCompletion
     } -&-
-    cmd("tar")("xvf", destination.getCanonicalPath) -&-
     say(s"GIs database ${name} was dowloaded and unpacked to ${location.getCanonicalPath}")
   }
 
@@ -72,6 +70,7 @@ case object gisTest {
   case object gisMapTest extends Bundle(gis) {
 
     def instructions: AnyInstructions = {
+      println("Starting test")
       lazy val bigMap = gis.giTaxIdMap
       testMap.forall { case (k, v) =>
         bigMap(k) == v

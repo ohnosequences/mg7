@@ -66,7 +66,7 @@ class ApplicationTest extends FunSuite with ParallelTestExecution {
     import gisTest._
 
     val specs = gisCompat.instanceSpecs(
-      instanceType = m3_medium,
+      instanceType = m3_xlarge,
       user.awsAccount.keypair.name,
       Some(era7.aws.roles.projects.name)
     )
