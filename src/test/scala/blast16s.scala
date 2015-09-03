@@ -48,7 +48,7 @@ class ApplicationTest extends FunSuite with ParallelTestExecution {
     }
   }
 
-  test("testing blast16s bundle") {
+  ignore("testing blast16s bundle") {
     val specs = blast16sCompat.instanceSpecs(
       instanceType = m3_medium,
       user.awsAccount.keypair.name,

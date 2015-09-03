@@ -6,12 +6,12 @@ class LCATest extends org.scalatest.FunSuite {
 
   object defs {
 
-    case object root extends TaxonNode {
+    case object root extends AnyTaxonNode {
       val id = "root"
       val parent = None
     }
 
-    class node(p: TaxonNode) extends TaxonNode {
+    class node(p: AnyTaxonNode) extends AnyTaxonNode {
       val id = this.toString
       val parent = Some(p)
     }
@@ -68,7 +68,7 @@ class LCATest extends org.scalatest.FunSuite {
 
   test("most specific node or lowest common ancestor") {
 
-    def ref(n: TaxonNode): Either[Path, Path] = Left(pathToTheRoot(l1, Seq()))
+    def ref(n: AnyTaxonNode): Either[Path, Path] = Left(pathToTheRoot(l1, Seq()))
 
     assertResult( LCA(List(root, c1, c2)) ) {
       solution(List(l1, r3))

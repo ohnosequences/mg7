@@ -17,8 +17,6 @@ import org.apache.commons.configuration.BaseConfiguration
 
 
 case object bio4jTaxonomy extends Bundle() {
-
-  // val region = "eu-west-1"
   val bucket = "resources.ohnosequences.com"
   val key = "16s/bio4j"
 
@@ -53,7 +51,6 @@ case object bio4jTaxonomy extends Bundle() {
     new TitanNCBITaxonomyGraph(
       new DefaultTitanGraph(TitanFactory.open(conf))
     )
-  // lazy val byId = graph.nCBITaxonIdIndex
 }
 
 
