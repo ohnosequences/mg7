@@ -3,17 +3,24 @@ package ohnosequences.metagenomica.loquats.blast
 import  ohnosequences.metagenomica._, bundles._
 
 import ohnosequences.loquat._, dataProcessing._
+
 import ohnosequences.statika.bundles._
 import ohnosequences.statika.instructions._
 import ohnosequencesBundles.statika.Blast
-import ohnosequences.blast._, api._, data._
-import ohnosequences.cosas._, typeSets._, types._, properties._
-import ohnosequences.datasets._, dataSets._, fileLocations._, illumina._, reads._
-import java.io.{ BufferedWriter, FileWriter, File }
-import ohnosequences.fastarious._, fasta._, fastq._
+
 import ohnosequences.blast._, api._, data._, outputFields._
 
-case object blastInstructions {
+import ohnosequences.cosas._, types._, typeSets._, properties._, records._
+import ops.typeSets._
+
+import ohnosequences.datasets._, dataSets._, fileLocations._, illumina._, reads._
+
+import ohnosequences.fastarious._, fasta._, fastq._
+
+import java.io.{ BufferedWriter, FileWriter, File }
+
+
+case object blastDataProcessing {
 
   case object blastBundle extends Blast("2.2.31")
 
@@ -31,7 +38,7 @@ case object blastInstructions {
     sgi       :&: □
   )
   case object blastExprType extends BlastExpressionType(blastn)(outRec)
-  case object outputType extends BlastOutputType(blastExprType, "blastn.blablabla")
+  case object blastOutputType extends BlastOutputType(blastExprType, "blastn.blablabla")
 
   private def blastExpr(args: ValueOf[blastn.Arguments]): BlastExpression[blastExprType.type] = {
     BlastExpression(blastExprType)(
@@ -66,7 +73,8 @@ case object blastInstructions {
 
     def instructions: AnyInstructions = say("Let the blasting begin!")
 
-    val bundleDependencies: List[AnyBundle] = List[AnyBundle](blastBundle, blast16s)
+    // this is defined in the constructor
+    // val bundleDependencies: List[AnyBundle] = List[AnyBundle](blastBundle, blast16s)
 
     type FastqInput <: AnyData
     val  fastqInput: FastqInput
@@ -74,8 +82,8 @@ case object blastInstructions {
     type BlastOutput <: AnyBlastOutput
     val  blastOutput: BlastOutput
 
-    type Input  = FastqInput :^: DNil
-    type Output = BlastOutput :^: DNil
+    type Input  <: FastqInput :^: DNil
+    type Output <: BlastOutput :^: DNil
 
     // What's this?
     // private def blastOutputFile(context: Context): File = (context / "mapping.out").javaFile
@@ -129,6 +137,24 @@ case object blastInstructions {
       )
 
     }
+  }
+
+
+  class BlastDataProcessing[
+    F <: AnyData,
+    B <: AnyBlastOutput
+  ](val fastqInput: F,
+    val blastOutput: B
+  )(implicit
+    parseInputFiles: ParseDenotations[(F :^: DNil)#LocationsAt[FileDataLocation], File],
+    outputFilesToMap: ToMap[(B :^: DNil)#LocationsAt[FileDataLocation], AnyData, FileDataLocation]
+  ) extends DataProcessingBundle(blastBundle, blast16s)(
+    input = fastqInput :^: DNil,
+    output = blastOutput :^: DNil
+  )(parseInputFiles, outputFilesToMap) with AnyBlastDataProcessing {
+
+    type FastqInput = F
+    type BlastOutput = B
   }
 
 }
