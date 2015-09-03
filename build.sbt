@@ -18,7 +18,8 @@ libraryDependencies ++= Seq(
   "ohnosequences"         %% "flash"         % "0.1.0-SNAPSHOT",
   "ohnosequences"         %% "blast"         % "0.1.0-SNAPSHOT",
   "ohnosequences"         %% "fastarious"    % "0.1.0-SNAPSHOT",
-  "bio4j"                 %  "bio4j"         % "0.12.0-RC1",
+  "bio4j"                 %  "bio4j"         % "0.12.0-SNAPSHOT",
+  "bio4j"                 %  "bio4j-titan"   % "0.4.0-SNAPSHOT",
   // generic tools:
   "ohnosequences"         %% "cosas"         % "0.7.0-SNAPSHOT",
   "ohnosequences"         %% "loquat"        % "2.0.0-SNAPSHOT",
@@ -40,8 +41,10 @@ dependencyOverrides ++= Set(
   "com.fasterxml.jackson.core" % "jackson-databind"    % "2.3.2",
   "com.fasterxml.jackson.core" % "jackson-annotations" % "2.3.2",
   "commons-logging"            % "commons-logging"     % "1.1.3",
+  "commons-codec"              % "commons-codec"       % "1.7",
   "org.apache.httpcomponents"  % "httpclient"          % "4.3.4",
-  "org.scala-lang.modules"     %% "scala-xml"          % "1.0.4"
+  "org.scala-lang.modules"     %% "scala-xml"          % "1.0.4",
+  "org.slf4j"                  % "slf4j-api"           % "1.7.7"
 )
 
 

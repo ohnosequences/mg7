@@ -7,6 +7,7 @@ case object taxonomyTree {
   trait TaxonNode {
 
     val id: String
+    // TODO: any other usefule information (i.e. name)
 
     // root doesn't have parent
     val parent: Option[TaxonNode]
