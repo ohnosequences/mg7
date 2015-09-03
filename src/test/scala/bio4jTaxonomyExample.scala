@@ -23,7 +23,7 @@ case object bio4jTaxonomyExample {
   }
 
   // the graph; its only (direct) use is for indexes and types
-  lazy val g = new TitanNCBITaxonomyGraph( new DefaultTitanGraph(TitanFactory.open(conf)) )
+  lazy val g: TitanNCBITaxonomyGraph = new TitanNCBITaxonomyGraph( new DefaultTitanGraph(TitanFactory.open(conf)) )
   lazy val byId = g.nCBITaxonIdIndex
 
   import g._

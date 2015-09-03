@@ -1,13 +1,11 @@
 package ohnosequences.metagenomica.bio4j
 
-import com.bio4j.model.ncbiTaxonomy._
 
 case object taxonomyTree {
-
   trait TaxonNode {
 
-    val id: String
-    // TODO: any other usefule information (i.e. name)
+    // val id: String
+    // TODO: any other useful information (i.e. name)
 
     // root doesn't have parent
     val parent: Option[TaxonNode]
@@ -79,4 +77,30 @@ case object taxonomyTree {
   }
 
 
+  ///////////////////////////////////////////////////////////////////////
+  // import com.bio4j.model.ncbiTaxonomy._
+  // import com.bio4j.titan.model.ncbiTaxonomy._
+  import com.bio4j.titan.util.DefaultTitanGraph
+  import com.thinkaurelius.titan.core._, schema._
+
+  type TitanTaxon = com.bio4j.model.ncbiTaxonomy.vertices.NCBITaxon[
+    DefaultTitanGraph,
+    TitanVertex, VertexLabelMaker,
+    TitanEdge, EdgeLabelMaker
+  ]
+
+
+  def toOption[T](optional: java.util.Optional[T]): Option[T] = {
+    if (optional.isPresent) Some(optional.get) else None
+  }
+
+  case class TitanTaxonNode(titanTaxon: TitanTaxon) extends TaxonNode {
+
+    lazy val id: String = titanTaxon.id()
+
+    lazy val parent: Option[TitanTaxonNode] =
+      toOption(titanTaxon.ncbiTaxonParent_inV) map { p =>
+        TitanTaxonNode(p)
+      }
+  }
 }

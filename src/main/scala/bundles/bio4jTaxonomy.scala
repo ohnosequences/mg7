@@ -13,7 +13,6 @@ import java.io.File
 import com.thinkaurelius.titan.core._
 import com.bio4j.titan.model.ncbiTaxonomy._
 import com.bio4j.titan.util.DefaultTitanGraph
-import org.apache.commons.configuration.Configuration
 import org.apache.commons.configuration.BaseConfiguration
 
 
@@ -42,7 +41,7 @@ case object bio4jTaxonomy extends Bundle() {
     say(s"Taxonomy database was dowloaded to ${location.getCanonicalPath}")
   }
 
-  lazy val conf: Configuration = {
+  lazy val conf: BaseConfiguration = {
     val base = new BaseConfiguration()
     base.setProperty("storage.directory", location)
     base.setProperty("storage.backend", "berkeleyje")
@@ -50,8 +49,11 @@ case object bio4jTaxonomy extends Bundle() {
   }
 
   // the graph; its only (direct) use is for indexes
-  lazy val graph: TitanNCBITaxonomyGraph = new TitanNCBITaxonomyGraph( new DefaultTitanGraph(TitanFactory.open(conf)) )
-  lazy val byId = graph.nCBITaxonIdIndex
+  lazy val graph: TitanNCBITaxonomyGraph =
+    new TitanNCBITaxonomyGraph(
+      new DefaultTitanGraph(TitanFactory.open(conf))
+    )
+  // lazy val byId = graph.nCBITaxonIdIndex
 }
 
 
