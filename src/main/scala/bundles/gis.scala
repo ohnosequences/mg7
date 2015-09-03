@@ -11,9 +11,8 @@ import com.amazonaws.services.s3.transfer._
 import java.io.File
 
 
-case object gis extends Bundle() {
+sealed class GIsBundle(name: String) extends Bundle() {
   val bucket = "resources.ohnosequences.com"
-  val name = "gi_taxid_nucl.dmp"
   val key = s"16s/${name}"
 
   val destination: File = new File(name)
@@ -34,56 +33,43 @@ case object gis extends Bundle() {
     } -&-
     say(s"GIs database ${name} was dowloaded and unpacked to ${location.getCanonicalPath}")
   }
-
-  def giTaxIdMap: Map[Int, Int] = {
-    // just two numbers separated with spaces
-    val pattern = """(\d+)\s+(\d+).*""".r
-
-    io.Source.fromFile(location).getLines.map {
-      case pattern(gi, taxId) => gi.toInt -> taxId.toInt
-      // throwing an error, what else can we do...
-      case _ => throw new Error("Wrong GIs file, can't parse something")
-    }.toMap
-  }
 }
 
+/* This is what will be used in the assignment loquat */
+case object filteredGIs extends GIsBundle("gi_taxid_filtered.csv")
 
-case object gisTest {
+
+case object filtering {
 
   import ohnosequences.statika.aws._, api._, amazonLinuxAMIs._
   import ohnosequences.awstools.regions.Region._
 
-  // just head of that dmp
-  val testMap: Map[Int, Int] = Map(
-    2  -> 9913,
-    3  -> 9913,
-    4  -> 9646,
-    5  -> 9913,
-    7  -> 9913,
-    9  -> 9913,
-    11 -> 9913,
-    13 -> 9913,
-    15 -> 9915,
-    16 -> 9771
-  )
+  case object originalGIs extends GIsBundle("gi_taxid_nucl.dmp")
 
-  case object gisMapTest extends Bundle(gis) {
+  // this is applied only once:
+  case object filterGIs extends Bundle(blast16s, originalGIs) {
+
+    // def giTaxIdMap: Map[Int, Int] = {
+    //   // just two numbers separated with spaces
+    //   val pattern = """(\d+)\s+(\d+).*""".r
+    //
+    //   io.Source.fromFile(location).getLines.map {
+    //     case pattern(gi, taxId) => gi.toInt -> taxId.toInt
+    //     // throwing an error, what else can we do...
+    //     case _ => throw new Error("Wrong GIs file, can't parse something")
+    //   }.toMap
+    // }
 
     def instructions: AnyInstructions = {
-      println("Starting test")
-      lazy val bigMap = gis.giTaxIdMap
-      testMap.forall { case (k, v) =>
-        bigMap(k) == v
-      } match {
-        case true  => say("everything's cool!")
-        case false => failure("something's wrong!")
-      }
+      println("Starting filtering")
+      // TODO: filter and upload the file
+      say("something")
     }
   }
 
-  case object gisCompat extends Compatible(
+  case object filterGIsCompat extends Compatible(
     amzn_ami_64bit(Ireland, Virtualization.HVM)(1),
-    gisMapTest,
+    filterGIs,
     generated.metadata.Metagenomica
   )
 
