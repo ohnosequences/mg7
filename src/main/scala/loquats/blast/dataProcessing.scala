@@ -13,7 +13,7 @@ import java.io.{ BufferedWriter, FileWriter, File }
 import ohnosequences.fastarious._, fasta._, fastq._
 import ohnosequences.blast._, api._, data._, outputFields._
 
-case object blastInstructions {
+case object blastDataProcessing {
 
   case object blastBundle extends Blast("2.2.31")
 
