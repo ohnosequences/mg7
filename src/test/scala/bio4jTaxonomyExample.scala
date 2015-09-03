@@ -33,4 +33,6 @@ case object bio4jTaxonomyExample {
   lazy val myTaxon: Option[Taxon] = (byId getVertex "ACF12431CC|ADFDA").asScala
 
   val u: Option[String] = myTaxon map { _.id }
+
+  val parent = myTaxon flatMap { _.ncbiTaxonParent_inV.asScala }
 }
