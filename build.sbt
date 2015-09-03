@@ -44,8 +44,20 @@ dependencyOverrides ++= Set(
   "commons-codec"              % "commons-codec"       % "1.7",
   "org.apache.httpcomponents"  % "httpclient"          % "4.3.4",
   "org.scala-lang.modules"     %% "scala-xml"          % "1.0.4",
+<<<<<<< HEAD
   "org.slf4j"                  % "slf4j-api"           % "1.7.7"
+=======
+  "org.slf4j" % "slf4j-api" % "1.7.7"
+>>>>>>> 1e1250419071422cd38a1f1a9a6af13582092557
 )
+
+  // "com.fasterxml.jackson.core" % "jackson-core" % "2.1.2",
+  // "com.fasterxml.jackson.core" % "jackson-databind" % "2.1.2",
+  // "com.fasterxml.jackson.core" % "jackson-annotations" % "2.1.1",
+  // "commons-beanutils" % "commons-beanutils" % "1.8.3",
+  // "commons-beanutils" % "commons-beanutils-core" % "1.8.3"
+
+
 
 
 fatArtifactSettings
