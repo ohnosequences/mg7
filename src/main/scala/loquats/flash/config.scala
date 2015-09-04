@@ -1,4 +1,4 @@
-package ohnosequences.metagenomica.flash
+package ohnosequences.metagenomica.loquats.flash
 
 import ohnosequences.datasets._, dataSets._, fileLocations._, s3Locations._, illumina._, reads._
 
