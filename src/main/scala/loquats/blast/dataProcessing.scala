@@ -44,7 +44,7 @@ case object blastDataProcessing {
     BlastExpression(blastExprType)(
       argumentValues  = args,
       // TODO whatever
-      optionValues    = blastn.defaults update (num_threads(24) :~: ∅)
+      optionValues    = blastn.defaults update (num_threads(1) :~: ∅)
     )
   }
 
