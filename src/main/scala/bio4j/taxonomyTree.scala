@@ -5,13 +5,13 @@ package ohnosequences.metagenomica.bio4j
 case object taxonomyTree {
 
   /* This is just an abstract representation of the taxonomy tree nodes */
-  trait AnyTaxonNode {
+  trait AnyTaxonNode extends Any {
 
-    val id: String
+    def id: String
     // TODO: any other useful information (i.e. name)
 
     // root doesn't have parent
-    val parent: Option[AnyTaxonNode]
+    def parent: Option[AnyTaxonNode]
   }
 
   /* Path in the tree stores a sequence of nodes from top to bottom */

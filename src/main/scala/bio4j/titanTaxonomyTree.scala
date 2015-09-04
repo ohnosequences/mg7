@@ -16,16 +16,16 @@ case object titanTaxonomyTree {
   ]
 
   // Java to Scala
-  def optional[T](jopt: java.util.Optional[T]): Option[T] = {
+  final def optional[T](jopt: java.util.Optional[T]): Option[T] = {
     if (jopt.isPresent) Some(jopt.get) else None
   }
 
   /* Particular instance of AnyTaxonNode */
-  case class TitanTaxonNode(titanTaxon: TitanNCBITaxon) extends AnyTaxonNode {
+  case class TitanTaxonNode(titanTaxon: TitanNCBITaxon) extends AnyVal with AnyTaxonNode {
 
-    lazy val id: String = titanTaxon.id()
+    def id: String = titanTaxon.id()
 
-    lazy val parent: Option[TitanTaxonNode] =
+    def parent: Option[TitanTaxonNode] =
       optional(titanTaxon.ncbiTaxonParent_inV) map TitanTaxonNode
   }
 
