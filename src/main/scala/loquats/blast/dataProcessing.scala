@@ -63,7 +63,7 @@ case object blastDataProcessing {
 
     val bw = new BufferedWriter(new FileWriter(file))
 
-    v.toLines foreach { l => bw.write(l) }
+    v.toLines foreach { l => bw.write(l); bw.newLine }
 
     bw.close()
     file
