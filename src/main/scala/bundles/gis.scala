@@ -47,23 +47,58 @@ case object filtering {
   case object originalGIs extends GIsBundle("gi_taxid_nucl.dmp")
 
   // this is applied only once:
-  case object filterGIs extends Bundle(blast16s, originalGIs) {
+  case object filterGIs extends Bundle(originalGIs) {
 
-    // def giTaxIdMap: Map[Int, Int] = {
-    //   // just two numbers separated with spaces
-    //   val pattern = """(\d+)\s+(\d+).*""".r
-    //
-    //   io.Source.fromFile(location).getLines.map {
-    //     case pattern(gi, taxId) => gi.toInt -> taxId.toInt
-    //     // throwing an error, what else can we do...
-    //     case _ => throw new Error("Wrong GIs file, can't parse something")
-    //   }.toMap
-    // }
+    val bucket = "resources.ohnosequences.com"
+
+    val referenceFileName = "reference.gis"
+    lazy val referenceFile = new File(referenceFileName)
+
+    val filteredFileName = "filtered.gis"
+    lazy val filteredFile = new File(filteredFileName)
+
+    def key(name: String) = s"16s/${name}"
+
 
     def instructions: AnyInstructions = {
-      println("Starting filtering")
-      // TODO: filter and upload the file
-      say("something")
+
+      lazy val transferManager = new TransferManager(new InstanceProfileCredentialsProvider())
+
+      // downloading reference GIs file
+      LazyTry {
+        println(s"""Dowloading
+          |from: s3://${bucket}/${key(referenceFileName)}
+          |to: ${referenceFile.getCanonicalPath}
+          |""".stripMargin)
+
+        transferManager.download(bucket, key(referenceFileName), referenceFile).waitForCompletion
+      } -&-
+      LazyTry {
+        val refGIs: Set[String] = io.Source.fromFile( referenceFile ).getLines.toSet
+
+        import com.github.tototoshi.csv._
+        val csvReader = CSVReader.open(originalGIs.location)(new TSVFormat {})
+        val csvWriter = CSVWriter.open(filteredFile, append = true)(new TSVFormat {})
+
+        // iterating over huge GIs file and filtering it
+        csvReader foreach { row =>
+          if ( refGIs.contains(row(0)) ) {
+            csvWriter.writeRow(row)
+            // println("added: " + row.mkString("\t"))
+          }
+        }
+
+        csvReader.close
+        csvWriter.close
+      } -&-
+      LazyTry {
+        println(s"""Uploading
+          |from: ${filteredFile.getCanonicalPath}
+          |to: s3://${bucket}/${key(filteredFileName)}
+          |""".stripMargin)
+
+        transferManager.upload(bucket, key(filteredFileName), filteredFile).waitForCompletion
+      }
     }
   }
 
