@@ -74,7 +74,7 @@ case object blastDataProcessing {
 
     val bw = new BufferedWriter(new FileWriter(to, true))
 
-    io.Source.fromFile(append).getLines foreach { l => bw write l }
+    io.Source.fromFile(append).getLines foreach { l => bw write l; bw.newLine }
 
     bw.close
     to
