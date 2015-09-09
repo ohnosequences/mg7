@@ -109,8 +109,11 @@ case object blastDataProcessing {
 
       LazyTry {
         lazy val quartets = io.Source.fromFile( context.file(fastqInput).javaFile ).getLines.grouped(4)
+        println(s"HAS NEXT: ${quartets.hasNext}")
 
-        quartets map { quartet =>
+        quartets foreach { quartet =>
+          println("======================")
+          println(quartet.mkString("\n"))
 
           // we only care about the id and the seq here
           val read = FASTA(
@@ -122,17 +125,18 @@ case object blastDataProcessing {
           val outFile = context / "blastRead.csv"
 
           val args = blastn.arguments(
-            db(blast16s.location) :~:
+            db(blast16s.dbName) :~:
             query(readFile) :~:
             out(outFile) :~:
             ∅
           )
 
           val expr = blastExpr(args)
+          println(expr.cmd.mkString(" "))
 
           // BAM!!!
-          val foo = expr.cmd.!!
-          println(foo)
+          val foo = expr.cmd.!
+          println(s"EXIT CODE: ${foo}")
 
           // we should have something in args getV out now. Append it!
           appendTo(outFile, totalOutput)

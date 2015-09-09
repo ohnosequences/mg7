@@ -18,8 +18,8 @@ case object blast16s extends Bundle() {
   val key = s"16s/${name}.tgz"
 
   val destination: File = new File(s"${name}.tgz")
-
   val location: File = new File(name)
+  val dbName: File = new File(s"${name}/${name}.fasta")
 
   def instructions: AnyInstructions = {
 
