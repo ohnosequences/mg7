@@ -35,7 +35,6 @@ case object blast16s extends Bundle() {
       transfer.waitForCompletion
     } -&-
     cmd("tar")("xvf", destination.getCanonicalPath) -&-
-    cmd("ls")("-la", location.getCanonicalPath) -&-
     say(s"Reference database ${name} was dowloaded to ${location.getCanonicalPath}")
 
   }

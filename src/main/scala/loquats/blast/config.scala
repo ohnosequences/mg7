@@ -47,7 +47,7 @@ case object blastTest {
   implicit def genericParser[D <: AnyData](implicit d: D): DenotationParser[D, FileDataLocation, File] =
     new DenotationParser(d, d.label)({ f: File => Some(FileDataLocation(f)) })
 
-  case object FastqDataType extends AnyDataType { val label = "fastq" }
+  case object FastqDataType extends AnyDataType
   case object fastqInput extends Data(FastqDataType, "foo.fastq")
 
 

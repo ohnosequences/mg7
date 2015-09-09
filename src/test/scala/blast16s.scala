@@ -48,7 +48,7 @@ class ApplicationTest extends FunSuite with ParallelTestExecution {
     }
   }
 
-  test("testing blast16s bundle") {
+  ignore("testing blast16s bundle") {
     val specs = blast16sCompat.instanceSpecs(
       instanceType = m3_medium,
       user.awsAccount.keypair.name,
@@ -56,6 +56,20 @@ class ApplicationTest extends FunSuite with ParallelTestExecution {
     )
 
     val instances = launchAndWait(ec2, blast16sCompat.name, specs)
+    // instances.foreach{ _.terminate }
+    assert{ instances.length == 1 }
+  }
+
+  test("testing blast bundle") {
+    import ohnosequences.metagenomica.loquats.blast.blastDataProcessing._
+
+    val specs = blastCompat.instanceSpecs(
+      instanceType = m3_medium,
+      user.awsAccount.keypair.name,
+      Some(era7.aws.roles.projects.name)
+    )
+
+    val instances = launchAndWait(ec2, blastCompat.name, specs)
     // instances.foreach{ _.terminate }
     assert{ instances.length == 1 }
   }

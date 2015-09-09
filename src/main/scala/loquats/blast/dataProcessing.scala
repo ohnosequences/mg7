@@ -24,6 +24,15 @@ case object blastDataProcessing {
 
   case object blastBundle extends Blast("2.2.31")
 
+  import ohnosequences.statika.aws._, api._, amazonLinuxAMIs._
+  import ohnosequences.awstools.regions.Region._
+
+  case object blastCompat extends Compatible(
+    amzn_ami_64bit(Ireland, Virtualization.HVM)(1),
+    blastBundle,
+    generated.metadata.Metagenomica
+  )
+
   // TODO with great power comes great responsibility. Move to conf
   case object outRec extends BlastOutputRecord(
     qseqid    :&:
@@ -99,34 +108,31 @@ case object blastDataProcessing {
 
       lazy val steps: Iterator[AnyInstructions] = quartets map { quartet =>
 
-        LazyTry {
-          // we only care about the id and the seq here
-          val read = FASTA(
-              header(FastqId(quartet(0)).toFastaHeader) :~:
-              fasta.sequence(FastaLines(quartet(1)))    :~: ∅
-            )
-
-          val readFile = writeFastaToFile(read, context / "read.fa")
-          val outFile = context / "blastRead.csv"
-
-          val args = blastn.arguments(
-            db(blast16s.location) :~:
-            query(readFile) :~:
-            out(outFile) :~:
-            ∅
+        // we only care about the id and the seq here
+        val read = FASTA(
+            header(FastqId(quartet(0)).toFastaHeader) :~:
+            fasta.sequence(FastaLines(quartet(1)))    :~: ∅
           )
 
-          val expr = blastExpr(args)
+        val readFile = writeFastaToFile(read, context / "read.fa")
+        val outFile = context / "blastRead.csv"
 
-          // run!
-          import scala.sys.process._
-          expr.cmd.!
+        val args = blastn.arguments(
+          db(blast16s.location) :~:
+          query(readFile) :~:
+          out(outFile) :~:
+          ∅
+        )
 
-          // we should have something in args getV out now. Append it!
+        val expr = blastExpr(args)
+
+        seqToInstructions(expr.cmd) -&-
+        LazyTry { // we should have something in args getV out now. Append it!
           appendTo(expr.argumentValues getV out, totalOutput)
-
-          // clean
-          readFile.delete; outFile.delete
+        } -&-
+        LazyTry{ // clean
+          readFile.delete
+          outFile.delete
         }
       }
 
