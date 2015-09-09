@@ -19,6 +19,8 @@ import ohnosequences.fastarious._, fasta._, fastq._
 
 import java.io.{ BufferedWriter, FileWriter, File }
 
+import sys.process._
+
 
 case object blastDataProcessing {
 
@@ -68,6 +70,7 @@ case object blastDataProcessing {
   }
 
   private def appendTo(append: File, to: File): File = {
+    println(s"Appending [${append.getCanonicalPath}] to [${to.getCanonicalPath}]")
 
     val bw = new BufferedWriter(new FileWriter(to, true))
 
@@ -104,39 +107,41 @@ case object blastDataProcessing {
 
       val totalOutput = context / "blastAll.csv"
 
-      lazy val quartets = io.Source.fromFile( context.file(fastqInput).javaFile ).getLines.grouped(4)
+      LazyTry {
+        lazy val quartets = io.Source.fromFile( context.file(fastqInput).javaFile ).getLines.grouped(4)
 
-      lazy val steps: Iterator[AnyInstructions] = quartets map { quartet =>
+        quartets map { quartet =>
 
-        // we only care about the id and the seq here
-        val read = FASTA(
-            header(FastqId(quartet(0)).toFastaHeader) :~:
-            fasta.sequence(FastaLines(quartet(1)))    :~: ∅
+          // we only care about the id and the seq here
+          val read = FASTA(
+              header(FastqId(quartet(0)).toFastaHeader) :~:
+              fasta.sequence(FastaLines(quartet(1)))    :~: ∅
+            )
+
+          val readFile = writeFastaToFile(read, context / "read.fa")
+          val outFile = context / "blastRead.csv"
+
+          val args = blastn.arguments(
+            db(blast16s.location) :~:
+            query(readFile) :~:
+            out(outFile) :~:
+            ∅
           )
 
-        val readFile = writeFastaToFile(read, context / "read.fa")
-        val outFile = context / "blastRead.csv"
+          val expr = blastExpr(args)
 
-        val args = blastn.arguments(
-          db(blast16s.location) :~:
-          query(readFile) :~:
-          out(outFile) :~:
-          ∅
-        )
+          // BAM!!!
+          val foo = expr.cmd.!!
+          println(foo)
 
-        val expr = blastExpr(args)
+          // we should have something in args getV out now. Append it!
+          appendTo(outFile, totalOutput)
 
-        seqToInstructions(expr.cmd) -&-
-        LazyTry { // we should have something in args getV out now. Append it!
-          appendTo(expr.argumentValues getV out, totalOutput)
-        } -&-
-        LazyTry{ // clean
+          // clean
           readFile.delete
           outFile.delete
         }
-      }
-
-      steps.foldLeft[AnyInstructions](say("processing quartets"))( _ -&- _ ) -&-
+      } -&-
       success(
         "much blast, very success!",
         blastOutput.inFile(totalOutput) :~: ∅
