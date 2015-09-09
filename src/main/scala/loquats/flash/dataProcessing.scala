@@ -60,7 +60,7 @@ trait AnyFlashDataProcessing extends AnyDataProcessingBundle {
     // run expression, hope for the best
     cmd("gunzip")(reads1gz) -&-
     cmd("gunzip")(reads2gz) -&-
-    flashExpr.cmd -&-
+    seqToInstructions(flashExpr.cmd) -&-
     success(
       s"FLASh merged reads from ${dataMappingId}, much success so fast",
       (data.merged: Data#Merged).inFile(flashOutput.mergedReads)           :~:

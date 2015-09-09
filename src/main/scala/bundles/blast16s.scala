@@ -34,8 +34,7 @@ case object blast16s extends Bundle() {
       val transfer = transferManager.download(bucket, key, destination)
       transfer.waitForCompletion
     } -&-
-    cmd("tar")("xvf", destination.getCanonicalPath) -&-
-    cmd("ls")("-la", location.getCanonicalPath) -&-
+    cmd("tar")("-xvzf", destination.getCanonicalPath) -&-
     say(s"Reference database ${name} was dowloaded to ${location.getCanonicalPath}")
 
   }
