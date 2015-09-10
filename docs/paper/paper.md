@@ -144,6 +144,14 @@ General approach. An analysis is defined as a software project. It can evolve in
 - **Decoupling** We can start working on the analysis specification, without any need for data in a much easier way.
 - **Expresiveness and safety** choose only from valid Illumina read types, build default FLASH command based on that, ...
 
+## 3.x Using MG7 with some example data-sets
+
+<!-- ?? -->
+We selected the datasets described in [Kennedy-2014] (??)
+
+## 3.7 MG7 availability
+
+MG7 is open source, available at https://github.com/ohnosequences/mg7 under an [AGPLv3](http://www.gnu.org/licenses/agpl-3.0.en.html) license.
 
 # 4. Discussion
 
