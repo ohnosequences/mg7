@@ -29,7 +29,7 @@ libraryDependencies ++= Seq(
   // bundles:
   "ohnosequences-bundles" %% "flash"         % "0.1.0-SNAPSHOT",
   "ohnosequences-bundles" %% "blast"         % "0.2.0-SNAPSHOT",
-  "ohnosequences-bundles" %% "bio4j-dist"    % "0.1.0-SNAPSHOT",
+  // "ohnosequences-bundles" %% "bio4j-dist"    % "0.1.0-SNAPSHOT",
   // utils:
   "era7"                  %% "project-utils" % "0.1.0-SNAPSHOT",
   // testing:
