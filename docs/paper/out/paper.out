@@ -1,0 +1,31 @@
+\BOOKMARK [1][-]{section.1}{1. Introduction}{}% 1
+\BOOKMARK [1][-]{section.2}{2. Materials and Methods}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{2.x Amazon Web Services}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{2.x Scala}{section.2}% 4
+\BOOKMARK [2][-]{subsection.2.3}{2.x Statika}{section.2}% 5
+\BOOKMARK [2][-]{subsection.2.4}{2.x Datasets}{section.2}% 6
+\BOOKMARK [2][-]{subsection.2.5}{2.x Loquat}{section.2}% 7
+\BOOKMARK [2][-]{subsection.2.6}{2.x Type-safe DSLs for BLAST and FLASH}{section.2}% 8
+\BOOKMARK [3][-]{subsubsection.2.6.1}{2.x.a BLAST DSL}{subsection.2.6}% 9
+\BOOKMARK [3][-]{subsubsection.2.6.2}{2.x.b FLASH DSL}{subsection.2.6}% 10
+\BOOKMARK [2][-]{subsection.2.7}{2.x Bio4j}{section.2}% 11
+\BOOKMARK [1][-]{section.3}{3. Results}{}% 12
+\BOOKMARK [2][-]{subsection.3.1}{3.1 Overview}{section.3}% 13
+\BOOKMARK [2][-]{subsection.3.2}{3.x 16S Reference Database Construction}{section.3}% 14
+\BOOKMARK [2][-]{subsection.3.3}{3.x Bio4j and Graph Databases}{section.3}% 15
+\BOOKMARK [2][-]{subsection.3.4}{3.x MG7 Pipeline Description}{section.3}% 16
+\BOOKMARK [2][-]{subsection.3.5}{3.x Taxonomic Assignment Algorithms}{section.3}% 17
+\BOOKMARK [3][-]{subsubsection.3.5.1}{3.x.y Lowest Common Ancestor based Taxonomic Assignment}{subsection.3.5}% 18
+\BOOKMARK [3][-]{subsubsection.3.5.2}{3.x.z Best BLAST hit taxonomic assignment}{subsection.3.5}% 19
+\BOOKMARK [2][-]{subsection.3.6}{3.x Other}{section.3}% 20
+\BOOKMARK [2][-]{subsection.3.7}{3.x Using MG7 with some example data-sets}{section.3}% 21
+\BOOKMARK [2][-]{subsection.3.8}{3.7 MG7 availability}{section.3}% 22
+\BOOKMARK [1][-]{section.4}{4. Discussion}{}% 23
+\BOOKMARK [2][-]{subsection.4.1}{4.1 Novelty points of MG7}{section.4}% 24
+\BOOKMARK [2][-]{subsection.4.2}{4.2 Designed for future challenges}{section.4}% 25
+\BOOKMARK [2][-]{subsection.4.3}{4.3 MG7 Future developments}{section.4}% 26
+\BOOKMARK [3][-]{subsubsection.4.3.1}{4.3.1 Comparison of groups of samples}{subsection.4.3}% 27
+\BOOKMARK [3][-]{subsubsection.4.3.2}{4.3.2 Interactive visualizations using the output files of MG7 \(Biographika project\)}{subsection.4.3}% 28
+\BOOKMARK [1][-]{section.5}{5 Acknowledgements}{}% 29
+\BOOKMARK [1][-]{section.6}{6 References}{}% 30
+\BOOKMARK [1][-]{section.7}{7 Tables and Figures}{}% 31

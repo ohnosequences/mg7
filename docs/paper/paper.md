@@ -1,5 +1,42 @@
 ---
-keywords:[Metagenomics, 16S, Bacterial diversity profile, Bio4j, Graph databases, Cloud computing, NGS, Genomic big data]
+title: "MG7: Configurable and scalable 16S metagenomics data analysis -- new methods optimized for massive cloud computing"
+
+authors:
+- name: Alexey Alekhin
+  affiliation: "_[oh no sequences!](http://ohnosequences.com)_ research group, [Era7 bioinformatics](http://www.era7bioinformatics.com)"
+  email: "aalekhin@ohnosequences.com"
+  position: 1
+- name: Evdokim Kovach
+  affiliation: "_[oh no sequences!](http://ohnosequences.com)_ research group, [Era7 bioinformatics](http://www.era7bioinformatics.com)"
+  email: "ekovach@ohnosequences.com"
+  position: 2
+- name: Marina Manrique
+  affiliation: "_[oh no sequences!](http://ohnosequences.com)_ research group, [Era7 bioinformatics](http://www.era7bioinformatics.com)"
+  email: "mmanrique@era7.com"
+  position: 3
+- name: Pablo Pareja
+  affiliation: "_[oh no sequences!](http://ohnosequences.com)_ research group, [Era7 bioinformatics](http://www.era7bioinformatics.com)"
+  email: "ppareja@ohnosequences.com"
+  position: 4
+- name: Eduardo Pareja
+  affiliation: "_[oh no sequences!](http://ohnosequences.com)_ research group, [Era7 bioinformatics](http://www.era7bioinformatics.com)"
+  email: "epareja@era7.com"
+  position: 5
+- name: Raquel Tobes
+  affiliation: "_[oh no sequences!](http://ohnosequences.com)_ research group, [Era7 bioinformatics](http://www.era7bioinformatics.com)"
+  email: "rtobes@era7.com"
+  position: 6
+
+correspondingAuthor:
+  name: Eduardo Pareja-Tobes
+  affiliation: "_[oh no sequences!](http://ohnosequences.com)_ research group, [Era7 bioinformatics](http://www.era7bioinformatics.com)"
+  email: "eparejatobes@ohnosequences.com"
+  position: 7
+
+abstract: |
+  No abstract yet. Will be here.
+
+keywords: "Metagenomics, 16S, Bacterial diversity profile, Bio4j, Graph databases, Cloud computing, NGS, Genomic big data"
 ---
 
 # 1. Introduction
