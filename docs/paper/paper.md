@@ -86,11 +86,11 @@ In the case of BLAST we use a model for expressions where we can guarantee for e
 - correct types for each option value
 - valid output record specification
 
-Generic type-safe parsers returning an heterogeneous record of BLAST output fields are also available, together with output data defined using *Datasets* which have a reference to the exact BLAST command options which yielded that output.
+Generic type-safe parsers returning an heterogeneous record of BLAST output fields are also available, together with output data defined using *Datasets* which have a reference to the exact BLAST command options which yielded that output. This let us provide generic parsers for BLAST output which are guaranteed to be correct, for example.
 
 ### 2.x.b FLASH DSL
-
-In the same spirit as for BLAST, ...
+<!-- TODO write something about this -->
+In the same spirit as for BLAST,
 
 ## 2.x Amazon Web Services
 
