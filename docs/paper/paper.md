@@ -66,11 +66,17 @@ A **location** can be, for example, an S3 object or a local file; by leaving the
 
 ## 2.x Loquat
 
-[Loquat](https://github.com/ohnosequences/loquat) is a library developed by so and so designed for the execution of embarrassingly parallel tasks using S3, SQS and EC2.
+[Loquat](https://github.com/ohnosequences/loquat) is a library developed by **so and so** designed for the execution of embarrassingly parallel tasks using S3, SQS and EC2.
 
-At the core there is a process with explicit input and output datasets (declared using the *Datasets* library described above). Workers will read from a SQS queue particular instances for the input data, consisting on the corresponding data locations at S3, together with where the corresponding outputs need to be placed at S3. This process corresponds to a bundle (which can declare any dependencies needed to perform its task). The input S3 objects will then be downloaded as local files, the process executed on them and the outputs written to their respective locations at S3. A *loquat* thus comprises essentially the process to be executed, the AWS configuration, and a set of inputs on which to run this process. There are deploy and resource management methods, making it easy to use it either as a library or from (for example) a Scala REPL.
+A **loquat** executes a process with explicit input and output datasets (declared using the *Datasets* library described above). Workers (EC2 instances) read from an SQS queue the S3 locations for both input and output data; then they download the input to local files, and pass these file locations to the process to be executed. The output is then put in the corresponding S3 locations.
 
-The input and output (and their locations) being defined statically has several critical advantages. First, composing different loquats is easy and safe; just use the output types and locations of the first one as input for the second one.
+A manager instance is used to monitor workers, provide initial data to be put in the SQS queue and optionally release resources depending on a set of configurable conditions.
+
+Both worker and manager instances are Statika bundles. In the case of the worker, it can declare any dependencies needed to perform its task: other tools, libraries, or data.
+
+All configuration such as the number of workers or the instance types is declared statically, the specification of a loquat being ultimately a Scala object. There are deploy and resource management methods, making it easy to use an existing loquat either as a library or from (for example) a Scala REPL.
+
+The input and output (and their locations) being defined statically has several critical advantages. First, composing different loquats is easy and safe; just use the output types and locations of the first one as input for the second one. Second, data and their types help in not mixing different resources when implementing a process, while serving as a safe and convenient mechanism for writing generic processing tasks. For example, merging paired-end Illumina reads generically is easy as the data type includes the relevant information (insert size, read length, etc) to pass to a tool such as FLASH.
 
 ## 2.x Type-safe DSLs for BLAST and FLASH
 
