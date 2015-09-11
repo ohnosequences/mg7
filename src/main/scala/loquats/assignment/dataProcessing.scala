@@ -4,7 +4,7 @@ import  ohnosequences.metagenomica._
 
 import ohnosequences.metagenomica.bio4j._, taxonomyTree._, titanTaxonomyTree._
 
-import ohnosequences.loquat._, dataProcessing._
+import ohnosequences.loquat.dataProcessing._
 import ohnosequences.statika.bundles._
 import ohnosequences.statika.instructions._
 import ohnosequencesBundles.statika.Blast
@@ -18,15 +18,19 @@ import ohnosequences.blast._, api._, data._, outputFields._
 import scala.util.Try
 
 
-case object assignmentDataProcessing {
+case object dataProcessing {
 
   // TODO: move it to the config
   case object CSVDataType extends AnyDataType { val label = "fastq" }
   case object lcaCSV extends Data(CSVDataType, "lca.csv")
   case object bbhCSV extends Data(CSVDataType, "bbh.csv")
 
+  // type BlastOutput = loquats.blast.blastTest.blastOutput.type
+  val  blastOutput = loquats.blast.blastTest.blastOutput
+
   type BlastRecord = loquats.blast.blastDataProcessing.outRec.type
   val blastRecord: BlastRecord = loquats.blast.blastDataProcessing.outRec
+
   val headers: Seq[String] = blastRecord.properties.mapToList(typeLabel)
 
   // TODO: move it somewhere up for global use
@@ -43,26 +47,40 @@ case object assignmentDataProcessing {
   // TODO: move it somewhere up for global use
   def parseInt(str: String): Option[Int] = Try(str.toInt).toOption
 
+  // FIXME: this thing should be used globally (ideally it should be in datasets)
+  implicit def genericParser[D <: AnyData](implicit d: D): DenotationParser[D, FileDataLocation, File] =
+    new DenotationParser(d, d.label)({ f: File => Some(FileDataLocation(f)) })
 
-  trait AnyAssignmentDataProcessing extends AnyDataProcessingBundle {
+
+  case object assignmentDataProcessing extends DataProcessingBundle(
+    bundles.bio4jTaxonomy,
+    bundles.filteredGIs
+  )(input = blastOutput :^: DNil,
+    output = lcaCSV :^: bbhCSV :^: DNil
+  ) {
 
     def instructions: AnyInstructions = say("Let's see who is who!")
 
-    val bundleDependencies: List[AnyBundle] = List[AnyBundle](
-      bundles.bio4jTaxonomy,
-      bundles.filteredGIs
-    )
+    // val bundleDependencies: List[AnyBundle] = List[AnyBundle](
+    //   bundles.bio4jTaxonomy,
+    //   bundles.filteredGIs
+    // )
 
     // TODO: this should be setup from the global config
-    type BlastOutput <: AnyBlastOutput {
-      type BlastExpressionType <: AnyBlastExpressionType {
-        type OutputRecord = BlastRecord
-      }
-    }
-    val  blastOutput: BlastOutput
+    // type BlastOutput <: AnyBlastOutput {
+    //   type BlastExpressionType <: AnyBlastExpressionType {
+    //     type OutputRecord = BlastRecord
+    //   }
+    // }
+    // val  blastOutput: BlastOutput
 
-    type Input  <: BlastOutput :^: DNil
-    type Output <: lcaCSV.type :^: bbhCSV.type :^: DNil
+    // TODO: these thing should be setup from the global config
+    // type Input = blastOutput.type :^: DNil
+    // val  input = blastOutput :^: DNil
+    //
+    // type Output = lcaCSV.type :^: bbhCSV.type :^: DNil
+    // val  output = lcaCSV :^: bbhCSV :^: DNil
+
 
     def processData(
       dataMappingId: String,

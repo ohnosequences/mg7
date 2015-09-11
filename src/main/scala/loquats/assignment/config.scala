@@ -22,67 +22,70 @@ import era7.project.loquats._
 
 import java.io.File
 
-import assignmentDataProcessing._
+import ohnosequences.metagenomica.loquats.assignment.dataProcessing._
 
 
-trait AnyAssignmentConfig extends Era7LoquatConfig { config =>
+abstract class AnyAssignmentConfig extends Era7LoquatConfig { config =>
 
-  type DataProcessing <: AnyAssignmentDataProcessing
-  val  dataProcessing: DataProcessing
+  // type DataProcessing = assignmentDataProcessing.type
+  // val  dataProcessing = assignmentDataProcessing: DataProcessing
 
-  type AssignmentDataMapping = AnyDataMapping { type DataProcessing = config.DataProcessing }
+  type AssignmentDataMapping = AnyDataMapping { type DataProcessing = assignmentDataProcessing.type }
   val  dataMappings: List[AssignmentDataMapping]
 }
 
-abstract class AssignmentConfig[D <: AnyAssignmentDataProcessing](val dataProcessing: D) extends AnyAssignmentConfig {
-
-  type DataProcessing = D
-}
+// abstract class AssignmentConfig[D <: AnyAssignmentDataProcessing](val dataProcessing: D) extends AnyAssignmentConfig {
+//
+//   type DataProcessing = D
+// }
 
 //////////////////////////////////////////////////////////////////////////////////////
 
 case object assignmenTest {
 
-  // TODO: move it to datasets
-  implicit def genericParser[D <: AnyData](implicit d: D): DenotationParser[D, FileDataLocation, File] =
-    new DenotationParser(d, d.label)({ f: File => Some(FileDataLocation(f)) })
+  case object testConfig extends AnyAssignmentConfig {
 
-  // case object testDataProcessing extends AssignmentDataProcessing(fastqInput, blastOutput)
+    val metadata: AnyArtifactMetadata = generated.metadata.Metagenomica
 
-  // case object testConfig extends AssignmentConfig(testDataProcessing) {
-  //
-  //   val metadata: AnyArtifactMetadata = generated.metadata.Metagenomica
-  //
-  //   val managerConfig = ManagerConfig(
-  //     instanceType = m3_medium,
-  //     purchaseModel = SpotAuto
-  //   )
-  //
-  //   val workersConfig = WorkersConfig(
-  //     instanceType = m3_medium,
-  //     purchaseModel = SpotAuto,
-  //     groupSize = WorkersGroupSize(0, 1, 10)
-  //   )
-  //
-  //   val terminationConfig = TerminationConfig(
-  //     terminateAfterInitialDataMappings = true
-  //   )
-  //
-  //   val dataMappings: List[AssignmentDataMapping] =
-  //     List(
-  //       DataMapping(
-  //         "ERR567374_1",
-  //         dataProcessing
-  //       )(remoteInput =
-  //           fastqInput.atS3(ObjectAddress("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/flash-test/ERR567374_1.merged.fastq")) :~:
-  //           ∅,
-  //         remoteOutput =
-  //           blastOutput.atS3(ObjectAddress("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/blast-test/ERR567374_1.merged.blast.csv")) :~:
-  //           ∅
-  //       )
-  //     )
-  //
-  // }
-  //
-  // case object testLoquat extends Loquat(testConfig, testDataProcessing)
+    val managerConfig = ManagerConfig(
+      instanceType = m3_medium,
+      purchaseModel = SpotAuto
+    )
+
+    val workersConfig = WorkersConfig(
+      instanceType = m3_medium,
+      purchaseModel = SpotAuto,
+      groupSize = WorkersGroupSize(0, 1, 10)
+    )
+
+    val terminationConfig = TerminationConfig(
+      terminateAfterInitialDataMappings = true
+    )
+
+    val dataMappings: List[AssignmentDataMapping] =
+      List(
+        DataMapping(
+          "ERR567374_1",
+          assignmentDataProcessing
+        )(remoteInput =
+            blastOutput.atS3(ObjectAddress(
+              "resources.ohnosequences.com",
+              "16s/public-datasets/PRJEB6592/blast-test/ERR567374_1.blast.partial.csv"
+            )) :~: ∅,
+          remoteOutput =
+            lcaCSV.atS3(ObjectAddress(
+              "resources.ohnosequences.com",
+              "16s/public-datasets/PRJEB6592/assignment-test/ERR567374_1.lca.csv"
+            )) :~:
+            bbhCSV.atS3(ObjectAddress(
+              "resources.ohnosequences.com",
+              "16s/public-datasets/PRJEB6592/assignment-test/ERR567374_1.bbh.csv"
+            )) :~:
+            ∅
+        )
+      )
+
+  }
+
+  case object testLoquat extends Loquat(testConfig, assignmentDataProcessing)
 }
