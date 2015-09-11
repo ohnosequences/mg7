@@ -47,7 +47,7 @@ MG7 itself and all the libraries used are written in Scala `2.11`.
 ## 2.x Statika
 
 <!-- TODO expand? -->
-[Statika](https://github.com/ohnosequences/statika) is a Scala library developed by **so and so** which serves as a way of defining and composing machine behaviors statically. The main component are **bundles**. Each bundle declares a sequence of computations (its behavior) which will be executed in an **environment**. A bundle can *depend* on other bundles, and when being executed by an environment, its DAG of dependencies is linearized and run in sequence. In our use, bundles correspond to what an EC2 instance should do and an environment to an image (AMI) which prepares the basic configuration, downloads the Scala code and runs it.
+[Statika](https://github.com/ohnosequences/statika) is a Scala library developed by **so and so** which serves as a way of defining and composing machine behaviors statically. The main component are **bundles**. Each bundle declares a sequence of computations (its behavior) which will be executed in an **environment**. A bundle can *depend* on other bundles, and when being executed by an environment, its DAG of dependencies is linearized and run in sequence. In our use, bundles correspond to what an EC2 instance should do and an environment to an image (AMI: **A**mazon **M**achine **I**mage) which prepares the basic configuration, downloads the Scala code and runs it.
 
 ## 2.x Datasets
 
