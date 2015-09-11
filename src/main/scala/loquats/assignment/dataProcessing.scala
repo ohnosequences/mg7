@@ -1,4 +1,4 @@
-package ohnosequences.metagenomica.loquats.taxonomy
+package ohnosequences.metagenomica.loquats.assignment
 
 import  ohnosequences.metagenomica._
 
@@ -15,9 +15,36 @@ import java.io.{ BufferedWriter, FileWriter, File }
 import ohnosequences.fastarious._, fasta._, fastq._
 import ohnosequences.blast._, api._, data._, outputFields._
 
-case object taxonomyDataProcessing {
+import scala.util.Try
 
-  trait AnyTaxonomyDataProcessing extends AnyDataProcessingBundle {
+
+case object assignmentDataProcessing {
+
+  // TODO: move it to the config
+  case object CSVDataType extends AnyDataType { val label = "fastq" }
+  case object lcaCSV extends Data(CSVDataType, "lca.csv")
+  case object bbhCSV extends Data(CSVDataType, "bbh.csv")
+
+  type BlastRecord = loquats.blast.blastDataProcessing.outRec.type
+  val blastRecord: BlastRecord = loquats.blast.blastDataProcessing.outRec
+  val headers: Seq[String] = blastRecord.properties.mapToList(typeLabel)
+
+  // TODO: move it somewhere up for global use
+  type ID = String
+
+  type GI = ID
+  type TaxID = ID
+  type ReadID = ID
+  type NodeID = ID
+
+  type LCA = Option[NodeID]
+  type BBH = Int
+
+  // TODO: move it somewhere up for global use
+  def parseInt(str: String): Option[Int] = Try(str.toInt).toOption
+
+
+  trait AnyAssignmentDataProcessing extends AnyDataProcessingBundle {
 
     def instructions: AnyInstructions = say("Let's see who is who!")
 
@@ -26,11 +53,16 @@ case object taxonomyDataProcessing {
       bundles.filteredGIs
     )
 
-    type BlastOutput <: AnyBlastOutput
+    // TODO: this should be setup from the global config
+    type BlastOutput <: AnyBlastOutput {
+      type BlastExpressionType <: AnyBlastExpressionType {
+        type OutputRecord = BlastRecord
+      }
+    }
     val  blastOutput: BlastOutput
 
-    type Input  = BlastOutput :^: DNil
-    // type Output =  :^: DNil
+    type Input  <: BlastOutput :^: DNil
+    type Output <: lcaCSV.type :^: bbhCSV.type :^: DNil
 
     def processData(
       dataMappingId: String,
@@ -41,30 +73,66 @@ case object taxonomyDataProcessing {
 
       // Reading TSV file with mapping gis-taxIds
       val gisReader: CSVReader = CSVReader.open( bundles.filteredGIs.location )(new TSVFormat {})
-      val gisMap: Map[String, String] = gisReader.iterator.map { row =>
+      val gisMap: Map[GI, TaxID] = gisReader.iterator.map { row =>
         row(0) -> row(1)
       }.toMap
+      gisReader.close
 
       val blastReader: CSVReader = CSVReader.open( context.file(blastOutput).javaFile )
-      val blastRecord = blastOutput.dataType.blastExpressionType.outputRecord
-      // TODO: use directly blast output/record from the blast loquat config
-      val headers: Seq[String] = ??? //blastRecord.properties.mapToList(typeLabel)
 
-      // TODO: use GIs from the blast output to retrieve taxon nodes, using titanTaxonNodes method
-      val gis: List[String] = blastReader.iterator.flatMap { row =>
-        val columns: Map[String, String] = headers.zip(row).toMap
-        columns.get(sgi.label)
-      }.toList
+      val assignments: Map[ReadID, (LCA, BBH)] = blastReader.iterator.toStream
+        .groupBy { row =>
+        // grouping rows by the read id
+        headers.zip(row).toMap.get(qseqid.label)
+      } flatMap {
+        case (None, _) => None
+        case (Some(readId), hits) => {
 
-      // TODO: merge this with gis
-      val taxIds: List[String] = gis flatMap gisMap.get
+          // this method chooses particular column by its header
+          def column(header: AnyOutputField): List[String] =
+            hits.toList.flatMap { columns: Seq[String] =>
+              headers.zip(columns).toMap.get(header.label)
+            }
 
-      val nodes: List[TitanTaxonNode] = titanTaxonNodes(bundles.bio4jTaxonomy.graph, taxIds)
+          // best blast score is just a maximum in the `bitscore` column
+          val bbh: BBH = column(bitscore).flatMap(parseInt).max
 
-      val lca: Solution = solution(nodes)
+          // for each hit row we take the column with GI and lookup its TaxID
+          val taxIds: List[TaxID] = column(sgi).flatMap(gisMap.get)
+          // then we generate Titan taxon nodes
+          val nodes: List[TitanTaxonNode] = titanTaxonNodes(bundles.bio4jTaxonomy.graph, taxIds)
+          // and return the taxon node ID corresponding to the read
+          val lca: LCA = solution(nodes).node.map(_.id)
 
-      // TODO: write something to the output file
-      ???
+          Some( (readId, (lca, bbh)) )
+        }
+      }
+
+      blastReader.close
+
+      // Now we will write these two types of result to two separate files
+      val lcaFile = context / "lca.csv"
+      val bbhFile = context / "bbh.csv"
+
+      val lcaWriter = CSVWriter.open(lcaFile.javaFile , append = true)
+      val bbhWriter = CSVWriter.open(bbhFile.javaFile , append = true)
+
+      assignments foreach { case (readId, (lca, bbh)) =>
+        // lca is an Option
+        lca foreach { smth => lcaWriter.writeRow(List(readId, smth)) }
+        // bbh is an Int
+        bbhWriter.writeRow(List(readId, bbh.toString))
+      }
+
+      lcaWriter.close
+      bbhWriter.close
+
+      success(
+        s"Results are written to [${lcaFile.path}] and [${bbhFile.path}]",
+        lcaCSV.inFile(lcaFile) :~:
+        bbhCSV.inFile(bbhFile) :~:
+        ∅
+      )
     }
   }
 
