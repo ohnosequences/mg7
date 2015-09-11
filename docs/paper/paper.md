@@ -50,11 +50,19 @@ MG7 itself and all the libraries used are written in Scala `2.11`.
 [Statika](https://github.com/ohnosequences/statika) is a Scala library developed by **so and so** which serves as a way of defining and composing machine behaviors statically. The main component are **bundles**. Each bundle declares a sequence of computations (its behavior) which will be executed in an **environment**. A bundle can *depend* on other bundles, and when being executed by an environment, its DAG of dependencies is linearized and run in sequence. In our use, bundles correspond to what an EC2 instance should do and an environment to an image (AMI: **A**mazon **M**achine **I**mage) which prepares the basic configuration, downloads the Scala code and runs it.
 
 ## 2.x Datasets
+<!-- TODO
+  reference to record types, tagged types etc
 
-<!-- TODO explain this better, type-level resource lookup etc -->
-[Datasets](https://github.com/ohnosequences/datasets) is a Scala library developed by **so and so** to declare datasets and their location. A particular piece of data is represented as a singleton type, with a reference to another singleton type representing its type.
+  - A calculus of tagged types, with applications to process languages
+  - Extensible records with scoped labels
 
-These singleton types are then used as keys for describing *where* this data is located. A location can be an S3 object or a local file; through the use of type-level keys we can easily keep track at the type level of resources, so that a process which locally has an input a set of reads can use the corresponding static data key.
+  This should add a reference to some of that, and explain that it is based on (essentially) an embedding of extensible record types in Scala. Maybe mention ohnosequences/cosas, our super-fancy library.
+-->
+[Datasets](https://github.com/ohnosequences/datasets) is a Scala library developed by **so and so** to declare datasets and their locations. **Data** is represented as type-indexed fields: Keys are modeled as singleton types, and values correspond to what could be called a denotation of the key: a value of type `Location` tagged with the key type. Then a **Dataset** is essentially a collection of data, which are guaranteed statically to be different through type-level predicates, making use of the value ↔ type correspondence which can be established through singleton types and implicits. A dataset location is then just a list of locations formed by locations of each data member of that dataset.
+
+Data keys can further have a reference to a **data type**, which, as the name hints at, can help in providing information about the type of data we are working with. For example, when declaring Illumina reads as a data, a data type containing information about the read length, insert size or end type (single or paired) is used.
+
+A **location** can be, for example, an S3 object or a local file; by leaving the location type used to denote particular data free we can work with different "physical" representations, while keeping track of to which logical data they are a representation of. Thus, a process can generate locally a `.fastq` file representing the merged reads, while another can put it in S3 with the fact that they all correspond to the "same" merged reads is always present, as the data that those "physical" representations denote.
 
 ## 2.x Loquat
 
