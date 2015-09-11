@@ -38,7 +38,11 @@ Considering all these aspects we have designed a new open source methodology for
 
 ## 2.x Scala
 
-[Scala](http://www.scala-lang.org/) is a hybrid object-functional programming language which runs on Java Virtual Machine. It has support for type-level programming, type-dependent types (through type members and singleton types), and Java interoperability. MG7 itself and all the libraries used are written in Scala `2.11`.
+[Scala](http://www.scala-lang.org/) is a hybrid object-functional programming language which runs on Java Virtual Machine. It has support for type-level programming, type-dependent types (through type members) and singleton types, which permits a restricted form of dependent types where types can depend essentially on values determined at compile time (through their corresponding singleton types). Conversely, through implicits one can retrieve the value corresponding to a singleton type.
+
+The other key feature for us is Java interoperability, which let us build on the vast number of existing Java libraries; we take advantage of this when using Bio4j as an API for the NCBI taxonomy.
+
+MG7 itself and all the libraries used are written in Scala `2.11`.
 
 ## 2.x Statika
 
