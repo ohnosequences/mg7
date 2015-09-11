@@ -36,6 +36,10 @@ Considering all these aspects we have designed a new open source methodology for
 # 2. Materials and Methods
 <!-- As far as my understanding of this section goes, here we should put a list-like enumeration of what we use. I'm also adding descriptions, that could go somewhere else if needed. -->
 
+## 2.x Amazon Web Services
+
+<!-- TODO describe this minimally: EC2, SQS, S3 -->
+
 ## 2.x Scala
 
 [Scala](http://www.scala-lang.org/) is a hybrid object-functional programming language which runs on Java Virtual Machine. It has support for type-level programming, type-dependent types (through type members) and singleton types, which permits a restricted form of dependent types where types can depend essentially on values determined at compile time (through their corresponding singleton types). Conversely, through implicits one can retrieve the value corresponding to a singleton type.
@@ -97,10 +101,6 @@ Generic type-safe parsers returning an heterogeneous record of BLAST output fiel
 ### 2.x.b FLASH DSL
 <!-- TODO write something about this -->
 In the same spirit as for BLAST,
-
-## 2.x Amazon Web Services
-
-<!-- EC2, SQS, S3. -->
 
 ## 2.x Bio4j
 
