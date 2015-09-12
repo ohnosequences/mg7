@@ -41,12 +41,17 @@ case object bio4jTaxonomy extends Bundle() {
 
   lazy val conf: BaseConfiguration = {
     val base = new BaseConfiguration()
-    base.setProperty("storage.directory", location)
+    base.setProperty("storage.directory", location.getCanonicalPath)
     base.setProperty("storage.backend", "berkeleyje")
+    base.setProperty("storage.batch-loading", "false")
+    base.setProperty("storage.transactions", "true")
+    base.setProperty("query.fast-property", "false")
+    base.setProperty("schema.default", "none")
     base
   }
 
   // the graph; its only (direct) use is for indexes
+  // FIXME: this works but still with errors, should be fixed (something about transactions)
   lazy val graph: TitanNCBITaxonomyGraph =
     new TitanNCBITaxonomyGraph(
       new DefaultTitanGraph(TitanFactory.open(conf))

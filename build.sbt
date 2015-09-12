@@ -18,8 +18,8 @@ libraryDependencies ++= Seq(
   "ohnosequences"         %% "flash"         % "0.2.0-SNAPSHOT",
   "ohnosequences"         %% "blast"         % "0.2.0-SNAPSHOT",
   "ohnosequences"         %% "fastarious"    % "0.1.0-SNAPSHOT",
-  "bio4j"                 %  "bio4j"         % "0.12.0-RC2",
-  "bio4j"                 %  "bio4j-titan"   % "0.4.0-RC1",
+  "bio4j"                 %  "bio4j"         % "0.12.0-SNAPSHOT",
+  "bio4j"                 %  "bio4j-titan"   % "0.4.0-SNAPSHOT",
   // generic tools:
   "ohnosequences"         %% "cosas"         % "0.7.0",
   "ohnosequences"         %% "loquat"        % "2.0.0-SNAPSHOT",
@@ -29,7 +29,6 @@ libraryDependencies ++= Seq(
   // bundles:
   "ohnosequences-bundles" %% "flash"         % "0.1.0-SNAPSHOT",
   "ohnosequences-bundles" %% "blast"         % "0.2.0-SNAPSHOT",
-  // "ohnosequences-bundles" %% "bio4j-dist"    % "0.1.0-SNAPSHOT",
   // utils:
   "era7"                  %% "project-utils" % "0.1.0-SNAPSHOT",
   // testing:
@@ -42,21 +41,27 @@ dependencyOverrides ++= Set(
   "com.fasterxml.jackson.core" % "jackson-annotations" % "2.3.2",
   "commons-logging"            % "commons-logging"     % "1.1.3",
   "commons-codec"              % "commons-codec"       % "1.7",
-  "org.apache.httpcomponents"  % "httpclient"          % "4.3.4",
-  "org.scala-lang.modules"     %% "scala-xml"          % "1.0.4",
+  "org.apache.httpcomponents"  % "httpclient"          % "4.5",
   "org.slf4j"                  % "slf4j-api"           % "1.7.7"
+  // "org.scala-lang.modules"     %% "scala-xml"          % "1.0.4",
+  ////
+  // "commons-beanutils"          % "commons-beanutils"       % "1.8.3",
+  // "commons-beanutils"          % "commons-beanutils-core"  % "1.8.3",
+  // "net.sf.opencsv"             % "opencsv"                 % "2.3"
 )
-
-  // "com.fasterxml.jackson.core" % "jackson-core" % "2.1.2",
-  // "com.fasterxml.jackson.core" % "jackson-databind" % "2.1.2",
-  // "com.fasterxml.jackson.core" % "jackson-annotations" % "2.1.1",
-  // "commons-beanutils" % "commons-beanutils" % "1.8.3",
-  // "commons-beanutils" % "commons-beanutils-core" % "1.8.3"
 
 
 
 
 fatArtifactSettings
+
+// copied from bio4j-titan:
+mergeStrategy in assembly ~= { old => {
+    case "log4j.properties"                       => MergeStrategy.filterDistinctLines
+    case PathList("org", "apache", "commons", _*) => MergeStrategy.first
+    case x                                        => old(x)
+  }
+}
 
 val metadataObject = Def.setting { name.value.split("""\W""").map(_.capitalize).mkString }
 
