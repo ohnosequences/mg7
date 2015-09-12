@@ -1,6 +1,6 @@
 package ohnosequences.metagenomica.tests
 
-import ohnosequences.metagenomica.bundles._, blast16sTest._
+import ohnosequences.metagenomica.bundles._
 
 import ohnosequences.statika._, aws._, bundles._
 
@@ -14,7 +14,7 @@ import ohnosequences.awstools.regions.Region._
 import ohnosequences.awstools.ec2.InstanceType._
 
 
-class ApplicationTest extends FunSuite with ParallelTestExecution {
+class BundlesTest extends FunSuite with ParallelTestExecution {
 
   val ec2 = EC2.create(new ProfileCredentialsProvider("default"))
   val user = era7.project.users.aalekhin
@@ -49,6 +49,8 @@ class ApplicationTest extends FunSuite with ParallelTestExecution {
   }
 
   ignore("testing blast16s bundle") {
+    import blast16sTest._
+
     val specs = blast16sCompat.instanceSpecs(
       instanceType = m3_medium,
       user.awsAccount.keypair.name,
@@ -56,11 +58,23 @@ class ApplicationTest extends FunSuite with ParallelTestExecution {
     )
 
     val instances = launchAndWait(ec2, blast16sCompat.name, specs)
-    // instances.foreach{ _.terminate }
     assert{ instances.length == 1 }
   }
 
-  test("testing blast bundle") {
+  ignore("testing gis filtering bundle") {
+    import filtering._
+
+    val specs = filterGIsCompat.instanceSpecs(
+      instanceType = m3_large,
+      user.awsAccount.keypair.name,
+      Some(era7.aws.roles.projects.name)
+    )
+
+    val instances = launchAndWait(ec2, filterGIsCompat.name, specs)
+    assert{ instances.length == 1 }
+  }
+
+  ignore("testing blast bundle") {
     import ohnosequences.metagenomica.loquats.blast.blastDataProcessing._
 
     val specs = blastCompat.instanceSpecs(
