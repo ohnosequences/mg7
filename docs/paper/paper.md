@@ -39,7 +39,7 @@ abstract: |
 keywords: "Metagenomics, 16S, Bacterial diversity profile, Bio4j, Graph databases, Cloud computing, NGS, Genomic big data"
 ---
 
-# 1. Introduction
+# Introduction
 <!-- TODO needs review -->
 
 Metagenomics data analysis is growing at exponential rate during the last years. The increasing throughput of massively parallel sequencing technologies, the derived decreasing cost,  and the high impact of metagenomics studies, especially in human health (diagnostics, treatments, drug response, prevention), are crucial reasons responsible for this growth of Metagenomics. There is a growing interest in sequencing all kind of microbiomes (gut, mouth, skin, urinary tract, airway, milk, bladder), in different conditions of health and disease, or after different treatments. Metagenomics is also impacting environmental sciences, crop sciences, agrifood sector and biotechnology in general. This new possibilities for exploring the diversity of micro-organisms in the most diverse environments is opening many new research areas but, due to this wide interest, it is expected that the amount of data will be overwhelming in the short time [@stephens2015big].
@@ -51,14 +51,14 @@ During the last years other sciences as astronomy or particle physics are facing
 This definitively new scenario demands new methods and tools to handle the current and future volume of metagenomic data with the sufficient speed of analysis.
 Considering all these aspects we have designed a new open source methodology for analyzing metagenomics data that exploits the new possibilities that cloud computing offers to get a system robust, programmatically configurable, modular, distributed, flexible, scalable and traceable in which the biological databases of reference sequences can be easily updated and/or frequently substituted by new ones or by databases specifically designed for focused projects.
 
-# 2. Materials and Methods
+# Materials and Methods
 <!-- As far as my understanding of this section goes, here we should put a list-like enumeration of what we use. I'm also adding descriptions, that could go somewhere else if needed. -->
 
-## 2.x Amazon Web Services
+## Amazon Web Services
 
 <!-- TODO describe this minimally: EC2, SQS, S3 -->
 
-## 2.x Scala
+## Scala
 
 [Scala](http://www.scala-lang.org/) is a hybrid object-functional programming language which runs on Java Virtual Machine. It has support for type-level programming, type-dependent types (through type members) and singleton types, which permits a restricted form of dependent types where types can depend essentially on values determined at compile time (through their corresponding singleton types). Conversely, through implicits one can retrieve the value corresponding to a singleton type.
 
@@ -66,12 +66,12 @@ The other key feature for us is Java interoperability, which let us build on the
 
 MG7 itself and all the libraries used are written in Scala `2.11`.
 
-## 2.x Statika
+## Statika
 
 <!-- TODO expand? -->
 [Statika](https://github.com/ohnosequences/statika) is a Scala library developed by **so and so** which serves as a way of defining and composing machine behaviors statically. The main component are **bundles**. Each bundle declares a sequence of computations (its behavior) which will be executed in an **environment**. A bundle can *depend* on other bundles, and when being executed by an environment, its DAG of dependencies is linearized and run in sequence. In our use, bundles correspond to what an EC2 instance should do and an environment to an image (AMI: **A**mazon **M**achine **I**mage) which prepares the basic configuration, downloads the Scala code and runs it.
 
-## 2.x Datasets
+## Datasets
 <!-- TODO
   reference to record types, tagged types etc
 
@@ -86,7 +86,7 @@ Data keys can further have a reference to a **data type**, which, as the name hi
 
 A **location** can be, for example, an S3 object or a local file; by leaving the location type used to denote particular data free we can work with different "physical" representations, while keeping track of to which logical data they are a representation of. Thus, a process can generate locally a `.fastq` file representing the merged reads, while another can put it in S3 with the fact that they all correspond to the "same" merged reads is always present, as the data that those "physical" representations denote.
 
-## 2.x Loquat
+## Loquat
 
 [Loquat](https://github.com/ohnosequences/loquat) is a library developed by **so and so** designed for the execution of embarrassingly parallel tasks using S3, SQS and EC2.
 
@@ -100,12 +100,12 @@ All configuration such as the number of workers or the instance types is declare
 
 The input and output (and their locations) being defined statically has several critical advantages. First, composing different loquats is easy and safe; just use the output types and locations of the first one as input for the second one. Second, data and their types help in not mixing different resources when implementing a process, while serving as a safe and convenient mechanism for writing generic processing tasks. For example, merging paired-end Illumina reads generically is easy as the data type includes the relevant information (insert size, read length, etc) to pass to a tool such as FLASH.
 
-## 2.x Type-safe DSLs for BLAST and FLASH
+## Type-safe DSLs for BLAST and FLASH
 
 <!-- TODO cite BLAST and FLASH -->
 We developed our own type-safe DSLs (Domain Specific Language) for [FLASH](https://github.com/ohnosequences/flash) and [BLAST](https://github.com/ohnosequences/blast) expressions and their execution.
 
-### 2.x.a BLAST DSL
+### BLAST DSL
 
 In the case of BLAST we use a model for expressions where we can guarantee for each BLAST command expression at compile time
 
@@ -116,17 +116,17 @@ In the case of BLAST we use a model for expressions where we can guarantee for e
 
 Generic type-safe parsers returning an heterogeneous record of BLAST output fields are also available, together with output data defined using *Datasets* which have a reference to the exact BLAST command options which yielded that output. This let us provide generic parsers for BLAST output which are guaranteed to be correct, for example.
 
-### 2.x.b FLASH DSL
+### FLASH DSL
 <!-- TODO write something about this -->
 In the same spirit as for BLAST,
 
-## 2.x Bio4j
+## Bio4j
 
 [Bio4j](https://github.com/bio4j/bio4j) is a data platform integrating data from different resources such as UniProt or GO in a graph data paradigm. We use the module containing the NCBI Taxonomy, and the use their Java API from Scala in the assignment phase.
 
-# 3. Results
+# Results
 
-## 3.1 Overview
+## Overview
 
 To tackle the challenges posed by metagenomics big data analysis outlined in the Introduction,
 
@@ -140,19 +140,19 @@ To tackle the challenges posed by metagenomics big data analysis outlined in the
 - Modeling of the taxonomy tree using the new paradigm of graph databases (Bio4j). It facilitates the taxonomic assignment tasks and the calculation of the taxa abundance values considering the hierarchic structure of taxonomy tree (cumulative values).
 - per-read assignment (??)
 
-## 3.x 16S Reference Database Construction
+## 16S Reference Database Construction
 
 Our 16S Reference Database is a curated subset of sequences from NCBI nucleotide database **nt**. This subset of 16S sequences was selected by similarity with the bacterial and archaeal reference sequences downloaded from RDP database [@cole2013ribosomal]. RDP unaligned sequences were used to capture new16S sequences from nt using BLAST similarity strategies and, then, performing additional curation steps to remove sequences with poor taxonomic assignments to taxonomic nodes close to the root of the taxonomic tree. All the nucleotide sequences included in nt database has a taxonomic assignment provided by the genbank sequence submitter. NCBI provides a table (available at ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/) to do the mapping of any Genbank Identifier (GI) to its Taxonomy Identifier (TaxID). Thus, we are based on a submitter-maintained taxonomic annotation system for reference sequences that supposes a sustainable system able to face the expected number of reference sequences that will populate the public global nucleotide databases in the near future. Another advantageous point is that we are based on NCBI taxonomy, the de facto standard taxonomic classification for biomolecular data [@cochrane20102010]. NCBI taxonomy is, without any doubt, the most used taxonomy all over the world and the most similar to the official taxonomies of each specific field. This is a crucial point because all the type-culture and tissue databanks follow this official taxonomical classification and, in addition, all the knowledge accumulated is referred to this taxonomy. In addition NCBI provides a direct connection between taxonomical formal names and the physical specimens that serve as exemplars for the species [@federhen2014type].
 
 If metagenomics results are easily integrated with the theoretical and experimental knowledge of each specific area, the impact of metagenomics will be higher that if metagenomics progress in a disconnected research branch. This strategy for building our database allows substituting the 16S database by any other subset of nt, even by the complete nt database if it would needed, for example, for analyzing shotgun metagenomics data.
 
-## 3.x Bio4j and Graph Databases
+## Bio4j and Graph Databases
 
-## 3.x MG7 Pipeline Description
+## MG7 Pipeline Description
 
-## 3.x Taxonomic Assignment Algorithms
+## Taxonomic Assignment Algorithms
 
-### 3.x.y Lowest Common Ancestor based Taxonomic Assignment
+### Lowest Common Ancestor based Taxonomic Assignment
 
 For each read:
 
@@ -166,11 +166,11 @@ For each read:
 
 In this approach the value used for evaluating the similarity is the bitscore that is a value that increases when similarity is higher and depends a lot on the length of the HSP
 
-### 3.x.z Best BLAST hit taxonomic assignment
+### Best BLAST hit taxonomic assignment
 
 We have maintained the simpler method of Best BLAST Hit (BBH) taxonomic assignment because, in some cases, it can provide information about the sequences that can be more useful than the obtained using LCA algorithm. Using LCA algorithm when some reference sequences with BLAST alignments over the required thresholds map to a not sufficiently specific taxID, the read can be assigned to an unspecific taxon near to the root. If the BBH reference sequence maps to a more specific taxa this method, in that case, gives us useful information.
 
-## 3.x Other
+## Other
 
 General approach. An analysis is defined as a software project. It can evolve in the same way. We can run the analysis in a test phase, review configuration and changes, etc. Key advantages of this approach are
 
@@ -180,20 +180,20 @@ General approach. An analysis is defined as a software project. It can evolve in
 - **Decoupling** We can start working on the analysis specification, without any need for data in a much easier way.
 - **Expresiveness and safety** choose only from valid Illumina read types, build default FLASH command based on that, ...
 
-## 3.x Using MG7 with some example data-sets
+## Using MG7 with some example data-sets
 
 <!-- ?? -->
 We selected the datasets described in [Kennedy-2014] (??)
 
-## 3.7 MG7 availability
+## MG7 availability
 
 MG7 is open source, available at https://github.com/ohnosequences/mg7 under an [AGPLv3](http://www.gnu.org/licenses/agpl-3.0.en.html) license.
 
-# 4. Discussion
+# Discussion
 
 <!-- From instructions: This section may be divided by subheadings. Discussions should cover the key findings of the study: discuss any prior art related to the subject so to place the novelty of the discovery in the appropriate context; discuss the potential short-comings and limitations on their interpretations; discuss their integration into the current understanding of the problem and how this advances the current views; speculate on the future direction of the research and freely postulate theories that could be tested in the future. -->
 
-## 4.1 Novelty points of MG7
+## Novelty points of MG7
 
 <!--  TODO fix all this -->
 
@@ -205,20 +205,16 @@ The most innovative ideas and developments integrated in MG7 are:
 - The use of the Graph databases paradigm to store and manage the taxonomy tree to obtain the taxonomic assignments and the cumulative frequencies
 - MG7 provides a sustainable model for updating the database of reference sequences appropriate to face the challenging amount of sequences that are generating the new high throughput technologies of sequencing
 
-## 4.2 Designed for future challenges
+## Designed for future challenges
 
 Other possible uses of the general schema: statika, loquat, ...
 
-## 4.3 MG7 Future developments
+## MG7 Future developments
 
-### 4.3.1 Comparison of groups of samples
+### Comparison of groups of samples
 
-### 4.3.2 Interactive visualizations using the output files of MG7 (Biographika project)
+### Interactive visualizations using the output files of MG7 (Biographika project)
 
-# 5 Acknowledgements
+# Acknowledgements
 
 INTERCROSSING (Grant 289974)
-
-# 6 References
-
-# 7 Tables and Figures

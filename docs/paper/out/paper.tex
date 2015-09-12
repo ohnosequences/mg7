@@ -64,7 +64,7 @@ No abstract yet. Will be here.
 Cloud computing, NGS, Genomic big data } %All article types: you may provide up to 8 keywords; at least 5 are mandatory.
 \end{abstract}
 
-\section{1. Introduction}\label{introduction}
+\section{Introduction}\label{introduction}
 
 Metagenomics data analysis is growing at exponential rate during the
 last years. The increasing throughput of massively parallel sequencing
@@ -151,11 +151,11 @@ which the biological databases of reference sequences can be easily
 updated and/or frequently substituted by new ones or by databases
 specifically designed for focused projects.
 
-\section{2. Materials and Methods}\label{materials-and-methods}
+\section{Materials and Methods}\label{materials-and-methods}
 
-\subsection{2.x Amazon Web Services}\label{x-amazon-web-services}
+\subsection{Amazon Web Services}\label{amazon-web-services}
 
-\subsection{2.x Scala}\label{x-scala}
+\subsection{Scala}\label{scala}
 
 \href{http://www.scala-lang.org/}{Scala} is a hybrid object-functional
 programming language which runs on Java Virtual Machine. It has support
@@ -172,7 +172,7 @@ of this when using Bio4j as an API for the NCBI taxonomy.
 MG7 itself and all the libraries used are written in Scala
 \texttt{2.11}.
 
-\subsection{2.x Statika}\label{x-statika}
+\subsection{Statika}\label{statika}
 
 \href{https://github.com/ohnosequences/statika}{Statika} is a Scala
 library developed by \textbf{so and so} which serves as a way of
@@ -186,7 +186,7 @@ environment to an image (AMI: \textbf{A}mazon \textbf{M}achine
 \textbf{I}mage) which prepares the basic configuration, downloads the
 Scala code and runs it.
 
-\subsection{2.x Datasets}\label{x-datasets}
+\subsection{Datasets}\label{datasets}
 
 \href{https://github.com/ohnosequences/datasets}{Datasets} is a Scala
 library developed by \textbf{so and so} to declare datasets and their
@@ -215,7 +215,7 @@ while another can put it in S3 with the fact that they all correspond to
 the ``same'' merged reads is always present, as the data that those
 ``physical'' representations denote.
 
-\subsection{2.x Loquat}\label{x-loquat}
+\subsection{Loquat}\label{loquat}
 
 \href{https://github.com/ohnosequences/loquat}{Loquat} is a library
 developed by \textbf{so and so} designed for the execution of
@@ -252,15 +252,15 @@ For example, merging paired-end Illumina reads generically is easy as
 the data type includes the relevant information (insert size, read
 length, etc) to pass to a tool such as FLASH.
 
-\subsection{2.x Type-safe DSLs for BLAST and
-FLASH}\label{x-type-safe-dsls-for-blast-and-flash}
+\subsection{Type-safe DSLs for BLAST and
+FLASH}\label{type-safe-dsls-for-blast-and-flash}
 
 We developed our own type-safe DSLs (Domain Specific Language) for
 \href{https://github.com/ohnosequences/flash}{FLASH} and
 \href{https://github.com/ohnosequences/blast}{BLAST} expressions and
 their execution.
 
-\subsubsection{2.x.a BLAST DSL}\label{x.a-blast-dsl}
+\subsubsection{BLAST DSL}\label{blast-dsl}
 
 In the case of BLAST we use a model for expressions where we can
 guarantee for each BLAST command expression at compile time
@@ -283,20 +283,20 @@ using \emph{Datasets} which have a reference to the exact BLAST command
 options which yielded that output. This let us provide generic parsers
 for BLAST output which are guaranteed to be correct, for example.
 
-\subsubsection{2.x.b FLASH DSL}\label{x.b-flash-dsl}
+\subsubsection{FLASH DSL}\label{flash-dsl}
 
 In the same spirit as for BLAST,
 
-\subsection{2.x Bio4j}\label{x-bio4j}
+\subsection{Bio4j}\label{bio4j}
 
 \href{https://github.com/bio4j/bio4j}{Bio4j} is a data platform
 integrating data from different resources such as UniProt or GO in a
 graph data paradigm. We use the module containing the NCBI Taxonomy, and
 the use their Java API from Scala in the assignment phase.
 
-\section{3. Results}\label{results}
+\section{Results}\label{results}
 
-\subsection{3.1 Overview}\label{overview}
+\subsection{Overview}\label{overview}
 
 To tackle the challenges posed by metagenomics big data analysis
 outlined in the Introduction,
@@ -318,8 +318,8 @@ calculation of the taxa abundance values considering the hierarchic
 structure of taxonomy tree (cumulative values). - per-read assignment
 (??)
 
-\subsection{3.x 16S Reference Database
-Construction}\label{x-16s-reference-database-construction}
+\subsection{16S Reference Database
+Construction}\label{s-reference-database-construction}
 
 Our 16S Reference Database is a curated subset of sequences from NCBI
 nucleotide database \textbf{nt}. This subset of 16S sequences was
@@ -356,17 +356,15 @@ branch. This strategy for building our database allows substituting the
 if it would needed, for example, for analyzing shotgun metagenomics
 data.
 
-\subsection{3.x Bio4j and Graph
-Databases}\label{x-bio4j-and-graph-databases}
+\subsection{Bio4j and Graph Databases}\label{bio4j-and-graph-databases}
 
-\subsection{3.x MG7 Pipeline
-Description}\label{x-mg7-pipeline-description}
+\subsection{MG7 Pipeline Description}\label{mg7-pipeline-description}
 
-\subsection{3.x Taxonomic Assignment
-Algorithms}\label{x-taxonomic-assignment-algorithms}
+\subsection{Taxonomic Assignment
+Algorithms}\label{taxonomic-assignment-algorithms}
 
-\subsubsection{3.x.y Lowest Common Ancestor based Taxonomic
-Assignment}\label{x.y-lowest-common-ancestor-based-taxonomic-assignment}
+\subsubsection{Lowest Common Ancestor based Taxonomic
+Assignment}\label{lowest-common-ancestor-based-taxonomic-assignment}
 
 For each read:
 
@@ -388,8 +386,8 @@ In this approach the value used for evaluating the similarity is the
 bitscore that is a value that increases when similarity is higher and
 depends a lot on the length of the HSP
 
-\subsubsection{3.x.z Best BLAST hit taxonomic
-assignment}\label{x.z-best-blast-hit-taxonomic-assignment}
+\subsubsection{Best BLAST hit taxonomic
+assignment}\label{best-blast-hit-taxonomic-assignment}
 
 We have maintained the simpler method of Best BLAST Hit (BBH) taxonomic
 assignment because, in some cases, it can provide information about the
@@ -400,7 +398,7 @@ the read can be assigned to an unspecific taxon near to the root. If the
 BBH reference sequence maps to a more specific taxa this method, in that
 case, gives us useful information.
 
-\subsection{3.x Other}\label{x-other}
+\subsection{Other}\label{other}
 
 General approach. An analysis is defined as a software project. It can
 evolve in the same way. We can run the analysis in a test phase, review
@@ -426,20 +424,20 @@ configuration and changes, etc. Key advantages of this approach are
   types, build default FLASH command based on that, \ldots{}
 \end{itemize}
 
-\subsection{3.x Using MG7 with some example
-data-sets}\label{x-using-mg7-with-some-example-data-sets}
+\subsection{Using MG7 with some example
+data-sets}\label{using-mg7-with-some-example-data-sets}
 
 We selected the datasets described in {[}Kennedy-2014{]} (??)
 
-\subsection{3.7 MG7 availability}\label{mg7-availability}
+\subsection{MG7 availability}\label{mg7-availability}
 
 MG7 is open source, available at https://github.com/ohnosequences/mg7
 under an \href{http://www.gnu.org/licenses/agpl-3.0.en.html}{AGPLv3}
 license.
 
-\section{4. Discussion}\label{discussion}
+\section{Discussion}\label{discussion}
 
-\subsection{4.1 Novelty points of MG7}\label{novelty-points-of-mg7}
+\subsection{Novelty points of MG7}\label{novelty-points-of-mg7}
 
 The most innovative ideas and developments integrated in MG7 are:
 
@@ -454,25 +452,23 @@ model for updating the database of reference sequences appropriate to
 face the challenging amount of sequences that are generating the new
 high throughput technologies of sequencing
 
-\subsection{4.2 Designed for future
+\subsection{Designed for future
 challenges}\label{designed-for-future-challenges}
 
 Other possible uses of the general schema: statika, loquat, \ldots{}
 
-\subsection{4.3 MG7 Future developments}\label{mg7-future-developments}
+\subsection{MG7 Future developments}\label{mg7-future-developments}
 
-\subsubsection{4.3.1 Comparison of groups of
+\subsubsection{Comparison of groups of
 samples}\label{comparison-of-groups-of-samples}
 
-\subsubsection{4.3.2 Interactive visualizations using the output files
-of MG7 (Biographika
+\subsubsection{Interactive visualizations using the output files of MG7
+(Biographika
 project)}\label{interactive-visualizations-using-the-output-files-of-mg7-biographika-project}
 
-\section{5 Acknowledgements}\label{acknowledgements}
+\section{Acknowledgements}\label{acknowledgements}
 
 INTERCROSSING (Grant 289974)
-
-\section{6 References}\label{references}
 
 \bibliographystyle{frontiersinSCNS_ENG_HUMS} % for Science, Engineering and Humanities and Social Sciences articles, for Humanities and Social Sciences articles please include page numbers in the in-text citations
 %\bibliographystyle{frontiersinHLTH&FPHY} % for Health and Physics articles
