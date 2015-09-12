@@ -19,10 +19,21 @@ import ohnosequences.fastarious._, fasta._, fastq._
 
 import java.io.{ BufferedWriter, FileWriter, File }
 
+import sys.process._
+
 
 case object blastDataProcessing {
 
   case object blastBundle extends Blast("2.2.31")
+
+  import ohnosequences.statika.aws._, api._, amazonLinuxAMIs._
+  import ohnosequences.awstools.regions.Region._
+
+  case object blastCompat extends Compatible(
+    amzn_ami_64bit(Ireland, Virtualization.HVM)(1),
+    blastBundle,
+    generated.metadata.Metagenomica
+  )
 
   // TODO with great power comes great responsibility. Move to conf
   case object outRec extends BlastOutputRecord(
@@ -44,7 +55,12 @@ case object blastDataProcessing {
     BlastExpression(blastExprType)(
       argumentValues  = args,
       // TODO whatever
-      optionValues    = blastn.defaults update (num_threads(1) :~: ∅)
+      optionValues    = blastn.defaults update (
+        num_threads(1) :~:
+        max_target_seqs(10) :~:
+        ohnosequences.blast.api.evalue(0.001)  :~:
+        blastn.task(blastn.megablast) :~: ∅
+      )
     )
   }
 
@@ -52,17 +68,18 @@ case object blastDataProcessing {
 
     val bw = new BufferedWriter(new FileWriter(file))
 
-    v.toLines foreach { l => bw.write(l) }
+    v.toLines foreach { l => bw.write(l); bw.newLine }
 
     bw.close()
     file
   }
 
   private def appendTo(append: File, to: File): File = {
+    println(s"Appending [${append.getCanonicalPath}] to [${to.getCanonicalPath}]")
 
     val bw = new BufferedWriter(new FileWriter(to, true))
 
-    io.Source.fromFile(append).getLines foreach { l => bw write l }
+    io.Source.fromFile(append).getLines foreach { l => bw write l; bw.newLine }
 
     bw.close
     to
@@ -95,11 +112,14 @@ case object blastDataProcessing {
 
       val totalOutput = context / "blastAll.csv"
 
-      lazy val quartets = io.Source.fromFile( context.file(fastqInput).javaFile ).getLines.grouped(4)
+      LazyTry {
+        lazy val quartets = io.Source.fromFile( context.file(fastqInput).javaFile ).getLines.grouped(4)
+        println(s"HAS NEXT: ${quartets.hasNext}")
 
-      lazy val steps: Iterator[AnyInstructions] = quartets map { quartet =>
+        quartets foreach { quartet =>
+          println("======================")
+          println(quartet.mkString("\n"))
 
-        LazyTry {
           // we only care about the id and the seq here
           val read = FASTA(
               header(FastqId(quartet(0)).toFastaHeader) :~:
@@ -110,27 +130,27 @@ case object blastDataProcessing {
           val outFile = context / "blastRead.csv"
 
           val args = blastn.arguments(
-            db(blast16s.location) :~:
+            db(blast16s.dbName) :~:
             query(readFile) :~:
             out(outFile) :~:
             ∅
           )
 
           val expr = blastExpr(args)
+          println(expr.cmd.mkString(" "))
 
-          // run!
-          import scala.sys.process._
-          expr.cmd.!
+          // BAM!!!
+          val foo = expr.cmd.!
+          println(s"EXIT CODE: ${foo}")
 
           // we should have something in args getV out now. Append it!
-          appendTo(expr.argumentValues getV out, totalOutput)
+          appendTo(outFile, totalOutput)
 
           // clean
-          readFile.delete; outFile.delete
+          readFile.delete
+          outFile.delete
         }
-      }
-
-      steps.foldLeft[AnyInstructions](say("processing quartets"))( _ -&- _ ) -&-
+      } -&-
       success(
         "much blast, very success!",
         blastOutput.inFile(totalOutput) :~: ∅

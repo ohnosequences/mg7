@@ -44,18 +44,17 @@ class FlashData [
   case object reads1_ extends PairedEnd1Fastq(readsType, "reads1.fastq.gz")
   case object reads2_ extends PairedEnd2Fastq(readsType, "reads2.fastq.gz")
 
-  case object merged_ extends MergedReads(readsType, reads1_, reads2_, flashOptions)
-  case object stats_ extends MergedReadsStats(merged_)
-
   type Reads1 = reads1_.type
   val  reads1 = reads1_
 
   type Reads2 = reads2_.type
   val  reads2 = reads2_
 
+  case object merged_ extends MergedReads(readsType, reads1, reads2, flashOptions)
   type Merged = merged_.type
   val  merged = merged_
 
+  case object stats_ extends MergedReadsStats[Merged](merged)
   type Stats = stats_.type
   val  stats = stats_
 }

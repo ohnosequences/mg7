@@ -61,7 +61,7 @@ class BundlesTest extends FunSuite with ParallelTestExecution {
     assert{ instances.length == 1 }
   }
 
-  test("testing gis filtering bundle") {
+  ignore("testing gis filtering bundle") {
     import filtering._
 
     val specs = filterGIsCompat.instanceSpecs(
@@ -71,6 +71,20 @@ class BundlesTest extends FunSuite with ParallelTestExecution {
     )
 
     val instances = launchAndWait(ec2, filterGIsCompat.name, specs)
+    assert{ instances.length == 1 }
+  }
+
+  ignore("testing blast bundle") {
+    import ohnosequences.metagenomica.loquats.blast.blastDataProcessing._
+
+    val specs = blastCompat.instanceSpecs(
+      instanceType = m3_medium,
+      user.awsAccount.keypair.name,
+      Some(era7.aws.roles.projects.name)
+    )
+
+    val instances = launchAndWait(ec2, blastCompat.name, specs)
+    // instances.foreach{ _.terminate }
     assert{ instances.length == 1 }
   }
 
