@@ -1,12 +1,12 @@
 package ohnosequences.metagenomica.loquats.blast
 
-import  ohnosequences.metagenomica._, bundles._
+import ohnosequences.metagenomica.configuration._
+import ohnosequences.metagenomica.bundles
 
 import ohnosequences.loquat._, dataProcessing._
 
 import ohnosequences.statika.bundles._
 import ohnosequences.statika.instructions._
-import ohnosequencesBundles.statika.Blast
 
 import ohnosequences.blast._, api._, data._, outputFields._
 
@@ -23,17 +23,6 @@ import sys.process._
 
 
 case object blastDataProcessing {
-
-  case object blastBundle extends Blast("2.2.31")
-
-  import ohnosequences.statika.aws._, api._, amazonLinuxAMIs._
-  import ohnosequences.awstools.regions.Region._
-
-  case object blastCompat extends Compatible(
-    amzn_ami_64bit(Ireland, Virtualization.HVM)(1),
-    blastBundle,
-    generated.metadata.Metagenomica
-  )
 
   // TODO with great power comes great responsibility. Move to conf
   case object outRec extends BlastOutputRecord(
@@ -90,20 +79,31 @@ case object blastDataProcessing {
 
     def instructions: AnyInstructions = say("Let the blasting begin!")
 
-    // this is defined in the constructor
-    // val bundleDependencies: List[AnyBundle] = List[AnyBundle](blastBundle, blast16s)
+    val bundleDependencies: List[AnyBundle] = List[AnyBundle](
+      bundles.blast,
+      bundles.blast16s
+    )
 
+    // TODO: more precise type
     type FastqInput <: AnyData
     val  fastqInput: FastqInput
+
+
+    // FIXME: we should use this instead of blastCmd, but .cmd requires implicits "/
+    // type BlastExpr <: AnyBlastExpression
+    // val  blastExpr: BlastExpr
+    // val blastCmd: Seq[String]
 
     type BlastOutput <: AnyBlastOutput
     val  blastOutput: BlastOutput
 
-    type Input  <: FastqInput :^: DNil
-    type Output <: BlastOutput :^: DNil
 
-    // What's this?
-    // private def blastOutputFile(context: Context): File = (context / "mapping.out").javaFile
+    type Input = FastqInput :^: DNil
+    val  input = fastqInput :^: DNil: Input
+
+    type Output = BlastOutput :^: DNil
+    val  output = blastOutput :^: DNil
+
 
     def processData(
       dataMappingId: String,
@@ -130,7 +130,7 @@ case object blastDataProcessing {
           val outFile = context / "blastRead.csv"
 
           val args = blastn.arguments(
-            db(blast16s.dbName) :~:
+            db(bundles.blast16s.dbName) :~:
             query(readFile) :~:
             out(outFile) :~:
             ∅
@@ -166,12 +166,9 @@ case object blastDataProcessing {
   ](val fastqInput: F,
     val blastOutput: B
   )(implicit
-    parseInputFiles: ParseDenotations[(F :^: DNil)#LocationsAt[FileDataLocation], File],
-    outputFilesToMap: ToMap[(B :^: DNil)#LocationsAt[FileDataLocation], AnyData, FileDataLocation]
-  ) extends DataProcessingBundle(blastBundle, blast16s)(
-    input = fastqInput :^: DNil,
-    output = blastOutput :^: DNil
-  )(parseInputFiles, outputFilesToMap) with AnyBlastDataProcessing {
+    val parseInputFiles: ParseDenotations[(F :^: DNil)#LocationsAt[FileDataLocation], File],
+    val outputFilesToMap: ToMap[(B :^: DNil)#LocationsAt[FileDataLocation], AnyData, FileDataLocation]
+  ) extends AnyBlastDataProcessing {
 
     type FastqInput = F
     type BlastOutput = B

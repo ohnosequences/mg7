@@ -7,6 +7,8 @@ import ohnosequences.datasets._, dataSets._, fileLocations._, illumina._, reads.
 import ohnosequences.flash.api._
 import ohnosequences.flash.data._
 
+import ohnosequences.blast._, api._, data._, outputFields._
+
 import java.io.File
 
 case object configuration {
@@ -17,7 +19,8 @@ case object configuration {
 
   trait AnyMetagenomicaData {
 
-    // Paired end reads as input
+    // FLASH
+
     type ReadsType <: AnyReadsType { type EndType = pairedEndType }
     val readsType: ReadsType
 
@@ -39,9 +42,23 @@ case object configuration {
     type FlashOutput = Merged :^: Stats :^: DNil
     val  flashOutput: FlashOutput
 
+
+    // BLAST
+
+    type BlastRecord <: AnyBlastOutputRecord
+    val  blastRecord: BlastRecord
+
+
+    type BlastOutput <: AnyBlastOutput
+    // {
+    //   type BlastExpressionType <: AnyBlastExpressionType {
+    //     type OutputRecord = BlastRecord
+    //   }
+    // }
+    val  blastOutput: BlastOutput
   }
 
-  class MetagenomicaData [
+  abstract class MetagenomicaData [
     RT <: AnyReadsType { type EndType = pairedEndType }
   ](val readsType: RT) extends AnyMetagenomicaData {
 
@@ -72,18 +89,14 @@ case object configuration {
     val  stats = stats_
 
     val  flashOutput = merged :^: stats :^: DNil
+
+    // case object blastExprType extends BlastExpressionType(blastn)(blastRecord)
+    // case object blastOutputType extends BlastOutputType(blastExprType, "blastn.out")
+    // case object blastOutput_ extends data.BlastOutput(blastOutputType, "blast.out.csv")
+    //
+    // type BlastOutput = blastOutput_.type
+    // val  blastOutput = blastOutput_
   }
 
-
-  // example
-  case object dt extends MetagenomicaData(illumina.PairedEnd(bp300, InsertSize(3000)))
-
-  case object flashProcessor extends loquats.flash.FlashDataProcessing(
-    dt.readsType,
-    dt.reads1,
-    dt.reads2,
-    dt.merged,
-    dt.stats
-  )
 
 }
