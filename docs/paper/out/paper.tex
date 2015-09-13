@@ -113,69 +113,240 @@ defined in metagenomics and there are shortcomings derived from the fact
 that many bioinformatics methodologies currently used for metagenomics
 data analysis were designed for a scenario very different that the
 current one. These are some of the aspects that have suffered crucial
-changes and advances with a direct impact in metagenomics data analysis.
-i. The first aspect is related to the sequences to be analyzed: the
-reads are larger, the sequencing depth and the number of samples of each
-project are considerably bigger. The first metagenomics studies were
-very local projects, while nowadays the most fruitful studies are done
-at a global level (international, continental, national). This kind of
-global studies has yielded the discovery of clinical biomarkers for
-diseases of the importance of cancer, obesity or inflammatory bowel
-diseases and has allowed exploring the biodiversity in many earth
-environments ii. The second aspect derives from the impressive genomics
-explosion, its effect being felt in this case in the reference
-sequences. The immense amount of sequences available in public
-repositories demands new approaches in curation, update and storage for
-metagenomics reference databases: current models will or already have
-problems to face the future avalanche of metagenomic sequences. iii. The
-third aspect to consider for metagenomics data analysis is related to
-the appearance of new models for massive computation and storage and to
-the new programming methodologies (Scala, \ldots{}) and new cloud models
-and resources. The immense new possibilities that these advances offer
-must have a direct impact in the metagenomics data analysis. iv. And
-finally the new social manner to do science, and especially genomic
-science is the fourth aspect to consider. Metagenomics evolves in a
-social and global scenario following a science democratization trend in
-which many small research groups from distant countries share a common
-big metagenomics project. This global cooperation demands systems
-allowing following exactly the same pipelines using equivalent cloud
-resources to modularly execute the analysis in an asynchronous way of
-working between different groups. This definitively new scenario demands
-new methods and tools to handle the current and future volume of
-metagenomic data with the sufficient speed of analysis. Considering all
-these aspects we have designed a new open source methodology for
-analyzing metagenomics data that exploits the new possibilities that
-cloud computing offers to get a system robust, programmatically
-configurable, modular, distributed, flexible, scalable and traceable in
-which the biological databases of reference sequences can be easily
-updated and/or frequently substituted by new ones or by databases
-specifically designed for focused projects.
+changes and advances with a direct impact in metagenomics data analysis:
+
+\begin{enumerate}
+\def\labelenumi{\roman{enumi}.}
+\tightlist
+\item
+  The first aspect is related to the sequences to be analyzed: the reads
+  are larger, the sequencing depth and the number of samples of each
+  project are considerably bigger. The first metagenomics studies were
+  very local projects, while nowadays the most fruitful studies are done
+  at a global level (international, continental, national). This kind of
+  global studies has yielded the discovery of clinical biomarkers for
+  diseases of the importance of cancer, obesity or inflammatory bowel
+  diseases and has allowed exploring the biodiversity in many earth
+  environments
+\item
+  The second aspect derives from the impressive genomics explosion, its
+  effect being felt in this case in the reference sequences. The immense
+  amount of sequences available in public repositories demands new
+  approaches in curation, update and storage for metagenomics reference
+  databases: current models will or already have problems to face the
+  future avalanche of metagenomic sequences.
+\item
+  The third aspect to consider for metagenomics data analysis is related
+  to the appearance of new models for massive computation and storage
+  such as the so-called cloud, or the widespread adoption of programming
+  methodologies like functional programming, or, more speculatively,
+  dependently typed programming. The immense new possibilities that
+  these advances offer must have a direct impact in metagenomics data
+  analysis.
+\item
+  And finally the new social manner to do science, and especially
+  genomic science is the fourth aspect to consider. Metagenomics evolves
+  in a social and global scenario following a science democratization
+  trend in which many small research groups from distant countries share
+  a common big metagenomics project. This global cooperation demands
+  systems allowing following exactly the same pipelines using equivalent
+  cloud resources to modularly execute the analysis in an asynchronous
+  way of working between different groups. This new scenario calls for
+  new methods and tools to handle the current and future volume of
+  metagenomic data with the sufficient speed of analysis.
+\end{enumerate}
+
+Considering all these aspects we have designed a new open source
+methodology for analyzing metagenomics data that exploits the new
+possibilities that cloud computing offers to get a system robust,
+programmatically configurable, modular, distributed, flexible, scalable
+and traceable in which the biological databases of reference sequences
+can be easily updated and/or frequently substituted by new ones or by
+databases specifically designed for focused projects.
 
 \section{Results}\label{results}
 
 \subsection{Overview}\label{overview}
 
 To tackle the challenges posed by metagenomics big data analysis
-outlined in the Introduction,
+outlined in the Introduction
 
-­- AWS resources in Scala (??) - A new approach to data analysis
-specification, management and specification based on working with it in
-exactly the same way as for a software project, together with the
-extensive use of compile-time structures and checks. - Parallelization
-and distributed analysis based on AWS, with on-demand infrastructure as
-the basic paradigm ­- fully automated processes, data and cloud
-resources management. - Static reproducible specification of
-dependencies and behavior of the different components using
-\emph{Statika} and \emph{Datasets} - Definition of complex pipelines
-using \emph{Loquat} a composable system for scaling/parallelizing
-stateless computations especially designed for Amazon Web Services (AWS)
-- Modeling of the taxonomy tree using the new paradigm of graph
-databases (Bio4j). It facilitates the taxonomic assignment tasks and the
-calculation of the taxa abundance values considering the hierarchic
-structure of taxonomy tree (cumulative values). - per-read assignment
-(??)
+\begin{itemize}
+\tightlist
+\item
+  Static reproducible specification of dependencies and behavior of the
+  different components using \emph{Statika} and \emph{Datasets}
+\item
+  Parallelization and distributed analysis based on AWS, with on-demand
+  infrastructure as the basic paradigm
+\item
+  Definition of complex pipelines using \emph{Loquat}, a composable
+  system for scaling/parallelizing stateless computations especially
+  designed for Amazon Web Services (AWS)
+\item
+  A new approach to data analysis specification, management and
+  specification based on working with it in exactly the same way as for
+  a software project, together with the extensive use of compile-time
+  structures and checks
+\item
+  Modeling of the taxonomy tree using the new paradigm of graph
+  databases (Bio4j). It facilitates the taxonomic assignment tasks and
+  the calculation of the taxa abundance values considering the
+  hierarchic structure of taxonomy tree (cumulative values)
+\item
+  per-read assignment (??)
+\end{itemize}
 
-\subsection{16S Reference Database
+\subsection{Libraries and resources}\label{libraries-and-resources}
+
+In this section we describe the resources and Scala libraries developed
+by the authors on top of which MG7 is built.
+
+\href{http://www.scala-lang.org/}{Scala}, a hybrid object-functional
+programming language, was chosen based on the possibility of using
+certain advanced programming styles, and Java interoperability, which
+let us build on the vast number of existing Java libraries; we take
+advantage of this when using Bio4j as an API for the NCBI taxonomy. It
+has support for type-level programming, type-dependent types (through
+type members) and singleton types, which permits a restricted form of
+dependent types where types can depend essentially on values determined
+at compile time (through their corresponding singleton types).
+Conversely, through implicits one can retrieve the value corresponding
+to a singleton type.
+
+\subsubsection{\texorpdfstring{\emph{Statika}: machine configuration and
+behavior}{Statika: machine configuration and behavior}}\label{statika-machine-configuration-and-behavior}
+
+\href{https://github.com/ohnosequences/statika}{Statika} is a Scala
+library developed by the first and last authors which serves as a way of
+defining and composing machine behaviors statically. The main component
+are \textbf{bundles}. Each bundle declares a sequence of computations
+(its behavior) which will be executed in an \textbf{environment}. A
+bundle can \emph{depend} on other bundles, and when being executed by an
+environment, its DAG of dependencies is linearized and run in sequence.
+In our use, bundles correspond to what an EC2 instance should do and an
+environment to an image (AMI: \textbf{A}mazon \textbf{M}achine
+\textbf{I}mage) which prepares the basic configuration, downloads the
+Scala code and runs it.
+
+\subsubsection{\texorpdfstring{\emph{Datasets}: a mini-language for
+data}{Datasets: a mini-language for data}}\label{datasets-a-mini-language-for-data}
+
+\href{https://github.com/ohnosequences/datasets}{Datasets} is a Scala
+library developed by the first and last authors with the goal of being a
+Scala-embedded mini-language for datasets and their locations.
+\textbf{Data} is represented as type-indexed fields: Keys are modeled as
+singleton types, and values correspond to what could be called a
+denotation of the key: a value of type \texttt{Location} tagged with the
+key type. Then a \textbf{Dataset} is essentially a collection of data,
+which are guaranteed statically to be different through type-level
+predicates, making use of the value ↔ type correspondence which can be
+established through singleton types and implicits. A dataset location is
+then just a list of locations formed by locations of each data member of
+that dataset. All this is based on what could be described as an
+embedding in Scala of an extensible record system with concatenation on
+disjoint labels, in the spirit of
+\citep[\citet{harper1991record}]{harper1990extensible}. For that
+\emph{Datasets} uses
+\href{https://github.com/ohnosequences/cosas/}{ohnosequences/cosas}.
+
+Data keys can further have a reference to a \textbf{data type}, which,
+as the name hints at, can help in providing information about the type
+of data we are working with. For example, when declaring Illumina reads
+as a data, a data type containing information about the read length,
+insert size or end type (single or paired) is used.
+
+A \textbf{location} can be, for example, an S3 object or a local file;
+by leaving the location type used to denote particular data free we can
+work with different ``physical'' representations, while keeping track of
+to which logical data they are a representation of. Thus, a process can
+generate locally a \texttt{.fastq} file representing the merged reads,
+while another can put it in S3 with the fact that they all correspond to
+the ``same'' merged reads is always present, as the data that those
+``physical'' representations denote.
+
+\subsubsection{\texorpdfstring{\emph{Loquat}: Parallel data processing
+with
+AWS}{Loquat: Parallel data processing with AWS}}\label{loquat-parallel-data-processing-with-aws}
+
+\href{https://github.com/ohnosequences/loquat}{Loquat} is a library
+developed by the first, second and last authors designed for the
+execution of embarrassingly parallel tasks using S3, SQS and EC2.
+
+A \textbf{loquat} executes a process with explicit input and output
+datasets (declared using the \emph{Datasets} library described above).
+Workers (EC2 instances) read from an SQS queue the S3 locations for both
+input and output data; then they download the input to local files, and
+pass these file locations to the process to be executed. The output is
+then put in the corresponding S3 locations.
+
+A manager instance is used to monitor workers, provide initial data to
+be put in the SQS queue and optionally release resources depending on a
+set of configurable conditions.
+
+Both worker and manager instances are Statika bundles. In the case of
+the worker, it can declare any dependencies needed to perform its task:
+other tools, libraries, or data.
+
+All configuration such as the number of workers or the instance types is
+declared statically, the specification of a loquat being ultimately a
+Scala object. There are deploy and resource management methods, making
+it easy to use an existing loquat either as a library or from (for
+example) a Scala REPL.
+
+The input and output (and their locations) being defined statically has
+several critical advantages. First, composing different loquats is easy
+and safe; just use the output types and locations of the first one as
+input for the second one. Second, data and their types help in not
+mixing different resources when implementing a process, while serving as
+a safe and convenient mechanism for writing generic processing tasks.
+For example, merging paired-end Illumina reads generically is easy as
+the data type includes the relevant information (insert size, read
+length, etc) to pass to a tool such as FLASH.
+
+\subsubsection{Type-safe eDSLs for BLAST and
+FLASH}\label{type-safe-edsls-for-blast-and-flash}
+
+We developed our own Scala-based type-safe eDSLs (\textbf{e}mbedded
+\textbf{D}omain \textbf{S}pecific \textbf{L}anguage) for
+\href{https://github.com/ohnosequences/flash}{FLASH} and
+\href{https://github.com/ohnosequences/blast}{BLAST} expressions and
+their execution.
+
+In the case of BLAST we use a model for expressions where we can
+guarantee for each BLAST command expression at compile time
+
+\begin{itemize}
+\tightlist
+\item
+  all required arguments are provided
+\item
+  only valid options are provided
+\item
+  correct types for each option value
+\item
+  valid output record specification
+\end{itemize}
+
+Generic type-safe parsers returning an heterogeneous record of BLAST
+output fields are also available, together with output data defined
+using \emph{Datasets} which have a reference to the exact BLAST command
+options which yielded that output. This let us provide generic parsers
+for BLAST output which are guaranteed to be correct, for example.
+
+In the same spirit as for BLAST, we implemented a type-safe EDSL for
+FLASH expressions and their execution, sporting features equivalent to
+those outlined for the BLAST EDSL.
+
+\subsubsection{Bio4j and Graph
+Databases}\label{bio4j-and-graph-databases}
+
+\citep[Bio4j][]{pareja2015bio4j} is a data platform integrating data
+from different resources such as UniProt or GO in a graph data paradigm.
+In the assignment phase we use a subgraph containing the NCBI Taxonomy,
+wrapping in Scala its Java API in a tree algebraic data type.
+
+\subsubsection{16S Reference Database
 Construction}\label{s-reference-database-construction}
 
 Our 16S Reference Database is a curated subset of sequences from NCBI
@@ -223,14 +394,12 @@ data. This possibility of changing the reference database provides
 flexibility to the system enabling it for easy updating and
 project-driven personalization.
 
-\subsection{Bio4j and Graph Databases}\label{bio4j-and-graph-databases}
+\subsection{Pipeline Description}\label{pipeline-description}
 
-\subsection{MG7 Pipeline Description}\label{mg7-pipeline-description}
-
-\subsection{Taxonomic Assignment
+\subsubsection{Taxonomic Assignment
 Algorithms}\label{taxonomic-assignment-algorithms}
 
-\subsubsection{Lowest Common Ancestor based Taxonomic
+\paragraph{Lowest Common Ancestor based Taxonomic
 Assignment}\label{lowest-common-ancestor-based-taxonomic-assignment}
 
 For each read:
@@ -253,7 +422,7 @@ In this approach the value used for evaluating the similarity is the
 bitscore that is a value that increases when similarity is higher and
 depends a lot on the length of the HSP
 
-\subsubsection{Best BLAST hit taxonomic
+\paragraph{Best BLAST hit taxonomic
 assignment}\label{best-blast-hit-taxonomic-assignment}
 
 We have maintained the simpler method of Best BLAST Hit (BBH) taxonomic
@@ -270,7 +439,7 @@ data-sets}\label{using-mg7-with-some-example-data-sets}
 
 We selected the datasets described in {[}Kennedy-2014{]} (??)
 
-\subsection{MG7 availability}\label{mg7-availability}
+\subsection{Availability}\label{availability}
 
 MG7 is open source, available at https://github.com/ohnosequences/mg7
 under an \href{http://www.gnu.org/licenses/agpl-3.0.en.html}{AGPLv3}
@@ -292,9 +461,8 @@ We could summarize the most innovative ideas and developments in MG7:
   \emph{expressiveness}
 \item
   input and output data, their locations and type are expressible and
-  checked at compile-time using our Scala library \emph{datasets} ­3.
-  management of dependencies and machine configurations using our Scala
-  library \emph{Statika}
+  checked at compile-time using \emph{Datasets} ­3. management of
+  dependencies and machine configurations using \emph{Statika}
 \item
   automation of AWS cloud resources and processes, including
   distribution and parallelization through the use of \emph{Loquat}
@@ -378,8 +546,6 @@ analysis and especially for biological data.
 
 \subsection{MG7 Future developments}\label{mg7-future-developments}
 
-Other possible uses of the general schema: statika, loquat, \ldots{}
-
 \subsubsection{Shotgun metagenomics}\label{shotgun-metagenomics}
 
 It is certainly possible to adapt MG7 to work with shotgun metagenomics
@@ -402,19 +568,12 @@ project)}\label{interactive-visualizations-using-the-output-files-of-mg7-biograp
 
 \subsection{Amazon Web Services}\label{amazon-web-services}
 
+We use EC2, S3 and SQS through a Scala wrapper of the official
+\href{https://aws.amazon.com/sdk-for-java/}{AWS Java SDK},
+\href{https://github.com/ohnosequences/aws-scala-tools/???}{ohnosequences/aws-scala-tools
+0.13.2}. This uses version \texttt{1.10.9} of the AWS Java SDK.
+
 \subsection{Scala}\label{scala}
-
-\href{http://www.scala-lang.org/}{Scala} is a hybrid object-functional
-programming language which runs on Java Virtual Machine. It has support
-for type-level programming, type-dependent types (through type members)
-and singleton types, which permits a restricted form of dependent types
-where types can depend essentially on values determined at compile time
-(through their corresponding singleton types). Conversely, through
-implicits one can retrieve the value corresponding to a singleton type.
-
-The other key feature for us is Java interoperability, which let us
-build on the vast number of existing Java libraries; we take advantage
-of this when using Bio4j as an API for the NCBI taxonomy.
 
 MG7 itself and all the libraries used are written in Scala
 \texttt{2.11}.
@@ -424,164 +583,44 @@ MG7 itself and all the libraries used are written in Scala
 MG7 uses
 \href{https://github.com/statika/statika/releases/tag/v0.2.0}{ohnosequences/statika
 2.0.0} for specifying the configuration and behavior of EC2 instances.
-\href{https://github.com/ohnosequences/statika}{Statika} is a Scala
-library developed by the first and last authors which serves as a way of
-defining and composing machine behaviors statically. The main component
-are \textbf{bundles}. Each bundle declares a sequence of computations
-(its behavior) which will be executed in an \textbf{environment}. A
-bundle can \emph{depend} on other bundles, and when being executed by an
-environment, its DAG of dependencies is linearized and run in sequence.
-In our use, bundles correspond to what an EC2 instance should do and an
-environment to an image (AMI: \textbf{A}mazon \textbf{M}achine
-\textbf{I}mage) which prepares the basic configuration, downloads the
-Scala code and runs it.
-
-MG7 uses
-\href{https://github.com/statika/statika/releases/tag/v0.2.0}{ohnosequences/statika
-2.0.0}.
 
 \subsection{Datasets}\label{datasets}
 
-\href{https://github.com/ohnosequences/datasets}{Datasets} is a Scala
-library developed by the first and last authors to declare datasets and
-their locations. \textbf{Data} is represented as type-indexed fields:
-Keys are modeled as singleton types, and values correspond to what could
-be called a denotation of the key: a value of type \texttt{Location}
-tagged with the key type. Then a \textbf{Dataset} is essentially a
-collection of data, which are guaranteed statically to be different
-through type-level predicates, making use of the value ↔ type
-correspondence which can be established through singleton types and
-implicits. A dataset location is then just a list of locations formed by
-locations of each data member of that dataset. All this is based on what
-could be described as an embedding in Scala of an extensible record
-system with concatenation on disjoint labels, in the spirit of
-\citep[\citet{harper1991record}]{harper1990extensible}. For that
-\emph{Datasets} uses
-\href{https://github.com/ohnosequences/cosas/releases/tag/v0.7.0}{ohnosequences/cosas
-0.7.0}.
-
-Data keys can further have a reference to a \textbf{data type}, which,
-as the name hints at, can help in providing information about the type
-of data we are working with. For example, when declaring Illumina reads
-as a data, a data type containing information about the read length,
-insert size or end type (single or paired) is used.
-
-A \textbf{location} can be, for example, an S3 object or a local file;
-by leaving the location type used to denote particular data free we can
-work with different ``physical'' representations, while keeping track of
-to which logical data they are a representation of. Thus, a process can
-generate locally a \texttt{.fastq} file representing the merged reads,
-while another can put it in S3 with the fact that they all correspond to
-the ``same'' merged reads is always present, as the data that those
-``physical'' representations denote.
-
 MG7 uses
 \href{https://github.com/ohnosequences/datasets/releases/tag/v0.2.0}{ohnosequences/datasets
-0.2.0}.
+0.2.0} for specifying input and output data, their type and their
+location.
 
 \subsection{Loquat}\label{loquat}
 
-\href{https://github.com/ohnosequences/loquat}{Loquat} is a library
-developed by the first, second and last authors designed for the
-execution of embarrassingly parallel tasks using S3, SQS and EC2.
-
-A \textbf{loquat} executes a process with explicit input and output
-datasets (declared using the \emph{Datasets} library described above).
-Workers (EC2 instances) read from an SQS queue the S3 locations for both
-input and output data; then they download the input to local files, and
-pass these file locations to the process to be executed. The output is
-then put in the corresponding S3 locations.
-
-A manager instance is used to monitor workers, provide initial data to
-be put in the SQS queue and optionally release resources depending on a
-set of configurable conditions.
-
-Both worker and manager instances are Statika bundles. In the case of
-the worker, it can declare any dependencies needed to perform its task:
-other tools, libraries, or data.
-
-All configuration such as the number of workers or the instance types is
-declared statically, the specification of a loquat being ultimately a
-Scala object. There are deploy and resource management methods, making
-it easy to use an existing loquat either as a library or from (for
-example) a Scala REPL.
-
-The input and output (and their locations) being defined statically has
-several critical advantages. First, composing different loquats is easy
-and safe; just use the output types and locations of the first one as
-input for the second one. Second, data and their types help in not
-mixing different resources when implementing a process, while serving as
-a safe and convenient mechanism for writing generic processing tasks.
-For example, merging paired-end Illumina reads generically is easy as
-the data type includes the relevant information (insert size, read
-length, etc) to pass to a tool such as FLASH.
-
 MG7 uses
 \href{https://github.com/ohnosequences/loquat/releases/tag/v2.0.0}{ohnosequences/loquat
-2.0.0}.
+2.0.0} for the specification of data processing tasks and their
+execution using AWS resources.
 
-\subsection{Type-safe EDSLs for BLAST and
-FLASH}\label{type-safe-edsls-for-blast-and-flash}
-
-We developed our own Scala-based type-safe EDSLs (Embedded Domain
-Specific Language) for
-\href{https://github.com/ohnosequences/flash}{FLASH} and
-\href{https://github.com/ohnosequences/blast}{BLAST} expressions and
-their execution.
-
-\subsubsection{BLAST EDSL}\label{blast-edsl}
-
-In the case of BLAST we use a model for expressions where we can
-guarantee for each BLAST command expression at compile time
-
-\begin{itemize}
-\tightlist
-\item
-  all required arguments are provided
-\item
-  only valid options are provided
-\item
-  correct types for each option value
-\item
-  valid output record specification
-\end{itemize}
-
-Generic type-safe parsers returning an heterogeneous record of BLAST
-output fields are also available, together with output data defined
-using \emph{Datasets} which have a reference to the exact BLAST command
-options which yielded that output. This let us provide generic parsers
-for BLAST output which are guaranteed to be correct, for example.
+\subsection{BLAST eDSL}\label{blast-edsl}
 
 MG7 uses
 \href{https://github.com/ohnosequences/blast/releases/tag/v0.2.0}{ohnosequences/blast
-0.2.0}.
+0.2.0}. The BLAST version used is \texttt{2.2.31+}
 
-\subsubsection{FLASH EDSL}\label{flash-edsl}
-
-In the same spirit as for BLAST, we implemented a type-safe EDSL for
-FLASH expressions and their execution, sporting features equivalent to
-those outlined for the BLAST EDSL.
+\subsection{FLASH eDSL}\label{flash-edsl}
 
 MG7 uses
 \href{https://github.com/ohnosequences/flash/releases/tag/v0.1.0}{ohnosequences/flash
-0.1.0}.
+0.1.0}. The FLASH version used is \texttt{?.?.?}
 
 \subsection{Bio4j}\label{bio4j}
-
-\href{https://github.com/bio4j/bio4j}{Bio4j} is a data platform
-integrating data from different resources such as UniProt or GO in a
-graph data paradigm. We use the module containing the NCBI Taxonomy, and
-the use their Java API from Scala in the assignment phase.
 
 MG7 uses
 \href{https://github.com/bio4j/bio4j/releases/tag/v0.12.0-RC3}{bio4j/bio4j
 0.12.0-RC3} and
 \href{https://github.com/bio4j/bio4j-titan/releases/tag/v0.4.0-RC2}{bio4j/bio4j-titan
-0.4.0-RC2}.
+0.4.0-RC2} as an API for the NCBI taxonomy.
 
 \section{Acknowledgements}\label{acknowledgements}
 
-INTERCROSSING (Grant 289974)
+The two first authors are funded by INTERCROSSING (Grant 289974).
 
 \bibliographystyle{frontiersinSCNS_ENG_HUMS} % for Science, Engineering and Humanities and Social Sciences articles, for Humanities and Social Sciences articles please include page numbers in the in-text citations
 %\bibliographystyle{frontiersinHLTH&FPHY} % for Health and Physics articles
