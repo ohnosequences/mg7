@@ -186,6 +186,10 @@ environment to an image (AMI: \textbf{A}mazon \textbf{M}achine
 \textbf{I}mage) which prepares the basic configuration, downloads the
 Scala code and runs it.
 
+MG7 uses
+\href{https://github.com/statika/statika/releases/tag/v0.2.0}{ohnosequences/statika
+2.0.0}.
+
 \subsection{Datasets}\label{datasets}
 
 \href{https://github.com/ohnosequences/datasets}{Datasets} is a Scala
@@ -214,6 +218,10 @@ generate locally a \texttt{.fastq} file representing the merged reads,
 while another can put it in S3 with the fact that they all correspond to
 the ``same'' merged reads is always present, as the data that those
 ``physical'' representations denote.
+
+MG7 uses
+\href{https://github.com/ohnosequences/datasets/releases/tag/v0.2.0}{ohnosequences/datasets
+0.2.0}.
 
 \subsection{Loquat}\label{loquat}
 
@@ -252,15 +260,20 @@ For example, merging paired-end Illumina reads generically is easy as
 the data type includes the relevant information (insert size, read
 length, etc) to pass to a tool such as FLASH.
 
-\subsection{Type-safe DSLs for BLAST and
-FLASH}\label{type-safe-dsls-for-blast-and-flash}
+MG7 uses
+\href{https://github.com/ohnosequences/loquat/releases/tag/v?.?.?}{ohnosequences/loquat
+?.?.?}.
 
-We developed our own type-safe DSLs (Domain Specific Language) for
+\subsection{Type-safe EDSLs for BLAST and
+FLASH}\label{type-safe-edsls-for-blast-and-flash}
+
+We developed our own Scala-based type-safe EDSLs (Embedded Domain
+Specific Language) for
 \href{https://github.com/ohnosequences/flash}{FLASH} and
 \href{https://github.com/ohnosequences/blast}{BLAST} expressions and
 their execution.
 
-\subsubsection{BLAST DSL}\label{blast-dsl}
+\subsubsection{BLAST EDSL}\label{blast-edsl}
 
 In the case of BLAST we use a model for expressions where we can
 guarantee for each BLAST command expression at compile time
@@ -283,9 +296,19 @@ using \emph{Datasets} which have a reference to the exact BLAST command
 options which yielded that output. This let us provide generic parsers
 for BLAST output which are guaranteed to be correct, for example.
 
-\subsubsection{FLASH DSL}\label{flash-dsl}
+MG7 uses
+\href{https://github.com/ohnosequences/blast/releases/tag/v0.2.0}{ohnosequences/blast
+0.2.0}.
 
-In the same spirit as for BLAST,
+\subsubsection{FLASH EDSL}\label{flash-edsl}
+
+In the same spirit as for BLAST, we implemented a type-safe EDSL for
+FLASH expressions and their execution, sporting features equivalent to
+those outlined for the BLAST EDSL.
+
+MG7 uses
+\href{https://github.com/ohnosequences/flash/releases/tag/v0.1.0}{ohnosequences/flash
+0.1.0}.
 
 \subsection{Bio4j}\label{bio4j}
 
@@ -293,6 +316,12 @@ In the same spirit as for BLAST,
 integrating data from different resources such as UniProt or GO in a
 graph data paradigm. We use the module containing the NCBI Taxonomy, and
 the use their Java API from Scala in the assignment phase.
+
+MG7 uses
+\href{https://github.com/bio4j/bio4j/releases/tag/v0.12.0-RC3}{bio4j/bio4j
+0.12.0-RC3} and
+\href{https://github.com/bio4j/bio4j-titan/releases/tag/v0.4.0-RC2}{bio4j/bio4j-titan
+0.4.0-RC2}.
 
 \section{Results}\label{results}
 

@@ -71,6 +71,8 @@ MG7 itself and all the libraries used are written in Scala `2.11`.
 <!-- TODO expand? -->
 [Statika](https://github.com/ohnosequences/statika) is a Scala library developed by the first and last authors which serves as a way of defining and composing machine behaviors statically. The main component are **bundles**. Each bundle declares a sequence of computations (its behavior) which will be executed in an **environment**. A bundle can *depend* on other bundles, and when being executed by an environment, its DAG of dependencies is linearized and run in sequence. In our use, bundles correspond to what an EC2 instance should do and an environment to an image (AMI: **A**mazon **M**achine **I**mage) which prepares the basic configuration, downloads the Scala code and runs it.
 
+MG7 uses [ohnosequences/statika 2.0.0](https://github.com/statika/statika/releases/tag/v0.2.0).
+
 ## Datasets
 <!-- TODO
   reference to record types, tagged types etc
@@ -86,6 +88,8 @@ Data keys can further have a reference to a **data type**, which, as the name hi
 
 A **location** can be, for example, an S3 object or a local file; by leaving the location type used to denote particular data free we can work with different "physical" representations, while keeping track of to which logical data they are a representation of. Thus, a process can generate locally a `.fastq` file representing the merged reads, while another can put it in S3 with the fact that they all correspond to the "same" merged reads is always present, as the data that those "physical" representations denote.
 
+MG7 uses [ohnosequences/datasets 0.2.0](https://github.com/ohnosequences/datasets/releases/tag/v0.2.0).
+
 ## Loquat
 
 [Loquat](https://github.com/ohnosequences/loquat) is a library developed by the first, second and last authors designed for the execution of embarrassingly parallel tasks using S3, SQS and EC2.
@@ -100,12 +104,14 @@ All configuration such as the number of workers or the instance types is declare
 
 The input and output (and their locations) being defined statically has several critical advantages. First, composing different loquats is easy and safe; just use the output types and locations of the first one as input for the second one. Second, data and their types help in not mixing different resources when implementing a process, while serving as a safe and convenient mechanism for writing generic processing tasks. For example, merging paired-end Illumina reads generically is easy as the data type includes the relevant information (insert size, read length, etc) to pass to a tool such as FLASH.
 
-## Type-safe DSLs for BLAST and FLASH
+MG7 uses [ohnosequences/loquat ?.?.?](https://github.com/ohnosequences/loquat/releases/tag/v?.?.?).
+
+## Type-safe EDSLs for BLAST and FLASH
 
 <!-- TODO cite BLAST and FLASH -->
-We developed our own type-safe DSLs (Domain Specific Language) for [FLASH](https://github.com/ohnosequences/flash) and [BLAST](https://github.com/ohnosequences/blast) expressions and their execution.
+We developed our own Scala-based type-safe EDSLs (Embedded Domain Specific Language) for [FLASH](https://github.com/ohnosequences/flash) and [BLAST](https://github.com/ohnosequences/blast) expressions and their execution.
 
-### BLAST DSL
+### BLAST EDSL
 
 In the case of BLAST we use a model for expressions where we can guarantee for each BLAST command expression at compile time
 
@@ -116,13 +122,19 @@ In the case of BLAST we use a model for expressions where we can guarantee for e
 
 Generic type-safe parsers returning an heterogeneous record of BLAST output fields are also available, together with output data defined using *Datasets* which have a reference to the exact BLAST command options which yielded that output. This let us provide generic parsers for BLAST output which are guaranteed to be correct, for example.
 
-### FLASH DSL
-<!-- TODO write something about this -->
-In the same spirit as for BLAST,
+MG7 uses [ohnosequences/blast 0.2.0](https://github.com/ohnosequences/blast/releases/tag/v0.2.0).
+
+### FLASH EDSL
+
+In the same spirit as for BLAST, we implemented a type-safe EDSL for FLASH expressions and their execution, sporting features equivalent to those outlined for the BLAST EDSL.
+
+MG7 uses [ohnosequences/flash 0.1.0](https://github.com/ohnosequences/flash/releases/tag/v0.1.0).
 
 ## Bio4j
 
 [Bio4j](https://github.com/bio4j/bio4j) is a data platform integrating data from different resources such as UniProt or GO in a graph data paradigm. We use the module containing the NCBI Taxonomy, and the use their Java API from Scala in the assignment phase.
+
+MG7 uses [bio4j/bio4j 0.12.0-RC3](https://github.com/bio4j/bio4j/releases/tag/v0.12.0-RC3) and [bio4j/bio4j-titan 0.4.0-RC2](https://github.com/bio4j/bio4j-titan/releases/tag/v0.4.0-RC2).
 
 # Results
 
