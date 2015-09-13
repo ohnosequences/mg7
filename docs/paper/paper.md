@@ -172,16 +172,6 @@ In this approach the value used for evaluating the similarity is the bitscore th
 
 We have maintained the simpler method of Best BLAST Hit (BBH) taxonomic assignment because, in some cases, it can provide information about the sequences that can be more useful than the obtained using LCA algorithm. Using LCA algorithm when some reference sequences with BLAST alignments over the required thresholds map to a not sufficiently specific taxID, the read can be assigned to an unspecific taxon near to the root. If the BBH reference sequence maps to a more specific taxa this method, in that case, gives us useful information.
 
-## Other
-
-General approach. An analysis is defined as a software project. It can evolve in the same way. We can run the analysis in a test phase, review configuration and changes, etc. Key advantages of this approach are
-
-- **Reproducibility** the same analysis can be run again with exactly the same configuration in a trivial way.
-- **Versioning** The analysis is a software project so it goes through the same stages, there can be different versions, stable releases, etc.
-- **Reuse** we can build standard configurations on top of this and reuse them for subsequent data analysis.
-- **Decoupling** We can start working on the analysis specification, without any need for data in a much easier way.
-- **Expresiveness and safety** choose only from valid Illumina read types, build default FLASH command based on that, ...
-
 ## Using MG7 with some example data-sets
 
 <!-- ?? -->
@@ -192,26 +182,44 @@ We selected the datasets described in [Kennedy-2014] (??)
 MG7 is open source, available at https://github.com/ohnosequences/mg7 under an [AGPLv3](http://www.gnu.org/licenses/agpl-3.0.en.html) license.
 
 # Discussion
-
 <!-- From instructions: This section may be divided by subheadings. Discussions should cover the key findings of the study: discuss any prior art related to the subject so to place the novelty of the discovery in the appropriate context; discuss the potential short-comings and limitations on their interpretations; discuss their integration into the current understanding of the problem and how this advances the current views; speculate on the future direction of the research and freely postulate theories that could be tested in the future. -->
 
-## Novelty points of MG7
+## What MG7 brings
 
-<!--  TODO fix all this -->
+We could summarize the most innovative ideas and developments in MG7:
 
-The most innovative ideas and developments integrated in MG7 are:
+<!-- TODO this needs a couple of points on the bio side. My idea is to have section for each. -->
+1. Treat data analysis as a software project. This makes for radical improvements in *reproducibility*, *reuse*, *versioning*, *safety*, *automation* and *expressiveness*
+2. input and output data, their locations and type are expressible and checked at compile-time using our Scala library *datasets*
+­3. management of dependencies and machine configurations using our Scala library *Statika*
+4. automation of AWS cloud resources and processes, including distribution and parallelization through the use of *Loquat*
+5. taxonomic data and related operations are treated natively as what they are: graphs, through the use of *Bio4j*
+6. MG7 provides a sustainable model for taxonomic assignment, appropriate to face the challenging amount of data that high throughput sequencing technologies generate
 
-­- The management dependencies checking their correctness before compilation using Scala type system
-- The automation of cloud resources and processes (parallelization management)
-- The cloud-oriented development of the system including a modeling AWS resources based on the powerful data typing of Scala
-- The use of the Graph databases paradigm to store and manage the taxonomy tree to obtain the taxonomic assignments and the cumulative frequencies
-- MG7 provides a sustainable model for updating the database of reference sequences appropriate to face the challenging amount of sequences that are generating the new high throughput technologies of sequencing
+## A new approach to data analysis
 
-## Designed for future challenges
+General approach. An analysis is defined as a software project. It can evolve in the same way. We can run the analysis in a test phase, review configuration and changes, etc. Key advantages of this approach are
 
-Other possible uses of the general schema: statika, loquat, ...
+- **Reproducibility** the same analysis can be run again with exactly the same configuration in a trivial way.
+- **Versioning** The analysis is a software project so it goes through the same stages, there can be different versions, stable releases, etc.
+- **Reuse** we can build standard configurations on top of this and reuse them for subsequent data analysis.
+- **Decoupling** We can start working on the analysis specification, without any need for data in a much easier way.
+- **Expresiveness and safety** choose only from valid Illumina read types, build default FLASH command based on that, ...
+
+## Inputs, outputs, data: compile-time, expressive, composable
+
+## Tools, data, dependencies and machine configurations
+
+## Parallel cloud execution ??
+<!-- The Loquat thing -->
+
+## Taxonomy and Bio4j
+
+## Future-proof
 
 ## MG7 Future developments
+
+Other possible uses of the general schema: statika, loquat, ...
 
 ### Comparison of groups of samples
 

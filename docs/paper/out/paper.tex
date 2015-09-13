@@ -408,7 +408,50 @@ the read can be assigned to an unspecific taxon near to the root. If the
 BBH reference sequence maps to a more specific taxa this method, in that
 case, gives us useful information.
 
-\subsection{Other}\label{other}
+\subsection{Using MG7 with some example
+data-sets}\label{using-mg7-with-some-example-data-sets}
+
+We selected the datasets described in {[}Kennedy-2014{]} (??)
+
+\subsection{MG7 availability}\label{mg7-availability}
+
+MG7 is open source, available at https://github.com/ohnosequences/mg7
+under an \href{http://www.gnu.org/licenses/agpl-3.0.en.html}{AGPLv3}
+license.
+
+\section{Discussion}\label{discussion}
+
+\subsection{What MG7 brings}\label{what-mg7-brings}
+
+We could summarize the most innovative ideas and developments in MG7:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Treat data analysis as a software project. This makes for radical
+  improvements in \emph{reproducibility}, \emph{reuse},
+  \emph{versioning}, \emph{safety}, \emph{automation} and
+  \emph{expressiveness}
+\item
+  input and output data, their locations and type are expressible and
+  checked at compile-time using our Scala library \emph{datasets} ­3.
+  management of dependencies and machine configurations using our Scala
+  library \emph{Statika}
+\item
+  automation of AWS cloud resources and processes, including
+  distribution and parallelization through the use of \emph{Loquat}
+\item
+  taxonomic data and related operations are treated natively as what
+  they are: graphs, through the use of \emph{Bio4j}
+\item
+  MG7 provides a sustainable model for taxonomic assignment, appropriate
+  to face the challenging amount of data that high throughput sequencing
+  technologies generate
+\end{enumerate}
+
+\subsection{A new approach to data
+analysis}\label{a-new-approach-to-data-analysis}
 
 General approach. An analysis is defined as a software project. It can
 evolve in the same way. We can run the analysis in a test phase, review
@@ -434,40 +477,21 @@ configuration and changes, etc. Key advantages of this approach are
   types, build default FLASH command based on that, \ldots{}
 \end{itemize}
 
-\subsection{Using MG7 with some example
-data-sets}\label{using-mg7-with-some-example-data-sets}
+\subsection{Inputs, outputs, data: compile-time, expressive,
+composable}\label{inputs-outputs-data-compile-time-expressive-composable}
 
-We selected the datasets described in {[}Kennedy-2014{]} (??)
+\subsection{Tools, data, dependencies and machine
+configurations}\label{tools-data-dependencies-and-machine-configurations}
 
-\subsection{MG7 availability}\label{mg7-availability}
+\subsection{Parallel cloud execution ??}\label{parallel-cloud-execution}
 
-MG7 is open source, available at https://github.com/ohnosequences/mg7
-under an \href{http://www.gnu.org/licenses/agpl-3.0.en.html}{AGPLv3}
-license.
+\subsection{Taxonomy and Bio4j}\label{taxonomy-and-bio4j}
 
-\section{Discussion}\label{discussion}
-
-\subsection{Novelty points of MG7}\label{novelty-points-of-mg7}
-
-The most innovative ideas and developments integrated in MG7 are:
-
-­- The management dependencies checking their correctness before
-compilation using Scala type system - The automation of cloud resources
-and processes (parallelization management) - The cloud-oriented
-development of the system including a modeling AWS resources based on
-the powerful data typing of Scala - The use of the Graph databases
-paradigm to store and manage the taxonomy tree to obtain the taxonomic
-assignments and the cumulative frequencies - MG7 provides a sustainable
-model for updating the database of reference sequences appropriate to
-face the challenging amount of sequences that are generating the new
-high throughput technologies of sequencing
-
-\subsection{Designed for future
-challenges}\label{designed-for-future-challenges}
-
-Other possible uses of the general schema: statika, loquat, \ldots{}
+\subsection{Future-proof}\label{future-proof}
 
 \subsection{MG7 Future developments}\label{mg7-future-developments}
+
+Other possible uses of the general schema: statika, loquat, \ldots{}
 
 \subsubsection{Comparison of groups of
 samples}\label{comparison-of-groups-of-samples}
