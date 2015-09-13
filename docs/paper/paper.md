@@ -104,7 +104,7 @@ All configuration such as the number of workers or the instance types is declare
 
 The input and output (and their locations) being defined statically has several critical advantages. First, composing different loquats is easy and safe; just use the output types and locations of the first one as input for the second one. Second, data and their types help in not mixing different resources when implementing a process, while serving as a safe and convenient mechanism for writing generic processing tasks. For example, merging paired-end Illumina reads generically is easy as the data type includes the relevant information (insert size, read length, etc) to pass to a tool such as FLASH.
 
-MG7 uses [ohnosequences/loquat ?.?.?](https://github.com/ohnosequences/loquat/releases/tag/v?.?.?).
+MG7 uses [ohnosequences/loquat 2.0.0](https://github.com/ohnosequences/loquat/releases/tag/v2.0.0).
 
 ## Type-safe EDSLs for BLAST and FLASH
 
