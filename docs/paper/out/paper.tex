@@ -202,7 +202,13 @@ collection of data, which are guaranteed statically to be different
 through type-level predicates, making use of the value ↔ type
 correspondence which can be established through singleton types and
 implicits. A dataset location is then just a list of locations formed by
-locations of each data member of that dataset.
+locations of each data member of that dataset. All this is based on what
+could be described as an embedding in Scala of an extensible record
+system with concatenation on disjoint labels, in the spirit of
+\citep[\citet{harper1991record}]{harper1990extensible}. For that
+\emph{Datasets} uses
+\href{https://github.com/ohnosequences/cosas/releases/tag/v0.7.0}{ohnosequences/cosas
+0.7.0}.
 
 Data keys can further have a reference to a \textbf{data type}, which,
 as the name hints at, can help in providing information about the type
