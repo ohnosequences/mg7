@@ -23,68 +23,70 @@ import java.io.File
 
 
 trait AnyFlashConfig extends Era7LoquatConfig { config =>
+  type Data <: AnyFlashData
+  // val  data: Data
 
-  type DataProcessing <: AnyFlashDataProcessing
+  type DataProcessing <: FlashDataProcessing[Data]
   val  dataProcessing: DataProcessing
 
   type FlashDataMappring = AnyDataMapping { type DataProcessing = config.DataProcessing }
   val  dataMappings: List[FlashDataMappring]
 }
 
-abstract class FlashConfig[D <: AnyFlashDataProcessing](val dataProcessing: D) extends AnyFlashConfig {
-
-  type DataProcessing = D
-}
+// abstract class FlashConfig[D <: AnyFlashData](val dataProcessing: D) extends AnyFlashConfig {
+//
+//   type DataProcessing = D
+// }
 
 //////////////////////////////////////////////////////////////////////////////////////
 
-case object flashTest {
-
-  // TODO: move it to datasets
-  implicit def genericParser[D <: AnyData](implicit d: D): DenotationParser[D, FileDataLocation, File] =
-    new DenotationParser(d, d.label)({ f: File => Some(FileDataLocation(f)) })
-
-
-  case object testData extends FlashData(illumina.PairedEnd(bp300, InsertSize(3000)))
-
-  case object testDataProcessing extends FlashDataProcessing(testData)
-
-  case object testConfig extends FlashConfig(testDataProcessing) {
-
-    val metadata: AnyArtifactMetadata = generated.metadata.Metagenomica
-
-    val managerConfig = ManagerConfig(
-      instanceType = m3_medium,
-      purchaseModel = SpotAuto
-    )
-
-    val workersConfig = WorkersConfig(
-      instanceType = m3_medium,
-      purchaseModel = SpotAuto,
-      groupSize = WorkersGroupSize(0, 1, 10)
-    )
-
-    val terminationConfig = TerminationConfig(
-      terminateAfterInitialDataMappings = true
-    )
-
-    val dataMappings: List[FlashDataMappring] =
-      List(
-        DataMapping(
-          "ERR567374_1",
-          dataProcessing
-        )(remoteInput =
-            dataProcessing.data.reads1.atS3(ObjectAddress("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/reads/ERR567374_1.fastq.gz")) :~:
-            dataProcessing.data.reads2.atS3(ObjectAddress("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/reads/ERR567374_2.fastq.gz")) :~:
-            ∅,
-          remoteOutput =
-            dataProcessing.data.merged.atS3(ObjectAddress("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/flash-test/ERR567374_1.merged.fastq")) :~:
-            dataProcessing.data.stats.atS3(ObjectAddress("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/flash-test/ERR567374_1.stats.txt")) :~:
-            ∅
-        )
-      )
-
-  }
-
-  case object testLoquat extends Loquat(testConfig, testDataProcessing)
-}
+// case object flashTest {
+//
+//   // TODO: move it to datasets
+//   implicit def genericParser[D <: AnyData](implicit d: D): DenotationParser[D, FileDataLocation, File] =
+//     new DenotationParser(d, d.label)({ f: File => Some(FileDataLocation(f)) })
+//
+//
+//   case object testData extends FlashData(illumina.PairedEnd(bp300, InsertSize(3000)))
+//
+//   case object testDataProcessing extends FlashDataProcessing(testData)
+//
+//   case object testConfig extends FlashConfig(testDataProcessing) {
+//
+//     val metadata: AnyArtifactMetadata = generated.metadata.Metagenomica
+//
+//     val managerConfig = ManagerConfig(
+//       instanceType = m3_medium,
+//       purchaseModel = SpotAuto
+//     )
+//
+//     val workersConfig = WorkersConfig(
+//       instanceType = m3_medium,
+//       purchaseModel = SpotAuto,
+//       groupSize = WorkersGroupSize(0, 1, 10)
+//     )
+//
+//     val terminationConfig = TerminationConfig(
+//       terminateAfterInitialDataMappings = true
+//     )
+//
+//     val dataMappings: List[FlashDataMappring] =
+//       List(
+//         DataMapping(
+//           "ERR567374_1",
+//           dataProcessing
+//         )(remoteInput =
+//             dataProcessing.data.reads1.atS3(ObjectAddress("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/reads/ERR567374_1.fastq.gz")) :~:
+//             dataProcessing.data.reads2.atS3(ObjectAddress("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/reads/ERR567374_2.fastq.gz")) :~:
+//             ∅,
+//           remoteOutput =
+//             dataProcessing.data.merged.atS3(ObjectAddress("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/flash-test/ERR567374_1.merged.fastq")) :~:
+//             dataProcessing.data.stats.atS3(ObjectAddress("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/flash-test/ERR567374_1.stats.txt")) :~:
+//             ∅
+//         )
+//       )
+//
+//   }
+//
+//   case object testLoquat extends Loquat(testConfig, testDataProcessing)
+// }
