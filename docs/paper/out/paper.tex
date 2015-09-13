@@ -322,39 +322,49 @@ structure of taxonomy tree (cumulative values). - per-read assignment
 Construction}\label{s-reference-database-construction}
 
 Our 16S Reference Database is a curated subset of sequences from NCBI
-nucleotide database \textbf{nt}. This subset of 16S sequences was
-selected by similarity with the bacterial and archaeal reference
-sequences downloaded from RDP database \citep{cole2013ribosomal}. RDP
-unaligned sequences were used to capture new16S sequences from nt using
-BLAST similarity strategies and, then, performing additional curation
-steps to remove sequences with poor taxonomic assignments to taxonomic
-nodes close to the root of the taxonomic tree. All the nucleotide
-sequences included in nt database has a taxonomic assignment provided by
-the genbank sequence submitter. NCBI provides a table (available at
+nucleotide database \textbf{nt}. The sequences included were selected by
+similarity with the bacterial and archaeal reference sequences
+downloaded from the \textbf{RDP database} \citep{cole2013ribosomal}. RDP
+unaligned sequences were used to capture new 16S sequences from
+\textbf{nt} using BLAST similarity search strategies and then,
+performing additional curation steps to remove sequences with poor
+taxonomic assignments to taxonomic nodes close to the root of the
+taxonomy tree. All the nucleotide sequences included in \textbf{nt}
+database has a taxonomic assignment provided by the \textbf{Genbank}
+sequence submitter. NCBI provides a table (available at
 ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/) to do the mapping of any
 Genbank Identifier (GI) to its Taxonomy Identifier (TaxID). Thus, we are
-based on a submitter-maintained taxonomic annotation system for
-reference sequences that supposes a sustainable system able to face the
-expected number of reference sequences that will populate the public
+based on a crowdsourced submitter-maintained taxonomic annotation system
+for reference sequences. It supposes a sustainable system able to face
+the expected number of reference sequences that will populate the public
 global nucleotide databases in the near future. Another advantageous
-point is that we are based on NCBI taxonomy, the de facto standard
-taxonomic classification for biomolecular data \citep{cochrane20102010}.
-NCBI taxonomy is, without any doubt, the most used taxonomy all over the
-world and the most similar to the official taxonomies of each specific
-field. This is a crucial point because all the type-culture and tissue
-databanks follow this official taxonomical classification and, in
-addition, all the knowledge accumulated is referred to this taxonomy. In
-addition NCBI provides a direct connection between taxonomical formal
-names and the physical specimens that serve as exemplars for the species
+point is that we are based on NCBI taxonomy, the \emph{de facto}
+standard taxonomic classification for biomolecular data
+\citep{cochrane20102010}. NCBI taxonomy is, undoubtedly, the most used
+taxonomy all over the world and the most similar to the official
+taxonomies of each specific field. This is a crucial point because all
+the type-culture and tissue databanks follow this official taxonomical
+classification and, in addition, all the knowledge accumulated during
+last decades is referred to this taxonomy. In addition NCBI provides a
+direct connection between taxonomical formal names and the physical
+specimens that serve as exemplars for the species
 \citep{federhen2014type}.
 
-If metagenomics results are easily integrated with the theoretical and
-experimental knowledge of each specific area, the impact of metagenomics
-will be higher that if metagenomics progress in a disconnected research
-branch. This strategy for building our database allows substituting the
-16S database by any other subset of nt, even by the complete nt database
-if it would needed, for example, for analyzing shotgun metagenomics
-data.
+Certainly, if metagenomics results are easily integrated with the
+theoretical and experimental knowledge of each specific area, the impact
+of metagenomics will be higher that if metagenomics progresses as a
+disconnected research branch. Considering that metagenomics data
+interoperability, which is especially critical in clinical environments,
+requires a stable taxonomy to be used as reference, we decided to rely
+on the most widely used taxonomy: the NCBI taxonomy. In addition, the
+biggest global sequence database GenBank follows this taxonomy to
+register the origin of all their submitted sequences. Our 16S database
+building strategy allows the substitution of the 16S database by any
+other subset of \textbf{nt}, even by the complete \textbf{nt} database
+if it would be needed, for example, for analyzing shotgun metagenomics
+data. This possibility of changing the reference database provides
+flexibility to the system enabling it for easy updating and
+project-driven personalization.
 
 \subsection{Bio4j and Graph Databases}\label{bio4j-and-graph-databases}
 
