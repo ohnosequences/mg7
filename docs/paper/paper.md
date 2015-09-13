@@ -160,11 +160,6 @@ In this approach the value used for evaluating the similarity is the bitscore th
 
 We have maintained the simpler method of Best BLAST Hit (BBH) taxonomic assignment because, in some cases, it can provide information about the sequences that can be more useful than the obtained using LCA algorithm. Using LCA algorithm when some reference sequences with BLAST alignments over the required thresholds map to a not sufficiently specific taxID, the read can be assigned to an unspecific taxon near to the root. If the BBH reference sequence maps to a more specific taxa this method, in that case, gives us useful information.
 
-## Using MG7 with some example data-sets
-
-<!-- ?? -->
-We selected the datasets described in [Kennedy-2014] (??)
-
 ## Availability
 
 MG7 is open source, available at https://github.com/ohnosequences/mg7 under an [AGPLv3](http://www.gnu.org/licenses/agpl-3.0.en.html) license.
