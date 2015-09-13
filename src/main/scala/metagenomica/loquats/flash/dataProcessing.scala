@@ -19,19 +19,26 @@ import ohnosequences.datasets._, dataSets._, fileLocations._, illumina._, reads.
 import java.io.File
 
 
-class FlashDataProcessing[D <: AnyFlashData](val data: D)(implicit
-  parseInputFiles: ParseDenotations[(D#Reads1 :^: D#Reads2 :^: DNil)#LocationsAt[FileDataLocation], File],
-  outputFilesToMap: ToMap[(D#Merged :^: D#Stats :^: DNil)#LocationsAt[FileDataLocation], AnyData, FileDataLocation]
-  // parseInputFiles: ParseDenotations[(data.reads1.type :^: data.reads2.type :^: DNil)#LocationsAt[FileDataLocation], File],
-  // outputFilesToMap: ToMap[(data.merged.type :^: data.stats.type :^: DNil)#LocationsAt[FileDataLocation], AnyData, FileDataLocation]
+class FlashDataProcessing[
+  RT <: AnyReadsType { type EndType = pairedEndType },
+  R1 <: AnyPairedEnd1Fastq { type DataType = RT },
+  R2 <: AnyPairedEnd2Fastq { type DataType = RT },
+  M  <: MergedReads[RT, R1, R2],
+  S  <: MergedReadsStats[M]
+](val readsType: RT,
+  val reads1: R1,
+  val reads2: R2,
+  val merged: M,
+  val stats: S
+)(implicit
+  parseInputFiles: ParseDenotations[(R1 :^: R2 :^: DNil)#LocationsAt[FileDataLocation], File],
+  outputFilesToMap: ToMap[(M :^: S :^: DNil)#LocationsAt[FileDataLocation], AnyData, FileDataLocation]
 ) extends DataProcessingBundle(bundles.flash)(
-  input = (data.reads1: D#Reads1) :^: (data.reads2: D#Reads2) :^: DNil,
-  output = (data.merged: D#Merged) :^: (data.stats: D#Stats) :^: DNil
-  // input = (data.reads1 :^: data.reads2 :^: DNil): (D#Reads1 :^: D#Reads2 :^: DNil),
-  // output = (data.merged :^: data.stats :^: DNil): (D#Merged :^: D#Stats :^: DNil)
+  input = reads1 :^: reads2 :^: DNil,
+  output = merged :^: stats :^: DNil
 )(parseInputFiles, outputFilesToMap) {
 
-  def instructions: AnyInstructions = say("I'll be fast a a flash!")
+  def instructions: AnyInstructions = say("I'll be fast as a flash!")
 
   // TODO FLASh stuff change options, derived from reads type
   final def processData(
@@ -39,8 +46,8 @@ class FlashDataProcessing[D <: AnyFlashData](val data: D)(implicit
     context: Context
   ): Instructions[OutputFiles] = {
 
-    val reads1gz: file = context.file(data.reads1: D#Reads1)
-    val reads2gz: file = context.file(data.reads2: D#Reads2)
+    val reads1gz: file = context.file(reads1)
+    val reads2gz: file = context.file(reads2)
 
     val reads1fastq: file = reads1gz.rename( _.stripSuffix(".gz") )
     val reads2fastq: file = reads2gz.rename( _.stripSuffix(".gz") )
@@ -54,13 +61,18 @@ class FlashDataProcessing[D <: AnyFlashData](val data: D)(implicit
     // define output
     lazy val flashOutput = FlashOutputAt(context / "output", prefix = "")
 
+    lazy val flashOptions = flash.defaults update (
+      read_len(readsType.length.toInt)   :~:
+      max_overlap(readsType.length.toInt) :~: ∅
+    )
+
     // the FLASh cmd we are going to run
     lazy val flashExpr = FlashExpression(flash)(
       flash.arguments(
         api.input(flashInput)   :~:
         api.output(flashOutput) :~: ∅
       ),
-      data.flashOptions
+      flashOptions
     )
 
     // run expression, hope for the best
@@ -69,24 +81,8 @@ class FlashDataProcessing[D <: AnyFlashData](val data: D)(implicit
     seqToInstructions(flashExpr.cmd) -&-
     success(
       s"FLASh merged reads from ${dataMappingId}, much success so fast",
-      (data.merged: D#Merged).inFile(flashOutput.mergedReads)           :~:
-      (data.stats: D#Stats).inFile(flashOutput.lengthNumericHistogram) :~: ∅
+      merged.inFile(flashOutput.mergedReads)           :~:
+      stats.inFile(flashOutput.lengthNumericHistogram) :~: ∅
     )
   }
 }
-
-// class FlashDataProcessing[
-//   D <: AnyFlashData
-// ](val data: D)(implicit
-//   val parseInputFiles: ParseDenotations[(D#Reads1 :^: D#Reads2 :^: DNil)#LocationsAt[FileDataLocation], File],
-//   val outputFilesToMap: ToMap[(D#Merged :^: D#Stats :^: DNil)#LocationsAt[FileDataLocation], AnyData, FileDataLocation]
-// ) extends AnyFlashDataProcessing {
-//
-//   type Data = D
-//
-//   type Input = D#Reads1 :^: D#Reads2 :^: DNil
-//   type Output = D#Merged :^: D#Stats :^: DNil
-//
-//   lazy val input = (data.reads1: D#Reads1) :^: (data.reads2: D#Reads2) :^: DNil
-//   lazy val output = (data.merged: D#Merged) :^: (data.stats: D#Stats) :^: DNil
-// }

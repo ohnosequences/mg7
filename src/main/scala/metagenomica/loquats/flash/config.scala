@@ -22,16 +22,16 @@ import java.io.File
 
 
 
-trait AnyFlashConfig extends Era7LoquatConfig { config =>
-  type Data <: AnyFlashData
-  // val  data: Data
-
-  type DataProcessing <: FlashDataProcessing[Data]
-  val  dataProcessing: DataProcessing
-
-  type FlashDataMappring = AnyDataMapping { type DataProcessing = config.DataProcessing }
-  val  dataMappings: List[FlashDataMappring]
-}
+// trait AnyFlashConfig extends Era7LoquatConfig { config =>
+//   type Data <: AnyFlashData
+//   // val  data: Data
+//
+//   type DataProcessing <: FlashDataProcessing[Data]
+//   val  dataProcessing: DataProcessing
+//
+//   type FlashDataMappring = AnyDataMapping { type DataProcessing = config.DataProcessing }
+//   val  dataMappings: List[FlashDataMappring]
+// }
 
 // abstract class FlashConfig[D <: AnyFlashData](val dataProcessing: D) extends AnyFlashConfig {
 //
