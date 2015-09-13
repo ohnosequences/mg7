@@ -223,6 +223,10 @@ The hierarchic structure of the taxonomy of the living organisms is a tree, and,
 
 Other possible uses of the general schema: statika, loquat, ...
 
+### Shotgun metagenomics
+
+It is certainly possible to adapt MG7 to work with shotgun metagenomics data. Simply changing the reference database to include whole genome sequence data could yield interesting results. This could also be refined by restricting reference sequences according to all sort of criteria, like biological function or taxonomy. Bio4j would be an invaluable tool here, thanks to  its ability to express express complex predicates on sequences using all the information linked with them (GO annotations, UniProt data, NCBI taxonomy, etc).
+
 ### Comparison of groups of samples
 
 ### Interactive visualizations using the output files of MG7 (Biographika project)
