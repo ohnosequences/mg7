@@ -175,7 +175,7 @@ MG7 itself and all the libraries used are written in Scala
 \subsection{Statika}\label{statika}
 
 \href{https://github.com/ohnosequences/statika}{Statika} is a Scala
-library developed by \textbf{so and so} which serves as a way of
+library developed by the first and last authors which serves as a way of
 defining and composing machine behaviors statically. The main component
 are \textbf{bundles}. Each bundle declares a sequence of computations
 (its behavior) which will be executed in an \textbf{environment}. A
@@ -189,16 +189,16 @@ Scala code and runs it.
 \subsection{Datasets}\label{datasets}
 
 \href{https://github.com/ohnosequences/datasets}{Datasets} is a Scala
-library developed by \textbf{so and so} to declare datasets and their
-locations. \textbf{Data} is represented as type-indexed fields: Keys are
-modeled as singleton types, and values correspond to what could be
-called a denotation of the key: a value of type \texttt{Location} tagged
-with the key type. Then a \textbf{Dataset} is essentially a collection
-of data, which are guaranteed statically to be different through
-type-level predicates, making use of the value ↔ type correspondence
-which can be established through singleton types and implicits. A
-dataset location is then just a list of locations formed by locations of
-each data member of that dataset.
+library developed by the first and last authors to declare datasets and
+their locations. \textbf{Data} is represented as type-indexed fields:
+Keys are modeled as singleton types, and values correspond to what could
+be called a denotation of the key: a value of type \texttt{Location}
+tagged with the key type. Then a \textbf{Dataset} is essentially a
+collection of data, which are guaranteed statically to be different
+through type-level predicates, making use of the value ↔ type
+correspondence which can be established through singleton types and
+implicits. A dataset location is then just a list of locations formed by
+locations of each data member of that dataset.
 
 Data keys can further have a reference to a \textbf{data type}, which,
 as the name hints at, can help in providing information about the type
@@ -218,8 +218,8 @@ the ``same'' merged reads is always present, as the data that those
 \subsection{Loquat}\label{loquat}
 
 \href{https://github.com/ohnosequences/loquat}{Loquat} is a library
-developed by \textbf{so and so} designed for the execution of
-embarrassingly parallel tasks using S3, SQS and EC2.
+developed by the first, second and last authors designed for the
+execution of embarrassingly parallel tasks using S3, SQS and EC2.
 
 A \textbf{loquat} executes a process with explicit input and output
 datasets (declared using the \emph{Datasets} library described above).

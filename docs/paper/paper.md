@@ -69,7 +69,7 @@ MG7 itself and all the libraries used are written in Scala `2.11`.
 ## Statika
 
 <!-- TODO expand? -->
-[Statika](https://github.com/ohnosequences/statika) is a Scala library developed by **so and so** which serves as a way of defining and composing machine behaviors statically. The main component are **bundles**. Each bundle declares a sequence of computations (its behavior) which will be executed in an **environment**. A bundle can *depend* on other bundles, and when being executed by an environment, its DAG of dependencies is linearized and run in sequence. In our use, bundles correspond to what an EC2 instance should do and an environment to an image (AMI: **A**mazon **M**achine **I**mage) which prepares the basic configuration, downloads the Scala code and runs it.
+[Statika](https://github.com/ohnosequences/statika) is a Scala library developed by the first and last authors which serves as a way of defining and composing machine behaviors statically. The main component are **bundles**. Each bundle declares a sequence of computations (its behavior) which will be executed in an **environment**. A bundle can *depend* on other bundles, and when being executed by an environment, its DAG of dependencies is linearized and run in sequence. In our use, bundles correspond to what an EC2 instance should do and an environment to an image (AMI: **A**mazon **M**achine **I**mage) which prepares the basic configuration, downloads the Scala code and runs it.
 
 ## Datasets
 <!-- TODO
@@ -80,7 +80,7 @@ MG7 itself and all the libraries used are written in Scala `2.11`.
 
   This should add a reference to some of that, and explain that it is based on (essentially) an embedding of extensible record types in Scala. Maybe mention ohnosequences/cosas, our super-fancy library.
 -->
-[Datasets](https://github.com/ohnosequences/datasets) is a Scala library developed by **so and so** to declare datasets and their locations. **Data** is represented as type-indexed fields: Keys are modeled as singleton types, and values correspond to what could be called a denotation of the key: a value of type `Location` tagged with the key type. Then a **Dataset** is essentially a collection of data, which are guaranteed statically to be different through type-level predicates, making use of the value ↔ type correspondence which can be established through singleton types and implicits. A dataset location is then just a list of locations formed by locations of each data member of that dataset.
+[Datasets](https://github.com/ohnosequences/datasets) is a Scala library developed by the first and last authors to declare datasets and their locations. **Data** is represented as type-indexed fields: Keys are modeled as singleton types, and values correspond to what could be called a denotation of the key: a value of type `Location` tagged with the key type. Then a **Dataset** is essentially a collection of data, which are guaranteed statically to be different through type-level predicates, making use of the value ↔ type correspondence which can be established through singleton types and implicits. A dataset location is then just a list of locations formed by locations of each data member of that dataset.
 
 Data keys can further have a reference to a **data type**, which, as the name hints at, can help in providing information about the type of data we are working with. For example, when declaring Illumina reads as a data, a data type containing information about the read length, insert size or end type (single or paired) is used.
 
@@ -88,7 +88,7 @@ A **location** can be, for example, an S3 object or a local file; by leaving the
 
 ## Loquat
 
-[Loquat](https://github.com/ohnosequences/loquat) is a library developed by **so and so** designed for the execution of embarrassingly parallel tasks using S3, SQS and EC2.
+[Loquat](https://github.com/ohnosequences/loquat) is a library developed by the first, second and last authors designed for the execution of embarrassingly parallel tasks using S3, SQS and EC2.
 
 A **loquat** executes a process with explicit input and output datasets (declared using the *Datasets* library described above). Workers (EC2 instances) read from an SQS queue the S3 locations for both input and output data; then they download the input to local files, and pass these file locations to the process to be executed. The output is then put in the corresponding S3 locations.
 
@@ -207,7 +207,7 @@ What we see as key advantages of this approach (when coupled with compile-time s
 - **Reuse** we can build standard configurations on top of this and reuse them for subsequent data analysis. A particular data analysis *task* can be used as a *library* in further analysis.
 - **Decoupling** We can start working on the analysis specification, without any need for available data in a much easier way.
 - **Documentation** We can take advantage of all the effort put into software documentation tools and practices, such as in our case Scaladoc or literate programming. As documentation, analysis processes and data specification live together in the files, it is much easier to keep coherence between them.
-- **Expresiveness and safety** For example in our case we can choose only from valid Illumina read types, and then build a default FLASH command based on that. The output locations, being declared statically, are also available for use in further analysis. 
+- **Expresiveness and safety** For example in our case we can choose only from valid Illumina read types, and then build a default FLASH command based on that. The output locations, being declared statically, are also available for use in further analysis.
 
 ## Inputs, outputs, data: compile-time, expressive, composable
 
