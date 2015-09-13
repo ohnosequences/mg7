@@ -198,13 +198,16 @@ We could summarize the most innovative ideas and developments in MG7:
 
 ## A new approach to data analysis
 
-General approach. An analysis is defined as a software project. It can evolve in the same way. We can run the analysis in a test phase, review configuration and changes, etc. Key advantages of this approach are
+MG7 proposes to define and work with a particular data analysis task as a software project, using Scala. The idea is that *everything*: data description, their location, configuration parameters, the infrastructure used, ... should be expressed as Scala code, and treated in the same way as any (well-managed) software project. This includes, among other things, using version control systems (`git` in our case), writing tests, making stable releases following [semantic versioning](http://semver.org/) or publishing artifacts to a repository.
+
+What we see as key advantages of this approach (when coupled with compile-time specification and checking), are
 
 - **Reproducibility** the same analysis can be run again with exactly the same configuration in a trivial way.
-- **Versioning** The analysis is a software project so it goes through the same stages, there can be different versions, stable releases, etc.
-- **Reuse** we can build standard configurations on top of this and reuse them for subsequent data analysis.
-- **Decoupling** We can start working on the analysis specification, without any need for data in a much easier way.
-- **Expresiveness and safety** choose only from valid Illumina read types, build default FLASH command based on that, ...
+- **Versioning** as in any software project, there can be different versions, stable releases, etc.
+- **Reuse** we can build standard configurations on top of this and reuse them for subsequent data analysis. A particular data analysis *task* can be used as a *library* in further analysis.
+- **Decoupling** We can start working on the analysis specification, without any need for available data in a much easier way.
+- **Documentation** We can take advantage of all the effort put into software documentation tools and practices, such as in our case Scaladoc or literate programming. As documentation, analysis processes and data specification live together in the files, it is much easier to keep coherence between them.
+- **Expresiveness and safety** For example in our case we can choose only from valid Illumina read types, and then build a default FLASH command based on that. The output locations, being declared statically, are also available for use in further analysis. 
 
 ## Inputs, outputs, data: compile-time, expressive, composable
 
