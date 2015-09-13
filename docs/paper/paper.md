@@ -215,6 +215,8 @@ General approach. An analysis is defined as a software project. It can evolve in
 
 ## Taxonomy and Bio4j
 
+The hierarchic structure of the taxonomy of the living organisms is a tree, and, hence, is also a graph in which each node, with the exception of the root node, has a unique parent node. It led us to model the taxonomy tree as a graph using the graph database paradigm. Previously we developed Bio4j **[Pareja-Tobes-2015]**, a platform for the integration of semantically rich biological data using typed graph models. It integrates most publicly available data linked with sequences into a set of interdependent graphs to be used for bioinformatics analysis and especially for biological data.
+
 ## Future-proof
 
 ## MG7 Future developments
