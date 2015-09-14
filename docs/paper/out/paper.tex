@@ -428,7 +428,7 @@ project-driven personalization.
 
 \subsection{Workflow Description}\label{workflow-description}
 
-The MG7 analysis workflow is summarized in Figure X. The input files for
+The MG7 analysis workflow is summarized in Figure 1. The input files for
 MG7 are the FASTQ files resulting from a paired-end NGS sequencing
 experiment.
 
@@ -469,7 +469,7 @@ Algorithms}\label{taxonomic-assignment-algorithms}
 
 All the reads are assigned under two different algorithms of assignment:
 i. Lowest Common Ancestor based taxonomic assignment (LCA) and ii. Best
-BLAST Hit based taxonomic assignment (BBH). Figure X displays
+BLAST Hit based taxonomic assignment (BBH). Figure 2 displays
 schematically the LCA algorithm applied sensu stricto (left panel) and
 the called `in line' exception (right panel) designed in order to gain
 specificity in the assignments in the cases in which the topology of the
@@ -496,9 +496,9 @@ nodes in the taxonomy tree: i. If all the nodes forms a line in the
 taxonomy tree (are located in a not branched lineage to the tree root)
 we should choose the most specific taxID as the final assignment for
 that read. We call to this kind of assignment the `in line' exception
-(see Figure X right panel). ii. If not, we should search for the
+(see Figure 2 right panel). ii. If not, we should search for the
 \emph{sensu stricto} Lowest Common Ancestor (LCA) of all the selected
-taxonomic nodes (See Figure X left panel). In this approach we decided
+taxonomic nodes (See Figure 2 left panel). In this approach we decided
 to use the bitscore for evaluating the similarity because it is a value
 that increases when similarity is higher and depends a lot on the length
 of the HSP. Some reads could not find sequences with enough similarity
