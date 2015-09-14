@@ -18,8 +18,8 @@ case object blast16s extends Bundle() {
   val key = s"16s/${name}.tgz"
 
   val destination: File = new File(s"${name}.tgz")
-
   val location: File = new File(name)
+  val dbName: File = new File(s"${name}/${name}.fasta")
 
   def instructions: AnyInstructions = {
 
@@ -34,8 +34,7 @@ case object blast16s extends Bundle() {
       val transfer = transferManager.download(bucket, key, destination)
       transfer.waitForCompletion
     } -&-
-    cmd("tar")("xvf", destination.getCanonicalPath) -&-
-    cmd("ls")("-la", location.getCanonicalPath) -&-
+    cmd("tar")("-xvzf", destination.getCanonicalPath) -&-
     say(s"Reference database ${name} was dowloaded to ${location.getCanonicalPath}")
 
   }

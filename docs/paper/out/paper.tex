@@ -255,11 +255,11 @@ defining and composing machine behaviors statically. The main component
 are \textbf{bundles}. Each bundle declares a sequence of computations
 (its behavior) which will be executed in an \textbf{environment}. A
 bundle can \emph{depend} on other bundles, and when being executed by an
-environment, its DAG of dependencies is linearized and run in sequence.
-In our use, bundles correspond to what an EC2 instance should do and an
-environment to an image (AMI: \textbf{A}mazon \textbf{M}achine
-\textbf{I}mage) which prepares the basic configuration, downloads the
-Scala code and runs it.
+environment, its DAG (Directed Acyclic Graph) of dependencies is
+linearized and run in sequence. In our use, bundles correspond to what
+an EC2 instance should do and an environment to an AMI (Amazon Machine
+Image) which prepares the basic configuration, downloads the Scala code
+and runs it.
 
 \subsubsection{\texorpdfstring{\emph{Datasets}: a mini-language for
 data}{Datasets: a mini-language for data}}\label{datasets-a-mini-language-for-data}
@@ -303,9 +303,10 @@ AWS}{Loquat: Parallel data processing with AWS}}\label{loquat-parallel-data-proc
 
 \href{https://github.com/ohnosequences/loquat}{Loquat} is a library
 developed by the first, second and last authors designed for the
-execution of embarrassingly parallel tasks using S3, SQS and EC2.
+execution of embarrassingly parallel tasks using S3, SQS and EC2 Amazon
+services.
 
-A \textbf{loquat} executes a process with explicit input and output
+A \emph{loquat} executes a process with explicit input and output
 datasets (declared using the \emph{Datasets} library described above).
 Workers (EC2 instances) read from an SQS queue the S3 locations for both
 input and output data; then they download the input to local files, and
@@ -316,9 +317,9 @@ A manager instance is used to monitor workers, provide initial data to
 be put in the SQS queue and optionally release resources depending on a
 set of configurable conditions.
 
-Both worker and manager instances are Statika bundles. In the case of
-the worker, it can declare any dependencies needed to perform its task:
-other tools, libraries, or data.
+Both worker and manager instances are \emph{Statika} bundles. In the
+case of the worker, it can declare any dependencies needed to perform
+its task: other tools, libraries, or data.
 
 All configuration such as the number of workers or the instance types is
 declared statically, the specification of a loquat being ultimately a
@@ -360,15 +361,15 @@ guarantee for each BLAST command expression at compile time
   valid output record specification
 \end{itemize}
 
-Generic type-safe parsers returning an heterogeneous record of BLAST
+Generic type-safe parsers returning a heterogeneous record of BLAST
 output fields are also available, together with output data defined
 using \emph{Datasets} which have a reference to the exact BLAST command
 options which yielded that output. This let us provide generic parsers
-for BLAST output which are guaranteed to be correct, for example.
+for BLAST output which are guaranteed to be correct.
 
-In the same spirit as for BLAST, we implemented a type-safe EDSL for
-FLASH expressions and their execution, sporting features equivalent to
-those outlined for the BLAST EDSL.
+In the same spirit as for BLAST, we implemented a type-safe eDSL for
+FLASH expressions and their execution, supporting features equivalent to
+those outlined for the BLAST eDSL.
 
 \subsubsection{Bio4j and Graph
 Databases}\label{bio4j-and-graph-databases}
@@ -682,8 +683,8 @@ project)}\label{interactive-visualizations-using-the-output-files-of-mg7-biograp
 
 We use EC2, S3 and SQS through a Scala wrapper of the official
 \href{https://aws.amazon.com/sdk-for-java/}{AWS Java SDK},
-\href{https://github.com/ohnosequences/aws-scala-tools/???}{ohnosequences/aws-scala-tools
-0.13.2}. This uses version \texttt{1.10.9} of the AWS Java SDK.
+\href{https://github.com/ohnosequences/aws-scala-tools/releases/tag/v0.13.2}{ohnosequences/aws-scala-tools
+\texttt{0.13.2}}. This uses version \texttt{1.9.25} of the AWS Java SDK.
 
 \subsection{Scala}\label{scala}
 
@@ -694,33 +695,34 @@ MG7 itself and all the libraries used are written in Scala
 
 MG7 uses
 \href{https://github.com/statika/statika/releases/tag/v0.2.0}{ohnosequences/statika
-2.0.0} for specifying the configuration and behavior of EC2 instances.
+\texttt{2.0.0}} for specifying the configuration and behavior of EC2
+instances.
 
 \subsection{Datasets}\label{datasets}
 
 MG7 uses
 \href{https://github.com/ohnosequences/datasets/releases/tag/v0.2.0}{ohnosequences/datasets
-0.2.0} for specifying input and output data, their type and their
-location.
+\texttt{0.2.0}} for specifying input and output data, their type and
+their location.
 
 \subsection{Loquat}\label{loquat}
 
 MG7 uses
 \href{https://github.com/ohnosequences/loquat/releases/tag/v2.0.0}{ohnosequences/loquat
-2.0.0} for the specification of data processing tasks and their
+\texttt{2.0.0}} for the specification of data processing tasks and their
 execution using AWS resources.
 
 \subsection{BLAST eDSL}\label{blast-edsl}
 
 MG7 uses
 \href{https://github.com/ohnosequences/blast/releases/tag/v0.2.0}{ohnosequences/blast
-0.2.0}. The BLAST version used is \texttt{2.2.31+}
+\texttt{0.2.0}}. The BLAST version used is \texttt{2.2.31+}
 
 \subsection{FLASH eDSL}\label{flash-edsl}
 
 MG7 uses
 \href{https://github.com/ohnosequences/flash/releases/tag/v0.1.0}{ohnosequences/flash
-0.1.0}. The FLASH version used is \texttt{?.?.?}
+\texttt{0.1.0}}. The FLASH version used is \texttt{1.2.11}
 
 \subsection{Bio4j}\label{bio4j}
 
