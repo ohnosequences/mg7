@@ -143,7 +143,7 @@ Our 16S database building strategy allows the substitution of the 16S database b
 
 ## Workflow Description
 
-The MG7 analysis workflow is summarized in <!-- TODO number -->Figure X. The input files for MG7 are the FASTQ files resulting from a paired-end NGS sequencing experiment.
+The MG7 analysis workflow is summarized in Figure 1. The input files for MG7 are the FASTQ files resulting from a paired-end NGS sequencing experiment.
 
 ### Joining reads of each pair using FLASH
 
@@ -151,7 +151,7 @@ In the first step the paired-end reads, designed with an insert size that yields
 
 ### Parallelized BLASTN of each read against the 16S-DB7
 
-The second step is to search for similar 16S sequences in our 16S-DB7 database. The taxonomic assignment for each read is based on BLASTN of each read against the 16S database. Assignment based on direct similarity of each read one by one compared against a sufficiently wide database is a very exhaustive method for assignment [@segata2013computational]<!-- TODO missing ref for @morgan2012chapter --> . Some methods of assignment compare the sequences only against the available complete bacterial genomes or avoid computational cost clustering or binning the sequences first, and then doing the assignments only for the representative sequence of each cluster. MG7 carries out an exhaustive comparison of all the reads under analysis and it does not applies any binning strategy. Every read is specifically compared with all the sequences of the 16S database. We select the best BLAST hits (10 hits by default) obtained for each read to do the taxonomic assignment.
+The second step is to search for similar 16S sequences in our 16S-DB7 database. The taxonomic assignment for each read is based on BLASTN of each read against the 16S database. Assignment based on direct similarity of each read one by one compared against a sufficiently wide database is a very exhaustive method for assignment [@segata2013computational, @morgan2012chapter]. Some methods of assignment compare the sequences only against the available complete bacterial genomes or avoid computational cost clustering or binning the sequences first, and then doing the assignments only for the representative sequence of each cluster. MG7 carries out an exhaustive comparison of all the reads under analysis and it does not applies any binning strategy. Every read is specifically compared with all the sequences of the 16S database. We select the best BLAST hits (10 hits by default) obtained for each read to do the taxonomic assignment.
 
 ### Taxonomic Assignment Algorithms
 All the reads are assigned under two different algorithms of assignment: i. Lowest Common Ancestor based taxonomic assignment (LCA) and ii. Best BLAST Hit based taxonomic assignment (BBH). Figure X displays schematically the LCA algorithm applied sensu stricto (left panel) and the called ‘in line’ exception (right panel) designed in order to gain specificity in the assignments in the cases in which the topology of the taxonomical nodes corresponding to the BLAST hits support sufficiently the assignment to the most specific taxon.
@@ -172,6 +172,7 @@ We decided to maintain the simpler method of Best BLAST Hit (BBH) for taxonomic 
 MG7 provides independent results for the 2 different approaches, LCA and BBH. The output files include, for each taxonomy node (with some read assigned), abundance values for direct assignment and cumulative assignment. The abundances are provided in counts (absolute values) and in percentage normalized to the number of reads of each sample. Direct assignments are calculated counting reads specifically assigned to a taxonomic node, not including the reads assigned to the descendant nodes in the taxonomy tree. Cumulative assignments are calculated including the direct assignments and also the assignments of the descendant nodes. For each sample MG7 provides 8 kinds of abundance values: LCA direct counts, LCA cumu. counts, LCA direct %, LCA cumu. %, BBH direct counts, BBH cumu. counts, BBH direct %, BBH cumu. %.
 
 ## Data analysis as a software project
+<!-- TODO what @marina-manrique wrote, @laughedelic will put it here  -->
 
 **IDEAS**
 
@@ -192,17 +193,8 @@ MG7 is open source, available at https://github.com/ohnosequences/mg7 under an [
 
 
 
-
-
-
-
-
-
-
 # Discussion
 <!-- From instructions: This section may be divided by subheadings. Discussions should cover the key findings of the study: discuss any prior art related to the subject so to place the novelty of the discovery in the appropriate context; discuss the potential short-comings and limitations on their interpretations; discuss their integration into the current understanding of the problem and how this advances the current views; speculate on the future direction of the research and freely postulate theories that could be tested in the future. -->
-
-## What MG7 brings
 
 We could summarize the most innovative ideas and developments in MG7:
 
@@ -230,51 +222,42 @@ What we see as key advantages of this approach (when coupled with compile-time s
 - **Expresiveness and safety** For example in our case we can choose only from valid Illumina read types, and then build a default FLASH command based on that. The output locations, being declared statically, are also available for use in further analysis.
 
 ## Inputs, outputs, data: compile-time, expressive, composable
-<!-- TODO some generic stuff here -->
+<!-- TODO @laughedelic doing this -->
 
 ## Tools, data, dependencies and machine configurations
+<!-- TODO @laughedelic doing this -->
 
 ## Parallel cloud execution ??
-<!-- The Loquat thing -->
+<!-- TODO @laughedelic doing this -->
 
 ## Taxonomy and Bio4j
-
+<!-- TODO if possible improve this. Maybe something about graph data biology lalala (bio4j paper?)  -->
 The hierarchic structure of the taxonomy of the living organisms is a tree, and, hence, is also a graph in which each node, with the exception of the root node, has a unique parent node. It led us to model the taxonomy tree as a graph using the graph database paradigm. Previously we developed Bio4j **[Pareja-Tobes-2015]**, a platform for the integration of semantically rich biological data using typed graph models. It integrates most publicly available data linked with sequences into a set of interdependent graphs to be used for bioinformatics analysis and especially for biological data.
 
-## Future-proof
-
-## MG7 Future developments
+## Future developments
 
 ### Shotgun metagenomics
 
 It is certainly possible to adapt MG7 to work with shotgun metagenomics data. Simply changing the reference database to include whole genome sequence data could yield interesting results. This could also be refined by restricting reference sequences according to all sort of criteria, like biological function or taxonomy. Bio4j would be an invaluable tool here, thanks to  its ability to express express complex predicates on sequences using all the information linked with them (GO annotations, UniProt data, NCBI taxonomy, etc).
 
-### Comparison of groups of samples
+### Comparing groups of samples
 
-### Interactive visualizations using the output files of MG7 (Biographika project)
+<!-- TODO write something about group of samples -->
 
+### Interactive visualizations based on Biographika
 
-
-
-
-
-
-
-
-
-
+<!-- TODO biographika -->
 
 
 
 
 
 # Materials and Methods
-<!-- As far as my understanding of this section goes, here we should put a list-like enumeration of what we use. I'm also adding descriptions, that could go somewhere else if needed. -->
 
 ## Amazon Web Services
 
 <!-- TODO describe this minimally: EC2, SQS, S3 -->
-We use EC2, S3 and SQS<!-- TODO no release here. Any other service? --> through a Scala wrapper of the official [AWS Java SDK](https://aws.amazon.com/sdk-for-java/), [ohnosequences/aws-scala-tools `0.13.2`](https://github.com/ohnosequences/aws-scala-tools/releases/tag/v0.13.2). This uses version `1.9.25` of the AWS Java SDK.
+We use EC2, S3 and SQS through a Scala wrapper of the official [AWS Java SDK](https://aws.amazon.com/sdk-for-java/), [ohnosequences/aws-scala-tools `0.13.2`](https://github.com/ohnosequences/aws-scala-tools/releases/tag/v0.13.2). This uses version `1.9.25` of the AWS Java SDK.
 
 ## Scala
 
