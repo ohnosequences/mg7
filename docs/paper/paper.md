@@ -79,9 +79,8 @@ These are some of the more innovative MG7 features:
 
 ## Libraries and resources
 
-In this section we describe the resources and Scala libraries developed by the authors on top of which MG7 is built.
-
-[Scala](http://www.scala-lang.org/), a hybrid object-functional programming language, was chosen based on the possibility of using certain advanced programming styles, and Java interoperability, which let us build on the vast number of existing Java libraries; we take advantage of this when using Bio4j as an API for the NCBI taxonomy. It has support for type-level programming, type-dependent types (through type members) and singleton types, which permits a restricted form of dependent types where types can depend essentially on values determined at compile time (through their corresponding singleton types). Conversely, through implicits one can retrieve the value corresponding to a singleton type.
+In this section we describe the resources and libraries developed by the authors on top of which MG7 is built. All MG7 code is written in [Scala](http://www.scala-lang.org/), a hybrid object-functional programming language.
+Scala was chosen based on the possibility of using certain advanced programming styles, and Java interoperability, which let us build on the vast number of existing Java libraries; we take advantage of this when using Bio4j as an API for the NCBI taxonomy. It has support for type-level programming, type-dependent types (through type members) and singleton types, which permits a restricted form of dependent types where types can depend essentially on values determined at compile time (through their corresponding singleton types). Conversely, through implicits one can retrieve the value corresponding to a singleton type.
 
 ### _Statika_: machine configuration and behavior
 
