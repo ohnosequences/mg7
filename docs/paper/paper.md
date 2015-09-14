@@ -168,6 +168,12 @@ MG7 provides independent results for the 2 different approaches, LCA and BBH. Th
 
 ## Data analysis as a software project
 
+**IDEAS**
+
+- the user needs to write code, a repo would be nice, AWS account
+- there's some sort of conf required for the AWS account (add users, roles, permissions, whatever)
+- Why this is a good thing (or should this just be in Discussion)
+- something else?
 
 ## Availability
 
