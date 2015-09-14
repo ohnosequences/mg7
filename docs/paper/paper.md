@@ -166,6 +166,9 @@ We decided to maintain the simpler method of Best BLAST Hit (BBH) for taxonomic 
 
 MG7 provides independent results for the 2 different approaches, LCA and BBH. The output files include, for each taxonomy node (with some read assigned), abundance values for direct assignment and cumulative assignment. The abundances are provided in counts (absolute values) and in percentage normalized to the number of reads of each sample. Direct assignments are calculated counting reads specifically assigned to a taxonomic node, not including the reads assigned to the descendant nodes in the taxonomy tree. Cumulative assignments are calculated including the direct assignments and also the assignments of the descendant nodes. For each sample MG7 provides 8 kinds of abundance values: LCA direct counts, LCA cumu. counts, LCA direct %, LCA cumu. %, BBH direct counts, BBH cumu. counts, BBH direct %, BBH cumu. %.
 
+## Data analysis as a software project
+
+
 ## Availability
 
 MG7 is open source, available at https://github.com/ohnosequences/mg7 under an [AGPLv3](http://www.gnu.org/licenses/agpl-3.0.en.html) license.
@@ -303,4 +306,4 @@ MG7 uses [bio4j/bio4j 0.12.0-RC3](https://github.com/bio4j/bio4j/releases/tag/v0
 
 # Acknowledgements
 
-The two first authors are funded by INTERCROSSING (Grant 289974).
+*Funding:* The two first authors are funded by INTERCROSSING (Grant 289974).
