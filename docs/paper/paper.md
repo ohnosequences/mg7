@@ -274,8 +274,14 @@ It is certainly possible to adapt MG7 to work with shotgun metagenomics data. Si
 
 ## Amazon Web Services
 
-<!-- TODO describe this minimally: EC2, SQS, S3 -->
-We use EC2, S3 and SQS<!-- TODO no release here. Any other service? --> through a Scala wrapper of the official [AWS Java SDK](https://aws.amazon.com/sdk-for-java/), [ohnosequences/aws-scala-tools `0.13.2`](https://github.com/ohnosequences/aws-scala-tools/releases/tag/v0.13.2). This uses version `1.9.25` of the AWS Java SDK.
+MG7 uses various Amazon Web Services:
+
+- EC2 (Elastic Compute Cloud) autoscaling groups for launching and managing computation units
+- S3 (Simple Storage Service) for storing inputs and output data
+- SQS (Simple Queue Service) for communication between different components of the system
+- SNS (Simple Notification Service) for notifying user about the progress
+
+These services are used through a Scala wrapper of the official [AWS Java SDK `1.9.25`](https://aws.amazon.com/sdk-for-java/), [ohnosequences/aws-scala-tools `0.13.2`](https://github.com/ohnosequences/aws-scala-tools/releases/tag/v0.13.2).
 
 ## Scala
 
