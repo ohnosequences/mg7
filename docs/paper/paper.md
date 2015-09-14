@@ -97,13 +97,13 @@ A **location** can be, for example, an S3 object or a local file; by leaving the
 
 ### _Loquat_: Parallel data processing with AWS
 
-[Loquat](https://github.com/ohnosequences/loquat) is a library developed by the first, second and last authors designed for the execution of embarrassingly parallel tasks using S3, SQS and EC2.
+[Loquat](https://github.com/ohnosequences/loquat) is a library developed by the first, second and last authors designed for the execution of embarrassingly parallel tasks using S3, SQS and EC2 Amazon services.
 
 A **loquat** executes a process with explicit input and output datasets (declared using the *Datasets* library described above). Workers (EC2 instances) read from an SQS queue the S3 locations for both input and output data; then they download the input to local files, and pass these file locations to the process to be executed. The output is then put in the corresponding S3 locations.
 
 A manager instance is used to monitor workers, provide initial data to be put in the SQS queue and optionally release resources depending on a set of configurable conditions.
 
-Both worker and manager instances are Statika bundles. In the case of the worker, it can declare any dependencies needed to perform its task: other tools, libraries, or data.
+Both worker and manager instances are *Statika* bundles. In the case of the worker, it can declare any dependencies needed to perform its task: other tools, libraries, or data.
 
 All configuration such as the number of workers or the instance types is declared statically, the specification of a loquat being ultimately a Scala object. There are deploy and resource management methods, making it easy to use an existing loquat either as a library or from (for example) a Scala REPL.
 
