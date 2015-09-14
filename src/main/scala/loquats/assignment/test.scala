@@ -25,25 +25,9 @@ import java.io.File
 import ohnosequences.metagenomica.loquats.assignment.dataProcessing._
 
 
-abstract class AnyAssignmentConfig extends Era7LoquatConfig { config =>
-
-  // type DataProcessing = assignmentDataProcessing.type
-  // val  dataProcessing = assignmentDataProcessing: DataProcessing
-
-  type AssignmentDataMapping = AnyDataMapping { type DataProcessing = assignmentDataProcessing.type }
-  val  dataMappings: List[AssignmentDataMapping]
-}
-
-// abstract class AssignmentConfig[D <: AnyAssignmentDataProcessing](val dataProcessing: D) extends AnyAssignmentConfig {
-//
-//   type DataProcessing = D
-// }
-
-//////////////////////////////////////////////////////////////////////////////////////
-
 case object assignmenTest {
 
-  case object testConfig extends AnyAssignmentConfig {
+  case object testConfig extends Era7LoquatConfig {
 
     val metadata: AnyArtifactMetadata = generated.metadata.Metagenomica
 
@@ -62,7 +46,7 @@ case object assignmenTest {
       terminateAfterInitialDataMappings = true
     )
 
-    val dataMappings: List[AssignmentDataMapping] =
+    val dataMappings: List[AnyDataMapping] =
       List(
         DataMapping(
           "ERR567374_1",

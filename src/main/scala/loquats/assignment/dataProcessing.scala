@@ -42,10 +42,14 @@ case object dataProcessing {
   type NodeID = ID
 
   type LCA = Option[NodeID]
-  type BBH = Int
+  type BBH = Option[NodeID]
 
   // TODO: move it somewhere up for global use
   def parseInt(str: String): Option[Int] = Try(str.toInt).toOption
+
+  // this method looks up particular column by its header
+  def column(row: Seq[String], header: AnyOutputField): Option[String] =
+    headers.zip(row).toMap.get(header.label)
 
   // FIXME: this thing should be used globally (ideally it should be in datasets)
   implicit def genericParser[D <: AnyData](implicit d: D): DenotationParser[D, FileDataLocation, File] =
@@ -60,27 +64,6 @@ case object dataProcessing {
   ) {
 
     def instructions: AnyInstructions = say("Let's see who is who!")
-
-    // val bundleDependencies: List[AnyBundle] = List[AnyBundle](
-    //   bundles.bio4jTaxonomy,
-    //   bundles.filteredGIs
-    // )
-
-    // TODO: this should be setup from the global config
-    // type BlastOutput <: AnyBlastOutput {
-    //   type BlastExpressionType <: AnyBlastExpressionType {
-    //     type OutputRecord = BlastRecord
-    //   }
-    // }
-    // val  blastOutput: BlastOutput
-
-    // TODO: these thing should be setup from the global config
-    // type Input = blastOutput.type :^: DNil
-    // val  input = blastOutput :^: DNil
-    //
-    // type Output = lcaCSV.type :^: bbhCSV.type :^: DNil
-    // val  output = lcaCSV :^: bbhCSV :^: DNil
-
 
     def processData(
       dataMappingId: String,
@@ -106,17 +89,19 @@ case object dataProcessing {
         case (None, _) => None
         case (Some(readId), hits) => {
 
-          // this method chooses particular column by its header
-          def column(header: AnyOutputField): List[String] =
-            hits.toList.flatMap { columns: Seq[String] =>
-              headers.zip(columns).toMap.get(header.label)
+          val bbh: BBH =
+            // this shouldn't happen, but let's be careful
+            if (hits.isEmpty) None
+            else {
+              // best blast score is just a maximum in the `bitscore` column
+              val maxRow: Seq[String] = hits.maxBy { row: Seq[String] =>
+                column(row, bitscore).flatMap(parseInt).getOrElse(0)
+              }
+              column(maxRow, sgi).flatMap(gisMap.get)
             }
 
-          // best blast score is just a maximum in the `bitscore` column
-          val bbh: BBH = column(bitscore).flatMap(parseInt).max
-
           // for each hit row we take the column with GI and lookup its TaxID
-          val taxIds: List[TaxID] = column(sgi).flatMap(gisMap.get)
+          val taxIds: List[TaxID] = hits.toList.flatMap(column(_, sgi)).flatMap(gisMap.get)
           // then we generate Titan taxon nodes
           val nodes: List[TitanTaxonNode] = titanTaxonNodes(bundles.bio4jTaxonomy.graph, taxIds)
           // and return the taxon node ID corresponding to the read
@@ -136,10 +121,8 @@ case object dataProcessing {
       val bbhWriter = CSVWriter.open(bbhFile.javaFile , append = true)
 
       assignments foreach { case (readId, (lca, bbh)) =>
-        // lca is an Option
-        lca foreach { smth => lcaWriter.writeRow(List(readId, smth)) }
-        // bbh is an Int
-        bbhWriter.writeRow(List(readId, bbh.toString))
+        lca foreach { nodeId => lcaWriter.writeRow(List(readId, nodeId)) }
+        bbh foreach { nodeId => bbhWriter.writeRow(List(readId, nodeId)) }
       }
 
       lcaWriter.close
