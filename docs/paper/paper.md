@@ -103,7 +103,7 @@ A **location** can be, for example, an S3 object or a local file; by leaving the
 
 [Loquat](https://github.com/ohnosequences/loquat) is a library developed by the first, second and last authors designed for the execution of embarrassingly parallel tasks using S3, SQS and EC2 Amazon services.
 
-A **loquat** executes a process with explicit input and output datasets (declared using the *Datasets* library described above). Workers (EC2 instances) read from an SQS queue the S3 locations for both input and output data; then they download the input to local files, and pass these file locations to the process to be executed. The output is then put in the corresponding S3 locations.
+A *loquat* executes a process with explicit input and output datasets (declared using the *Datasets* library described above). Workers (EC2 instances) read from an SQS queue the S3 locations for both input and output data; then they download the input to local files, and pass these file locations to the process to be executed. The output is then put in the corresponding S3 locations.
 
 A manager instance is used to monitor workers, provide initial data to be put in the SQS queue and optionally release resources depending on a set of configurable conditions.
 
@@ -274,7 +274,7 @@ It is certainly possible to adapt MG7 to work with shotgun metagenomics data. Si
 ## Amazon Web Services
 
 <!-- TODO describe this minimally: EC2, SQS, S3 -->
-We use EC2, S3 and SQS<!-- TODO no release here. Any other service? --> through a Scala wrapper of the official [AWS Java SDK](https://aws.amazon.com/sdk-for-java/), [ohnosequences/aws-scala-tools 0.13.2](https://github.com/ohnosequences/aws-scala-tools/???). This uses version `1.10.9` of the AWS Java SDK.
+We use EC2, S3 and SQS<!-- TODO no release here. Any other service? --> through a Scala wrapper of the official [AWS Java SDK](https://aws.amazon.com/sdk-for-java/), [ohnosequences/aws-scala-tools `0.13.2`](https://github.com/ohnosequences/aws-scala-tools/releases/tag/v0.13.2). This uses version `1.9.25` of the AWS Java SDK.
 
 ## Scala
 
@@ -282,23 +282,23 @@ MG7 itself and all the libraries used are written in Scala `2.11`.
 
 ## Statika
 
-MG7 uses [ohnosequences/statika 2.0.0](https://github.com/statika/statika/releases/tag/v0.2.0) for specifying the configuration and behavior of EC2 instances.
+MG7 uses [ohnosequences/statika `2.0.0`](https://github.com/statika/statika/releases/tag/v0.2.0) for specifying the configuration and behavior of EC2 instances.
 
 ## Datasets
 
-MG7 uses [ohnosequences/datasets 0.2.0](https://github.com/ohnosequences/datasets/releases/tag/v0.2.0) for specifying input and output data, their type and their location.
+MG7 uses [ohnosequences/datasets `0.2.0`](https://github.com/ohnosequences/datasets/releases/tag/v0.2.0) for specifying input and output data, their type and their location.
 
 ## Loquat
 
-MG7 uses [ohnosequences/loquat 2.0.0](https://github.com/ohnosequences/loquat/releases/tag/v2.0.0) for the specification of data processing tasks and their execution using AWS resources.
+MG7 uses [ohnosequences/loquat `2.0.0`](https://github.com/ohnosequences/loquat/releases/tag/v2.0.0) for the specification of data processing tasks and their execution using AWS resources.
 
 ## BLAST eDSL
 
-MG7 uses [ohnosequences/blast 0.2.0](https://github.com/ohnosequences/blast/releases/tag/v0.2.0). The BLAST version used is `2.2.31+`
+MG7 uses [ohnosequences/blast `0.2.0`](https://github.com/ohnosequences/blast/releases/tag/v0.2.0). The BLAST version used is `2.2.31+`
 
 ## FLASH eDSL
 
-MG7 uses [ohnosequences/flash 0.1.0](https://github.com/ohnosequences/flash/releases/tag/v0.1.0). The FLASH version used is `?.?.?`
+MG7 uses [ohnosequences/flash `0.1.0`](https://github.com/ohnosequences/flash/releases/tag/v0.1.0). The FLASH version used is `1.2.11`
 
 ## Bio4j
 
