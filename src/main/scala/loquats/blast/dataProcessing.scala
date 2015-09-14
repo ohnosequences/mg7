@@ -3,19 +3,37 @@ package ohnosequences.metagenomica.loquats.blast
 import  ohnosequences.metagenomica._, bundles._
 
 import ohnosequences.loquat._, dataProcessing._
+
 import ohnosequences.statika.bundles._
 import ohnosequences.statika.instructions._
 import ohnosequencesBundles.statika.Blast
-import ohnosequences.blast._, api._, data._
-import ohnosequences.cosas._, typeSets._, types._, properties._
-import ohnosequences.datasets._, dataSets._, fileLocations._, illumina._, reads._
-import java.io.{ BufferedWriter, FileWriter, File }
-import ohnosequences.fastarious._, fasta._, fastq._
+
 import ohnosequences.blast._, api._, data._, outputFields._
 
-case object blastInstructions {
+import ohnosequences.cosas._, types._, typeSets._, properties._, records._
+import ops.typeSets._
+
+import ohnosequences.datasets._, dataSets._, fileLocations._, illumina._, reads._
+
+import ohnosequences.fastarious._, fasta._, fastq._
+
+import java.io.{ BufferedWriter, FileWriter, File }
+
+import sys.process._
+
+
+case object blastDataProcessing {
 
   case object blastBundle extends Blast("2.2.31")
+
+  import ohnosequences.statika.aws._, api._, amazonLinuxAMIs._
+  import ohnosequences.awstools.regions.Region._
+
+  case object blastCompat extends Compatible(
+    amzn_ami_64bit(Ireland, Virtualization.HVM)(1),
+    blastBundle,
+    generated.metadata.Metagenomica
+  )
 
   // TODO with great power comes great responsibility. Move to conf
   case object outRec extends BlastOutputRecord(
@@ -31,13 +49,18 @@ case object blastInstructions {
     sgi       :&: □
   )
   case object blastExprType extends BlastExpressionType(blastn)(outRec)
-  case object outputType extends BlastOutputType(blastExprType, "blastn.blablabla")
+  case object blastOutputType extends BlastOutputType(blastExprType, "blastn.blablabla")
 
   private def blastExpr(args: ValueOf[blastn.Arguments]): BlastExpression[blastExprType.type] = {
     BlastExpression(blastExprType)(
       argumentValues  = args,
       // TODO whatever
-      optionValues    = blastn.defaults update (num_threads(24) :~: ∅)
+      optionValues    = blastn.defaults update (
+        num_threads(1) :~:
+        max_target_seqs(10) :~:
+        ohnosequences.blast.api.evalue(0.001)  :~:
+        blastn.task(blastn.megablast) :~: ∅
+      )
     )
   }
 
@@ -45,17 +68,18 @@ case object blastInstructions {
 
     val bw = new BufferedWriter(new FileWriter(file))
 
-    v.toLines foreach { l => bw.write(l) }
+    v.toLines foreach { l => bw.write(l); bw.newLine }
 
     bw.close()
     file
   }
 
   private def appendTo(append: File, to: File): File = {
+    println(s"Appending [${append.getCanonicalPath}] to [${to.getCanonicalPath}]")
 
     val bw = new BufferedWriter(new FileWriter(to, true))
 
-    io.Source.fromFile(append).getLines foreach { l => bw write l }
+    io.Source.fromFile(append).getLines foreach { l => bw write l; bw.newLine }
 
     bw.close
     to
@@ -66,7 +90,8 @@ case object blastInstructions {
 
     def instructions: AnyInstructions = say("Let the blasting begin!")
 
-    val bundleDependencies: List[AnyBundle] = List[AnyBundle](blastBundle, blast16s)
+    // this is defined in the constructor
+    // val bundleDependencies: List[AnyBundle] = List[AnyBundle](blastBundle, blast16s)
 
     type FastqInput <: AnyData
     val  fastqInput: FastqInput
@@ -74,8 +99,8 @@ case object blastInstructions {
     type BlastOutput <: AnyBlastOutput
     val  blastOutput: BlastOutput
 
-    type Input  = FastqInput :^: DNil
-    type Output = BlastOutput :^: DNil
+    type Input  <: FastqInput :^: DNil
+    type Output <: BlastOutput :^: DNil
 
     // What's this?
     // private def blastOutputFile(context: Context): File = (context / "mapping.out").javaFile
@@ -87,11 +112,14 @@ case object blastInstructions {
 
       val totalOutput = context / "blastAll.csv"
 
-      lazy val quartets = io.Source.fromFile( context.file(fastqInput).javaFile ).getLines.grouped(4)
+      LazyTry {
+        lazy val quartets = io.Source.fromFile( context.file(fastqInput).javaFile ).getLines.grouped(4)
+        println(s"HAS NEXT: ${quartets.hasNext}")
 
-      lazy val steps: Iterator[AnyInstructions] = quartets map { quartet =>
+        quartets foreach { quartet =>
+          println("======================")
+          println(quartet.mkString("\n"))
 
-        LazyTry {
           // we only care about the id and the seq here
           val read = FASTA(
               header(FastqId(quartet(0)).toFastaHeader) :~:
@@ -102,33 +130,51 @@ case object blastInstructions {
           val outFile = context / "blastRead.csv"
 
           val args = blastn.arguments(
-            db(blast16s.location) :~:
+            db(blast16s.dbName) :~:
             query(readFile) :~:
             out(outFile) :~:
             ∅
           )
 
           val expr = blastExpr(args)
+          println(expr.cmd.mkString(" "))
 
-          // run!
-          import scala.sys.process._
-          expr.cmd.!
+          // BAM!!!
+          val foo = expr.cmd.!
+          println(s"EXIT CODE: ${foo}")
 
           // we should have something in args getV out now. Append it!
-          appendTo(expr.argumentValues getV out, totalOutput)
+          appendTo(outFile, totalOutput)
 
           // clean
-          readFile.delete; outFile.delete
+          readFile.delete
+          outFile.delete
         }
-      }
-
-      steps.foldLeft[AnyInstructions](say("processing quartets"))( _ -&- _ ) -&-
+      } -&-
       success(
         "much blast, very success!",
         blastOutput.inFile(totalOutput) :~: ∅
       )
 
     }
+  }
+
+
+  class BlastDataProcessing[
+    F <: AnyData,
+    B <: AnyBlastOutput
+  ](val fastqInput: F,
+    val blastOutput: B
+  )(implicit
+    parseInputFiles: ParseDenotations[(F :^: DNil)#LocationsAt[FileDataLocation], File],
+    outputFilesToMap: ToMap[(B :^: DNil)#LocationsAt[FileDataLocation], AnyData, FileDataLocation]
+  ) extends DataProcessingBundle(blastBundle, blast16s)(
+    input = fastqInput :^: DNil,
+    output = blastOutput :^: DNil
+  )(parseInputFiles, outputFilesToMap) with AnyBlastDataProcessing {
+
+    type FastqInput = F
+    type BlastOutput = B
   }
 
 }

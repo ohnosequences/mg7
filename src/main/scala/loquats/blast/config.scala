@@ -2,36 +2,39 @@ package ohnosequences.metagenomica.loquats.blast
 
 import ohnosequences.datasets._, dataSets._, fileLocations._, s3Locations._, illumina._, reads._
 
-import ohnosequences.cosas._, typeSets._, types._
+import ohnosequences.cosas._, typeSets._, types._, properties._, records._
 import ohnosequences.cosas.ops.typeSets._
 
 import ohnosequences.loquat._, utils._, configs._, dataMappings._, dataProcessing._
 
+import ohnosequences.blast._
+import ohnosequences.blast.api._, outputFields._
+import ohnosequences.blast.data._
+
 import ohnosequences.statika.bundles._
-import ohnosequences.statika.aws._, api._, amazonLinuxAMIs._
+import ohnosequences.statika.aws.api._
+import ohnosequences.statika.aws.amazonLinuxAMIs._
 
 import ohnosequences.awstools._, regions.Region._, s3.ObjectAddress, ec2.InstanceType._
 import ohnosequences.awstools.autoscaling._
-
-import ohnosequences.flash.api._
-import ohnosequences.flash.data._
 
 import era7.project.loquats._
 
 import java.io.File
 
+import blastDataProcessing._
 
 
-trait AnyFlashConfig extends Era7LoquatConfig { config =>
+trait AnyBlastConfig extends Era7LoquatConfig { config =>
 
-  type DataProcessing <: AnyFlashDataProcessing
+  type DataProcessing <: AnyBlastDataProcessing
   val  dataProcessing: DataProcessing
 
   type BlastDataMapping = AnyDataMapping { type DataProcessing = config.DataProcessing }
   val  dataMappings: List[BlastDataMapping]
 }
 
-abstract class BlastConfig[D <: AnyFlashDataProcessing](val dataProcessing: D) extends AnyFlashConfig {
+abstract class BlastConfig[D <: AnyBlastDataProcessing](val dataProcessing: D) extends AnyBlastConfig {
 
   type DataProcessing = D
 }
@@ -44,10 +47,14 @@ case object blastTest {
   implicit def genericParser[D <: AnyData](implicit d: D): DenotationParser[D, FileDataLocation, File] =
     new DenotationParser(d, d.label)({ f: File => Some(FileDataLocation(f)) })
 
+  case object FastqDataType extends AnyDataType
+  case object fastqInput extends Data(FastqDataType, "foo.fastq")
 
-  case object testData extends FlashData(illumina.PairedEnd(bp300, InsertSize(3000)))
 
-  case object testDataProcessing extends FlashDataProcessing(testData)
+  case object blastOutput extends BlastOutput(blastOutputType, "blast.out.csv")
+
+
+  case object testDataProcessing extends BlastDataProcessing(fastqInput, blastOutput)
 
   case object testConfig extends BlastConfig(testDataProcessing) {
 
@@ -74,10 +81,10 @@ case object blastTest {
           "ERR567374_1",
           dataProcessing
         )(remoteInput =
-          dataProcessing.data.merged.atS3(ObjectAddress("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/flash-test/ERR567374_1.merged.fastq")) :~:
-          ∅,
+            fastqInput.atS3(ObjectAddress("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/flash-test/ERR567374_1.merged.fastq")) :~:
+            ∅,
           remoteOutput =
-            dataProcessing.blastOutput.atS3(ObjectAddress("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/blast-test/ERR567374_1.merged.blast.csv")) :~:
+            blastOutput.atS3(ObjectAddress("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/blast-test/ERR567374_1.merged.blast.csv")) :~:
             ∅
         )
       )
