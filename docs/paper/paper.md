@@ -56,15 +56,6 @@ ii. The second aspect derives from the impressive genomics explosion, its effect
 iii. The third aspect to consider for metagenomics data analysis is related to the appearance of new models for massive computation and storage such as the so-called cloud, or the widespread adoption of programming methodologies like functional programming, or, more speculatively, dependently typed programming. The immense new possibilities that these advances offer must have a direct impact in metagenomics data analysis.
 iv. And finally the new social manner to do science, and especially genomic science is the fourth aspect to consider. Metagenomics evolves in a social and global scenario following a science democratization trend in which many small research groups from distant countries share a common big metagenomics project. This global cooperation demands systems allowing following exactly the same pipelines using equivalent cloud resources to modularly execute the analysis in an asynchronous way of working between different groups. This new scenario calls for new methods and tools to handle the current and future volume of metagenomic data with the sufficient speed of analysis.
 
-Considering all these aspects we have designed a new open source methodology for analyzing metagenomics data that exploits the new possibilities that cloud computing offers to get a system robust, programmatically configurable, modular, distributed, flexible, scalable and traceable in which the biological databases of reference sequences can be easily updated and/or frequently substituted by new ones or by databases specifically designed for focused projects.
-
-
-
-
-
-
-
-
 
 
 
@@ -74,16 +65,17 @@ Considering all these aspects we have designed a new open source methodology for
 
 ## Overview
 
-To tackle the challenges posed by metagenomics big data analysis outlined in the Introduction
+Considering the current new metagenomics scenario and to tackle the challenges posed by metagenomics big data analysis outlined in the Introduction we have designed a new open source methodology for analyzing metagenomics data. It exploits the new possibilities that cloud computing offers to get a system robust, programmatically configurable, modular, distributed, flexible, scalable and traceable in which the biological databases of reference sequences can be easily updated and/or frequently substituted by new ones or by databases specifically designed for focused projects.
 
-<!-- TODO improve this. Should match the following sections -->
+These are some of the more innovative MG7 features:
 
 - Static reproducible specification of dependencies and behavior of the different components using *Statika* and *Datasets*
 - Parallelization and distributed analysis based on AWS, with on-demand infrastructure as the basic paradigm
-- Definition of complex pipelines using *Loquat*, a composable system for scaling/parallelizing stateless computations especially designed for Amazon Web Services (AWS)
+- Definition of complex workflows using *Loquat*, a composable system for scaling/parallelizing stateless computations especially designed for Amazon Web Services (AWS)
 - A new approach to data analysis specification, management and specification based on working with it in exactly the same way as for a software project, together with the extensive use of compile-time structures and checks
 - Modeling of the taxonomy tree using the new paradigm of graph databases (Bio4j). It facilitates the taxonomic assignment tasks and the calculation of the taxa abundance values considering the hierarchic structure of taxonomy tree (cumulative values)
-- per-read assignment (??)
+- Exhaustive per-read taxonomic assignment using two complementary assignment algorithms Lowest Common Ancestor and Best BLAST Hit
+- Using a new 16S database of reference sequences (16S-DB7) with a flexible and sustainable system of updating and project-driven customization
 
 ## Libraries and resources
 

@@ -159,20 +159,21 @@ changes and advances with a direct impact in metagenomics data analysis:
   metagenomic data with the sufficient speed of analysis.
 \end{enumerate}
 
-Considering all these aspects we have designed a new open source
-methodology for analyzing metagenomics data that exploits the new
-possibilities that cloud computing offers to get a system robust,
-programmatically configurable, modular, distributed, flexible, scalable
-and traceable in which the biological databases of reference sequences
-can be easily updated and/or frequently substituted by new ones or by
-databases specifically designed for focused projects.
-
 \section{Results}\label{results}
 
 \subsection{Overview}\label{overview}
 
-To tackle the challenges posed by metagenomics big data analysis
-outlined in the Introduction
+Considering the current new metagenomics scenario and to tackle the
+challenges posed by metagenomics big data analysis outlined in the
+Introduction we have designed a new open source methodology for
+analyzing metagenomics data. It exploits the new possibilities that
+cloud computing offers to get a system robust, programmatically
+configurable, modular, distributed, flexible, scalable and traceable in
+which the biological databases of reference sequences can be easily
+updated and/or frequently substituted by new ones or by databases
+specifically designed for focused projects.
+
+These are some of the more innovative MG7 features:
 
 \begin{itemize}
 \tightlist
@@ -183,7 +184,7 @@ outlined in the Introduction
   Parallelization and distributed analysis based on AWS, with on-demand
   infrastructure as the basic paradigm
 \item
-  Definition of complex pipelines using \emph{Loquat}, a composable
+  Definition of complex workflows using \emph{Loquat}, a composable
   system for scaling/parallelizing stateless computations especially
   designed for Amazon Web Services (AWS)
 \item
@@ -197,7 +198,12 @@ outlined in the Introduction
   the calculation of the taxa abundance values considering the
   hierarchic structure of taxonomy tree (cumulative values)
 \item
-  per-read assignment (??)
+  Exhaustive per-read taxonomic assignment using two complementary
+  assignment algorithms Lowest Common Ancestor and Best BLAST Hit
+\item
+  Using a new 16S database of reference sequences (16S-DB7) with a
+  flexible and sustainable system of updating and project-driven
+  customization
 \end{itemize}
 
 \subsection{Libraries and resources}\label{libraries-and-resources}
