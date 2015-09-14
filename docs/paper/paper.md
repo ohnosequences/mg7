@@ -202,8 +202,6 @@ MG7 is open source, available at https://github.com/ohnosequences/mg7 under an [
 # Discussion
 <!-- From instructions: This section may be divided by subheadings. Discussions should cover the key findings of the study: discuss any prior art related to the subject so to place the novelty of the discovery in the appropriate context; discuss the potential short-comings and limitations on their interpretations; discuss their integration into the current understanding of the problem and how this advances the current views; speculate on the future direction of the research and freely postulate theories that could be tested in the future. -->
 
-## What MG7 brings
-
 We could summarize the most innovative ideas and developments in MG7:
 
 <!-- TODO this needs a couple of points on the bio side. My idea is to have section for each. -->
