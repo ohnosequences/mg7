@@ -6,6 +6,8 @@ import ohnosequences.metagenomica.loquats.assignment.dataProcessing._
 import ohnosequences.metagenomica.bio4j._, taxonomyTree._, titanTaxonomyTree._
 
 import ohnosequences.loquat.dataProcessing._
+import ohnosequences.loquat.utils._
+
 import ohnosequences.statika.bundles._
 import ohnosequences.statika.instructions._
 import ohnosequencesBundles.statika.Blast
@@ -21,14 +23,54 @@ import scala.util.Try
 
 case object dataProcessing {
 
-  case object directCountsCSV extends Data(CSVDataType, "directCounts.csv")
-  case object accumulatedCountsCSV extends Data(CSVDataType, "accumulatedCounts.csv")
+  case object lcaCountsCSV extends Data(CSVDataType, "lca.counts.csv")
+  case object bbhCountsCSV extends Data(CSVDataType, "bbh.counts.csv")
 
+  // returns count of the given id and a filtered list (without that id)
+  def count(id: ID, list: List[ID]): (Int, List[ID]) =
+    list.foldLeft( (0, List[ID]()) ) { case ((count, rest), next) =>
+      if (next == id) (count + 1, rest)
+      else (count, next :: rest)
+    }
+
+  // TODO: make it tailrec
+  def directCounts(taxIds: List[TaxID]): Map[TaxID, Int] = {
+
+    @scala.annotation.tailrec
+    def rec(list: List[TaxID], acc: Map[TaxID, Int]): Map[TaxID, Int] =
+      list match{
+        case Nil => acc
+        case h :: t => {
+          val (n, rest) = count(h, t)
+          rec(rest, acc.updated(h, n + 1))
+        }
+      }
+
+    rec(taxIds, Map[TaxID, Int]())
+  }
+
+  // TODO: figure out some more effective algorithm
+  // Caution: it uses bio4j bundle!
+  def accumulatedCounts(counts: Map[TaxID, Int]): Map[TaxID, (Int, Int)] = {
+    counts.foldLeft(
+      Map[TaxID, (Int, Int)]()
+    ) { case (acc, (id, count)) =>
+      val node: Option[TitanTaxonNode] = titanTaxonNode(bundles.bio4jTaxonomy.graph, id)
+      val ancestors: Seq[AnyTaxonNode] = node.map{ n => pathToTheRoot(n, Seq()) }.getOrElse(Seq())
+
+      ancestors.foldLeft(
+        acc.updated(id, (count, 0))
+      ) { (acc, node) =>
+        val (direct, accumulated) = acc.get(node.id).getOrElse((0, 0))
+        acc.updated(node.id, (direct, accumulated + count))
+      }
+    }
+  }
 
   case object countingDataProcessing extends DataProcessingBundle(
     bundles.bio4jTaxonomy
-  )(input = lcaCSV :^: DNil,
-    output = directCountsCSV :^: accumulatedCountsCSV :^: DNil
+  )(input = lcaCSV :^: bbhCSV :^: DNil,
+    output = lcaCountsCSV :^: bbhCountsCSV :^: DNil
   ) {
 
     def instructions: AnyInstructions = say("I'm counting you!")
@@ -40,51 +82,30 @@ case object dataProcessing {
 
       import com.github.tototoshi.csv._
 
-      val lcaReader: CSVReader = CSVReader.open( context.file(lcaCSV).javaFile )
+      // same thing that we do for lca and bbh
+      def processFile(f: file): file = {
+        val csvReader: CSVReader = CSVReader.open( f.javaFile )
+        val counts: Map[TaxID, (Int, Int)] = accumulatedCounts(
+          // FIXME: use some csv api instead of row(1)
+          directCounts( csvReader.iterator.map{ row => row(1) }.toList )
+        )
+        csvReader.close
 
-      val directCounts: Map[TaxID, Int] = lcaReader.iterator.toStream
-        .foldLeft(Map[TaxID, Int]()) { (acc, row) =>
-          // TODO: use csv api?
-          val taxId = row(1)
-          val current: Int = acc.get(taxId).getOrElse(0)
-          acc.updated(taxId, current + 1)
-        }
+        val outFile = context / s"${f.name}.counts"
+        val csvWriter = CSVWriter.open(outFile.javaFile, append = true)
+        counts foreach { case (taxId, (dir, acc)) => csvWriter.writeRow( List(taxId, dir, acc) ) }
+        csvWriter.close
 
-      lcaReader.close
-
-      // TODO: figure out some more effective algorithm
-      // TODO: split it and test separately
-      val accumulatedCounts: Map[TaxID, Int] = directCounts
-        .foldLeft(Map[TaxID, Int]()) { case (acc, (taxId, count)) =>
-          val node: Option[TitanTaxonNode] = titanTaxonNode(bundles.bio4jTaxonomy.graph, taxId)
-          val ancestors: Seq[AnyTaxonNode] = node.map{ n => pathToTheRoot(n, Seq()) }.getOrElse(Seq())
-
-          ancestors.foldLeft(acc) { (acc, node) =>
-            val current: Int = acc.get(node.id).getOrElse(0)
-            acc.updated(node.id, current + count)
-          }
-        }
-
-      // Now we will write these two types of result to two separate files
-      val directCountsFile = context / "directCounts.csv"
-      val accumulatedCountsFile = context / "accumulatedCounts.csv"
-
-      val directCountsWriter = CSVWriter.open(directCountsFile.javaFile, append = true)
-      directCounts foreach { case (taxId, count) =>
-        directCountsWriter.writeRow(List(taxId, count))
+        outFile
       }
-      directCountsWriter.close
 
-      val accumulatedCountsWriter = CSVWriter.open(accumulatedCountsFile.javaFile, append = true)
-      accumulatedCounts foreach { case (taxId, count) =>
-        accumulatedCountsWriter.writeRow(List(taxId, count))
-      }
-      accumulatedCountsWriter.close
+      val lcaOut: file = processFile( context.file(lcaCSV) )
+      val bbhOut: file = processFile( context.file(bbhCSV) )
 
       success(
         s"Results are written to ...",
-        directCountsCSV.inFile(directCountsFile) :~:
-        accumulatedCountsCSV.inFile(accumulatedCountsFile) :~:
+        lcaCountsCSV.inFile(lcaOut) :~:
+        bbhCountsCSV.inFile(bbhOut) :~:
         ∅
       )
     }

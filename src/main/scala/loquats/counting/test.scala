@@ -56,15 +56,19 @@ case object countingTest {
             lcaCSV.atS3(ObjectAddress(
               "resources.ohnosequences.com",
               "16s/public-datasets/PRJEB6592/assignment-test/ERR567374_1.lca.csv"
+            )) :~:
+            bbhCSV.atS3(ObjectAddress(
+              "resources.ohnosequences.com",
+              "16s/public-datasets/PRJEB6592/assignment-test/ERR567374_1.bbh.csv"
             )) :~: ∅,
           remoteOutput =
-            directCountsCSV.atS3(ObjectAddress(
+            lcaCountsCSV.atS3(ObjectAddress(
               "resources.ohnosequences.com",
-              "16s/public-datasets/PRJEB6592/counting-test/ERR567374_1.counts.direct.csv"
+              "16s/public-datasets/PRJEB6592/counting-test/ERR567374_1.lca.counts.csv"
             )) :~:
-            accumulatedCountsCSV.atS3(ObjectAddress(
+            bbhCountsCSV.atS3(ObjectAddress(
               "resources.ohnosequences.com",
-              "16s/public-datasets/PRJEB6592/counting-test/ERR567374_1.counts.accumulated.csv"
+              "16s/public-datasets/PRJEB6592/counting-test/ERR567374_1.bbh.counts.csv"
             )) :~:
             ∅
         )
