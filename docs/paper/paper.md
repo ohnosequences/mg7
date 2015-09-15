@@ -230,8 +230,13 @@ What we see as key advantages of this approach (when coupled with compile-time s
 - **Documentation** We can take advantage of all the effort put into software documentation tools and practices, such as in our case Scaladoc or literate programming. As documentation, analysis processes and data specification live together in the files, it is much easier to keep coherence between them.
 - **Expresiveness and safety** For example in our case we can choose only from valid Illumina read types, and then build a default FLASH command based on that. The output locations, being declared statically, are also available for use in further analysis.
 
-## Inputs, outputs, data: compile-time, expressive, composable
-<!-- TODO some generic stuff here -->
+## Input and output data declaration
+
+An important aspect of the MG7 workflow is the way it deals with data resources. All the data that is going to be used in the analysis or produced as an output is described as Scala code using rich types from the *Datasets* language. This allows user to specify all the information about the type of the data that can be utilized then by the tools analyzing this data. For example, we can specify that for the first part of the MG7 workflow running FLASH in parallel, requires Illumina paired end reads and produces joined reads.
+
+On one hand, specification of the input data allows us to restrict its type and force users to be conscious about what they pass as an input. On the other hand specification of the output data helps to build a workflow as a _composition_ of several parts: we can ensure on the Scala code type level that the output of one component fits as an input of the next component. This can be crucial, as often the way the analysis works depends a lot on the particular structure of the data. For instance, in the MG7 workflow, using BLAST eDSL, we can describe exactly which format will the output of the BLAST step have, which information it will include, and then in the next step we can reuse this description to easily parse BLAST output and retrieve the part of the information needed for the taxonomy assignment analysis. Having data structure descibed statically as Scala code allows us to be sure that we won't have parsing problems or other issues with incompatible data passed between components of the workflow.
+
+All this doesn't compromise flexibility of the way user works with data in MG7. On the contrary, having static data declarations as a part of the configuration allows user to reuse component of analysis and modify it easily according to particular needs. Besides that, an important advantage of the type-level control is the additinal insurance from unsuccessful analysis launches, which may lead to the lost of time and as a consequence finance spent on the cloud resources.
 
 ## Tools, data, dependencies and machine configurations
 
