@@ -236,7 +236,7 @@ An important aspect of the MG7 workflow is the way it deals with data resources.
 
 On one hand, specification of the input data allows us to restrict its type and force users to be conscious about what they pass as an input. On the other hand specification of the output data helps to build a workflow as a _composition_ of several parts: we can ensure on the Scala code type level that the output of one component fits as an input of the next component. This can be crucial, as often the way the analysis works depends a lot on the particular structure of the data. For instance, in the MG7 workflow, using BLAST eDSL, we can describe exactly which format will the output of the BLAST step have, which information it will include, and then in the next step we can reuse this description to easily parse BLAST output and retrieve the part of the information needed for the taxonomy assignment analysis. Having data structure descibed statically as Scala code allows us to be sure that we won't have parsing problems or other issues with incompatible data passed between components of the workflow.
 
-All this doesn't compromise flexibility of the way user works with data in MG7. On the contrary, having static data declarations as a part of the configuration allows user to reuse component of analysis and modify it easily according to particular needs. Besides that, an important advantage of the type-level control is the additinal insurance from unsuccessful analysis launches, which may lead to the lost of time and as a consequence finance spent on the cloud resources.
+All this doesn't compromise flexibility of the way user works with data in MG7. On the contrary, having static data declarations as a part of the configuration allows user to reuse component of analysis and modify it easily according to particular needs. Besides that, an important advantage of the type-level control is the additional insurance from unsuccessful analysis launches, which may lead to the lost of time and as a consequence finance spent on the cloud resources.
 
 ## Tools, data, dependencies and machine configurations
 
@@ -282,7 +282,7 @@ It is certainly possible to adapt MG7 to work with shotgun metagenomics data. Si
 MG7 uses various Amazon Web Services:
 
 - EC2 (Elastic Compute Cloud) autoscaling groups for launching and managing computation units
-- S3 (Simple Storage Service) for storing inputs and output data
+- S3 (Simple Storage Service) for storing input and output data
 - SQS (Simple Queue Service) for communication between different components of the system
 - SNS (Simple Notification Service) for notifying user about the progress
 
