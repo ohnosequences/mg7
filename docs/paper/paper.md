@@ -226,15 +226,31 @@ What we see as key advantages of this approach (when coupled with compile-time s
 
 An important aspect of the MG7 workflow is the way it deals with data resources. All the data that is going to be used in the analysis or produced as an output is described as Scala code using rich types from the *Datasets* language. This allows user to specify all the information about the type of the data that can be utilized then by the tools analyzing this data. For example, we can specify that for the first part of the MG7 workflow running FLASH in parallel, requires Illumina paired end reads and produces joined reads.
 
-On one hand, specification of the input data allows us to restrict its type and force users to be conscious about what they pass as an input. On the other hand specification of the output data helps to build a workflow as a _composition_ of several parts: we can ensure on the Scala code type level that the output of one component fits as an input of the next component. This can be crucial, as often the way the analysis works depends a lot on the particular structure of the data. For instance, in the MG7 workflow, using BLAST eDSL, we can describe exactly which format will the output of the BLAST step have, which information it will include, and then in the next step we can reuse this description to easily parse BLAST output and retrieve the part of the information needed for the taxonomy assignment analysis. Having data structure descibed statically as Scala code allows us to be sure that we won't have parsing problems or other issues with incompatible data passed between components of the workflow.
+On one hand, specification of the input data allows us to restrict its type and force users to be conscious about what they pass as an input. On the other hand specification of the output data helps to build a workflow as a _composition_ of several parts: we can ensure on the Scala code type level that the output of one component fits as an input of the next component. This can be crucial, as often the way the analysis works depends a lot on the particular structure of the data. For instance, in the MG7 workflow, using BLAST eDSL, we can describe exactly which format will the output of the BLAST step have, which information it will include, and then in the next step we can reuse this description to easily parse BLAST output and retrieve the part of the information needed for the taxonomy assignment analysis. Having data structure described statically as Scala code allows us to be sure that we won't have parsing problems or other issues with incompatible data passed between components of the workflow.
 
 All this doesn't compromise flexibility of the way user works with data in MG7. On the contrary, having static data declarations as a part of the configuration allows user to reuse component of analysis and modify it easily according to particular needs. Besides that, an important advantage of the type-level control is the additional insurance from unsuccessful analysis launches, which may lead to the lost of time and as a consequence finance spent on the cloud resources.
 
-## Tools, data, dependencies and machine configurations
-<!-- TODO @laughedelic doing this -->
 
 ## Parallel cloud execution ??
-<!-- TODO @laughedelic doing this -->
+
+<!-- TODO @laughedelic is doing this. Some ideas:
+  - some general words about Loquat rephrasing the description above
+  - importance of parallelising
+  - what is Loquat from the user perspective: code, config, instructions
+  - how to launch a loquat
+  - loquats used in MG7
+-->
+
+
+## Tools, data, dependencies and automated deployment
+
+Bioinformatics software often has a complicated installation process and requires various dependencies with unclear versions. This makes the deployment of the bioinformatics tools an involved task and resolving it manually is not a solution in the context of cloud computations. To face this problem, one needs an automated system of managing tools and resources, which will allow an expressive way for describing dependencies between parts of a pipeline and provide a reproducible procedure of its deployment. We have developed *Statika* for this purpose and successfully use it in MG7.
+
+Every external tool involved in the workflow is represented as a *Statika* bundle, which is essentially a Scala project describing the installation process of this tool and declaring dependencies on other bundles which will be installed prior to the considered tool itself. Describing relationships between bundles on the code level allows us to track the directed acyclic graph of their dependencies and linearize them to automatically install them sequentially in the right order. Meanwhile describing installation process on the code level allows user to utilize wide range of Scala and Java APIs, making installation a well-defined sequence of steps rather than an unreliable script dependent on the certain environment. This way *Statika* provides an easy way to make deployment an automated reproducible process.
+
+Besides the bioinformatics tools like BLAST and FLASH, *Statika* bundles are used for wrapping data dependencies and all inner components of the system that require cloud deployment. In particular, all components of *Loquat* are bundles, which allows user to define which components are needed for the parallel processing on each computation unit in an expressive way, declaring them as bundle dependencies of the loquat "worker" bundle. This modularization is also important for the matter of making components of the system easily reusable for different projects and liberating user from most of the tasks related to their deployment.
+
+<!-- TODO what about machines configurations? some AWS specifics? -->
 
 ## Taxonomy and Bio4j
 <!-- TODO if possible improve this. Maybe something about graph data biology lalala (bio4j paper?)  -->
