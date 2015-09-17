@@ -34,7 +34,7 @@ correspondingAuthor:
   position: 7
 
 abstract: |
-  The exponential growth of metagenomics is adding a significant plus of complexity to the big data problem in genomics. In this new scenario impacted by the wide scale and scope of the projects and by the explosion of sequence data to be analyzed is especially opportune the use of new possibilities that cloud computing approaches, new functional and dependently typed programming languages and new database paradigms as graph databases offer. To tackle the challenges of big data analysis in this work we have used these new means to design and develop a new open source methodology for analyzing metagenomics data, MG7. It exploits the new possibilities that cloud computing offers to get a system robust, programmatically configurable, modular, distributed, flexible, scalable and traceable in which the biological databases of reference sequences can be easily updated and / or frequently substituted by new ones or by databases specifically designed for focused projects. MG7 uses parallelization and distributed analysis based on AWS, with on-demand infrastructure as the basic paradigm and allow the definition of complex workflows using a composable system for scaling/parallelizing stateless computations especially designed for Amazon Web Services (AWS) that counts with a static reproducible specification of dependencies and behavior of the different components. The modelling of the taxonomy tree is done using the new paradigm of graph databases of Bio4j that facilitates the taxonomic assignment tasks and the calculation of the taxa abundance values considering the hierarchic structure of taxonomy tree. MG7 includes the new 16S database 16S-DB7 built with a flexible and sustainable system of updating and project-driven personalization.
+  The exponential growth of metagenomics is adding a significant plus of complexity to the big data problem in genomics. In this new scenario impacted by the wide scale and scope of the projects and by the explosion of sequence data to be analyzed is especially opportune the use of new possibilities that cloud computing approaches, new functional and dependently typed programming languages and new database paradigms as graph databases offer. To tackle the challenges of big data analysis in this work we have used these new means to design and develop a new open source methodology for analyzing metagenomics data, MG7. It exploits the new possibilities that cloud computing offers to get a system robust, programmatically configurable, modular, distributed, flexible, scalable and traceable in which the biological databases of reference sequences can be easily updated and / or frequently substituted by new ones or by databases specifically designed for focused projects. MG7 uses parallelization and distributed analysis based on AWS, with on-demand infrastructure as the basic paradigm and allow the definition of complex workflows using a composable system for scaling/parallelizing stateless computations designed for Amazon Web Services (AWS) that counts with a static reproducible specification of dependencies and behavior of the different components. The modelling of the taxonomy tree is done using the new paradigm of graph databases of Bio4j that facilitates the taxonomic assignment tasks and the calculation of the taxa abundance values considering the hierarchic structure of taxonomy tree. MG7 includes the new 16S database 16S-DB7 built with a flexible and sustainable system of updating and project-driven personalization.
 
   $^\dagger$ The first and second authors contributed equally to this work
 
@@ -44,11 +44,11 @@ keywords: "Metagenomics, 16S, Bacterial diversity profile, Bio4j, Graph database
 # Introduction
 <!-- TODO needs review -->
 
-During the past decade, metagenomics data analysis is growing exponentially. Some of the reasons behind this are the increasing throughput of massively parallel sequencing technologies (with the derived decrease in sequencing costs), and the wide impact of metagenomics studies, especially in human health (diagnostics, treatments, drug response or prevention). We should also mention what could be called the microbiome explosion:  all kind of microbiomes (gut, mouth, skin, urinary tract, airway, milk, bladder) are now routinely sequenced in different conditions of health and disease, or after different treatments. The impact of Metagenomics is also being felt in environmental sciences, crop sciences, the agrifood sector and biotechnology in general. These new possibilities for exploring the diversity of micro--organisms in the most varied environments are opening new research areas, and drastically changing the existing ones.
+During the past decade, metagenomics data analysis is growing exponentially. Some of the reasons behind this are the increasing throughput of massively parallel sequencing technologies (with the derived decrease in sequencing costs), and the wide impact of metagenomics studies [@oulas2015metagenomics], especially in human health  (diagnostics, treatments, drug response or prevention) [@bikel2015combining]. We should also mention what could be called the microbiome explosion: all kind of microbiomes (gut, mouth, skin, urinary tract, airway, milk, bladder) are now routinely sequenced in different conditions of health and disease, or after different treatments. The impact of Metagenomics is also being felt in environmental sciences [@ufarte2015discovery], crop sciences, the agrifood sector [@coughlan2015biotechnological] and biotechnology in general [@cowan2015metagenomics, @kodzius2015marine]. These new possibilities for exploring the diversity of micro--organisms in the most varied environments are opening new research areas, and drastically changing the existing ones.
 
 As a consequence, the challenge is thus moving (as in other fields) from data acquisition to data analysis: the amount of data is expected to be overwhelming in a very short time [@stephens2015big].
 
-Genome researchers have raised the alarm over big data in the past [@hayden2015genome], but even a more serious challenge might be faced with the metagenomics boom. If we compare metagenomics data with other genomics data used in clinical genotyping we find a differential feature: the key role of time. Thus, for example, in some longitudinal studies, serial sampling of the same patient along several weeks (or years) is being used for the follow up of some intestinal pathologies, for studying the evolution of the gut microbiome after antibiotic treatment, or for colon cancer early detection [@zeller2014potential]. This need of sampling across time adds more complexity to metagenomics data storage and demands adapted algorithms to detect state variations across time as well as idiosyncratic commonalities of the microbiome of each individual [@franzosa2015identifying].
+Genome researchers have raised the alarm over big data in the past [@hayden2015genome], but even a more serious challenge might be faced with the metagenomics boom. If we compare metagenomics data with other genomics data used in clinical genotyping we find a differential feature: the key role of time. Thus, for example, in some longitudinal studies, serial sampling from the same patient [@faust2015metagenomics] along several weeks (or years) is being used for the follow up of some intestinal pathologies, for studying the evolution of the gut microbiome after antibiotic treatment, or for colon cancer early detection [@zeller2014potential, @garrett2015cancer]. This need of sampling across time adds more complexity to metagenomics data storage and demands adapted algorithms to detect state variations across time as well as idiosyncratic commonalities of the microbiome of each individual [@franzosa2015identifying].
 In addition to the intra-individual sampling-time dependence, metagenomic clinical test results vary depending on the specific region of extraction of the clinical specimen. This local variability adds complexity to the analysis since different localizations (different tissues, different anatomical regions, healthy or tumour tissues) are required to have a sufficiently complete landscape of the human microbiome. Moreover, re--analysis of old samples using new tools and better reference databases might be also demanded from time to time.
 
 Other disciplines such as astronomy or particle physics have faced the big data challenge before. A key difference is the existence of standards for data processing [@stephens2015big]; in metagenomics global standards for converting raw sequence data into processed data are not yet well defined, and there are shortcomings derived from the fact that most bioinformatics methodologies used for metagenomics data analysis were designed for scenarios very different from the current one. These are some of the aspects that have suffered crucial changes and advances with a direct impact in metagenomics data analysis:
@@ -107,9 +107,9 @@ A *loquat* executes a process with explicit input and output datasets (declared 
 
 A manager instance is used to monitor workers, provide initial data to be put in the SQS queue and optionally release resources depending on a set of configurable conditions.
 
-Both worker and manager instances are *Statika* bundles. In the case of the worker, it can declare any dependencies needed to perform its task: other tools, libraries, or data.
+Both worker and manager instances are *Statika* bundles. The worker can declare any dependencies needed to perform its task: other tools, libraries, or data.
 
-All configuration such as the number of workers or the instance types is declared statically, the specification of a loquat being ultimately a Scala object. There are deploy and resource management methods, making it easy to use an existing loquat either as a library or from (for example) a Scala REPL.
+All configuration such as the number of workers or the instance types is declared statically, the specification of a loquat being ultimately a Scala object. Deploy and resource management methods make easy to use an existing loquat either as a library or from (for example) a Scala REPL.
 
 The input and output (and their locations) being defined statically has several critical advantages. First, composing different loquats is easy and safe; just use the output types and locations of the first one as input for the second one. Second, data and their types help in not mixing different resources when implementing a process, while serving as a safe and convenient mechanism for writing generic processing tasks. For example, merging paired-end Illumina reads generically is easy as the data type includes the relevant information (insert size, read length, etc) to pass to a tool such as FLASH.
 
@@ -143,7 +143,7 @@ Our 16S database building strategy allows the substitution of the 16S database b
 
 ## Workflow Description
 
-The MG7 analysis workflow is summarized in <!-- TODO number -->Figure X. The input files for MG7 are the FASTQ files resulting from a paired-end NGS sequencing experiment.
+The MG7 analysis workflow is summarized in Figure 1. The input files for MG7 are the FASTQ files resulting from a paired-end NGS sequencing experiment.
 
 ### Joining reads of each pair using FLASH
 
@@ -151,15 +151,15 @@ In the first step the paired-end reads, designed with an insert size that yields
 
 ### Parallelized BLASTN of each read against the 16S-DB7
 
-The second step is to search for similar 16S sequences in our 16S-DB7 database. The taxonomic assignment for each read is based on BLASTN of each read against the 16S database. Assignment based on direct similarity of each read one by one compared against a sufficiently wide database is a very exhaustive method for assignment [@segata2013computational]<!-- TODO missing ref for @morgan2012chapter --> . Some methods of assignment compare the sequences only against the available complete bacterial genomes or avoid computational cost clustering or binning the sequences first, and then doing the assignments only for the representative sequence of each cluster. MG7 carries out an exhaustive comparison of all the reads under analysis and it does not applies any binning strategy. Every read is specifically compared with all the sequences of the 16S database. We select the best BLAST hits (10 hits by default) obtained for each read to do the taxonomic assignment.
+The second step is to search for similar 16S sequences in our 16S-DB7 database. The taxonomic assignment for each read is based on BLASTN of each read against the 16S database. Assignment based on direct similarity of each read one by one compared against a sufficiently wide database is a very exhaustive method for assignment [@segata2013computational, @morgan2012chapter]. Some methods of assignment compare the sequences only against the available complete bacterial genomes or avoid computational cost clustering or binning the sequences first, and then doing the assignments only for the representative sequence of each cluster. MG7 carries out an exhaustive comparison of all the reads under analysis and it does not applies any binning strategy. Every read is specifically compared with all the sequences of the 16S database. We select the best BLAST hits (10 hits by default) obtained for each read to do the taxonomic assignment.
 
 ### Taxonomic Assignment Algorithms
-All the reads are assigned under two different algorithms of assignment: i. Lowest Common Ancestor based taxonomic assignment (LCA) and ii. Best BLAST Hit based taxonomic assignment (BBH). Figure X displays schematically the LCA algorithm applied sensu stricto (left panel) and the called ‘in line’ exception (right panel) designed in order to gain specificity in the assignments in the cases in which the topology of the taxonomical nodes corresponding to the BLAST hits support sufficiently the assignment to the most specific taxon.
+All the reads are assigned under two different algorithms of assignment: i. Lowest Common Ancestor based taxonomic assignment (LCA) and ii. Best BLAST Hit based taxonomic assignment (BBH). Figure 2 displays schematically the LCA algorithm applied sensu stricto (left panel) and the called ‘in line’ exception (right panel) designed in order to gain specificity in the assignments in the cases in which the topology of the taxonomical nodes corresponding to the BLAST hits support sufficiently the assignment to the most specific taxon.
 
 #### Lowest Common Ancestor based Taxonomic Assignment
 
 For each read, first, we select the BEST BLAST HITs (by default 10 Hits) over a threshold of similarity (by default $evalue \leq e^{-15}$) filtering those hits that are not sufficiently good comparing them with the best one. We select the best HSP (High Similarity Pair) per reference sequence and then choose the best HSP (that with lowest e value) between all the selected ones. The bitscore of this best HSP (called S) is used as reference to filter the rest of HSPs. All the HSPs with bitscore below p x S are filtered. p is a coefficient fixed by the user to define the bitscore required, e.g. if p=0.9 and S=700 the required bitscore threshold would be 630.
-Once we have the definitive HSPs selected, we obtain their corresponding taxonomic nodes using the taxonomic assignments that NCBI provides for all the nt database sequences. Now we have to analyze the topological distribution of these nodes in the taxonomy tree: i. If all the nodes forms a line in the taxonomy tree (are located in a not branched lineage to the tree root) we should choose the most specific taxID as the final assignment for that read. We call to this kind of assignment the ‘in line’ exception (see Figure X right panel). ii. If not, we should search for the *sensu stricto* Lowest Common Ancestor (LCA) of all the selected taxonomic nodes (See Figure X left panel). In this approach we decided to use the bitscore for evaluating the similarity because it is a value that increases when similarity is higher and depends a lot on the length of the HSP.
+Once we have the definitive HSPs selected, we obtain their corresponding taxonomic nodes using the taxonomic assignments that NCBI provides for all the nt database sequences. Now we have to analyze the topological distribution of these nodes in the taxonomy tree: i. If all the nodes forms a line in the taxonomy tree (are located in a not branched lineage to the tree root) we should choose the most specific taxID as the final assignment for that read. We call to this kind of assignment the ‘in line’ exception (see Figure 2 right panel). ii. If not, we should search for the *sensu stricto* Lowest Common Ancestor (LCA) of all the selected taxonomic nodes (See Figure 2 left panel). In this approach we decided to use the bitscore for evaluating the similarity because it is a value that increases when similarity is higher and depends a lot on the length of the HSP.
 Some reads could not find sequences with enough similarity in the database and then they would be classified as reads with no hits.
 Advanced metagenomics analysis approaches [@huson2013microbial] have adopted LCA assignment algorithms because it provides fine and trusted taxonomical assignment.
 
@@ -172,6 +172,7 @@ We decided to maintain the simpler method of Best BLAST Hit (BBH) for taxonomic 
 MG7 provides independent results for the 2 different approaches, LCA and BBH. The output files include, for each taxonomy node (with some read assigned), abundance values for direct assignment and cumulative assignment. The abundances are provided in counts (absolute values) and in percentage normalized to the number of reads of each sample. Direct assignments are calculated counting reads specifically assigned to a taxonomic node, not including the reads assigned to the descendant nodes in the taxonomy tree. Cumulative assignments are calculated including the direct assignments and also the assignments of the descendant nodes. For each sample MG7 provides 8 kinds of abundance values: LCA direct counts, LCA cumu. counts, LCA direct %, LCA cumu. %, BBH direct counts, BBH cumu. counts, BBH direct %, BBH cumu. %.
 
 ## Data analysis as a software project
+<!-- TODO what @marina-manrique wrote, @laughedelic will put it here  -->
 
 **IDEAS**
 
@@ -192,17 +193,8 @@ MG7 is open source, available at https://github.com/ohnosequences/mg7 under an [
 
 
 
-
-
-
-
-
-
-
 # Discussion
 <!-- From instructions: This section may be divided by subheadings. Discussions should cover the key findings of the study: discuss any prior art related to the subject so to place the novelty of the discovery in the appropriate context; discuss the potential short-comings and limitations on their interpretations; discuss their integration into the current understanding of the problem and how this advances the current views; speculate on the future direction of the research and freely postulate theories that could be tested in the future. -->
-
-## What MG7 brings
 
 We could summarize the most innovative ideas and developments in MG7:
 
@@ -230,51 +222,42 @@ What we see as key advantages of this approach (when coupled with compile-time s
 - **Expresiveness and safety** For example in our case we can choose only from valid Illumina read types, and then build a default FLASH command based on that. The output locations, being declared statically, are also available for use in further analysis.
 
 ## Inputs, outputs, data: compile-time, expressive, composable
-<!-- TODO some generic stuff here -->
+<!-- TODO @laughedelic doing this -->
 
 ## Tools, data, dependencies and machine configurations
+<!-- TODO @laughedelic doing this -->
 
 ## Parallel cloud execution ??
-<!-- The Loquat thing -->
+<!-- TODO @laughedelic doing this -->
 
 ## Taxonomy and Bio4j
-
+<!-- TODO if possible improve this. Maybe something about graph data biology lalala (bio4j paper?)  -->
 The hierarchic structure of the taxonomy of the living organisms is a tree, and, hence, is also a graph in which each node, with the exception of the root node, has a unique parent node. It led us to model the taxonomy tree as a graph using the graph database paradigm. Previously we developed Bio4j **[Pareja-Tobes-2015]**, a platform for the integration of semantically rich biological data using typed graph models. It integrates most publicly available data linked with sequences into a set of interdependent graphs to be used for bioinformatics analysis and especially for biological data.
 
-## Future-proof
-
-## MG7 Future developments
+## Future developments
 
 ### Shotgun metagenomics
 
 It is certainly possible to adapt MG7 to work with shotgun metagenomics data. Simply changing the reference database to include whole genome sequence data could yield interesting results. This could also be refined by restricting reference sequences according to all sort of criteria, like biological function or taxonomy. Bio4j would be an invaluable tool here, thanks to  its ability to express express complex predicates on sequences using all the information linked with them (GO annotations, UniProt data, NCBI taxonomy, etc).
 
-### Comparison of groups of samples
+### Comparing groups of samples
 
-### Interactive visualizations using the output files of MG7 (Biographika project)
+<!-- TODO write something about group of samples -->
 
+### Interactive visualizations based on Biographika
 
-
-
-
-
-
-
-
-
-
+<!-- TODO biographika -->
 
 
 
 
 
 # Materials and Methods
-<!-- As far as my understanding of this section goes, here we should put a list-like enumeration of what we use. I'm also adding descriptions, that could go somewhere else if needed. -->
 
 ## Amazon Web Services
 
 <!-- TODO describe this minimally: EC2, SQS, S3 -->
-We use EC2, S3 and SQS<!-- TODO no release here. Any other service? --> through a Scala wrapper of the official [AWS Java SDK](https://aws.amazon.com/sdk-for-java/), [ohnosequences/aws-scala-tools `0.13.2`](https://github.com/ohnosequences/aws-scala-tools/releases/tag/v0.13.2). This uses version `1.9.25` of the AWS Java SDK.
+We use EC2, S3 and SQS through a Scala wrapper of the official [AWS Java SDK](https://aws.amazon.com/sdk-for-java/), [ohnosequences/aws-scala-tools `0.13.2`](https://github.com/ohnosequences/aws-scala-tools/releases/tag/v0.13.2). This uses version `1.9.25` of the AWS Java SDK.
 
 ## Scala
 
