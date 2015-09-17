@@ -231,17 +231,6 @@ On one hand, specification of the input data allows us to restrict its type and 
 All this doesn't compromise flexibility of the way user works with data in MG7. On the contrary, having static data declarations as a part of the configuration allows user to reuse component of analysis and modify it easily according to particular needs. Besides that, an important advantage of the type-level control is the additional insurance from unsuccessful analysis launches, which may lead to the lost of time and as a consequence finance spent on the cloud resources.
 
 
-## Parallel cloud execution ??
-
-<!-- TODO @laughedelic is doing this. Some ideas:
-  - some general words about Loquat rephrasing the description above
-  - importance of parallelising
-  - what is Loquat from the user perspective: code, config, instructions
-  - how to launch a loquat
-  - loquats used in MG7
--->
-
-
 ## Tools, data, dependencies and automated deployment
 
 Bioinformatics software often has a complicated installation process and requires various dependencies with unclear versions. This makes the deployment of the bioinformatics tools an involved task and resolving it manually is not a solution in the context of cloud computations. To face this problem, one needs an automated system of managing tools and resources, which will allow an expressive way for describing dependencies between parts of a pipeline and provide a reproducible procedure of its deployment. We have developed *Statika* for this purpose and successfully use it in MG7.
@@ -251,6 +240,12 @@ Every external tool involved in the workflow is represented as a *Statika* bundl
 Besides the bioinformatics tools like BLAST and FLASH, *Statika* bundles are used for wrapping data dependencies and all inner components of the system that require cloud deployment. In particular, all components of *Loquat* are bundles, which allows user to define which components are needed for the parallel processing on each computation unit in an expressive way, declaring them as bundle dependencies of the loquat "worker" bundle. This modularization is also important for the matter of making components of the system easily reusable for different projects and liberating user from most of the tasks related to their deployment.
 
 <!-- TODO what about machines configurations? some AWS specifics? -->
+
+## Parallel computations in the cloud 
+
+The MG7 workflow consists of certain steps, each of which perform some work in parallel, using the cloud infrastructure managed by *Loquat*. It is important to notice the horizontal<!-- or vertical? --> scalability of this approach. Irrespectively of how much data is needed to be proccessed, MG7 will easily handle it, by splitting data on chunks and performing the analysis on multiple computaion units. The Amazon Elastic Compute Cloud (EC2) provides a transparent way of managing computation infrastructure, called autoscaling groups. User can easily set up MG7 configuration parameters, adjusting the amount of EC2 instances they want to occupy for each task and their type. When using Amazon Web Services for parallel computations, it is easy to scale the computation resources, because the you pay for the time, not the amount of computation units.
+
+<!-- TODO this feels unfinished, but I can't write anything else here "_ -->
 
 ## Taxonomy and Bio4j
 <!-- TODO if possible improve this. Maybe something about graph data biology lalala (bio4j paper?)  -->
