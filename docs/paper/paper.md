@@ -174,13 +174,13 @@ MG7 provides independent results for the 2 different approaches, LCA and BBH. Th
 ## Data analysis as a software project
 <!-- TODO what @marina-manrique wrote, @laughedelic will put it here  -->
 
-The workflow for analysis of 16S data with MG7 is indeed a set of tasks, each of them based in *Loquat*. For each task a set of inputs and outputs as well as some parameters must be statically defined. The user is also free to leave all the parameters by default and define only the input and output of the whole workflow. The definition of this configuration is essentially Scala code and the way of starting an MG7 analysis is compiling the project code and launching it from the Scala interactive console.
+The MG7 16 data analysis workflow is indeed a set of tasks, all of them based in *Loquat*. For each task, a set of inputs and outputs as well as configuration parameters must be statically defined. The user is also free to leave the reasonable defaults for configuration, needing only to define the input and output of the whole workflow. The definition of this configuration is Scala code and the way of starting an MG7 analysis is compiling the project code and launching it from the Scala interactive console.
 
-The compilation of the code prior to launching any analysis assures that no AWS resources are launched if the analysis is not well defined, avoiding expenses not leading to any analysis. Besides the type check, various runtime checks are made before launch to ensure existence of input data and availability of resources.
+Code compilation prior to launching any analysis assures that no AWS resources are launched if the analysis is not well--defined, avoiding expenses not leading to any analysis. Besides compile--time checks, runtime checks are made before launch to ensure existence of input data and availability of resources.
 
-An MG7 analysis is then a Scala project where the user only needs to set certain variables at the code level (input, output and parameters), compile the code and run it. To facilitate the process of setting up the Scala project a template is provided.
+An MG7 analysis is then a Scala project where the user only needs to set certain variables at the code level (input, output and parameters), compile the code and run it. To facilitate the process of setting up the Scala project, a template with sensible defaults is provided.
 
-In order to be able to exploit Amazon Web Services infrastructure for the MG7 analysis, user needs to set up an AWS account with certain IAM (Identity and Access Management) permission policies that will grant access to the resources used in the workflow.
+In order to be able to exploit Amazon Web Services infrastructure for the MG7 analysis, the user needs to set up an AWS account with certain IAM (Identity and Access Management) permission policies that will grant access to the resources used in the workflow.
 
 ## Availability
 
@@ -241,7 +241,7 @@ Besides the bioinformatics tools like BLAST and FLASH, *Statika* bundles are use
 
 <!-- TODO what about machines configurations? some AWS specifics? -->
 
-## Parallel computations in the cloud 
+## Parallel computations in the cloud
 
 The MG7 workflow consists of certain steps, each of which perform some work in parallel, using the cloud infrastructure managed by *Loquat*. It is important to notice the horizontal<!-- or vertical? --> scalability of this approach. Irrespectively of how much data is needed to be proccessed, MG7 will easily handle it, by splitting data on chunks and performing the analysis on multiple computaion units. The Amazon Elastic Compute Cloud (EC2) provides a transparent way of managing computation infrastructure, called autoscaling groups. User can easily set up MG7 configuration parameters, adjusting the amount of EC2 instances they want to occupy for each task and their type. When using Amazon Web Services for parallel computations, it is easy to scale the computation resources, because the you pay for the time, not the amount of computation units.
 

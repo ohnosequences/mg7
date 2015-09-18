@@ -543,20 +543,30 @@ counts, BBH cumu. counts, BBH direct \%, BBH cumu. \%.
 \subsection{Data analysis as a software
 project}\label{data-analysis-as-a-software-project}
 
-\textbf{IDEAS}
+The MG7 16 data analysis workflow is indeed a set of tasks, all of them
+based in \emph{Loquat}. For each task, a set of inputs and outputs as
+well as configuration parameters must be statically defined. The user is
+also free to leave the reasonable defaults for configuration, needing
+only to define the input and output of the whole workflow. The
+definition of this configuration is Scala code and the way of starting
+an MG7 analysis is compiling the project code and launching it from the
+Scala interactive console.
 
-\begin{itemize}
-\tightlist
-\item
-  the user needs to write code, a repo would be nice, AWS account
-\item
-  there's some sort of conf required for the AWS account (add users,
-  roles, permissions, whatever)
-\item
-  Why this is a good thing (or should this just be in Discussion)
-\item
-  something else?
-\end{itemize}
+Code compilation prior to launching any analysis assures that no AWS
+resources are launched if the analysis is not well--defined, avoiding
+expenses not leading to any analysis. Besides compile--time checks,
+runtime checks are made before launch to ensure existence of input data
+and availability of resources.
+
+An MG7 analysis is then a Scala project where the user only needs to set
+certain variables at the code level (input, output and parameters),
+compile the code and run it. To facilitate the process of setting up the
+Scala project, a template with sensible defaults is provided.
+
+In order to be able to exploit Amazon Web Services infrastructure for
+the MG7 analysis, the user needs to set up an AWS account with certain
+IAM (Identity and Access Management) permission policies that will grant
+access to the resources used in the workflow.
 
 \subsection{Availability}\label{availability}
 
@@ -639,13 +649,96 @@ compile-time specification and checking), are
   statically, are also available for use in further analysis.
 \end{itemize}
 
-\subsection{Inputs, outputs, data: compile-time, expressive,
-composable}\label{inputs-outputs-data-compile-time-expressive-composable}
+\subsection{Input and output data
+declaration}\label{input-and-output-data-declaration}
 
-\subsection{Tools, data, dependencies and machine
-configurations}\label{tools-data-dependencies-and-machine-configurations}
+An important aspect of the MG7 workflow is the way it deals with data
+resources. All the data that is going to be used in the analysis or
+produced as an output is described as Scala code using rich types from
+the \emph{Datasets} language. This allows user to specify all the
+information about the type of the data that can be utilized then by the
+tools analyzing this data. For example, we can specify that for the
+first part of the MG7 workflow running FLASH in parallel, requires
+Illumina paired end reads and produces joined reads.
 
-\subsection{Parallel cloud execution ??}\label{parallel-cloud-execution}
+On one hand, specification of the input data allows us to restrict its
+type and force users to be conscious about what they pass as an input.
+On the other hand specification of the output data helps to build a
+workflow as a \emph{composition} of several parts: we can ensure on the
+Scala code type level that the output of one component fits as an input
+of the next component. This can be crucial, as often the way the
+analysis works depends a lot on the particular structure of the data.
+For instance, in the MG7 workflow, using BLAST eDSL, we can describe
+exactly which format will the output of the BLAST step have, which
+information it will include, and then in the next step we can reuse this
+description to easily parse BLAST output and retrieve the part of the
+information needed for the taxonomy assignment analysis. Having data
+structure described statically as Scala code allows us to be sure that
+we won't have parsing problems or other issues with incompatible data
+passed between components of the workflow.
+
+All this doesn't compromise flexibility of the way user works with data
+in MG7. On the contrary, having static data declarations as a part of
+the configuration allows user to reuse component of analysis and modify
+it easily according to particular needs. Besides that, an important
+advantage of the type-level control is the additional insurance from
+unsuccessful analysis launches, which may lead to the lost of time and
+as a consequence finance spent on the cloud resources.
+
+\subsection{Tools, data, dependencies and automated
+deployment}\label{tools-data-dependencies-and-automated-deployment}
+
+Bioinformatics software often has a complicated installation process and
+requires various dependencies with unclear versions. This makes the
+deployment of the bioinformatics tools an involved task and resolving it
+manually is not a solution in the context of cloud computations. To face
+this problem, one needs an automated system of managing tools and
+resources, which will allow an expressive way for describing
+dependencies between parts of a pipeline and provide a reproducible
+procedure of its deployment. We have developed \emph{Statika} for this
+purpose and successfully use it in MG7.
+
+Every external tool involved in the workflow is represented as a
+\emph{Statika} bundle, which is essentially a Scala project describing
+the installation process of this tool and declaring dependencies on
+other bundles which will be installed prior to the considered tool
+itself. Describing relationships between bundles on the code level
+allows us to track the directed acyclic graph of their dependencies and
+linearize them to automatically install them sequentially in the right
+order. Meanwhile describing installation process on the code level
+allows user to utilize wide range of Scala and Java APIs, making
+installation a well-defined sequence of steps rather than an unreliable
+script dependent on the certain environment. This way \emph{Statika}
+provides an easy way to make deployment an automated reproducible
+process.
+
+Besides the bioinformatics tools like BLAST and FLASH, \emph{Statika}
+bundles are used for wrapping data dependencies and all inner components
+of the system that require cloud deployment. In particular, all
+components of \emph{Loquat} are bundles, which allows user to define
+which components are needed for the parallel processing on each
+computation unit in an expressive way, declaring them as bundle
+dependencies of the loquat ``worker'' bundle. This modularization is
+also important for the matter of making components of the system easily
+reusable for different projects and liberating user from most of the
+tasks related to their deployment.
+
+\subsection{Parallel computations in the
+cloud}\label{parallel-computations-in-the-cloud}
+
+The MG7 workflow consists of certain steps, each of which perform some
+work in parallel, using the cloud infrastructure managed by
+\emph{Loquat}. It is important to notice the horizontal scalability of
+this approach. Irrespectively of how much data is needed to be
+proccessed, MG7 will easily handle it, by splitting data on chunks and
+performing the analysis on multiple computaion units. The Amazon Elastic
+Compute Cloud (EC2) provides a transparent way of managing computation
+infrastructure, called autoscaling groups. User can easily set up MG7
+configuration parameters, adjusting the amount of EC2 instances they
+want to occupy for each task and their type. When using Amazon Web
+Services for parallel computations, it is easy to scale the computation
+resources, because the you pay for the time, not the amount of
+computation units.
 
 \subsection{Taxonomy and Bio4j}\label{taxonomy-and-bio4j}
 
@@ -682,10 +775,28 @@ Biographika}\label{interactive-visualizations-based-on-biographika}
 
 \subsection{Amazon Web Services}\label{amazon-web-services}
 
-We use EC2, S3 and SQS through a Scala wrapper of the official
-\href{https://aws.amazon.com/sdk-for-java/}{AWS Java SDK},
+MG7 uses various Amazon Web Services:
+
+\begin{itemize}
+\tightlist
+\item
+  EC2 (Elastic Compute Cloud) autoscaling groups for launching and
+  managing computation units
+\item
+  S3 (Simple Storage Service) for storing input and output data
+\item
+  SQS (Simple Queue Service) for communication between different
+  components of the system
+\item
+  SNS (Simple Notification Service) for notifying user about the
+  progress
+\end{itemize}
+
+These services are used through a Scala wrapper of the official
+\href{https://aws.amazon.com/sdk-for-java/}{AWS Java SDK
+\texttt{1.9.25}},
 \href{https://github.com/ohnosequences/aws-scala-tools/releases/tag/v0.13.2}{ohnosequences/aws-scala-tools
-\texttt{0.13.2}}. This uses version \texttt{1.9.25} of the AWS Java SDK.
+\texttt{0.13.2}}.
 
 \subsection{Scala}\label{scala}
 
