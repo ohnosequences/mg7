@@ -666,24 +666,24 @@ type and force users to be conscious about what they pass as an input.
 On the other hand specification of the output data helps to build a
 workflow as a \emph{composition} of several parts: we can ensure on the
 Scala code type level that the output of one component fits as an input
-of the next component. This can be crucial, as often the way the
-analysis works depends a lot on the particular structure of the data.
-For instance, in the MG7 workflow, using BLAST eDSL, we can describe
-exactly which format will the output of the BLAST step have, which
-information it will include, and then in the next step we can reuse this
-description to easily parse BLAST output and retrieve the part of the
-information needed for the taxonomy assignment analysis. Having data
+for the next component. This is crucial, as obviously the way a data
+analysis task works depends a lot on the particular structure of the
+data. For instance, in the MG7 workflow, using BLAST eDSL, we can
+precisely describe which format will have the output of the BLAST step,
+which information it will include, and then in the next step we can
+reuse this description to parse BLAST output and retrieve the part of
+the information needed for the taxonomy assignment analysis. Having data
 structure described statically as Scala code allows us to be sure that
 we won't have parsing problems or other issues with incompatible data
-passed between components of the workflow.
+passed between workflow components.
 
-All this doesn't compromise flexibility of the way user works with data
-in MG7. On the contrary, having static data declarations as a part of
-the configuration allows user to reuse component of analysis and modify
-it easily according to particular needs. Besides that, an important
-advantage of the type-level control is the additional insurance from
-unsuccessful analysis launches, which may lead to the lost of time and
-as a consequence finance spent on the cloud resources.
+All this does not compromise flexibility in how the user works with data
+in MG7: having static data declarations as a part of the configuration
+allows the user to reuse analysis components, or modify them according
+to particular needs. Besides that, an important advantage of the
+type-level control is the added protection from the execution (and
+deployment) of a wrongly configured analysis task, which may lead to
+significant costs in both time and money.
 
 \subsection{Tools, data, dependencies and automated
 deployment}\label{tools-data-dependencies-and-automated-deployment}
@@ -715,13 +715,13 @@ process.
 Besides the bioinformatics tools like BLAST and FLASH, \emph{Statika}
 bundles are used for wrapping data dependencies and all inner components
 of the system that require cloud deployment. In particular, all
-components of \emph{Loquat} are bundles, which allows user to define
-which components are needed for the parallel processing on each
-computation unit in an expressive way, declaring them as bundle
-dependencies of the loquat ``worker'' bundle. This modularization is
-also important for the matter of making components of the system easily
-reusable for different projects and liberating user from most of the
-tasks related to their deployment.
+components of \emph{Loquat} are bundles; the user can then define which
+components are needed for the parallel processing on each computation
+unit in an expressive way, declaring them as bundle dependencies of the
+loquat ``worker'' bundle. This modularization is also important for the
+matter of making components of the system reusable for different
+projects and liberating the user from most of the tasks related to their
+deployment.
 
 \subsection{Parallel computations in the
 cloud}\label{parallel-computations-in-the-cloud}
@@ -729,16 +729,16 @@ cloud}\label{parallel-computations-in-the-cloud}
 The MG7 workflow consists of certain steps, each of which perform some
 work in parallel, using the cloud infrastructure managed by
 \emph{Loquat}. It is important to notice the horizontal scalability of
-this approach. Irrespectively of how much data is needed to be
-proccessed, MG7 will easily handle it, by splitting data on chunks and
-performing the analysis on multiple computaion units. The Amazon Elastic
-Compute Cloud (EC2) provides a transparent way of managing computation
-infrastructure, called autoscaling groups. User can easily set up MG7
-configuration parameters, adjusting the amount of EC2 instances they
-want to occupy for each task and their type. When using Amazon Web
-Services for parallel computations, it is easy to scale the computation
-resources, because the you pay for the time, not the amount of
-computation units.
+this approach. Irrespectively of how much data needs to be processed,
+MG7 will easily handle it, by splitting data on chunks and performing
+the analysis on multiple computation units. The Amazon Elastic Compute
+Cloud (EC2) service provides a transparent way of managing computation
+infrastructure, called autoscaling groups. The User can set MG7
+configuration parameters, adjusting for each task the amount and
+hardware characteristics of the EC2 instances they want to occupy for
+it. When using Amazon Web Services for parallel computations, it is easy
+to scale the computation resources, because the you pay for the time,
+not the amount of computation units.
 
 \subsection{Taxonomy and Bio4j}\label{taxonomy-and-bio4j}
 
@@ -780,16 +780,17 @@ MG7 uses the following Amazon Web Services:
 \begin{itemize}
 \tightlist
 \item
-  EC2 (Elastic Compute Cloud) autoscaling groups for launching and
-  managing computation units
+  \href{https://aws.amazon.com/ec2}{EC2} (Elastic Compute Cloud)
+  autoscaling groups for launching and managing computation units
 \item
-  S3 (Simple Storage Service) for storing input and output data
+  \href{https://aws.amazon.com/s3}{S3} (Simple Storage Service) for
+  storing input and output data
 \item
-  SQS (Simple Queue Service) for communication between different
-  components of the system
+  \href{https://aws.amazon.com/sqs}{SQS} (Simple Queue Service) for
+  communication between different components of the system
 \item
-  SNS (Simple Notification Service) for notifying user about the
-  progress
+  \href{https://aws.amazon.com/sns}{SNS} (Simple Notification Service)
+  for e-mail notifications
 \end{itemize}
 
 These services are used through a Scala wrapper of the official
