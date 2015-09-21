@@ -44,12 +44,12 @@ keywords: "Metagenomics, 16S, Bacterial diversity profile, Bio4j, Graph database
 # Introduction
 <!-- TODO needs review -->
 
-During the past decade, metagenomics data analysis is growing exponentially. Some of the reasons behind this are the increasing throughput of massively parallel sequencing technologies (with the derived decrease in sequencing costs), and the wide impact of metagenomics studies [@oulas2015metagenomics], especially in human health  (diagnostics, treatments, drug response or prevention) [@bikel2015combining]. We should also mention what could be called the microbiome explosion: all kind of microbiomes (gut, mouth, skin, urinary tract, airway, milk, bladder) are now routinely sequenced in different conditions of health and disease, or after different treatments. The impact of Metagenomics is also being felt in environmental sciences [@ufarte2015discovery], crop sciences, the agrifood sector [@coughlan2015biotechnological] and biotechnology in general [@cowan2015metagenomics, @kodzius2015marine]. These new possibilities for exploring the diversity of micro--organisms in the most varied environments are opening new research areas, and drastically changing the existing ones.
+During the past decade, metagenomics data analysis is growing exponentially. Some of the reasons behind this are the increasing throughput of massively parallel sequencing technologies (with the derived decrease in sequencing costs), and the wide impact of metagenomics studies [@oulas2015metagenomics], especially in human health  (diagnostics, treatments, drug response or prevention) [@bikel2015combining]. We should also mention what could be called the microbiome explosion: all kind of microbiomes (gut, mouth, skin, urinary tract, airway, milk, bladder) are now routinely sequenced in different conditions of health and disease, or after different treatments. The impact of Metagenomics is also being felt in environmental sciences [@ufarte2015discovery], crop sciences, the agrifood sector [@coughlan2015biotechnological] and biotechnology in general [@cowan2015metagenomics, @kodzius2015marine]. These new possibilities for exploring the diversity of micro-organisms in the most varied environments are opening new research areas, and drastically changing the existing ones.
 
 As a consequence, the challenge is thus moving (as in other fields) from data acquisition to data analysis: the amount of data is expected to be overwhelming in a very short time [@stephens2015big].
 
 Genome researchers have raised the alarm over big data in the past [@hayden2015genome], but even a more serious challenge might be faced with the metagenomics boom. If we compare metagenomics data with other genomics data used in clinical genotyping we find a differential feature: the key role of time. Thus, for example, in some longitudinal studies, serial sampling from the same patient [@faust2015metagenomics] along several weeks (or years) is being used for the follow up of some intestinal pathologies, for studying the evolution of the gut microbiome after antibiotic treatment, or for colon cancer early detection [@zeller2014potential, @garrett2015cancer]. This need of sampling across time adds more complexity to metagenomics data storage and demands adapted algorithms to detect state variations across time as well as idiosyncratic commonalities of the microbiome of each individual [@franzosa2015identifying].
-In addition to the intra-individual sampling-time dependence, metagenomic clinical test results vary depending on the specific region of extraction of the clinical specimen. This local variability adds complexity to the analysis since different localizations (different tissues, different anatomical regions, healthy or tumour tissues) are required to have a sufficiently complete landscape of the human microbiome. Moreover, re--analysis of old samples using new tools and better reference databases might be also demanded from time to time.
+In addition to the intra-individual sampling-time dependence, metagenomic clinical test results vary depending on the specific region of extraction of the clinical specimen. This local variability adds complexity to the analysis since different localizations (different tissues, different anatomical regions, healthy or tumour tissues) are required to have a sufficiently complete landscape of the human microbiome. Moreover, re-analysis of old samples using new tools and better reference databases might be also demanded from time to time.
 
 Other disciplines such as astronomy or particle physics have faced the big data challenge before. A key difference is the existence of standards for data processing [@stephens2015big]; in metagenomics global standards for converting raw sequence data into processed data are not yet well defined, and there are shortcomings derived from the fact that most bioinformatics methodologies used for metagenomics data analysis were designed for scenarios very different from the current one. These are some of the aspects that have suffered crucial changes and advances with a direct impact in metagenomics data analysis:
 
@@ -174,12 +174,13 @@ MG7 provides independent results for the 2 different approaches, LCA and BBH. Th
 ## Data analysis as a software project
 <!-- TODO what @marina-manrique wrote, @laughedelic will put it here  -->
 
-**IDEAS**
+The MG7 16 data analysis workflow is indeed a set of tasks, all of them based in *Loquat*. For each task, a set of inputs and outputs as well as configuration parameters must be statically defined. The user is also free to leave the reasonable defaults for configuration, needing only to define the input and output of the whole workflow. The definition of this configuration is Scala code and the way of starting an MG7 analysis is compiling the project code and launching it from the Scala interactive console.
 
-- the user needs to write code, a repo would be nice, AWS account
-- there's some sort of conf required for the AWS account (add users, roles, permissions, whatever)
-- Why this is a good thing (or should this just be in Discussion)
-- something else?
+Code compilation prior to launching any analysis assures that no AWS resources are launched if the analysis is not well-defined, avoiding expenses not leading to any analysis. Besides compile-time checks, runtime checks are made before launch to ensure existence of input data and availability of resources.
+
+An MG7 analysis is then a Scala project where the user only needs to set certain variables at the code level (input, output and parameters), compile the code and run it. To facilitate the process of setting up the Scala project, a template with sensible defaults is provided.
+
+In order to be able to exploit Amazon Web Services infrastructure for the MG7 analysis, the user needs to set up an AWS account with certain IAM (Identity and Access Management) permission policies that will grant access to the resources used in the workflow.
 
 ## Availability
 
@@ -221,14 +222,29 @@ What we see as key advantages of this approach (when coupled with compile-time s
 - **Documentation** We can take advantage of all the effort put into software documentation tools and practices, such as in our case Scaladoc or literate programming. As documentation, analysis processes and data specification live together in the files, it is much easier to keep coherence between them.
 - **Expresiveness and safety** For example in our case we can choose only from valid Illumina read types, and then build a default FLASH command based on that. The output locations, being declared statically, are also available for use in further analysis.
 
-## Inputs, outputs, data: compile-time, expressive, composable
-<!-- TODO @laughedelic doing this -->
+## Input and output data declaration
 
-## Tools, data, dependencies and machine configurations
-<!-- TODO @laughedelic doing this -->
+An important aspect of the MG7 workflow is the way it deals with data resources. All the data that is going to be used in the analysis or produced as an output is described as Scala code using rich types from the *Datasets* language. This allows user to specify all the information about the type of the data that can be utilized then by the tools analyzing this data. For example, we can specify that for the first part of the MG7 workflow running FLASH in parallel, requires Illumina paired end reads and produces joined reads.
 
-## Parallel cloud execution ??
-<!-- TODO @laughedelic doing this -->
+On one hand, specification of the input data allows us to restrict its type and force users to be conscious about what they pass as an input. On the other hand specification of the output data helps to build a workflow as a _composition_ of several parts: we can ensure on the Scala code type level that the output of one component fits as an input for the next component. This is crucial, as obviously the way a data analysis task works depends a lot on the particular structure of the data. For instance, in the MG7 workflow, using BLAST eDSL, we can precisely describe which format will have the output of the BLAST step, which information it will include, and then in the next step we can reuse this description to parse BLAST output and retrieve the part of the information needed for the taxonomy assignment analysis. Having data structure described statically as Scala code allows us to be sure that we won't have parsing problems or other issues with incompatible data passed between workflow components.
+
+All this does not compromise flexibility in how the user works with data in MG7: having static data declarations as a part of the configuration allows the user to reuse analysis components, or modify them according to particular needs. Besides that, an important advantage of the type-level control is the added protection from the execution (and deployment) of a wrongly configured analysis task, which may lead to significant costs in both time and money.
+
+## Tools, data, dependencies and automated deployment
+
+Bioinformatics software often has a complicated installation process and requires various dependencies with unclear versions. This makes the deployment of the bioinformatics tools an involved task and resolving it manually is not a solution in the context of cloud computations. To face this problem, one needs an automated system of managing tools and resources, which will allow an expressive way for describing dependencies between parts of a pipeline and provide a reproducible procedure of its deployment. We have developed *Statika* for this purpose and successfully use it in MG7.
+
+Every external tool involved in the workflow is represented as a *Statika* bundle, which is essentially a Scala project describing the installation process of this tool and declaring dependencies on other bundles which will be installed prior to the considered tool itself. Describing relationships between bundles on the code level allows us to track the directed acyclic graph of their dependencies and linearize them to automatically install them sequentially in the right order. Meanwhile describing installation process on the code level allows user to utilize wide range of Scala and Java APIs, making installation a well-defined sequence of steps rather than an unreliable script dependent on the certain environment. This way *Statika* provides an easy way to make deployment an automated reproducible process.
+
+Besides the bioinformatics tools like BLAST and FLASH, *Statika* bundles are used for wrapping data dependencies and all inner components of the system that require cloud deployment. In particular, all components of *Loquat* are bundles; the user can then define which components are needed for the parallel processing on each computation unit in an expressive way, declaring them as bundle dependencies of the loquat "worker" bundle. This modularization is also important for the matter of making components of the system reusable for different projects and liberating the user from most of the tasks related to their deployment.
+
+<!-- TODO what about machines configurations? some AWS specifics? -->
+
+## Parallel computations in the cloud
+
+The MG7 workflow consists of certain steps, each of which perform some work in parallel, using the cloud infrastructure managed by *Loquat*. It is important to notice the horizontal scalability of this approach. Irrespectively of how much data needs to be processed, MG7 will easily handle it, by splitting data on chunks and performing the analysis on multiple computation units. The Amazon Elastic Compute Cloud (EC2) service provides a transparent way of managing computation infrastructure, called autoscaling groups. The User can set MG7 configuration parameters, adjusting for each task the amount and hardware characteristics of the EC2 instances they want to occupy for it. But it's important to note that as each workflow step is not very resource demanding, it is not needed to hire EC2 instances with some advanced hardware, instead an average type will work and you can win time by simply scaling the number of the hired instances.
+
+<!-- TODO this feels unfinished, but I can't write anything else here "_ -->
 
 ## Taxonomy and Bio4j
 <!-- TODO if possible improve this. Maybe something about graph data biology lalala (bio4j paper?)  -->
@@ -256,8 +272,14 @@ It is certainly possible to adapt MG7 to work with shotgun metagenomics data. Si
 
 ## Amazon Web Services
 
-<!-- TODO describe this minimally: EC2, SQS, S3 -->
-We use EC2, S3 and SQS through a Scala wrapper of the official [AWS Java SDK](https://aws.amazon.com/sdk-for-java/), [ohnosequences/aws-scala-tools `0.13.2`](https://github.com/ohnosequences/aws-scala-tools/releases/tag/v0.13.2). This uses version `1.9.25` of the AWS Java SDK.
+MG7 uses the following Amazon Web Services:
+
+- [EC2](https://aws.amazon.com/ec2) (Elastic Compute Cloud) autoscaling groups for launching and managing computation units
+- [S3](https://aws.amazon.com/s3) (Simple Storage Service) for storing input and output data
+- [SQS](https://aws.amazon.com/sqs) (Simple Queue Service) for communication between different components of the system
+- [SNS](https://aws.amazon.com/sns) (Simple Notification Service) for e-mail notifications
+
+These services are used through a Scala wrapper of the official [AWS Java SDK `1.9.25`](https://aws.amazon.com/sdk-for-java/): [ohnosequences/aws-scala-tools `0.13.2`](https://github.com/ohnosequences/aws-scala-tools/releases/tag/v0.13.2).
 
 ## Scala
 
