@@ -736,9 +736,10 @@ Cloud (EC2) service provides a transparent way of managing computation
 infrastructure, called autoscaling groups. The User can set MG7
 configuration parameters, adjusting for each task the amount and
 hardware characteristics of the EC2 instances they want to occupy for
-it. When using Amazon Web Services for parallel computations, it is easy
-to scale the computation resources, because the you pay for the time,
-not the amount of computation units.
+it. But it's important to note that as each workflow step is not very
+resource demanding, it is not needed to hire EC2 instances with some
+advanced hardware, instead an average type will work and you can win
+time by simply scaling the number of the hired instances.
 
 \subsection{Taxonomy and Bio4j}\label{taxonomy-and-bio4j}
 
