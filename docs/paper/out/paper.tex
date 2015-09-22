@@ -28,13 +28,13 @@
 \def\keyFont{\fontsize{8}{11}\helveticabold }
 \def\firstAuthorLast{Alexey Alekhin {et~al.}} %use et al only if is more than 1 author
 \def\Authors{
- Alexey Alekhin\(^\dagger\)\,$^{1}$  Evdokim Kovach\(^\dagger\)\,$^{1}$  Marina Manrique\,$^{1}$  Pablo Pareja\,$^{1}$  Eduardo Pareja\,$^{1}$  Raquel Tobes\,$^{1}$  and Eduardo Pareja-Tobes $^{1,*}$
+ Alexey Alekhin\(^\dagger\)\,$^{1}$  Evdokim Kovach\(^\dagger\)\,$^{1}$  Marina Manrique\,$^{1}$  Pablo Pareja-Tobes\,$^{1}$  Eduardo Pareja\,$^{1}$  Raquel Tobes\,$^{1}$  and Eduardo Pareja-Tobes $^{1,*}$
 }% Affiliations should be keyed to the author's name with superscript numbers and be listed as follows: Laboratory, Institute, Department, Organization, City, State abbreviation (USA, Canada, Australia), and Country (without detailed address information such as city zip codes or street names).
 % If one of the authors has a change of address, list the new address below the correspondence details using a superscript symbol and use the same symbol to indicate the author in the author list.
 \def\Address{$^{1}$Oh no sequences! Research Group, Era7 Bioinformatics, Granada, Spain}
 % The Corresponding Author should be marked with an asterisk
 % Provide the exact contact address (this time including street name and city zip code) and email of the corresponding author
-\def\corrAuthor{Corresponding Author}
+\def\corrAuthor{Eduardo Pareja-Tobes}
 \def\corrAddress{Oh no sequences! Research Group, Era7 Bioinformatics, Plaza Campo Verde 3, Granada, 18001, Spain}
 \def\corrEmail{eparejatobes@ohnosequences.com}
 
@@ -71,8 +71,8 @@ system robust, programmatically configurable, modular, distributed,
 flexible, scalable and traceable in which the biological databases of
 reference sequences can be easily updated and/or frequently substituted
 by new ones or by databases specifically designed for focused projects.
-MG7 uses parallelization and distributed analysis based on AWS (Amazon
-Web Services), with on-demand infrastructure as the basic paradigm and
+MG7 uses parallelization and distributed analysis based on Amazon Web
+Services (AWS), with on-demand infrastructure as the basic paradigm and
 allow the definition of complex workflows using a composable system for
 scaling/parallelizing stateless computations designed for AWS that
 counts with a static reproducible specification of dependencies and
@@ -212,7 +212,7 @@ These are some of the more innovative MG7 features:
 \item
   Definition of complex workflows using \emph{Loquat}, a composable
   system for scaling/parallelizing stateless computations especially
-  designed for Amazon Web Services (AWS)
+  designed for AWS
 \item
   A new approach to data analysis specification, management and
   specification based on working with it in exactly the same way as for
@@ -336,14 +336,14 @@ mixing different resources when implementing a process, while serving as
 a safe and convenient mechanism for writing generic processing tasks.
 For example, merging paired-end Illumina reads generically is easy as
 the data type includes the relevant information (insert size, read
-length, etc) to pass to a tool such as FLASH.
+length, etc) to pass to a tool such as FLASh.
 
 \subsubsection{Type-safe eDSLs for BLAST and
-FLASH}\label{type-safe-edsls-for-blast-and-flash}
+FLASh}\label{type-safe-edsls-for-blast-and-flash}
 
 We developed our own Scala-based type-safe eDSLs (embedded Domain
 Specific Languages) for
-\href{https://github.com/ohnosequences/flash}{FLASH} and
+\href{https://github.com/ohnosequences/flash}{FLASh} and
 \href{https://github.com/ohnosequences/blast}{BLAST} expressions and
 their execution.
 
@@ -369,7 +369,7 @@ options which yielded that output. This lets us provide generic parsers
 for BLAST output which are guaranteed to be correct.
 
 In the same spirit as for BLAST, we implemented a type-safe eDSL for
-FLASH expressions and their execution, supporting features equivalent to
+FLASh expressions and their execution, supporting features equivalent to
 those outlined for the BLAST eDSL.
 
 \subsubsection{Bio4j and Graph
@@ -387,7 +387,7 @@ Our 16S Reference Database is a curated subset of sequences from NCBI
 nucleotide database \textbf{nt}. The sequences included were selected by
 similarity with the bacterial and archaeal reference sequences
 downloaded from the \textbf{RDP database} \citep{cole2013ribosomal}. RDP
-unaligned sequences were used to capture new 16S sequences from
+unaligned sequences were used to capture new 16S RNA sequences from
 \textbf{nt} using BLAST similarity search strategies and then,
 performing additional curation steps to remove sequences with poor
 taxonomic assignments to taxonomic nodes close to the root of the
@@ -435,11 +435,11 @@ MG7 are the FASTQ files resulting from a paired-end NGS sequencing
 experiment.
 
 \subsubsection{Joining reads of each pair using
-FLASH}\label{joining-reads-of-each-pair-using-flash}
+FLASh}\label{joining-reads-of-each-pair-using-flash}
 
 In the first step the paired-end reads, designed with an insert size
 that yields pairs of reads with an overlapping region between them, are
-assembled using FLASH \citep{magovc2011flash}. FLASH is designed to
+assembled using FLASh \citep{magovc2011flash}. FLASh is designed to
 merge pairs of reads when the original DNA fragments are shorter than
 twice the length of reads. Thus, the sequence obtained after joining the
 2 reads of each pair is larger and has better quality since the sequence
@@ -482,32 +482,32 @@ the assignment to the most specific taxon.
 Assignment}\label{lowest-common-ancestor-based-taxonomic-assignment}
 
 For each read, first, we select the BEST BLAST HITs (by default 10 Hits)
-over a threshold of similarity (by default \(evalue \leq e^{-15}\))
+over a BLAST expect value threshold (by default \(evalue \leq e^{-15}\))
 filtering those hits that are not sufficiently good comparing them with
 the best one. We select the best HSP (High Similarity Pair) per
-reference sequence and then choose the best HSP (that with lowest e
-value) between all the selected ones. The bitscore of this best HSP
+reference sequence and then choose the best HSP (that with lowest
+E-value) between all the selected ones. The bitscore of this best HSP
 (called S) is used as reference to filter the rest of HSPs. All the HSPs
-with bitscore below p x S are filtered. p is a coefficient fixed by the
-user to define the bitscore required, e.g.~if p=0.9 and S=700 the
-required bitscore threshold would be 630. Once we have the definitive
-HSPs selected, we obtain their corresponding taxonomic nodes using the
-taxonomic assignments that NCBI provides for all the nt database
-sequences. Now we have to analyze the topological distribution of these
-nodes in the taxonomy tree: i. If all the nodes forms a line in the
-taxonomy tree (are located in a not branched lineage to the tree root)
-we should choose the most specific taxID as the final assignment for
-that read. We call to this kind of assignment the `in line' exception
-(see Figure 2 right panel). ii. If not, we should search for the
-\emph{sensu stricto} Lowest Common Ancestor (LCA) of all the selected
-taxonomic nodes (See Figure 2 left panel). In this approach we decided
-to use the bitscore for evaluating the similarity because it is a value
-that increases when similarity is higher and depends a lot on the length
-of the HSP. Some reads could not find sequences with enough similarity
-in the database and then they would be classified as reads with no hits.
-Advanced metagenomics analysis approaches \citep{huson2013microbial}
-have adopted LCA assignment algorithms because it provides fine and
-trusted taxonomical assignment.
+with bitscore below the product \(p S\) are filtered. p is a coefficient
+fixed by the user to define the bitscore required, e.g.~if \(p=0.9\) and
+\(S=700\) the required bitscore threshold would be \(630\). Once we have
+the definitive HSPs selected, we obtain their corresponding taxonomic
+nodes using the taxonomic assignments that NCBI provides for all the nt
+database sequences. Now we have to analyze the topological distribution
+of these nodes in the taxonomy tree: i. If all the nodes forms a line in
+the taxonomy tree (are located in a not branched lineage to the tree
+root) we should choose the most specific taxID as the final assignment
+for that read. We call to this kind of assignment the `in line'
+exception (see Figure 2 right panel). ii. If not, we should search for
+the \emph{sensu stricto} Lowest Common Ancestor (LCA) of all the
+selected taxonomic nodes (See Figure 2 left panel). In this approach we
+decided to use the bitscore for evaluating the similarity because it is
+a value that increases when similarity is higher and depends a lot on
+the length of the HSP. Some reads could not find sequences with enough
+similarity in the database and then they would be classified as reads
+with no hits. Advanced metagenomics analysis approaches
+\citep{huson2012microbial} have adopted LCA assignment algorithms
+because it provides fine and trusted taxonomical assignment.
 
 \paragraph{Best BLAST hit taxonomic
 assignment}\label{best-blast-hit-taxonomic-assignment}
@@ -561,10 +561,10 @@ certain variables at the code level (input, output and parameters),
 compile the code and run it. To facilitate the process of setting up the
 Scala project, a template with sensible defaults is provided.
 
-In order to be able to exploit Amazon Web Services infrastructure for
-the MG7 analysis, the user needs to set up an AWS account with certain
-IAM (Identity and Access Management) permission policies that will grant
-access to the resources used in the workflow.
+In order to be able to exploit AWS infrastructure for the MG7 analysis,
+the user needs to set up an AWS account with certain IAM (Identity and
+Access Management) permission policies that will grant access to the
+resources used in the workflow.
 
 \subsection{Availability}\label{availability}
 
@@ -586,8 +586,10 @@ We could summarize the most innovative ideas and developments in MG7:
   \emph{expressiveness}
 \item
   input and output data, their locations and type are expressible and
-  checked at compile-time using \emph{Datasets} ­3. management of
-  dependencies and machine configurations using \emph{Statika}
+  checked at compile-time using \emph{Datasets}
+\item
+  management of dependencies and machine configurations using
+  \emph{Statika}
 \item
   automation of AWS cloud resources and processes, including
   distribution and parallelization through the use of \emph{Loquat}
@@ -643,7 +645,7 @@ compile-time specification and checking), are
 \item
   \textbf{Expresiveness and safety} For example in our case we can
   choose only from valid Illumina read types, and then build a default
-  FLASH command based on that. The output locations, being declared
+  FLASh command based on that. The output locations, being declared
   statically, are also available for use in further analysis.
 \end{itemize}
 
@@ -653,10 +655,10 @@ declaration}\label{input-and-output-data-declaration}
 An important aspect of the MG7 workflow is the way it deals with data
 resources. All the data that is going to be used in the analysis or
 produced as an output is described as Scala code using rich types from
-the \emph{Datasets} language. This allows user to specify all the
-information about the type of the data that can be utilized then by the
-tools analyzing this data. For example, we can specify that for the
-first part of the MG7 workflow running FLASH in parallel, requires
+the \emph{Datasets} language. This allows The user can specify
+information about types of data, information that can then be utilized
+by tools analyzing this data. For example, we can specify that for the
+first part of the MG7 workflow running FLASh in parallel, requires
 Illumina paired end reads and produces joined reads.
 
 On one hand, specification of the input data allows us to restrict its
@@ -672,7 +674,7 @@ which information it will include, and then in the next step we can
 reuse this description to parse BLAST output and retrieve the part of
 the information needed for the taxonomy assignment analysis. Having data
 structure described statically as Scala code allows us to be sure that
-we won't have parsing problems or other issues with incompatible data
+we will not have parsing problems or other issues with incompatible data
 passed between workflow components.
 
 All this does not compromise flexibility in how the user works with data
@@ -703,14 +705,14 @@ other bundles which will be installed prior to the considered tool
 itself. Describing relationships between bundles on the code level
 allows us to track the directed acyclic graph of their dependencies and
 linearize them to automatically install them sequentially in the right
-order. Meanwhile describing installation process on the code level
-allows user to utilize wide range of Scala and Java APIs, making
-installation a well-defined sequence of steps rather than an unreliable
-script dependent on the certain environment. This way \emph{Statika}
-provides an easy way to make deployment an automated reproducible
-process.
+order. Meanwhile describing the installation process on the code level
+allows the user to utilize the wide range of available Scala and Java
+APIs and tools, making installation a well-defined sequence of steps
+rather than an unreliable script, dependent on a certain environment.
+\emph{Statika} offers an easy path towards making deployment an
+automated, reproducible process.
 
-Besides the bioinformatics tools like BLAST and FLASH, \emph{Statika}
+Besides bioinformatics tools like BLAST and FLASh, \emph{Statika}
 bundles are used for wrapping data dependencies and all inner components
 of the system that require cloud deployment. In particular, all
 components of \emph{Loquat} are bundles; the user can then define which
@@ -724,20 +726,20 @@ deployment.
 \subsection{Parallel computations in the
 cloud}\label{parallel-computations-in-the-cloud}
 
-The MG7 workflow consists of certain steps, each of which perform some
+The MG7 workflow consists of certain steps, each of which performs some
 work in parallel, using the cloud infrastructure managed by
 \emph{Loquat}. It is important to notice the horizontal scalability of
 this approach. Irrespectively of how much data needs to be processed,
-MG7 will easily handle it, by splitting data on chunks and performing
-the analysis on multiple computation units. The Amazon Elastic Compute
-Cloud (EC2) service provides a transparent way of managing computation
+MG7 will handle it, by splitting data into chunks and performing the
+analysis on multiple computation units. The Amazon Elastic Compute Cloud
+(EC2) service provides a transparent way of managing computation
 infrastructure, called autoscaling groups. The User can set MG7
 configuration parameters, adjusting for each task the amount and
-hardware characteristics of the EC2 instances they want to occupy for
-it. But it's important to note that as each workflow step is not very
+hardware characteristics of the EC2 instances they want to use for it.
+But it is important to note that, as each workflow step is not very
 resource demanding, it is not needed to hire EC2 instances with some
-advanced hardware, instead an average type will work and you can win
-time by simply scaling the number of the hired instances.
+advanced hardware, instead an average type will work and you can reduce
+execution time by simply scaling out the number of instances.
 
 \subsection{Taxonomy and Bio4j}\label{taxonomy-and-bio4j}
 
@@ -760,7 +762,7 @@ data. Simply changing the reference database to include whole genome
 sequence data could yield interesting results. This could also be
 refined by restricting reference sequences according to all sort of
 criteria, like biological function or taxonomy. Bio4j would be an
-invaluable tool here, thanks to its ability to express express complex
+invaluable tool here, thanks to its ability to express complex
 predicates on sequences using all the information linked with them (GO
 annotations, UniProt data, NCBI taxonomy, etc).
 
@@ -827,11 +829,11 @@ MG7 uses
 \href{https://github.com/ohnosequences/blast/releases/tag/v0.2.0}{ohnosequences/blast
 v0.2.0}. The BLAST version used is v2.2.31+.
 
-\subsection{FLASH eDSL}\label{flash-edsl}
+\subsection{FLASh eDSL}\label{flash-edsl}
 
 MG7 uses
 \href{https://github.com/ohnosequences/flash/releases/tag/v0.1.0}{ohnosequences/flash
-v0.1.0}. The FLASH version used is v1.2.11.
+v0.1.0}. The FLASh version used is v1.2.11.
 
 \subsection{Bio4j}\label{bio4j}
 
