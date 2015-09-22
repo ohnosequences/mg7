@@ -69,20 +69,19 @@ open source methodology for analyzing metagenomics data, MG7. It
 exploits the new possibilities that cloud computing offers to get a
 system robust, programmatically configurable, modular, distributed,
 flexible, scalable and traceable in which the biological databases of
-reference sequences can be easily updated and / or frequently
-substituted by new ones or by databases specifically designed for
-focused projects. MG7 uses parallelization and distributed analysis
-based on AWS, with on-demand infrastructure as the basic paradigm and
+reference sequences can be easily updated and/or frequently substituted
+by new ones or by databases specifically designed for focused projects.
+MG7 uses parallelization and distributed analysis based on AWS (Amazon
+Web Services), with on-demand infrastructure as the basic paradigm and
 allow the definition of complex workflows using a composable system for
-scaling/parallelizing stateless computations designed for Amazon Web
-Services (AWS) that counts with a static reproducible specification of
-dependencies and behavior of the different components. The modelling of
-the taxonomy tree is done using the new paradigm of graph databases of
-Bio4j that facilitates the taxonomic assignment tasks and the
-calculation of the taxa abundance values considering the hierarchic
-structure of taxonomy tree. MG7 includes the new 16S database 16S-DB7
-built with a flexible and sustainable system of updating and
-project-driven personalization.
+scaling/parallelizing stateless computations designed for AWS that
+counts with a static reproducible specification of dependencies and
+behavior of the different components. The modelling of the taxonomy tree
+is done using the new paradigm of graph databases of Bio4j that
+facilitates the taxonomic assignment tasks and the calculation of the
+taxa abundance values considering the hierarchic structure of taxonomy
+tree. MG7 includes the new 16S-DB7 database built with a flexible and
+sustainable system of updating and project-driven personalization.
 
 \(^\dagger\) The first and second authors contributed equally to this
 work
@@ -173,7 +172,7 @@ and advances with a direct impact in metagenomics data analysis:
   \textbf{Cloud computing:} the appearance of new models for massive
   computation and storage such as the so-called cloud, or the widespread
   adoption of programming methodologies like functional programming, or,
-  more speculatively, dependently typed programming. The immense new
+  more speculatively, dependently typed programming. The new
   possibilities that these advances offer must have a direct impact in
   metagenomics data analysis.
 \item
@@ -271,20 +270,20 @@ data}{Datasets: a mini-language for data}}\label{datasets-a-mini-language-for-da
 \href{https://github.com/ohnosequences/datasets}{Datasets} is a Scala
 library developed by the first and last authors with the goal of being a
 Scala-embedded mini-language for datasets and their locations.
-\textbf{Data} is represented as type-indexed fields: Keys are modeled as
+\textbf{Data} is represented as type-indexed fields: keys are modeled as
 singleton types, and values correspond to what could be called a
 denotation of the key: a value of type \texttt{Location} tagged with the
 key type. Then a \textbf{Dataset} is essentially a collection of data,
 which are guaranteed statically to be different through type-level
-predicates, making use of the value ↔ type correspondence which can be
+predicates, making use of the value--type correspondence which can be
 established through singleton types and implicits. A dataset location is
-then just a list of locations formed by locations of each data member of
-that dataset. All this is based on what could be described as an
-embedding in Scala of an extensible record system with concatenation on
-disjoint labels, in the spirit of
-\citep[\citet{harper1991record}]{harper1990extensible}. For that
-\emph{Datasets} uses
-\href{https://github.com/ohnosequences/cosas/}{ohnosequences/cosas}.
+then just a list of locations formed by locations of each dataset key.
+All this is based on what could be described as an embedding in Scala of
+an extensible record system with concatenation on disjoint labels, in
+the spirit of \citep[\citet{harper1991record}]{harper1990extensible}.
+For that \emph{Datasets} uses
+\href{https://github.com/ohnosequences/cosas/}{ohnosequences/cosas}
+library.
 
 Data keys can further have a reference to a \textbf{data type}, which,
 as the name hints at, can help in providing information about the type
@@ -343,14 +342,14 @@ length, etc) to pass to a tool such as FLASH.
 \subsubsection{Type-safe eDSLs for BLAST and
 FLASH}\label{type-safe-edsls-for-blast-and-flash}
 
-We developed our own Scala-based type-safe eDSLs (\textbf{e}mbedded
-\textbf{D}omain \textbf{S}pecific \textbf{L}anguage) for
+We developed our own Scala-based type-safe eDSLs (embedded Domain
+Specific Languages) for
 \href{https://github.com/ohnosequences/flash}{FLASH} and
 \href{https://github.com/ohnosequences/blast}{BLAST} expressions and
 their execution.
 
-In the case of BLAST we use a model for expressions where we can
-guarantee for each BLAST command expression at compile time
+In the case of BLAST we use a model where we can guarantee for each
+BLAST command expression at compile time that
 
 \begin{itemize}
 \tightlist
@@ -367,7 +366,7 @@ guarantee for each BLAST command expression at compile time
 Generic type-safe parsers returning a heterogeneous record of BLAST
 output fields are also available, together with output data defined
 using \emph{Datasets} which have a reference to the exact BLAST command
-options which yielded that output. This let us provide generic parsers
+options which yielded that output. This lets us provide generic parsers
 for BLAST output which are guaranteed to be correct.
 
 In the same spirit as for BLAST, we implemented a type-safe eDSL for
@@ -416,19 +415,19 @@ specimens that serve as exemplars for the species
 
 Certainly, if metagenomics results are easily integrated with the
 theoretical and experimental knowledge of each specific area, the impact
-of metagenomics will be higher that if metagenomics progresses as a
-disconnected research branch. Considering that metagenomics data
-interoperability, which is especially critical in clinical environments,
-requires a stable taxonomy to be used as reference, we decided to rely
-on the most widely used taxonomy: the NCBI taxonomy. In addition, the
-biggest global sequence database GenBank follows this taxonomy to
-register the origin of all their submitted sequences. Our 16S database
-building strategy allows the substitution of the 16S database by any
-other subset of \textbf{nt}, even by the complete \textbf{nt} database
-if it would be needed, for example, for analyzing shotgun metagenomics
-data. This possibility of changing the reference database provides
-flexibility to the system enabling it for easy updating and
-project-driven personalization.
+of metagenomics will be higher than if it progresses as a disconnected
+research branch. Considering that metagenomics data interoperability,
+which is especially critical in clinical environments, requires a stable
+taxonomy to be used as reference, we decided to rely on the most widely
+used taxonomy: the NCBI taxonomy. In addition, the biggest global
+sequence database GenBank follows this taxonomy to register the origin
+of all their submitted sequences. Our 16S database building strategy
+allows the substitution of the 16S database by any other subset of
+\textbf{nt}, even by the complete \textbf{nt} database if it would be
+needed, for example, for analyzing shotgun metagenomics data. This
+possibility of changing the reference database provides flexibility to
+the system enabling it for easy updating and project-driven
+personalization.
 
 \subsection{Workflow Description}\label{workflow-description}
 
@@ -609,13 +608,13 @@ analysis}\label{a-new-approach-to-data-analysis}
 
 MG7 proposes to define and work with a particular data analysis task as
 a software project, using Scala. The idea is that \emph{everything}:
-data description, their location, configuration parameters, the
-infrastructure used, \ldots{} should be expressed as Scala code, and
-treated in the same way as any (well-managed) software project. This
-includes, among other things, using version control systems
-(\texttt{git} in our case), writing tests, making stable releases
-following \href{http://semver.org/}{semantic versioning} or publishing
-artifacts to a repository.
+data description, their location, configuration parameters and the
+infrastructure used should be expressed as Scala code, and treated in
+the same way as any (well-managed) software project. This includes,
+among other things, using version control systems (\texttt{git} in our
+case), writing tests, making stable releases following
+\href{http://semver.org/}{semantic versioning} or publishing artifacts
+to a repository.
 
 What we see as key advantages of this approach (when coupled with
 compile-time specification and checking), are
@@ -795,56 +794,53 @@ MG7 uses the following Amazon Web Services:
 \end{itemize}
 
 These services are used through a Scala wrapper of the official
-\href{https://aws.amazon.com/sdk-for-java/}{AWS Java SDK
-\texttt{1.9.25}}:
+\href{https://aws.amazon.com/sdk-for-java/}{AWS Java SDK v1.9.25}:
 \href{https://github.com/ohnosequences/aws-scala-tools/releases/tag/v0.13.2}{ohnosequences/aws-scala-tools
-\texttt{0.13.2}}.
+v0.13.2}.
 
 \subsection{Scala}\label{scala}
 
-MG7 itself and all the libraries used are written in Scala
-\texttt{2.11}.
+MG7 itself and all the libraries used are written in Scala v2.11.
 
 \subsection{Statika}\label{statika}
 
 MG7 uses
 \href{https://github.com/statika/statika/releases/tag/v0.2.0}{ohnosequences/statika
-\texttt{2.0.0}} for specifying the configuration and behavior of EC2
-instances.
+v2.0.0} for specifying the configuration and behavior of EC2 instances.
 
 \subsection{Datasets}\label{datasets}
 
 MG7 uses
 \href{https://github.com/ohnosequences/datasets/releases/tag/v0.2.0}{ohnosequences/datasets
-\texttt{0.2.0}} for specifying input and output data, their type and
-their location.
+v0.2.0} for specifying input and output data, their type and their
+location.
 
 \subsection{Loquat}\label{loquat}
 
 MG7 uses
 \href{https://github.com/ohnosequences/loquat/releases/tag/v2.0.0}{ohnosequences/loquat
-\texttt{2.0.0}} for the specification of data processing tasks and their
+v2.0.0} for the specification of data processing tasks and their
 execution using AWS resources.
 
 \subsection{BLAST eDSL}\label{blast-edsl}
 
 MG7 uses
 \href{https://github.com/ohnosequences/blast/releases/tag/v0.2.0}{ohnosequences/blast
-\texttt{0.2.0}}. The BLAST version used is \texttt{2.2.31+}
+v0.2.0}. The BLAST version used is v2.2.31+.
 
 \subsection{FLASH eDSL}\label{flash-edsl}
 
 MG7 uses
 \href{https://github.com/ohnosequences/flash/releases/tag/v0.1.0}{ohnosequences/flash
-\texttt{0.1.0}}. The FLASH version used is \texttt{1.2.11}
+v0.1.0}. The FLASH version used is v1.2.11.
 
 \subsection{Bio4j}\label{bio4j}
 
 MG7 uses
 \href{https://github.com/bio4j/bio4j/releases/tag/v0.12.0-RC3}{bio4j/bio4j
-0.12.0-RC3} and
+v0.12.0-RC3} and
 \href{https://github.com/bio4j/bio4j-titan/releases/tag/v0.4.0-RC2}{bio4j/bio4j-titan
-0.4.0-RC2} as an API for the NCBI taxonomy.
+v0.4.0-RC2} as an API for the NCBI taxonomy.
 
 \section{Acknowledgements}\label{acknowledgements}
 

@@ -275,35 +275,35 @@ MG7 uses the following Amazon Web Services:
 - [SQS](https://aws.amazon.com/sqs) (Simple Queue Service) for communication between different components of the system
 - [SNS](https://aws.amazon.com/sns) (Simple Notification Service) for e-mail notifications
 
-These services are used through a Scala wrapper of the official [AWS Java SDK 1.9.25](https://aws.amazon.com/sdk-for-java/): [ohnosequences/aws-scala-tools 0.13.2](https://github.com/ohnosequences/aws-scala-tools/releases/tag/v0.13.2).
+These services are used through a Scala wrapper of the official [AWS Java SDK v1.9.25](https://aws.amazon.com/sdk-for-java/): [ohnosequences/aws-scala-tools v0.13.2](https://github.com/ohnosequences/aws-scala-tools/releases/tag/v0.13.2).
 
 ## Scala
 
-MG7 itself and all the libraries used are written in Scala 2.11.
+MG7 itself and all the libraries used are written in Scala v2.11.
 
 ## Statika
 
-MG7 uses [ohnosequences/statika 2.0.0](https://github.com/statika/statika/releases/tag/v0.2.0) for specifying the configuration and behavior of EC2 instances.
+MG7 uses [ohnosequences/statika v2.0.0](https://github.com/statika/statika/releases/tag/v0.2.0) for specifying the configuration and behavior of EC2 instances.
 
 ## Datasets
 
-MG7 uses [ohnosequences/datasets 0.2.0](https://github.com/ohnosequences/datasets/releases/tag/v0.2.0) for specifying input and output data, their type and their location.
+MG7 uses [ohnosequences/datasets v0.2.0](https://github.com/ohnosequences/datasets/releases/tag/v0.2.0) for specifying input and output data, their type and their location.
 
 ## Loquat
 
-MG7 uses [ohnosequences/loquat 2.0.0](https://github.com/ohnosequences/loquat/releases/tag/v2.0.0) for the specification of data processing tasks and their execution using AWS resources.
+MG7 uses [ohnosequences/loquat v2.0.0](https://github.com/ohnosequences/loquat/releases/tag/v2.0.0) for the specification of data processing tasks and their execution using AWS resources.
 
 ## BLAST eDSL
 
-MG7 uses [ohnosequences/blast 0.2.0](https://github.com/ohnosequences/blast/releases/tag/v0.2.0). The BLAST version used is 2.2.31+
+MG7 uses [ohnosequences/blast v0.2.0](https://github.com/ohnosequences/blast/releases/tag/v0.2.0). The BLAST version used is v2.2.31+.
 
 ## FLASH eDSL
 
-MG7 uses [ohnosequences/flash 0.1.0](https://github.com/ohnosequences/flash/releases/tag/v0.1.0). The FLASH version used is 1.2.11
+MG7 uses [ohnosequences/flash v0.1.0](https://github.com/ohnosequences/flash/releases/tag/v0.1.0). The FLASH version used is v1.2.11.
 
 ## Bio4j
 
-MG7 uses [bio4j/bio4j 0.12.0-RC3](https://github.com/bio4j/bio4j/releases/tag/v0.12.0-RC3) and [bio4j/bio4j-titan 0.4.0-RC2](https://github.com/bio4j/bio4j-titan/releases/tag/v0.4.0-RC2) as an API for the NCBI taxonomy.
+MG7 uses [bio4j/bio4j v0.12.0-RC3](https://github.com/bio4j/bio4j/releases/tag/v0.12.0-RC3) and [bio4j/bio4j-titan v0.4.0-RC2](https://github.com/bio4j/bio4j-titan/releases/tag/v0.4.0-RC2) as an API for the NCBI taxonomy.
 
 
 
