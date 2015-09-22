@@ -116,7 +116,7 @@ The input and output (and their locations) being defined statically has several 
 ### Type-safe eDSLs for BLAST and FLASH
 
 <!-- TODO cite BLAST and FLASH -->
-We developed our own Scala-based type-safe eDSLs (**e**mbedded **D**omain **S**pecific **L**anguage) for [FLASH](https://github.com/ohnosequences/flash) and [BLAST](https://github.com/ohnosequences/blast) expressions and their execution.
+We developed our own Scala-based type-safe eDSLs (embedded Domain Specific Languages) for [FLASH](https://github.com/ohnosequences/flash) and [BLAST](https://github.com/ohnosequences/blast) expressions and their execution.
 
 In the case of BLAST we use a model for expressions where we can guarantee for each BLAST command expression at compile time
 
