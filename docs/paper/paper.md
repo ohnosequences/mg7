@@ -172,7 +172,6 @@ We decided to maintain the simpler method of Best BLAST Hit (BBH) for taxonomic 
 MG7 provides independent results for the 2 different approaches, LCA and BBH. The output files include, for each taxonomy node (with some read assigned), abundance values for direct assignment and cumulative assignment. The abundances are provided in counts (absolute values) and in percentage normalized to the number of reads of each sample. Direct assignments are calculated counting reads specifically assigned to a taxonomic node, not including the reads assigned to the descendant nodes in the taxonomy tree. Cumulative assignments are calculated including the direct assignments and also the assignments of the descendant nodes. For each sample MG7 provides 8 kinds of abundance values: LCA direct counts, LCA cumu. counts, LCA direct %, LCA cumu. %, BBH direct counts, BBH cumu. counts, BBH direct %, BBH cumu. %.
 
 ## Data analysis as a software project
-<!-- TODO what @marina-manrique wrote, @laughedelic will put it here  -->
 
 The MG7 16 data analysis workflow is indeed a set of tasks, all of them based in *Loquat*. For each task, a set of inputs and outputs as well as configuration parameters must be statically defined. The user is also free to leave the reasonable defaults for configuration, needing only to define the input and output of the whole workflow. The definition of this configuration is Scala code and the way of starting an MG7 analysis is compiling the project code and launching it from the Scala interactive console.
 
@@ -211,7 +210,7 @@ We will expand on each item in the following sections.
 
 ## A new approach to data analysis
 
-MG7 proposes to define and work with a particular data analysis task as a software project, using Scala. The idea is that *everything*: data description, their location, configuration parameters, the infrastructure used, <!-- TODO --> ... should be expressed as Scala code, and treated in the same way as any (well-managed) software project. This includes, among other things, using version control systems (`git` in our case), writing tests, making stable releases following [semantic versioning](http://semver.org/) or publishing artifacts to a repository.
+MG7 proposes to define and work with a particular data analysis task as a software project, using Scala. The idea is that *everything*: data description, their location, configuration parameters and the infrastructure used should be expressed as Scala code, and treated in the same way as any (well-managed) software project. This includes, among other things, using version control systems (`git` in our case), writing tests, making stable releases following [semantic versioning](http://semver.org/) or publishing artifacts to a repository.
 
 What we see as key advantages of this approach (when coupled with compile-time specification and checking), are
 
@@ -238,15 +237,12 @@ Every external tool involved in the workflow is represented as a *Statika* bundl
 
 Besides the bioinformatics tools like BLAST and FLASH, *Statika* bundles are used for wrapping data dependencies and all inner components of the system that require cloud deployment. In particular, all components of *Loquat* are bundles; the user can then define which components are needed for the parallel processing on each computation unit in an expressive way, declaring them as bundle dependencies of the loquat "worker" bundle. This modularization is also important for the matter of making components of the system reusable for different projects and liberating the user from most of the tasks related to their deployment.
 
-<!-- TODO what about machines configurations? some AWS specifics? -->
-
 ## Parallel computations in the cloud
 
 The MG7 workflow consists of certain steps, each of which perform some work in parallel, using the cloud infrastructure managed by *Loquat*. It is important to notice the horizontal scalability of this approach. Irrespectively of how much data needs to be processed, MG7 will easily handle it, by splitting data on chunks and performing the analysis on multiple computation units. The Amazon Elastic Compute Cloud (EC2) service provides a transparent way of managing computation infrastructure, called autoscaling groups. The User can set MG7 configuration parameters, adjusting for each task the amount and hardware characteristics of the EC2 instances they want to occupy for it. But it's important to note that as each workflow step is not very resource demanding, it is not needed to hire EC2 instances with some advanced hardware, instead an average type will work and you can win time by simply scaling the number of the hired instances.
 
-<!-- TODO this feels unfinished, but I can't write anything else here "_ -->
-
 ## Taxonomy and Bio4j
+
 <!-- TODO if possible improve this. Maybe something about graph data biology lalala (bio4j paper?)  -->
 The hierarchic structure of the taxonomy of the living organisms is a tree, and, hence, is also a graph in which each node, with the exception of the root node, has a unique parent node. It led us to model the taxonomy tree as a graph using the graph database paradigm. Previously we developed Bio4j **[Pareja-Tobes-2015]**, a platform for the integration of semantically rich biological data using typed graph models. It integrates most publicly available data linked with sequences into a set of interdependent graphs to be used for bioinformatics analysis and especially for biological data.
 
@@ -279,31 +275,31 @@ MG7 uses the following Amazon Web Services:
 - [SQS](https://aws.amazon.com/sqs) (Simple Queue Service) for communication between different components of the system
 - [SNS](https://aws.amazon.com/sns) (Simple Notification Service) for e-mail notifications
 
-These services are used through a Scala wrapper of the official [AWS Java SDK `1.9.25`](https://aws.amazon.com/sdk-for-java/): [ohnosequences/aws-scala-tools `0.13.2`](https://github.com/ohnosequences/aws-scala-tools/releases/tag/v0.13.2).
+These services are used through a Scala wrapper of the official [AWS Java SDK 1.9.25](https://aws.amazon.com/sdk-for-java/): [ohnosequences/aws-scala-tools 0.13.2](https://github.com/ohnosequences/aws-scala-tools/releases/tag/v0.13.2).
 
 ## Scala
 
-MG7 itself and all the libraries used are written in Scala `2.11`.
+MG7 itself and all the libraries used are written in Scala 2.11.
 
 ## Statika
 
-MG7 uses [ohnosequences/statika `2.0.0`](https://github.com/statika/statika/releases/tag/v0.2.0) for specifying the configuration and behavior of EC2 instances.
+MG7 uses [ohnosequences/statika 2.0.0](https://github.com/statika/statika/releases/tag/v0.2.0) for specifying the configuration and behavior of EC2 instances.
 
 ## Datasets
 
-MG7 uses [ohnosequences/datasets `0.2.0`](https://github.com/ohnosequences/datasets/releases/tag/v0.2.0) for specifying input and output data, their type and their location.
+MG7 uses [ohnosequences/datasets 0.2.0](https://github.com/ohnosequences/datasets/releases/tag/v0.2.0) for specifying input and output data, their type and their location.
 
 ## Loquat
 
-MG7 uses [ohnosequences/loquat `2.0.0`](https://github.com/ohnosequences/loquat/releases/tag/v2.0.0) for the specification of data processing tasks and their execution using AWS resources.
+MG7 uses [ohnosequences/loquat 2.0.0](https://github.com/ohnosequences/loquat/releases/tag/v2.0.0) for the specification of data processing tasks and their execution using AWS resources.
 
 ## BLAST eDSL
 
-MG7 uses [ohnosequences/blast `0.2.0`](https://github.com/ohnosequences/blast/releases/tag/v0.2.0). The BLAST version used is `2.2.31+`
+MG7 uses [ohnosequences/blast 0.2.0](https://github.com/ohnosequences/blast/releases/tag/v0.2.0). The BLAST version used is 2.2.31+
 
 ## FLASH eDSL
 
-MG7 uses [ohnosequences/flash `0.1.0`](https://github.com/ohnosequences/flash/releases/tag/v0.1.0). The FLASH version used is `1.2.11`
+MG7 uses [ohnosequences/flash 0.1.0](https://github.com/ohnosequences/flash/releases/tag/v0.1.0). The FLASH version used is 1.2.11
 
 ## Bio4j
 
