@@ -261,7 +261,7 @@ The comparison of the taxonomic profiles between different groups of samples is 
 <!-- TODO write something about group of samples -->
 
 ### Interactive visualizations based on Biographika
-
+New visualization tools for metagenomics results are undoubtedly needed. Interactivity is a especially interesting feature visualizing metagenomics data since the expert needs to explore the results in a knowledge-driven way. The majority of the available metagenomics data visualizations are static. We are working in the project Biographika **cite Biorxive paper**, to provide interactive rich visualizations on the web for Bio4j data. The development of visualizations specific for MG7 is one of the Biographika current goals. Biographika uses D3.js, the de facto standard visualization JavaScript library, and is open source.   
 <!-- TODO biographika -->
 
 
