@@ -256,6 +256,7 @@ The hierarchic structure of the taxonomy of the living organisms is a tree, and,
 It is certainly possible to adapt MG7 to work with shotgun metagenomics data. Simply changing the reference database to include whole genome sequence data could yield interesting results. This could also be refined by restricting reference sequences according to all sort of criteria, like biological function or taxonomy. Bio4j would be an invaluable tool here, thanks to  its ability to express complex predicates on sequences using all the information linked with them (GO annotations, UniProt data, NCBI taxonomy, etc).
 
 ### Comparing groups of samples
+The comparison of the taxonomic profiles between different groups of samples is a need to extract useful conclusions in many metagenomics studies. Tasks related with these analysis of groups, as the extraction of the minimal tree with all the taxa with some direct or accumulated assignment, will be defined and developed in the new in progress module. 
 
 <!-- TODO write something about group of samples -->
 
