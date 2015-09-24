@@ -15,7 +15,8 @@ import ohnosequences.statika.bundles._
 import ohnosequences.statika.aws.api._
 import ohnosequences.statika.aws.amazonLinuxAMIs._
 
-import ohnosequences.awstools._, regions.Region._, s3.ObjectAddress, ec2.InstanceType._
+import ohnosequences.awstools._, regions.Region._, ec2.InstanceType._
+import ohnosequences.awstools.s3._
 import ohnosequences.awstools.autoscaling._
 
 import era7.project.loquats._
@@ -61,12 +62,12 @@ case object blastTest {
     val metadata: AnyArtifactMetadata = generated.metadata.Metagenomica
 
     val managerConfig = ManagerConfig(
-      instanceType = m3_medium,
+      instanceType = m3.medium,
       purchaseModel = SpotAuto
     )
 
     val workersConfig = WorkersConfig(
-      instanceType = m3_medium,
+      instanceType = m3.medium,
       purchaseModel = SpotAuto,
       groupSize = WorkersGroupSize(0, 1, 10)
     )
@@ -81,10 +82,10 @@ case object blastTest {
           "ERR567374_1",
           dataProcessing
         )(remoteInput =
-            fastqInput.atS3(ObjectAddress("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/flash-test/ERR567374_1.merged.fastq")) :~:
+            fastqInput.inS3Object(S3Object("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/flash-test/ERR567374_1.merged.fastq")) :~:
             ∅,
           remoteOutput =
-            blastOutput.atS3(ObjectAddress("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/blast-test/ERR567374_1.merged.blast.csv")) :~:
+            blastOutput.inS3Object(S3Object("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/blast-test/ERR567374_1.merged.blast.csv")) :~:
             ∅
         )
       )

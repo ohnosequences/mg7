@@ -28,8 +28,8 @@ trait AnyFlashData {
   val stats: Stats
 
   lazy val flashOptions = flash.defaults update (
-    read_len(readsType.length.toInt)   :~:
-    max_overlap(readsType.length.toInt) :~: ∅
+    read_len(readsType.length.length)   :~:
+    max_overlap(readsType.length.length) :~: ∅
   )
 
 }

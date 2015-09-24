@@ -15,7 +15,8 @@ import ohnosequences.statika.bundles._
 import ohnosequences.statika.aws.api._
 import ohnosequences.statika.aws.amazonLinuxAMIs._
 
-import ohnosequences.awstools._, regions.Region._, s3.ObjectAddress, ec2.InstanceType._
+import ohnosequences.awstools._, regions.Region._, ec2.InstanceType._
+import ohnosequences.awstools.s3._
 import ohnosequences.awstools.autoscaling._
 
 import era7.project.loquats._
@@ -33,12 +34,12 @@ case object countingTest {
     val metadata: AnyArtifactMetadata = generated.metadata.Metagenomica
 
     val managerConfig = ManagerConfig(
-      instanceType = m3_medium,
+      instanceType = m3.medium,
       purchaseModel = SpotAuto
     )
 
     val workersConfig = WorkersConfig(
-      instanceType = m3_medium,
+      instanceType = m3.medium,
       purchaseModel = SpotAuto,
       groupSize = WorkersGroupSize(0, 1, 10)
     )
@@ -53,20 +54,20 @@ case object countingTest {
           "ERR567374_1",
           countingDataProcessing
         )(remoteInput =
-            lcaCSV.atS3(ObjectAddress(
+            lcaCSV.inS3Object(S3Object(
               "resources.ohnosequences.com",
               "16s/public-datasets/PRJEB6592/assignment-test/ERR567374_1.lca.csv"
             )) :~:
-            bbhCSV.atS3(ObjectAddress(
+            bbhCSV.inS3Object(S3Object(
               "resources.ohnosequences.com",
               "16s/public-datasets/PRJEB6592/assignment-test/ERR567374_1.bbh.csv"
             )) :~: ∅,
           remoteOutput =
-            lcaCountsCSV.atS3(ObjectAddress(
+            lcaCountsCSV.inS3Object(S3Object(
               "resources.ohnosequences.com",
               "16s/public-datasets/PRJEB6592/counting-test/ERR567374_1.lca.counts.csv"
             )) :~:
-            bbhCountsCSV.atS3(ObjectAddress(
+            bbhCountsCSV.inS3Object(S3Object(
               "resources.ohnosequences.com",
               "16s/public-datasets/PRJEB6592/counting-test/ERR567374_1.bbh.counts.csv"
             )) :~:
