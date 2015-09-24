@@ -284,6 +284,23 @@ MG7 uses [ohnosequences/flash v0.1.0](https://github.com/ohnosequences/flash/rel
 
 MG7 uses [bio4j/bio4j v0.12.0-RC3](https://github.com/bio4j/bio4j/releases/tag/v0.12.0-RC3) and [bio4j/bio4j-titan v0.4.0-RC2](https://github.com/bio4j/bio4j-titan/releases/tag/v0.4.0-RC2) as an API for the NCBI taxonomy.
 
+# Disclosure/Conflict-of-Interest Statement
+
+All authors work at the _Oh no sequences!_ research group, part of Era7 Bioinformatics. Era7 offers metagenomics data analysis services based on MG7. MG7 is open source, available under the OSI-approved AGPLv3 license.
+
+# Author Contributions
+
+<!-- Initials: AA, EK, MM, PPT, EP, RT, EPT -->
+- **AA** developed *MG7*, *Statika*, *Datasets*, and *aws-scala-tools*; wrote the paper;
+- **EK** developed *nispero* (a prototype for *Loquat* [@kovach2014nispero]) and *aws-scala-tools*.
+- **MM** MG7 workflow design; curation and design for the 16S-DB7 reference database; wrote the paper.
+- **PPT** curation, design, data extraction code for the 16S-DB7 reference database.
+- **EP** MG7 workflow design; wrote the paper.
+- **RT** MG7 workflow design, assignment strategy; curation and design for the 16S-DB7 reference database; wrote the paper.
+- **EPT** developed *MG7*, *Statika*, *Datasets*, *FLASh/BLAST eDSLs*; data analysis approach and design; wrote the paper.
+
+All authors have read and approved the final manuscript.
+
 # Acknowledgements
 
 *Funding:* The two first authors are funded by INTERCROSSING (Grant 289974).
