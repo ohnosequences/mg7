@@ -57,34 +57,36 @@ methods optimized for massive cloud computing}
 
 \begin{abstract}
 
-The exponential growth of metagenomics is adding a significant plus of
-complexity to the big data problem in genomics. In this new scenario
-impacted by the wide scale and scope of the projects and by the
-explosion of sequence data to be analyzed is especially opportune the
-use of new possibilities that cloud computing approaches, new functional
-and dependently typed programming languages and new database paradigms
-as graph databases offer. To tackle the challenges of big data analysis
-in this work we have used these new means to design and develop a new
-open source methodology for analyzing metagenomics data, MG7. It
-exploits the new possibilities that cloud computing offers to get a
-system robust, programmatically configurable, modular, distributed,
-flexible, scalable and traceable in which the biological databases of
-reference sequences can be easily updated and/or frequently substituted
-by new ones or by databases specifically designed for focused projects.
-MG7 uses parallelization and distributed analysis based on Amazon Web
-Services (AWS), with on-demand infrastructure as the basic paradigm and
-allow the definition of complex workflows using a composable system for
-scaling/parallelizing stateless computations designed for AWS that
-counts with a static reproducible specification of dependencies and
-behavior of the different components. The modeling of the taxonomy tree
-is done using the new paradigm of graph databases of Bio4j that
-facilitates the taxonomic assignment tasks and the calculation of the
-taxa abundance values considering the hierarchic structure of taxonomy
-tree. MG7 includes the new 16S-DB7 database built with a flexible and
-sustainable system of updating and project-driven personalization.
+As part of the Cambrian explosion of omics data, metagenomics brings to
+the table a specific, defining trait: its social essence. The
+\emph{meta} prefix exerts its influence, with multitudes manifesting
+themselves everywhere; from samples to data analysis, from actors
+involved to (present and future) applications. Of these dimensions, data
+analysis is where needs lay further from what current tools provide. Key
+features are, among others, scalability, reproducibility, data
+provenance and distribution, process identity and versioning. These are
+the goals guiding our work in MG7, a 16S metagenomics data analysis
+system. The basic principle is a new approach to data analysis, where
+configuration, processes, or data locations are static, type-checked and
+subject to the standard evolution of a well-maintained software project.
+Cloud computing, in its Amazon Web Services incarnation, when coupled
+with these ideas, produces a robust, safely configurable, scalable tool.
+Processes, data, machine behaviors and their dependencies are expressed
+using a set of libraries which bring as much as possible checking and
+validation to the type level, without sacrificing expressiveness.
+Together they form a toolkit for defining scalable cloud-based workflows
+composed of stateless computations, with a static reproducible
+specification of dependencies, behavior and wiring of all steps. The
+modeling of taxonomy data is done using Bio4j, where the new paradigm of
+graph databases allows for both a simple expression of taxonomic
+assignment tasks and the calculation of taxa abundance values
+considering the hierarchic structure of the taxonomy tree. MG7 includes
+a new 16S reference database, \emph{16S-DB7}, built with a flexible and
+sustainable update system, and the possibility of project-driven
+personalization.
 
 \(^\dagger\) The first and second authors contributed equally to this
-work
+work.
 
 \tiny
  \keyFont{ \section{Keywords:} Metagenomics, 16S, Bacterial diversity profile, Bio4j, Graph databases,
@@ -382,27 +384,27 @@ from different resources such as UniProt or GO in a graph data paradigm.
 In the assignment phase we use a subgraph containing the NCBI Taxonomy,
 wrapping in Scala its Java API in a tree algebraic data type.
 
-\subsubsection{16S Reference Database
-Construction}\label{s-reference-database-construction}
+\subsubsection{16S-DB7 Reference Database
+Construction}\label{s-db7-reference-database-construction}
 
-Our 16S Reference Database is a curated subset of sequences from NCBI
-nucleotide database \textbf{nt}. The sequences included were selected by
-similarity with the bacterial and archaeal reference sequences
-downloaded from the \textbf{RDP database} \citep{cole2013ribosomal}. RDP
-unaligned sequences were used to capture new 16S RNA sequences from
-\textbf{nt} using BLAST similarity search strategies and then,
-performing additional curation steps to remove sequences with poor
-taxonomic assignments to taxonomic nodes close to the root of the
-taxonomy tree. All the nucleotide sequences included in \textbf{nt}
-database has a taxonomic assignment provided by the \textbf{Genbank}
-sequence submitter. NCBI provides a table (available at
+Our 16S-DB7 Reference Database is a curated subset of sequences from the
+NCBI nucleotide database \textbf{nt}. The sequences included were
+selected by similarity with the bacterial and archaeal reference
+sequences downloaded from the \textbf{RDP database}
+\citep{cole2013ribosomal}. RDP unaligned sequences were used to capture
+new 16S RNA sequences from \textbf{nt} using BLAST similarity search
+strategies and then, performing additional curation steps to remove
+sequences with poor taxonomic assignments to taxonomic nodes close to
+the root of the taxonomy tree. All the nucleotide sequences included in
+\textbf{nt} database has a taxonomic assignment provided by the
+\textbf{Genbank} sequence submitter. NCBI provides a table (available at
 ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/) to do the mapping of any
 Genbank Identifier (GI) to its Taxonomy Identifier (TaxID). Thus, we are
 based on a crowdsourced submitter-maintained taxonomic annotation system
 for reference sequences. It supposes a sustainable system able to face
 the expected number of reference sequences that will populate the public
 global nucleotide databases in the near future. Another advantageous
-point is that we are based on NCBI taxonomy, the \emph{de facto}
+point is that we are based on NCBI taxonomy, the \emph{de-facto}
 standard taxonomic classification for biomolecular data
 \citep{cochrane20102010}. NCBI taxonomy is, undoubtedly, the most used
 taxonomy all over the world and the most similar to the official
