@@ -293,10 +293,10 @@ All authors work at the _Oh no sequences!_ research group, part of Era7 Bioinfor
 <!-- Initials: AA, EK, MM, PPT, EP, RT, EPT -->
 - **AA** developed *MG7*, *Statika*, *Datasets*, and *aws-scala-tools*; wrote the paper;
 - **EK** developed *nispero* (a prototype for *Loquat* [@kovach2014nispero]) and *aws-scala-tools*.
-- **MM** MG7 workflow design; curation and design for the 16S-DB7 reference database; wrote the paper.
-- **PPT** curation, design, data extraction code for the 16S-DB7 reference database.
-- **EP** MG7 workflow design; wrote the paper.
-- **RT** MG7 workflow design, assignment strategy; curation and design for the 16S-DB7 reference database; wrote the paper.
+- **MM** *MG7* workflow design; curation and design of the *16S-DB7* reference database; wrote the paper.
+- **PPT** curation, design, data extraction code of the *16S-DB7* reference database.
+- **EP** *MG7* workflow design; wrote the paper.
+- **RT** *MG7* workflow design, assignment strategy; curation and design of the *16S-DB7* reference database; wrote the paper.
 - **EPT** developed *MG7*, *Statika*, *Datasets*, *FLASh/BLAST eDSLs*; data analysis approach and design; wrote the paper.
 
 All authors have read and approved the final manuscript.
