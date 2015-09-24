@@ -76,8 +76,8 @@ case object configuration {
     val  flashInput = reads1 :^: reads2 :^: DNil
 
     lazy val flashOptions = flash.defaults update (
-      read_len(readsType.length.toInt)   :~:
-      max_overlap(readsType.length.toInt) :~: ∅
+      read_len(readsType.length.length)   :~:
+      max_overlap(readsType.length.length) :~: ∅
     )
 
     case object merged_ extends MergedReads(readsType, reads1, reads2, flashOptions)

@@ -28,13 +28,13 @@
 \def\keyFont{\fontsize{8}{11}\helveticabold }
 \def\firstAuthorLast{Alexey Alekhin {et~al.}} %use et al only if is more than 1 author
 \def\Authors{
- Alexey Alekhin\(^\dagger\)\,$^{1}$  Evdokim Kovach\(^\dagger\)\,$^{1}$  Marina Manrique\,$^{1}$  Pablo Pareja\,$^{1}$  Eduardo Pareja\,$^{1}$  Raquel Tobes\,$^{1}$  and Eduardo Pareja-Tobes $^{1,*}$
+ Alexey Alekhin\(^\dagger\)\,$^{1}$  Evdokim Kovach\(^\dagger\)\,$^{1}$  Marina Manrique\,$^{1}$  Pablo Pareja-Tobes\,$^{1}$  Eduardo Pareja\,$^{1}$  Raquel Tobes\,$^{1}$  and Eduardo Pareja-Tobes $^{1,*}$
 }% Affiliations should be keyed to the author's name with superscript numbers and be listed as follows: Laboratory, Institute, Department, Organization, City, State abbreviation (USA, Canada, Australia), and Country (without detailed address information such as city zip codes or street names).
 % If one of the authors has a change of address, list the new address below the correspondence details using a superscript symbol and use the same symbol to indicate the author in the author list.
 \def\Address{$^{1}$Oh no sequences! Research Group, Era7 Bioinformatics, Granada, Spain}
 % The Corresponding Author should be marked with an asterisk
 % Provide the exact contact address (this time including street name and city zip code) and email of the corresponding author
-\def\corrAuthor{Corresponding Author}
+\def\corrAuthor{Eduardo Pareja-Tobes}
 \def\corrAddress{Oh no sequences! Research Group, Era7 Bioinformatics, Plaza Campo Verde 3, Granada, 18001, Spain}
 \def\corrEmail{eparejatobes@ohnosequences.com}
 
@@ -69,27 +69,27 @@ open source methodology for analyzing metagenomics data, MG7. It
 exploits the new possibilities that cloud computing offers to get a
 system robust, programmatically configurable, modular, distributed,
 flexible, scalable and traceable in which the biological databases of
-reference sequences can be easily updated and / or frequently
-substituted by new ones or by databases specifically designed for
-focused projects. MG7 uses parallelization and distributed analysis
-based on AWS, with on-demand infrastructure as the basic paradigm and
+reference sequences can be easily updated and/or frequently substituted
+by new ones or by databases specifically designed for focused projects.
+MG7 uses parallelization and distributed analysis based on Amazon Web
+Services (AWS), with on-demand infrastructure as the basic paradigm and
 allow the definition of complex workflows using a composable system for
-scaling/parallelizing stateless computations designed for Amazon Web
-Services (AWS) that counts with a static reproducible specification of
-dependencies and behavior of the different components. The modelling of
-the taxonomy tree is done using the new paradigm of graph databases of
-Bio4j that facilitates the taxonomic assignment tasks and the
-calculation of the taxa abundance values considering the hierarchic
-structure of taxonomy tree. MG7 includes the new 16S database 16S-DB7
-built with a flexible and sustainable system of updating and
-project-driven personalization.
+scaling/parallelizing stateless computations designed for AWS that
+counts with a static reproducible specification of dependencies and
+behavior of the different components. The modeling of the taxonomy tree
+is done using the new paradigm of graph databases of Bio4j that
+facilitates the taxonomic assignment tasks and the calculation of the
+taxa abundance values considering the hierarchic structure of taxonomy
+tree. MG7 includes the new 16S-DB7 database built with a flexible and
+sustainable system of updating and project-driven personalization.
 
 \(^\dagger\) The first and second authors contributed equally to this
 work
 
 \tiny
  \keyFont{ \section{Keywords:} Metagenomics, 16S, Bacterial diversity profile, Bio4j, Graph databases,
-Cloud computing, NGS, Genomic big data } %All article types: you may provide up to 8 keywords; at least 5 are mandatory.
+Cloud computing, NGS, Genomic big data, Microbiome, Environmental, 16S
+Database } %All article types: you may provide up to 8 keywords; at least 5 are mandatory.
 \end{abstract}
 
 \section{Introduction}\label{introduction}
@@ -108,7 +108,7 @@ treatments. The impact of Metagenomics is also being felt in
 environmental sciences \citep{ufarte2015discovery}, crop sciences, the
 agrifood sector \citep{coughlan2015biotechnological} and biotechnology
 in general \citep[\citet{kodzius2015marine}]{cowan2015metagenomics}.
-These new possibilities for exploring the diversity of micro--organisms
+These new possibilities for exploring the diversity of micro-organisms
 in the most varied environments are opening new research areas, and
 drastically changing the existing ones.
 
@@ -135,10 +135,10 @@ sampling-time dependence, metagenomic clinical test results vary
 depending on the specific region of extraction of the clinical specimen.
 This local variability adds complexity to the analysis since different
 localizations (different tissues, different anatomical regions, healthy
-or tumour tissues) are required to have a sufficiently complete
-landscape of the human microbiome. Moreover, re--analysis of old samples
-using new tools and better reference databases might be also demanded
-from time to time.
+or tumor tissues) are required to have a sufficiently complete landscape
+of the human microbiome. Moreover, re-analysis of old samples using new
+tools and better reference databases might be also demanded from time to
+time.
 
 Other disciplines such as astronomy or particle physics have faced the
 big data challenge before. A key difference is the existence of
@@ -152,7 +152,6 @@ and advances with a direct impact in metagenomics data analysis:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
-\tightlist
 \item
   \textbf{Sequence data:} the reads are larger, the sequencing depth and
   the number of samples of each project are considerably bigger. The
@@ -171,11 +170,11 @@ and advances with a direct impact in metagenomics data analysis:
   sequence data.
 \item
   \textbf{Cloud computing:} the appearance of new models for massive
-  computation and storage such as the so-called cloud, or the widespread
-  adoption of programming methodologies like functional programming, or,
-  more speculatively, dependently typed programming. The immense new
-  possibilities that these advances offer must have a direct impact in
-  metagenomics data analysis.
+  computation and storage such as the cloud-based platforms, or the
+  widespread adoption of programming methodologies like functional
+  programming, or, more speculatively, dependently typed programming.
+  The new possibilities that these advances offer must have a direct
+  impact in metagenomics data analysis.
 \item
   \textbf{Open science:} the new social manner to do science,
   particularly so in genomics, brings its own set of requirements.
@@ -214,7 +213,7 @@ These are some of the more innovative MG7 features:
 \item
   Definition of complex workflows using \emph{Loquat}, a composable
   system for scaling/parallelizing stateless computations especially
-  designed for Amazon Web Services (AWS)
+  designed for AWS
 \item
   A new approach to data analysis specification, management and
   specification based on working with it in exactly the same way as for
@@ -271,20 +270,20 @@ data}{Datasets: a mini-language for data}}\label{datasets-a-mini-language-for-da
 \href{https://github.com/ohnosequences/datasets}{Datasets} is a Scala
 library developed by the first and last authors with the goal of being a
 Scala-embedded mini-language for datasets and their locations.
-\textbf{Data} is represented as type-indexed fields: Keys are modeled as
+\textbf{Data} is represented as type-indexed fields: keys are modeled as
 singleton types, and values correspond to what could be called a
 denotation of the key: a value of type \texttt{Location} tagged with the
 key type. Then a \textbf{Dataset} is essentially a collection of data,
 which are guaranteed statically to be different through type-level
-predicates, making use of the value ↔ type correspondence which can be
+predicates, making use of the value--type correspondence which can be
 established through singleton types and implicits. A dataset location is
-then just a list of locations formed by locations of each data member of
-that dataset. All this is based on what could be described as an
-embedding in Scala of an extensible record system with concatenation on
-disjoint labels, in the spirit of
-\citep[\citet{harper1991record}]{harper1990extensible}. For that
-\emph{Datasets} uses
-\href{https://github.com/ohnosequences/cosas/}{ohnosequences/cosas}.
+then just a list of locations formed by locations of each dataset key.
+All this is based on what could be described as an embedding in Scala of
+an extensible record system with concatenation on disjoint labels, in
+the spirit of \citep[\citet{harper1991record}]{harper1990extensible}.
+For that \emph{Datasets} uses
+\href{https://github.com/ohnosequences/cosas/}{ohnosequences/cosas}
+library.
 
 Data keys can further have a reference to a \textbf{data type}, which,
 as the name hints at, can help in providing information about the type
@@ -338,19 +337,20 @@ mixing different resources when implementing a process, while serving as
 a safe and convenient mechanism for writing generic processing tasks.
 For example, merging paired-end Illumina reads generically is easy as
 the data type includes the relevant information (insert size, read
-length, etc) to pass to a tool such as FLASH.
+length, etc) to pass to a tool such as FLASh.
 
 \subsubsection{Type-safe eDSLs for BLAST and
-FLASH}\label{type-safe-edsls-for-blast-and-flash}
+FLASh}\label{type-safe-edsls-for-blast-and-flash}
 
-We developed our own Scala-based type-safe eDSLs (\textbf{e}mbedded
-\textbf{D}omain \textbf{S}pecific \textbf{L}anguage) for
-\href{https://github.com/ohnosequences/flash}{FLASH} and
-\href{https://github.com/ohnosequences/blast}{BLAST} expressions and
-their execution.
+We developed our own Scala-based type-safe eDSLs (embedded Domain
+Specific Languages) for
+\href{https://github.com/ohnosequences/flash}{FLASh}
+\citep{magovc2011flash} and
+\href{https://github.com/ohnosequences/blast}{BLAST}
+\citep{camacho2009blast} expressions and their execution.
 
-In the case of BLAST we use a model for expressions where we can
-guarantee for each BLAST command expression at compile time
+In the case of BLAST we use a model where we can guarantee for each
+BLAST command expression at compile time that
 
 \begin{itemize}
 \tightlist
@@ -367,11 +367,11 @@ guarantee for each BLAST command expression at compile time
 Generic type-safe parsers returning a heterogeneous record of BLAST
 output fields are also available, together with output data defined
 using \emph{Datasets} which have a reference to the exact BLAST command
-options which yielded that output. This let us provide generic parsers
+options which yielded that output. This lets us provide generic parsers
 for BLAST output which are guaranteed to be correct.
 
 In the same spirit as for BLAST, we implemented a type-safe eDSL for
-FLASH expressions and their execution, supporting features equivalent to
+FLASh expressions and their execution, supporting features equivalent to
 those outlined for the BLAST eDSL.
 
 \subsubsection{Bio4j and Graph
@@ -389,7 +389,7 @@ Our 16S Reference Database is a curated subset of sequences from NCBI
 nucleotide database \textbf{nt}. The sequences included were selected by
 similarity with the bacterial and archaeal reference sequences
 downloaded from the \textbf{RDP database} \citep{cole2013ribosomal}. RDP
-unaligned sequences were used to capture new 16S sequences from
+unaligned sequences were used to capture new 16S RNA sequences from
 \textbf{nt} using BLAST similarity search strategies and then,
 performing additional curation steps to remove sequences with poor
 taxonomic assignments to taxonomic nodes close to the root of the
@@ -416,19 +416,19 @@ specimens that serve as exemplars for the species
 
 Certainly, if metagenomics results are easily integrated with the
 theoretical and experimental knowledge of each specific area, the impact
-of metagenomics will be higher that if metagenomics progresses as a
-disconnected research branch. Considering that metagenomics data
-interoperability, which is especially critical in clinical environments,
-requires a stable taxonomy to be used as reference, we decided to rely
-on the most widely used taxonomy: the NCBI taxonomy. In addition, the
-biggest global sequence database GenBank follows this taxonomy to
-register the origin of all their submitted sequences. Our 16S database
-building strategy allows the substitution of the 16S database by any
-other subset of \textbf{nt}, even by the complete \textbf{nt} database
-if it would be needed, for example, for analyzing shotgun metagenomics
-data. This possibility of changing the reference database provides
-flexibility to the system enabling it for easy updating and
-project-driven personalization.
+of metagenomics will be higher than if it progresses as a disconnected
+research branch. Considering that metagenomics data interoperability,
+which is especially critical in clinical environments, requires a stable
+taxonomy to be used as reference, we decided to rely on the most widely
+used taxonomy: the NCBI taxonomy. In addition, the biggest global
+sequence database GenBank follows this taxonomy to register the origin
+of all their submitted sequences. Our 16S database building strategy
+allows the substitution of the 16S database by any other subset of
+\textbf{nt}, even by the complete \textbf{nt} database if it would be
+needed, for example, for analyzing shotgun metagenomics data. This
+possibility of changing the reference database provides flexibility to
+the system enabling it for easy updating and project-driven
+personalization.
 
 \subsection{Workflow Description}\label{workflow-description}
 
@@ -437,11 +437,11 @@ MG7 are the FASTQ files resulting from a paired-end NGS sequencing
 experiment.
 
 \subsubsection{Joining reads of each pair using
-FLASH}\label{joining-reads-of-each-pair-using-flash}
+FLASh}\label{joining-reads-of-each-pair-using-flash}
 
 In the first step the paired-end reads, designed with an insert size
 that yields pairs of reads with an overlapping region between them, are
-assembled using FLASH \citep{magovc2011flash}. FLASH is designed to
+assembled using FLASh \citep{magovc2011flash}. FLASh is designed to
 merge pairs of reads when the original DNA fragments are shorter than
 twice the length of reads. Thus, the sequence obtained after joining the
 2 reads of each pair is larger and has better quality since the sequence
@@ -455,18 +455,19 @@ sequences.
 
 The second step is to search for similar 16S sequences in our 16S-DB7
 database. The taxonomic assignment for each read is based on BLASTN of
-each read against the 16S database. Assignment based on direct
-similarity of each read one by one compared against a sufficiently wide
-database is a very exhaustive method for assignment
-\citep[\citet{morgan2012chapter}]{segata2013computational}. Some methods
-of assignment compare the sequences only against the available complete
-bacterial genomes or avoid computational cost clustering or binning the
-sequences first, and then doing the assignments only for the
-representative sequence of each cluster. MG7 carries out an exhaustive
-comparison of all the reads under analysis and it does not applies any
-binning strategy. Every read is specifically compared with all the
-sequences of the 16S database. We select the best BLAST hits (10 hits by
-default) obtained for each read to do the taxonomic assignment.
+each read against the 16S database.Assignment based on direct similarity
+of each read one by one compared against a sufficiently wide database is
+considered in different reviews of metagenomics analysis methodologies
+\citep[\citet{morgan2012chapter}]{segata2013computational} as a very
+exhaustive method for assignment. Some methods of assignment compare the
+sequences only against the 16S genes from available complete bacterial
+genomes or avoid computational cost clustering or binning the sequences
+first, and then doing the assignments only for the representative
+sequence of each cluster. MG7 carries out an exhaustive comparison of
+all the reads under analysis and it does not applies any binning
+strategy. Every read is specifically compared with all the sequences of
+the 16S database. We select the best BLAST hits (10 hits by default)
+obtained for each read to do the taxonomic assignment.
 
 \subsubsection{Taxonomic Assignment
 Algorithms}\label{taxonomic-assignment-algorithms}
@@ -484,32 +485,36 @@ the assignment to the most specific taxon.
 Assignment}\label{lowest-common-ancestor-based-taxonomic-assignment}
 
 For each read, first, we select the BEST BLAST HITs (by default 10 Hits)
-over a threshold of similarity (by default \(evalue \leq e^{-15}\))
-filtering those hits that are not sufficiently good comparing them with
-the best one. We select the best HSP (High Similarity Pair) per
-reference sequence and then choose the best HSP (that with lowest e
-value) between all the selected ones. The bitscore of this best HSP
-(called S) is used as reference to filter the rest of HSPs. All the HSPs
-with bitscore below p x S are filtered. p is a coefficient fixed by the
-user to define the bitscore required, e.g.~if p=0.9 and S=700 the
-required bitscore threshold would be 630. Once we have the definitive
-HSPs selected, we obtain their corresponding taxonomic nodes using the
-taxonomic assignments that NCBI provides for all the nt database
-sequences. Now we have to analyze the topological distribution of these
-nodes in the taxonomy tree: i. If all the nodes forms a line in the
-taxonomy tree (are located in a not branched lineage to the tree root)
-we should choose the most specific taxID as the final assignment for
-that read. We call to this kind of assignment the `in line' exception
-(see Figure 2 right panel). ii. If not, we should search for the
-\emph{sensu stricto} Lowest Common Ancestor (LCA) of all the selected
-taxonomic nodes (See Figure 2 left panel). In this approach we decided
-to use the bitscore for evaluating the similarity because it is a value
-that increases when similarity is higher and depends a lot on the length
-of the HSP. Some reads could not find sequences with enough similarity
-in the database and then they would be classified as reads with no hits.
-Advanced metagenomics analysis approaches \citep{huson2013microbial}
-have adopted LCA assignment algorithms because it provides fine and
-trusted taxonomical assignment.
+over a threshold of similarity. To evaluate similarity for this first
+filtering of hits we use the Expect value (by default
+\(evalue \leq e^{-15}\)) that describes the number of hits one can
+``expect'' to see by chance when searching a database of a particular
+size. In a second filtering step we filtering those hits that are not
+sufficiently good comparing them with the best one. We select the best
+HSP (High Similarity Pair) per reference sequence and then choose the
+best HSP (that with lowest E-value) between all the selected ones. The
+bitscore of this best HSP (called S) is used as reference to filter the
+rest of HSPs. All the HSPs with bitscore below the product \(p S\) are
+filtered. p is a coefficient fixed by the user to define the bitscore
+required, e.g.~if \(p=0.9\) and \(S=700\) the required bitscore
+threshold would be \(630\). Once we have the definitive HSPs selected,
+we obtain their corresponding taxonomic nodes using the taxonomic
+assignments that NCBI provides for all the nt database sequences. Now we
+have to analyze the topological distribution of these nodes in the
+taxonomy tree: i. If all the nodes forms a line in the taxonomy tree
+(are located in a not branched lineage to the tree root) we should
+choose the most specific taxID as the final assignment for that read. We
+call to this kind of assignment the `in line' exception (see Figure 2
+right panel). ii. If not, we should search for the \emph{sensu stricto}
+Lowest Common Ancestor (LCA) of all the selected taxonomic nodes (See
+Figure 2 left panel). In this approach we decided to use the bitscore
+for evaluating the similarity because it is a value that increases when
+similarity is higher and depends a lot on the length of the HSP. Some
+reads could not find sequences with enough similarity in the database
+and then they would be classified as reads with no hits. Advanced
+metagenomics analysis approaches \citep{huson2012microbial} have adopted
+LCA assignment algorithms because it provides fine and trusted
+taxonomical assignment.
 
 \paragraph{Best BLAST hit taxonomic
 assignment}\label{best-blast-hit-taxonomic-assignment}
@@ -538,25 +543,35 @@ in the taxonomy tree. Cumulative assignments are calculated including
 the direct assignments and also the assignments of the descendant nodes.
 For each sample MG7 provides 8 kinds of abundance values: LCA direct
 counts, LCA cumu. counts, LCA direct \%, LCA cumu. \%, BBH direct
-counts, BBH cumu. counts, BBH direct \%, BBH cumu. \%.
+counts, BBH cumu. counts, BBH direct \% and BBH cumu. \%.
 
 \subsection{Data analysis as a software
 project}\label{data-analysis-as-a-software-project}
 
-\textbf{IDEAS}
+The MG7 16S data analysis workflow is indeed a set of tasks, all of them
+based in \emph{Loquat}. For each task, a set of inputs and outputs as
+well as configuration parameters must be statically defined. The user is
+also free to leave the reasonable defaults for configuration, needing
+only to define the input and output of the whole workflow. The
+definition of this configuration is Scala code and the way of starting
+an MG7 analysis is compiling the project code and launching it from the
+Scala interactive console.
 
-\begin{itemize}
-\tightlist
-\item
-  the user needs to write code, a repo would be nice, AWS account
-\item
-  there's some sort of conf required for the AWS account (add users,
-  roles, permissions, whatever)
-\item
-  Why this is a good thing (or should this just be in Discussion)
-\item
-  something else?
-\end{itemize}
+Code compilation prior to launching any analysis assures that no AWS
+resources are launched if the analysis is not well-defined, avoiding
+expenses not leading to any analysis. Besides compile-time checks,
+runtime checks are made before launch to ensure existence of input data
+and availability of resources.
+
+An MG7 analysis is then a Scala project where the user only needs to set
+certain variables at the code level (input, output and parameters),
+compile the code and run it. To facilitate the process of setting up the
+Scala project, a template with sensible defaults is provided.
+
+In order to be able to exploit AWS infrastructure for the MG7 analysis,
+the user needs to set up an AWS account with certain IAM (Identity and
+Access Management) permission policies that will grant access to the
+resources used in the workflow.
 
 \subsection{Availability}\label{availability}
 
@@ -572,19 +587,21 @@ We could summarize the most innovative ideas and developments in MG7:
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  Treat data analysis as a software project. This makes for radical
+  Treating data analysis as a software project. This makes for radical
   improvements in \emph{reproducibility}, \emph{reuse},
   \emph{versioning}, \emph{safety}, \emph{automation} and
   \emph{expressiveness}
 \item
-  input and output data, their locations and type are expressible and
-  checked at compile-time using \emph{Datasets} ­3. management of
-  dependencies and machine configurations using \emph{Statika}
+  Checking at compile-time: input and output data, their locations and
+  type are expressible and checked at compile-time using \emph{Datasets}
 \item
-  automation of AWS cloud resources and processes, including
+  Management of dependencies and machine configurations using
+  \emph{Statika}
+\item
+  Automation of AWS cloud resources and processes, including
   distribution and parallelization through the use of \emph{Loquat}
 \item
-  taxonomic data and related operations are treated natively as what
+  Taxonomic data and related operations are treated natively as what
   they are: graphs, through the use of \emph{Bio4j}
 \item
   MG7 provides a sustainable model for taxonomic assignment, appropriate
@@ -594,18 +611,19 @@ We could summarize the most innovative ideas and developments in MG7:
 
 We will expand on each item in the following sections.
 
-\subsection{A new approach to data
-analysis}\label{a-new-approach-to-data-analysis}
+\subsection{A new approach to data analysis: data analysis as a software
+project and checking at
+compile-time}\label{a-new-approach-to-data-analysis-data-analysis-as-a-software-project-and-checking-at-compile-time}
 
 MG7 proposes to define and work with a particular data analysis task as
 a software project, using Scala. The idea is that \emph{everything}:
-data description, their location, configuration parameters, the
-infrastructure used, \ldots{} should be expressed as Scala code, and
-treated in the same way as any (well-managed) software project. This
-includes, among other things, using version control systems
-(\texttt{git} in our case), writing tests, making stable releases
-following \href{http://semver.org/}{semantic versioning} or publishing
-artifacts to a repository.
+data description, their location, configuration parameters and the
+infrastructure used should be expressed as Scala code, and treated in
+the same way as any (well-managed) software project. This includes,
+among other things, using version control systems (\texttt{git} in our
+case), writing tests, making stable releases following
+\href{http://semver.org/}{semantic versioning} or publishing artifacts
+to a repository.
 
 What we see as key advantages of this approach (when coupled with
 compile-time specification and checking), are
@@ -634,18 +652,102 @@ compile-time specification and checking), are
   to keep coherence between them.
 \item
   \textbf{Expresiveness and safety} For example in our case we can
-  choose only from valid Illumina read types, and then build a default
-  FLASH command based on that. The output locations, being declared
+  choose only from valid illumina read types, and then build a default
+  FLASh command based on that. The output locations, being declared
   statically, are also available for use in further analysis.
 \end{itemize}
 
-\subsection{Inputs, outputs, data: compile-time, expressive,
-composable}\label{inputs-outputs-data-compile-time-expressive-composable}
+\subsection{Input and output data
+declaration}\label{input-and-output-data-declaration}
 
-\subsection{Tools, data, dependencies and machine
-configurations}\label{tools-data-dependencies-and-machine-configurations}
+An important aspect of the MG7 workflow is the way it deals with data
+resources. All the data that is going to be used in the analysis or
+produced as an output is described as Scala code using rich types from
+the \emph{Datasets} language. This allows the user to specify
+information about types of data, information that can then be utilized
+by tools analyzing this data. For example, we can specify that, for the
+first part of the MG7 workflow, running FLASh in parallel requires
+illumina paired end reads and produces joined reads.
 
-\subsection{Parallel cloud execution ??}\label{parallel-cloud-execution}
+On one hand, specification of the input data allows us to restrict its
+type and force users to be conscious about what they pass as an input.
+On the other hand, specification of the output data helps to build a
+workflow as a \emph{composition} of several parts: we can ensure on the
+Scala code type level that the output of one component fits as an input
+for the next component. This is crucial as, obviously, the way a data
+analysis task works depends a lot on the particular structure of the
+data. For instance, in the MG7 workflow, using BLAST eDSL, we can
+precisely describe which format will have the output of the BLAST step,
+which information it will include, and then in the next step we can
+reuse this description to parse BLAST output and retrieve the part of
+the information needed for the taxonomy assignment analysis. Having the
+data structure described statically as Scala code allows us to be sure
+that we will not have parsing problems or other issues with incompatible
+data passed between workflow components.
+
+All this does not compromise flexibility in how the user works with data
+in MG7: having static data declarations as a part of the configuration
+allows the user to reuse analysis components, or modify them according
+to particular needs. Besides that, an important advantage of the
+type-level control is the added protection from the execution (and
+deployment) of a wrongly configured analysis task, which may lead to
+significant costs in both time and money.
+
+\subsection{Tools, data, dependencies and automated
+deployment}\label{tools-data-dependencies-and-automated-deployment}
+
+Bioinformatics software often has a complicated installation process and
+requires various dependencies with unclear versions. This makes the
+deployment of the bioinformatics tools an involved task and resolving it
+manually is not a solution in the context of cloud computations. To face
+this problem, one needs an automated system of managing tools and
+resources, which will allow an expressive way for describing
+dependencies between parts of a pipeline and provide a reproducible
+procedure of its deployment. We have developed \emph{Statika} for this
+purpose and successfully used it in MG7.
+
+Every external tool involved in the workflow is represented as a
+\emph{Statika} bundle, which is essentially a Scala project describing
+the installation process of this tool and declaring dependencies on
+other bundles which will be installed prior to the considered tool
+itself. Describing relationships between bundles on the code level
+allows us to track the directed acyclic graph of their dependencies and
+linearize them to automatically install them sequentially in the right
+order. Meanwhile, describing the installation process on the code level
+allows the user to utilize the wide range of available Scala and Java
+APIs and tools, making installation a well-defined sequence of steps
+rather than an unreliable script, dependent on a certain environment.
+\emph{Statika} offers an easy path towards making deployment an
+automated, reproducible process.
+
+Besides bioinformatics tools like BLAST and FLASh, \emph{Statika}
+bundles are used for wrapping data dependencies and all inner components
+of the system that require cloud deployment. In particular, all
+components of \emph{Loquat} are bundles; the user can then define which
+components are needed for the parallel processing on each computation
+unit in an expressive way, declaring them as bundle dependencies of the
+loquat ``worker'' bundle. This modularization is also important for the
+matter of making components of the system reusable for different
+projects and liberating the user from most of the tasks related to their
+deployment.
+
+\subsection{Parallel computations in the
+cloud}\label{parallel-computations-in-the-cloud}
+
+The MG7 workflow consists of certain steps, each of which performs some
+work in parallel, using the cloud infrastructure managed by
+\emph{Loquat}. It is important to notice the horizontal scalability of
+this approach. Irrespectively of how much data needs to be processed,
+MG7 will handle it, by splitting data into chunks and performing the
+analysis on multiple computation units. The Amazon Elastic Compute Cloud
+(EC2) service provides a transparent way of managing computation
+infrastructure, called autoscaling groups. The User can set MG7
+configuration parameters, adjusting for each task the amount and
+hardware characteristics of the EC2 instances they want to use for it.
+But it is important to note that, as each workflow step is not very
+resource demanding, it is not needed to hire EC2 instances with some
+advanced hardware. Instead, an average type will work and you can reduce
+execution time by simply scaling out the number of instances.
 
 \subsection{Taxonomy and Bio4j}\label{taxonomy-and-bio4j}
 
@@ -657,7 +759,12 @@ we developed Bio4j \textbf{{[}Pareja-Tobes-2015{]}}, a platform for the
 integration of semantically rich biological data using typed graph
 models. It integrates most publicly available data linked with sequences
 into a set of interdependent graphs to be used for bioinformatics
-analysis and especially for biological data.
+analysis and especially for biological data. MG7 works based on the
+Bio4j taxonomy module. It opens the possibility to connect the taxonomic
+profiling data obtained with MG7 to all the biological knowledge
+associated to each taxon. Using the information available in Bio4j for
+all the proteins assigned to each taxon we are connected to all the
+functional data available in Uniprot related with it.
 
 \subsection{Future developments}\label{future-developments}
 
@@ -668,70 +775,140 @@ data. Simply changing the reference database to include whole genome
 sequence data could yield interesting results. This could also be
 refined by restricting reference sequences according to all sort of
 criteria, like biological function or taxonomy. Bio4j would be an
-invaluable tool here, thanks to its ability to express express complex
+invaluable tool here, thanks to its ability to express complex
 predicates on sequences using all the information linked with them (GO
 annotations, UniProt data, NCBI taxonomy, etc).
 
 \subsubsection{Comparing groups of
 samples}\label{comparing-groups-of-samples}
 
+The comparison of the taxonomic profiles between different groups of
+samples is a need for many metagenomics studies. Tasks related with this
+group-based analysis, such as the extraction of the minimal tree with
+all the taxa with some direct or accumulated assignment, will be part of
+a new MG7 module, already in development.
+
 \subsubsection{Interactive visualizations based on
 Biographika}\label{interactive-visualizations-based-on-biographika}
+
+New visualization tools for metagenomics results are undoubtedly needed.
+Interactivity is a especially interesting feature for metagenomics data
+visualization, since the expert needs to explore the results in a
+knowledge-driven way. The majority of the available metagenomics data
+visualizations are static. We are working in the \emph{Biographika}
+project \citep{tobes2015biographika}, to provide interactive rich
+visualizations on the web for Bio4j data. The development of
+visualizations specific for MG7 is one of Biographika current goals.
+Biographika is based on D3.js, the de-facto standard JavaScript data
+visualization library, and is open source.
 
 \section{Materials and Methods}\label{materials-and-methods}
 
 \subsection{Amazon Web Services}\label{amazon-web-services}
 
-We use EC2, S3 and SQS through a Scala wrapper of the official
-\href{https://aws.amazon.com/sdk-for-java/}{AWS Java SDK},
+MG7 uses the following Amazon Web Services:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://aws.amazon.com/ec2}{EC2} (Elastic Compute Cloud)
+  autoscaling groups for launching and managing computation units
+\item
+  \href{https://aws.amazon.com/s3}{S3} (Simple Storage Service) for
+  storing input and output data
+\item
+  \href{https://aws.amazon.com/sqs}{SQS} (Simple Queue Service) for
+  communication between different components of the system
+\item
+  \href{https://aws.amazon.com/sns}{SNS} (Simple Notification Service)
+  for e-mail notifications
+\end{itemize}
+
+These services are used through a Scala wrapper of the official
+\href{https://aws.amazon.com/sdk-for-java/}{AWS Java SDK v1.9.25}:
 \href{https://github.com/ohnosequences/aws-scala-tools/releases/tag/v0.13.2}{ohnosequences/aws-scala-tools
-\texttt{0.13.2}}. This uses version \texttt{1.9.25} of the AWS Java SDK.
+v0.13.2}.
 
 \subsection{Scala}\label{scala}
 
-MG7 itself and all the libraries used are written in Scala
-\texttt{2.11}.
+MG7 itself and all the libraries used are written in Scala v2.11.
 
 \subsection{Statika}\label{statika}
 
 MG7 uses
 \href{https://github.com/statika/statika/releases/tag/v0.2.0}{ohnosequences/statika
-\texttt{2.0.0}} for specifying the configuration and behavior of EC2
-instances.
+v2.0.0} for specifying the configuration and behavior of EC2 instances.
 
 \subsection{Datasets}\label{datasets}
 
 MG7 uses
 \href{https://github.com/ohnosequences/datasets/releases/tag/v0.2.0}{ohnosequences/datasets
-\texttt{0.2.0}} for specifying input and output data, their type and
-their location.
+v0.2.0} for specifying input and output data, their type and their
+location.
 
 \subsection{Loquat}\label{loquat}
 
 MG7 uses
 \href{https://github.com/ohnosequences/loquat/releases/tag/v2.0.0}{ohnosequences/loquat
-\texttt{2.0.0}} for the specification of data processing tasks and their
+v2.0.0} for the specification of data processing tasks and their
 execution using AWS resources.
 
 \subsection{BLAST eDSL}\label{blast-edsl}
 
 MG7 uses
 \href{https://github.com/ohnosequences/blast/releases/tag/v0.2.0}{ohnosequences/blast
-\texttt{0.2.0}}. The BLAST version used is \texttt{2.2.31+}
+v0.2.0}. The BLAST version used is v2.2.31+.
 
-\subsection{FLASH eDSL}\label{flash-edsl}
+\subsection{FLASh eDSL}\label{flash-edsl}
 
 MG7 uses
 \href{https://github.com/ohnosequences/flash/releases/tag/v0.1.0}{ohnosequences/flash
-\texttt{0.1.0}}. The FLASH version used is \texttt{1.2.11}
+v0.1.0}. The FLASh version used is v1.2.11.
 
 \subsection{Bio4j}\label{bio4j}
 
 MG7 uses
 \href{https://github.com/bio4j/bio4j/releases/tag/v0.12.0-RC3}{bio4j/bio4j
-0.12.0-RC3} and
+v0.12.0-RC3} and
 \href{https://github.com/bio4j/bio4j-titan/releases/tag/v0.4.0-RC2}{bio4j/bio4j-titan
-0.4.0-RC2} as an API for the NCBI taxonomy.
+v0.4.0-RC2} as an API for the NCBI taxonomy.
+
+\section{Disclosure/Conflict-of-Interest
+Statement}\label{disclosureconflict-of-interest-statement}
+
+All authors work at the \emph{Oh no sequences!} research group, part of
+Era7 Bioinformatics. Era7 offers metagenomics data analysis services
+based on MG7. MG7 is open source, available under the OSI-approved
+AGPLv3 license.
+
+\section{Author Contributions}\label{author-contributions}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{AA} developed \emph{MG7}, \emph{Statika}, \emph{Datasets}, and
+  \emph{aws-scala-tools}; wrote the paper;
+\item
+  \textbf{EK} developed \emph{nispero} (a prototype for \emph{Loquat}
+  \citep{kovach2014nispero}) and \emph{aws-scala-tools}.
+\item
+  \textbf{MM} \emph{MG7} workflow design; curation and design of the
+  \emph{16S-DB7} reference database; wrote the paper.
+\item
+  \textbf{PPT} curation, design, data extraction code of the
+  \emph{16S-DB7} reference database.
+\item
+  \textbf{EP} \emph{MG7} workflow design; wrote the paper.
+\item
+  \textbf{RT} \emph{MG7} workflow design, assignment strategy; curation
+  and design of the \emph{16S-DB7} reference database; wrote the paper.
+\item
+  \textbf{EPT} developed \emph{MG7}, \emph{Statika}, \emph{Datasets},
+  \emph{FLASh/BLAST eDSLs}; data analysis approach and design; wrote the
+  paper.
+\end{itemize}
+
+All authors have read and approved the final manuscript.
 
 \section{Acknowledgements}\label{acknowledgements}
 
