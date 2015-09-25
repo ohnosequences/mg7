@@ -10,7 +10,8 @@ import ohnosequences.loquat._, utils._, configs._, dataMappings._, dataProcessin
 import ohnosequences.statika.bundles._
 import ohnosequences.statika.aws._, api._, amazonLinuxAMIs._
 
-import ohnosequences.awstools._, regions.Region._, s3.ObjectAddress, ec2.InstanceType._
+import ohnosequences.awstools._, regions.Region._, ec2.InstanceType._
+import ohnosequences.awstools.s3._
 import ohnosequences.awstools.autoscaling._
 
 import ohnosequences.flash.api._
@@ -54,12 +55,12 @@ case object flashTest {
     val metadata: AnyArtifactMetadata = generated.metadata.Metagenomica
 
     val managerConfig = ManagerConfig(
-      instanceType = m3_medium,
+      instanceType = m3.medium,
       purchaseModel = SpotAuto
     )
 
     val workersConfig = WorkersConfig(
-      instanceType = m3_medium,
+      instanceType = m3.medium,
       purchaseModel = SpotAuto,
       groupSize = WorkersGroupSize(0, 1, 10)
     )
@@ -74,12 +75,12 @@ case object flashTest {
           "ERR567374_1",
           dataProcessing
         )(remoteInput =
-            dataProcessing.data.reads1.atS3(ObjectAddress("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/reads/ERR567374_1.fastq.gz")) :~:
-            dataProcessing.data.reads2.atS3(ObjectAddress("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/reads/ERR567374_2.fastq.gz")) :~:
+            dataProcessing.data.reads1.inS3Object(S3Object("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/reads/ERR567374_1.fastq.gz")) :~:
+            dataProcessing.data.reads2.inS3Object(S3Object("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/reads/ERR567374_2.fastq.gz")) :~:
             ∅,
           remoteOutput =
-            dataProcessing.data.merged.atS3(ObjectAddress("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/flash-test/ERR567374_1.merged.fastq")) :~:
-            dataProcessing.data.stats.atS3(ObjectAddress("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/flash-test/ERR567374_1.stats.txt")) :~:
+            dataProcessing.data.merged.inS3Object(S3Object("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/flash-test/ERR567374_1.merged.fastq")) :~:
+            dataProcessing.data.stats.inS3Object(S3Object("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592/flash-test/ERR567374_1.stats.txt")) :~:
             ∅
         )
       )

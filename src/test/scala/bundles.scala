@@ -52,7 +52,7 @@ class BundlesTest extends FunSuite with ParallelTestExecution {
     import blast16sTest._
 
     val specs = blast16sCompat.instanceSpecs(
-      instanceType = m3_medium,
+      instanceType = m3.medium,
       user.awsAccount.keypair.name,
       Some(era7.aws.roles.projects.name)
     )
@@ -78,7 +78,7 @@ class BundlesTest extends FunSuite with ParallelTestExecution {
     import ohnosequences.metagenomica.loquats.blast.blastDataProcessing._
 
     val specs = blastCompat.instanceSpecs(
-      instanceType = m3_medium,
+      instanceType = m3.medium,
       user.awsAccount.keypair.name,
       Some(era7.aws.roles.projects.name)
     )
