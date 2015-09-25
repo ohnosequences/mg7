@@ -10,7 +10,8 @@ import ohnosequences.loquat._, utils._, configs._, dataMappings._, dataProcessin
 import ohnosequences.statika.bundles._
 import ohnosequences.statika.aws._, api._, amazonLinuxAMIs._
 
-import ohnosequences.awstools._, regions.Region._, s3.ObjectAddress, ec2.InstanceType._
+import ohnosequences.awstools._, regions.Region._, ec2.InstanceType._
+import ohnosequences.awstools.s3._
 import ohnosequences.awstools.autoscaling._
 
 import ohnosequences.flash.api._

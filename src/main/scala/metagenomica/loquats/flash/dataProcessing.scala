@@ -19,24 +19,15 @@ import ohnosequences.datasets._, dataSets._, fileLocations._, illumina._, reads.
 import java.io.File
 
 
-class FlashDataProcessing[
-  RT <: AnyReadsType { type EndType = pairedEndType },
-  R1 <: AnyPairedEnd1Fastq { type DataType = RT },
-  R2 <: AnyPairedEnd2Fastq { type DataType = RT },
-  M  <: MergedReads[RT, R1, R2],
-  S  <: MergedReadsStats[M]
-](val readsType: RT,
-  val reads1: R1,
-  val reads2: R2,
-  val merged: M,
-  val stats: S
-)(implicit
-  parseInputFiles: ParseDenotations[(R1 :^: R2 :^: DNil)#LocationsAt[FileDataLocation], File],
-  outputFilesToMap: ToMap[(M :^: S :^: DNil)#LocationsAt[FileDataLocation], AnyData, FileDataLocation]
-) extends DataProcessingBundle(bundles.flash)(
-  input = reads1 :^: reads2 :^: DNil,
-  output = merged :^: stats :^: DNil
-)(parseInputFiles, outputFilesToMap) {
+trait AnyFlashDataProcessing extends AnyDataProcessingBundle {
+
+  type MD <: AnyMetagenomicaData;
+  val md: MD
+
+  val bundleDependencies: List[AnyBundle] = List( bundles.flash )
+
+  type Input = MD#Reads1 :^: MD#Reads2 :^: DNil
+  type Output = MD#Merged :^: MD#Stats :^: DNil
 
   def instructions: AnyInstructions = say("I'll be fast as a flash!")
 
@@ -46,8 +37,8 @@ class FlashDataProcessing[
     context: Context
   ): Instructions[OutputFiles] = {
 
-    val reads1gz: file = context.file(reads1)
-    val reads2gz: file = context.file(reads2)
+    val reads1gz: file = context.file(md.reads1: MD#Reads1)
+    val reads2gz: file = context.file(md.reads2: MD#Reads2)
 
     val reads1fastq: file = reads1gz.rename( _.stripSuffix(".gz") )
     val reads2fastq: file = reads2gz.rename( _.stripSuffix(".gz") )
@@ -61,18 +52,13 @@ class FlashDataProcessing[
     // define output
     lazy val flashOutput = FlashOutputAt(context / "output", prefix = "")
 
-    lazy val flashOptions = flash.defaults update (
-      read_len(readsType.length.toInt)   :~:
-      max_overlap(readsType.length.toInt) :~: ∅
-    )
-
     // the FLASh cmd we are going to run
     lazy val flashExpr = FlashExpression(flash)(
       flash.arguments(
         api.input(flashInput)   :~:
         api.output(flashOutput) :~: ∅
       ),
-      flashOptions
+      md.flashOptions
     )
 
     // run expression, hope for the best
@@ -81,8 +67,19 @@ class FlashDataProcessing[
     seqToInstructions(flashExpr.cmd) -&-
     success(
       s"FLASh merged reads from ${dataMappingId}, much success so fast",
-      merged.inFile(flashOutput.mergedReads)           :~:
-      stats.inFile(flashOutput.lengthNumericHistogram) :~: ∅
+      (md.merged: MD#Merged).inFile(flashOutput.mergedReads)           :~:
+      (md.stats: MD#Stats).inFile(flashOutput.lengthNumericHistogram) :~: ∅
     )
   }
+}
+
+class FlashDataProcessing[MD0 <: AnyMetagenomicaData](val md0: MD0)(implicit
+  val parseInputFiles: ParseDenotations[(MD0#Reads1 :^: MD0#Reads2 :^: DNil)#LocationsAt[FileDataLocation], File],
+  val outputFilesToMap: ToMap[(MD0#Merged :^: MD0#Stats :^: DNil)#LocationsAt[FileDataLocation], AnyData, FileDataLocation]
+) extends AnyFlashDataProcessing {
+  type MD = MD0
+  val  md = md0
+
+  lazy val input: Input = (md.reads1: MD#Reads1) :^: (md.reads2: MD#Reads2) :^: DNil
+  lazy val output: Output = (md.merged: MD#Merged) :^: (md.stats: MD#Stats) :^: DNil
 }
