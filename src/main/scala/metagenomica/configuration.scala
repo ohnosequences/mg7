@@ -10,12 +10,32 @@ import ohnosequences.flash.data._
 import ohnosequences.blast._, api._, data._, outputFields._
 
 import java.io.File
+import scala.util.Try
+
 
 case object configuration {
 
   // TODO: move it to datasets
   implicit def genericParser[D <: AnyData](implicit d: D): DenotationParser[D, FileDataLocation, File] =
     new DenotationParser(d, d.label)({ f: File => Some(FileDataLocation(f)) })
+
+
+  case object CSVDataType extends AnyDataType { val label = "fastq" }
+  case object lcaCSV extends Data(CSVDataType, "lca.csv")
+  case object bbhCSV extends Data(CSVDataType, "bbh.csv")
+
+  type ID = String
+  type GI = ID
+  type TaxID = ID
+  type ReadID = ID
+  type NodeID = ID
+
+  type LCA = Option[NodeID]
+  type BBH = Option[NodeID]
+
+  // TODO: move it somewhere up for global use
+  def parseInt(str: String): Option[Int] = Try(str.toInt).toOption
+
 
 
   trait AnyMetagenomicaData {
