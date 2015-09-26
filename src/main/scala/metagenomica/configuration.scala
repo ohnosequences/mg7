@@ -20,9 +20,13 @@ case object configuration {
     new DenotationParser(d, d.label)({ f: File => Some(FileDataLocation(f)) })
 
 
-  case object CSVDataType extends AnyDataType { val label = "fastq" }
+  case object CSVDataType extends AnyDataType { val label = "csv" }
+
   case object lcaCSV extends Data(CSVDataType, "lca.csv")
   case object bbhCSV extends Data(CSVDataType, "bbh.csv")
+
+  case object lcaCountsCSV extends Data(CSVDataType, "lca.counts.csv")
+  case object bbhCountsCSV extends Data(CSVDataType, "bbh.counts.csv")
 
   type ID = String
   type GI = ID
