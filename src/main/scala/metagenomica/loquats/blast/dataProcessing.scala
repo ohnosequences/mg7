@@ -22,36 +22,10 @@ import java.io.{ BufferedWriter, FileWriter, File }
 import sys.process._
 
 
-case object blastDataProcessing {
+trait AnyBlastDataProcessing extends AnyDataProcessingBundle {
 
-  // TODO with great power comes great responsibility. Move to conf
-  case object outRec extends BlastOutputRecord(
-    qseqid    :&:
-    qlen      :&:
-    qstart    :&:
-    qend      :&:
-    sseqid    :&:
-    slen      :&:
-    sstart    :&:
-    send      :&:
-    bitscore  :&:
-    sgi       :&: □
-  )
-  case object blastExprType extends BlastExpressionType(blastn)(outRec)
-  case object blastOutputType extends BlastOutputType(blastExprType, "blastn.blablabla")
-
-  private def blastExpr(args: ValueOf[blastn.Arguments]): BlastExpression[blastExprType.type] = {
-    BlastExpression(blastExprType)(
-      argumentValues  = args,
-      // TODO whatever
-      optionValues    = blastn.defaults update (
-        num_threads(1) :~:
-        max_target_seqs(10) :~:
-        ohnosequences.blast.api.evalue(0.001)  :~:
-        blastn.task(blastn.megablast) :~: ∅
-      )
-    )
-  }
+  type MD <: AnyMetagenomicaData
+  val md: MD
 
   private def writeFastaToFile(v: ValueOf[FASTA], file: File): File = {
 
@@ -75,103 +49,80 @@ case object blastDataProcessing {
   }
 
 
-  trait AnyBlastDataProcessing extends AnyDataProcessingBundle {
+  def instructions: AnyInstructions = say("Let the blasting begin!")
 
-    def instructions: AnyInstructions = say("Let the blasting begin!")
-
-    val bundleDependencies: List[AnyBundle] = List[AnyBundle](
-      bundles.blast,
-      bundles.blast16s
-    )
-
-    // TODO: more precise type
-    type FastqInput <: AnyData
-    val  fastqInput: FastqInput
+  val bundleDependencies: List[AnyBundle] = List[AnyBundle](
+    bundles.blast,
+    bundles.blast16s
+  )
 
 
-    // FIXME: we should use this instead of blastCmd, but .cmd requires implicits "/
-    // type BlastExpr <: AnyBlastExpression
-    // val  blastExpr: BlastExpr
-    // val blastCmd: Seq[String]
-
-    type BlastOutput <: AnyBlastOutput
-    val  blastOutput: BlastOutput
+  type Input = MD#Merged :^: DNil
+  type Output = MD#BlastOut :^: DNil
 
 
-    type Input = FastqInput :^: DNil
-    val  input = fastqInput :^: DNil: Input
+  def processData(
+    dataMappingId: String,
+    context: Context
+  ): Instructions[OutputFiles] = {
 
-    type Output = BlastOutput :^: DNil
-    val  output = blastOutput :^: DNil
+    val totalOutput = context / "blastAll.csv"
 
+    LazyTry {
+      lazy val quartets = io.Source.fromFile( context.file(md.merged: MD#Merged).javaFile ).getLines.grouped(4)
+      println(s"HAS NEXT: ${quartets.hasNext}")
 
-    def processData(
-      dataMappingId: String,
-      context: Context
-    ): Instructions[OutputFiles] = {
+      quartets foreach { quartet =>
+        println("======================")
+        println(quartet.mkString("\n"))
 
-      val totalOutput = context / "blastAll.csv"
-
-      LazyTry {
-        lazy val quartets = io.Source.fromFile( context.file(fastqInput).javaFile ).getLines.grouped(4)
-        println(s"HAS NEXT: ${quartets.hasNext}")
-
-        quartets foreach { quartet =>
-          println("======================")
-          println(quartet.mkString("\n"))
-
-          // we only care about the id and the seq here
-          val read = FASTA(
-              header(FastqId(quartet(0)).toFastaHeader) :~:
-              fasta.sequence(FastaLines(quartet(1)))    :~: ∅
-            )
-
-          val readFile = writeFastaToFile(read, context / "read.fa")
-          val outFile = context / "blastRead.csv"
-
-          val args = blastn.arguments(
-            db(bundles.blast16s.dbName) :~:
-            query(readFile) :~:
-            out(outFile) :~:
-            ∅
+        // we only care about the id and the seq here
+        val read = FASTA(
+            header(FastqId(quartet(0)).toFastaHeader) :~:
+            fasta.sequence(FastaLines(quartet(1)))    :~: ∅
           )
 
-          val expr = blastExpr(args)
-          println(expr.cmd.mkString(" "))
+        val readFile = writeFastaToFile(read, context / "read.fa")
+        val outFile = context / "blastRead.csv"
 
-          // BAM!!!
-          val foo = expr.cmd.!
-          println(s"EXIT CODE: ${foo}")
+        val args = blastn.arguments(
+          db(bundles.blast16s.dbName) :~:
+          query(readFile) :~:
+          out(outFile) :~:
+          ∅
+        )
 
-          // we should have something in args getV out now. Append it!
-          appendTo(outFile, totalOutput)
+        val expr = md.blastExpr(args)
+        println(expr.toSeq.mkString(" "))
 
-          // clean
-          readFile.delete
-          outFile.delete
-        }
-      } -&-
-      success(
-        "much blast, very success!",
-        blastOutput.inFile(totalOutput) :~: ∅
-      )
+        // BAM!!!
+        val foo = expr.toSeq.!
+        println(s"EXIT CODE: ${foo}")
 
-    }
+        // we should have something in args getV out now. Append it!
+        appendTo(outFile, totalOutput)
+
+        // clean
+        readFile.delete
+        outFile.delete
+      }
+    } -&-
+    success(
+      "much blast, very success!",
+      (md.blastOut: MD#BlastOut).inFile(totalOutput) :~: ∅
+    )
+
   }
+}
 
 
-  class BlastDataProcessing[
-    F <: AnyData,
-    B <: AnyBlastOutput
-  ](val fastqInput: F,
-    val blastOutput: B
-  )(implicit
-    val parseInputFiles: ParseDenotations[(F :^: DNil)#LocationsAt[FileDataLocation], File],
-    val outputFilesToMap: ToMap[(B :^: DNil)#LocationsAt[FileDataLocation], AnyData, FileDataLocation]
-  ) extends AnyBlastDataProcessing {
+class BlastDataProcessing[MD0 <: AnyMetagenomicaData](val md0: MD0)(implicit
+  val parseInputFiles: ParseDenotations[(MD0#Merged :^: DNil)#LocationsAt[FileDataLocation], File],
+  val outputFilesToMap: ToMap[(MD0#BlastOut :^: DNil)#LocationsAt[FileDataLocation], AnyData, FileDataLocation]
+) extends AnyBlastDataProcessing {
+  type MD = MD0
+  val  md = md0
 
-    type FastqInput = F
-    type BlastOutput = B
-  }
-
+  val input = (md.merged: MD#Merged) :^: DNil
+  val output = (md.blastOut: MD#BlastOut) :^: DNil
 }

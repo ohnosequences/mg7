@@ -21,7 +21,7 @@ import java.io.File
 
 trait AnyFlashDataProcessing extends AnyDataProcessingBundle {
 
-  type MD <: AnyMetagenomicaData;
+  type MD <: AnyMetagenomicaData
   val md: MD
 
   val bundleDependencies: List[AnyBundle] = List( bundles.flash )

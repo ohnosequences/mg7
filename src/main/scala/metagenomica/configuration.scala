@@ -51,53 +51,52 @@ case object configuration {
 
     // BLAST
 
-    type BlastRecord <: AnyBlastOutputRecord
-    val  blastRecord: BlastRecord
+    type BlastOutRec <: AnyBlastOutputRecord
+    val  blastOutRec: BlastOutRec
 
+    type BlastExprType >: BlastExpressionType[blastn, BlastOutRec]
+                       <: BlastExpressionType[blastn, BlastOutRec]
+    val  blastExprType: BlastExprType
 
-    type BlastOutput <: AnyBlastOutput
-    // {
-    //   type BlastExpressionType <: AnyBlastExpressionType {
-    //     type OutputRecord = BlastRecord
-    //   }
-    // }
-    val  blastOutput: BlastOutput
+    type BlastOutType >: BlastOutputType[BlastExprType]
+                      <: BlastOutputType[BlastExprType]
+    val  blastOutType: BlastOutType
+
+    def blastExpr(args: ValueOf[blastn.Arguments]): BlastExpression[BlastExprType]
+
+    type BlastOut >: BlastOutput[BlastOutType]
+                  <: BlastOutput[BlastOutType]
+    val  blastOut: BlastOut
   }
 
-  // abstract class MetagenomicaData [
-  //   RT <: AnyReadsType { type EndType = pairedEndType }
-  // ](val readsType: RT) extends AnyMetagenomicaData {
-  //
-  //   type ReadsType = RT
-  //
-  //   // case object reads1_ extends PairedEnd1Fastq(readsType, "reads1.fastq.gz")
-  //   // case object reads2_ extends PairedEnd2Fastq(readsType, "reads2.fastq.gz")
-  //
-  //   // type Reads1 = reads1_.type
-  //   // val  reads1 = reads1_
-  //   //
-  //   // type Reads2 = reads2_.type
-  //   // val  reads2 = reads2_
-  //
-  //   // val  flashInput = reads1 :^: reads2 :^: DNil
-  //
-  //   // case object merged_ extends MergedReads(readsType, reads1, reads2, flashOptions)
-  //   // type Merged = merged_.type
-  //   // val  merged = merged_
-  //   //
-  //   // case object stats_ extends MergedReadsStats[Merged](merged)
-  //   // type Stats = stats_.type
-  //   // val  stats = stats_
-  //   //
-  //   // val  flashOutput = merged :^: stats :^: DNil
-  //
-  //   // case object blastExprType extends BlastExpressionType(blastn)(blastRecord)
-  //   // case object blastOutputType extends BlastOutputType(blastExprType, "blastn.out")
-  //   // case object blastOutput_ extends data.BlastOutput(blastOutputType, "blast.out.csv")
-  //   //
-  //   // type BlastOutput = blastOutput_.type
-  //   // val  blastOutput = blastOutput_
+  // case object outRec extends BlastOutputRecord(
+  //   qseqid    :&:
+  //   qlen      :&:
+  //   qstart    :&:
+  //   qend      :&:
+  //   sseqid    :&:
+  //   slen      :&:
+  //   sstart    :&:
+  //   send      :&:
+  //   bitscore  :&:
+  //   sgi       :&: □
+  // )
+
+  // case object blastExprType extends BlastExpressionType(blastn)(outRec)
+
+  // case object blastOutputType extends BlastOutputType(blastExprType, "blastn.blablabla")
+
+  // private def blastExpr(args: ValueOf[blastn.Arguments]): BlastExpression[blastExprType.type] = {
+  //   BlastExpression(blastExprType)(
+  //     argumentValues  = args,
+  //     // TODO whatever
+  //     optionValues    = blastn.defaults update (
+  //       num_threads(1) :~:
+  //       max_target_seqs(10) :~:
+  //       ohnosequences.blast.api.evalue(0.001)  :~:
+  //       blastn.task(blastn.megablast) :~: ∅
+  //     )
+  //   )
   // }
-  //
 
 }
