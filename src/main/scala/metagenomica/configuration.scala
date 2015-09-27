@@ -1,6 +1,7 @@
 package ohnosequences.metagenomica
 
 import ohnosequences.cosas._, typeSets._, types._
+import ops.typeSets._
 
 import ohnosequences.datasets._, dataSets._, fileLocations._, illumina._, reads._
 
@@ -78,49 +79,52 @@ case object configuration {
     type BlastOutRec <: AnyBlastOutputRecord
     val  blastOutRec: BlastOutRec
 
+    // implicitly:
+    val validBlastRecord: BlastOutRec#Properties CheckForAll ValidOutputRecordFor[blastn]
+
     type BlastExprType >: BlastExpressionType[blastn, BlastOutRec]
                        <: BlastExpressionType[blastn, BlastOutRec]
-    val  blastExprType: BlastExprType
+    lazy val blastExprType: BlastExprType = new BlastExpressionType(blastn)(blastOutRec)(validBlastRecord)
 
     type BlastOutType >: BlastOutputType[BlastExprType]
                       <: BlastOutputType[BlastExprType]
-    val  blastOutType: BlastOutType
+    val  blastOutType: BlastOutType = new BlastOutputType(blastExprType, "useless label")
 
+    // type BlastExpr <: AnyBlastExpression {
+    //   type Tpe <: AnyBlastExpressionType {
+    //     type OutputRecord = BlastOutRec
+    //   }
+    // }
     def blastExpr(args: ValueOf[blastn.Arguments]): BlastExpression[BlastExprType]
 
     type BlastOut >: BlastOutput[BlastOutType]
                   <: BlastOutput[BlastOutType]
-    val  blastOut: BlastOut
+    val  blastOut: BlastOut = new BlastOutput(blastOutType, "blast.out.csv")
   }
 
-  // case object outRec extends BlastOutputRecord(
-  //   qseqid    :&:
-  //   qlen      :&:
-  //   qstart    :&:
-  //   qend      :&:
-  //   sseqid    :&:
-  //   slen      :&:
-  //   sstart    :&:
-  //   send      :&:
-  //   bitscore  :&:
-  //   sgi       :&: □
-  // )
+  abstract class MetagenomicaData[
+    RT <: AnyReadsType { type EndType = pairedEndType },
+    BR <: AnyBlastOutputRecord
+  ](val readsType: RT,
+    val blastOutRec: BR
+  )(implicit
+    val validBlastRecord: BR#Properties CheckForAll ValidOutputRecordFor[blastn]
+  ) extends AnyMetagenomicaData {
 
-  // case object blastExprType extends BlastExpressionType(blastn)(outRec)
+    type ReadsType = RT
 
-  // case object blastOutputType extends BlastOutputType(blastExprType, "blastn.blablabla")
+    type Reads1 = PairedEnd1Fastq[ReadsType]
+    type Reads2 = PairedEnd2Fastq[ReadsType]
 
-  // private def blastExpr(args: ValueOf[blastn.Arguments]): BlastExpression[blastExprType.type] = {
-  //   BlastExpression(blastExprType)(
-  //     argumentValues  = args,
-  //     // TODO whatever
-  //     optionValues    = blastn.defaults update (
-  //       num_threads(1) :~:
-  //       max_target_seqs(10) :~:
-  //       ohnosequences.blast.api.evalue(0.001)  :~:
-  //       blastn.task(blastn.megablast) :~: ∅
-  //     )
-  //   )
-  // }
+    type Merged = MergedReads[ReadsType, Reads1, Reads2]
+    type Stats  = MergedReadsStats[Merged]
+
+
+    type BlastOutRec = BR
+
+    type BlastExprType = BlastExpressionType[blastn, BlastOutRec]
+    type BlastOutType  = BlastOutputType[BlastExprType]
+    type BlastOut = BlastOutput[BlastOutType]
+  }
 
 }
