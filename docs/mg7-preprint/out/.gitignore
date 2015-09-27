@@ -1,0 +1,10 @@
+# TeX garbage
+paper.aux
+paper.log
+*.log
+paper.out
+paper.toc
+paper.bbl
+paper.bcf
+paper.blg
+paper.run.xml
