@@ -7,6 +7,7 @@ import ohnosequences.loquat._, utils._, dataProcessing._
 
 import ohnosequences.statika.bundles._
 import ohnosequences.statika.instructions._
+import ohnosequences.statika.results._
 
 import ohnosequences.flash._
 import ohnosequences.flash.api._

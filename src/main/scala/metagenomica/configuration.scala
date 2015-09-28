@@ -17,7 +17,7 @@ import scala.util.Try
 case object configuration {
 
   // TODO: move it to datasets
-  implicit def genericParser[D <: AnyData](implicit d: D): DenotationParser[D, FileDataLocation, File] =
+  implicit def genericParser[DDD <: AnyData](implicit d: DDD): DenotationParser[DDD, FileDataLocation, File] =
     new DenotationParser(d, d.label)({ f: File => Some(FileDataLocation(f)) })
 
 
@@ -52,14 +52,14 @@ case object configuration {
 
     type Reads1 >: PairedEnd1Fastq[ReadsType]
                 <: PairedEnd1Fastq[ReadsType]
-    lazy val reads1: Reads1 = new PairedEnd1Fastq(readsType, "reads1.fastq.gz")
+    implicit val reads1: Reads1 = new PairedEnd1Fastq(readsType, "reads1.fastq.gz")
 
     type Reads2 >: PairedEnd2Fastq[ReadsType]
                 <: PairedEnd2Fastq[ReadsType]
-    lazy val reads2: Reads2 = new PairedEnd2Fastq(readsType, "reads2.fastq.gz")
+    implicit val reads2: Reads2 = new PairedEnd2Fastq(readsType, "reads2.fastq.gz")
 
 
-    // TODO: make it free
+    // TODO: should it be configurable?
     lazy val flashOptions = flash.defaults update (
       read_len(readsType.length.length)   :~:
       max_overlap(readsType.length.length) :~: ∅
@@ -67,11 +67,11 @@ case object configuration {
 
     type Merged >: MergedReads[ReadsType, Reads1, Reads2]
                 <: MergedReads[ReadsType, Reads1, Reads2]
-    lazy val merged: Merged = new MergedReads(readsType, reads1, reads2, flashOptions)
+    implicit val merged: Merged = new MergedReads(readsType, reads1, reads2, flashOptions)
 
     type Stats >: MergedReadsStats[Merged]
                <: MergedReadsStats[Merged]
-    lazy val stats: Stats = new MergedReadsStats(merged)
+    implicit val stats: Stats = new MergedReadsStats(merged)
 
 
     // BLAST
@@ -90,12 +90,18 @@ case object configuration {
                       <: BlastOutputType[BlastExprType]
     val  blastOutType: BlastOutType = new BlastOutputType(blastExprType, "useless label")
 
-    // type BlastExpr <: AnyBlastExpression {
-    //   type Tpe <: AnyBlastExpressionType {
-    //     type OutputRecord = BlastOutRec
-    //   }
-    // }
-    def blastExpr(args: ValueOf[blastn.Arguments]): BlastExpression[BlastExprType]
+    def blastExpr(args: ValueOf[blastn.Arguments]): BlastExpression[BlastExprType] = {
+      BlastExpression(blastExprType)(
+        argumentValues = args,
+        // TODO: should it be configurable?
+        optionValues   = blastn.defaults update (
+          num_threads(1) :~:
+          max_target_seqs(10) :~:
+          ohnosequences.blast.api.evalue(0.001)  :~:
+          blastn.task(blastn.megablast) :~: ∅
+        )
+      )
+    }
 
     type BlastOut >: BlastOutput[BlastOutType]
                   <: BlastOutput[BlastOutType]
@@ -108,6 +114,7 @@ case object configuration {
   ](val readsType: RT,
     val blastOutRec: BR
   )(implicit
+    // TODO: add a check for minimal set of properties in the record (like bitscore and sgi)
     val validBlastRecord: BR#Properties CheckForAll ValidOutputRecordFor[blastn]
   ) extends AnyMetagenomicaData {
 

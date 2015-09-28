@@ -21,7 +21,7 @@ libraryDependencies ++= Seq(
   "bio4j"                 %  "bio4j"         % "0.12.0-SNAPSHOT",
   "bio4j"                 %  "bio4j-titan"   % "0.4.0-SNAPSHOT",
   // generic tools:
-  "ohnosequences"         %% "cosas"         % "0.7.0",
+  "ohnosequences"         %% "cosas"         % "0.7.1-SNAPSHOT",
   "ohnosequences"         %% "loquat"        % "2.0.0-SNAPSHOT",
   "ohnosequences"         %% "datasets"      % "0.2.0-SNAPSHOT",
   "ohnosequences"         %% "statika"       % "2.0.0-new-instructions-SNAPSHOT",

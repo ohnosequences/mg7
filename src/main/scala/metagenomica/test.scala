@@ -1,6 +1,6 @@
 package ohnosequences.metagenomica
 
-import ohnosequences.metagenomica.configuration._
+
 
 import ohnosequences.datasets._, dataSets._, fileLocations._, s3Locations._, illumina._, reads._
 
@@ -19,8 +19,10 @@ import ohnosequences.awstools.autoscaling._
 import ohnosequences.flash.api._
 import ohnosequences.flash.data._
 
-import ohnosequences.blast.api._, outputFields._
+import ohnosequences.blast.api._
 import ohnosequences.blast.data._
+
+import ohnosequences.metagenomica.configuration._
 
 import era7.project.loquats._
 
@@ -28,41 +30,86 @@ import java.io.File
 
 
 case object test {
+  import ohnosequences.blast.api.outputFields._
 
   case object outRec extends BlastOutputRecord(
-    qseqid    :&:
-    qlen      :&:
-    qstart    :&:
-    qend      :&:
-    sseqid    :&:
-    slen      :&:
-    sstart    :&:
-    send      :&:
-    bitscore  :&:
-    sgi       :&: □
-  )
-
-  // case object blastExprType extends BlastExpressionType(blastn)(outRec)
-  // case object blastOutputType extends BlastOutputType(blastExprType, "blastn.blablabla")
-  // case object blastOutput extends BlastOutput(blastOutputType, "blast.csv")
+      qseqid   :&:
+      qlen     :&:
+      qstart   :&:
+      qend     :&:
+      sseqid   :&:
+      slen     :&:
+      sstart   :&:
+      send     :&:
+      bitscore :&:
+      sgi      :&:
+      □
+    )
 
   case object testData extends MetagenomicaData(
     readsType = illumina.PairedEnd(bp300, InsertSize(3000)),
     blastOutRec = outRec
-  ) {
+  )
 
-    def blastExpr(args: ValueOf[blastn.Arguments]): BlastExpression[BlastExprType] = {
-      BlastExpression(blastExprType)(
-        argumentValues = args,
-        optionValues   = blastn.defaults update (
-          num_threads(1) :~:
-          max_target_seqs(10) :~:
-          ohnosequences.blast.api.evalue(0.001)  :~:
-          blastn.task(blastn.megablast) :~: ∅
-        )
+  trait AnyTestLoquatConfig extends Era7LoquatConfig { config =>
+
+    val metadata: AnyArtifactMetadata = generated.metadata.Metagenomica
+
+    val managerConfig = ManagerConfig(
+      instanceType = m3.medium,
+      purchaseModel = SpotAuto
+    )
+
+    val workersConfig = WorkersConfig(
+      instanceType = m3.medium,
+      purchaseModel = SpotAuto,
+      groupSize = WorkersGroupSize(0, 1, 10)
+    )
+
+    val terminationConfig = TerminationConfig(
+      terminateAfterInitialDataMappings = true
+    )
+
+    // TODO: should we limit it to only MG7-related things?
+    type DataProcessing <: AnyDataProcessingBundle
+    val  dataProcessing: DataProcessing
+
+    val dataMappings: List[DataMapping[DataProcessing]]
+  }
+
+  abstract class TestLoquatConfig[DP <: AnyDataProcessingBundle](val dataProcessing: DP) {
+    type DataProcessing = DP
+  }
+
+}
+
+case object testLoquats {
+  import test._
+  import loquats.flash._
+
+  val commonS3Prefix = S3Folder("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592")
+
+  // !!!
+  import testData._
+
+  case object flashDataProcessing extends FlashDataProcessing(testData)
+
+  case object flashConfig extends TestLoquatConfig(flashDataProcessing) {
+
+    val dataMappings: List[DataMapping[DataProcessing]] = List(
+      DataMapping(
+        "ERR567374_1",
+        dataProcessing
+      )(remoteInput =
+          testData.reads1.inS3Object(commonS3Prefix / "reads/ERR567374_1.fastq.gz") :~:
+          testData.reads2.inS3Object(commonS3Prefix / "reads/ERR567374_2.fastq.gz") :~:
+          ∅,
+        remoteOutput =
+          testData.merged.inS3Object(commonS3Prefix / "flash-test/ERR567374_1.merged.fastq") :~:
+          testData.stats.inS3Object(commonS3Prefix / "flash-test/ERR567374_1.stats.txt") :~:
+          ∅
       )
-    }
-
+    )
   }
 
 }
