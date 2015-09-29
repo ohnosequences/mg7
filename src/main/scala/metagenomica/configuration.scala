@@ -105,7 +105,7 @@ case object configuration {
 
     type BlastOut >: BlastOutput[BlastOutType]
                   <: BlastOutput[BlastOutType]
-    val  blastOut: BlastOut = new BlastOutput(blastOutType, "blast.out.csv")
+    implicit val blastOut: BlastOut = new BlastOutput(blastOutType, "blast.out.csv")
   }
 
   abstract class MetagenomicaData[
