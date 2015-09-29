@@ -89,6 +89,7 @@ case object test {
 
 case object testLoquats {
   import test._
+  import loquats._
 
   val sampleIds: List[String] = List("ERR567374")
   val commonS3Prefix = S3Folder("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592")
@@ -96,8 +97,6 @@ case object testLoquats {
   // !!!
   import testData._
 
-
-  import loquats.flash._
 
   case object flashDataProcessing extends FlashDataProcessing(testData)
 
@@ -120,8 +119,6 @@ case object testLoquats {
 
 
 
-  import loquats.blast._
-
   case object blastDataProcessing extends BlastDataProcessing(testData)
 
   case object blastConfig extends TestLoquatConfig(blastDataProcessing) {
@@ -139,8 +136,6 @@ case object testLoquats {
 
   case object blastLoquat extends TestLoquat(blastConfig)
 
-
-  import loquats.assignment._
 
   case object assignmentDataProcessing extends AssignmentDataProcessing(testData)
 
@@ -160,8 +155,6 @@ case object testLoquats {
 
   case object assignmentLoquat extends TestLoquat(assignmentConfig)
 
-
-  import loquats.counting._
 
   // not needed!
   // case object countingDataProcessing extends CountingDataProcessing(testData)

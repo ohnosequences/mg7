@@ -1,4 +1,4 @@
-package ohnosequences.metagenomica.loquats.blast
+package ohnosequences.metagenomica.loquats
 
 import ohnosequences.metagenomica.configuration._
 import ohnosequences.metagenomica.bundles

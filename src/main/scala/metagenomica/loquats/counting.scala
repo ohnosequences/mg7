@@ -1,4 +1,4 @@
-package ohnosequences.metagenomica.loquats.counting
+package ohnosequences.metagenomica.loquats
 
 import ohnosequences.metagenomica.configuration._
 import ohnosequences.metagenomica.bundles
