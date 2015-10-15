@@ -16,11 +16,6 @@ import scala.util.Try
 
 case object configuration {
 
-  // TODO: move it to datasets
-  implicit def genericParser[DDD <: AnyData](implicit d: DDD): DenotationParser[DDD, FileDataLocation, File] =
-    new DenotationParser(d, d.label)({ f: File => Some(FileDataLocation(f)) })
-
-
   case object CSVDataType extends AnyDataType { val label = "csv" }
 
   case object lcaCSV extends Data(CSVDataType, "lca.csv")

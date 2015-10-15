@@ -104,12 +104,12 @@ case object testLoquats {
     val dataMappings: List[DataMapping[DataProcessing]] = sampleIds map { sampleId =>
       DataMapping(sampleId, dataProcessing)(
         remoteInput =
-          testData.reads1.inS3Object(commonS3Prefix / "reads" / s"${sampleId}_1.fastq.gz") :~:
-          testData.reads2.inS3Object(commonS3Prefix / "reads" / s"${sampleId}_2.fastq.gz") :~:
+          testData.reads1.inS3(commonS3Prefix / "reads" / s"${sampleId}_1.fastq.gz") :~:
+          testData.reads2.inS3(commonS3Prefix / "reads" / s"${sampleId}_2.fastq.gz") :~:
           ∅,
         remoteOutput =
-          testData.merged.inS3Object(commonS3Prefix / "flash-test" / s"${sampleId}.merged.fastq") :~:
-          testData.stats.inS3Object(commonS3Prefix / "flash-test" / s"${sampleId}.stats.txt") :~:
+          testData.merged.inS3(commonS3Prefix / "flash-test" / s"${sampleId}.merged.fastq") :~:
+          testData.stats.inS3(commonS3Prefix / "flash-test" / s"${sampleId}.stats.txt") :~:
           ∅
       )
     }
@@ -125,10 +125,10 @@ case object testLoquats {
     val dataMappings: List[DataMapping[DataProcessing]] = sampleIds map { sampleId =>
       DataMapping(sampleId, dataProcessing)(
         remoteInput =
-          testData.merged.inS3Object(commonS3Prefix / "flash-test" / s"${sampleId}.merged.fastq") :~:
+          testData.merged.inS3(commonS3Prefix / "flash-test" / s"${sampleId}.merged.fastq") :~:
           ∅,
         remoteOutput =
-          testData.blastOut.inS3Object(commonS3Prefix / "blast-test" / s"${sampleId}.blast.csv") :~:
+          testData.blastOut.inS3(commonS3Prefix / "blast-test" / s"${sampleId}.blast.csv") :~:
           ∅
       )
     }
@@ -143,11 +143,11 @@ case object testLoquats {
     val dataMappings: List[DataMapping[DataProcessing]] = sampleIds map { sampleId =>
       DataMapping(sampleId, dataProcessing)(
         remoteInput =
-          testData.blastOut.inS3Object(commonS3Prefix / "blast-test" / s"${sampleId}.blast.partial.csv") :~:
+          testData.blastOut.inS3(commonS3Prefix / "blast-test" / s"${sampleId}.blast.partial.csv") :~:
           ∅,
         remoteOutput =
-          lcaCSV.inS3Object(commonS3Prefix / "assignment-test" / s"${sampleId}.lca.csv") :~:
-          bbhCSV.inS3Object(commonS3Prefix / "assignment-test" / s"${sampleId}.bbh.csv") :~:
+          lcaCSV.inS3(commonS3Prefix / "assignment-test" / s"${sampleId}.lca.csv") :~:
+          bbhCSV.inS3(commonS3Prefix / "assignment-test" / s"${sampleId}.bbh.csv") :~:
           ∅
       )
     }
@@ -163,12 +163,12 @@ case object testLoquats {
     val dataMappings: List[DataMapping[DataProcessing]] = sampleIds map { sampleId =>
       DataMapping(sampleId, dataProcessing)(
         remoteInput =
-          lcaCSV.inS3Object(commonS3Prefix / "assignment-test" / s"${sampleId}.lca.csv") :~:
-          bbhCSV.inS3Object(commonS3Prefix / "assignment-test" / s"${sampleId}.bbh.csv") :~:
+          lcaCSV.inS3(commonS3Prefix / "assignment-test" / s"${sampleId}.lca.csv") :~:
+          bbhCSV.inS3(commonS3Prefix / "assignment-test" / s"${sampleId}.bbh.csv") :~:
           ∅,
         remoteOutput =
-          lcaCountsCSV.inS3Object(commonS3Prefix / "counting-test" / s"${sampleId}.lca.counts.csv") :~:
-          bbhCountsCSV.inS3Object(commonS3Prefix / "counting-test" / s"${sampleId}.bbh.counts.csv") :~:
+          lcaCountsCSV.inS3(commonS3Prefix / "counting-test" / s"${sampleId}.lca.counts.csv") :~:
+          bbhCountsCSV.inS3(commonS3Prefix / "counting-test" / s"${sampleId}.bbh.counts.csv") :~:
           ∅
       )
     }

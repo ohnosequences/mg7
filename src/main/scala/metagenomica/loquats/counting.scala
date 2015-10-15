@@ -14,7 +14,7 @@ import ohnosequences.datasets._, dataSets._, fileLocations._
 
 
 case object countingDataProcessing extends DataProcessingBundle(
-  bundles.bio4jTaxonomy
+  bundles.bio4jNCBITaxonomy
 )(input = lcaCSV :^: bbhCSV :^: DNil,
   output = lcaCountsCSV :^: bbhCountsCSV :^: DNil
 ) {
@@ -49,7 +49,7 @@ case object countingDataProcessing extends DataProcessingBundle(
     counts.foldLeft(
       Map[TaxID, (Int, Int)]()
     ) { case (acc, (id, count)) =>
-      val node: Option[TitanTaxonNode] = titanTaxonNode(bundles.bio4jTaxonomy.graph, id)
+      val node: Option[TitanTaxonNode] = titanTaxonNode(bundles.bio4jNCBITaxonomy.graph, id)
       val ancestors: Seq[AnyTaxonNode] = node.map{ n => pathToTheRoot(n, Seq()) }.getOrElse(Seq())
 
       ancestors.foldLeft(

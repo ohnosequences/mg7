@@ -31,7 +31,7 @@ trait AnyAssignmentDataProcessing extends AnyDataProcessingBundle {
   lazy val output = lcaCSV :^: bbhCSV :^: DNil
 
   val bundleDependencies: List[AnyBundle] = List[AnyBundle](
-    bundles.bio4jTaxonomy,
+    bundles.bio4jNCBITaxonomy,
     bundles.filteredGIs
   )
 
@@ -80,7 +80,7 @@ trait AnyAssignmentDataProcessing extends AnyDataProcessingBundle {
         // for each hit row we take the column with GI and lookup its TaxID
         val taxIds: List[TaxID] = hits.toList.flatMap(column(_, sgi)).flatMap(gisMap.get)
         // then we generate Titan taxon nodes
-        val nodes: List[TitanTaxonNode] = titanTaxonNodes(bundles.bio4jTaxonomy.graph, taxIds)
+        val nodes: List[TitanTaxonNode] = titanTaxonNodes(bundles.bio4jNCBITaxonomy.graph, taxIds)
         // and return the taxon node ID corresponding to the read
         val lca: LCA = solution(nodes).node.map(_.id)
 
