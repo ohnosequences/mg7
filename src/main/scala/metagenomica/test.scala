@@ -119,6 +119,25 @@ case object testLoquats {
 
 
 
+  case object splitDataProcessing extends SplitDataProcessing(testData)
+
+  case object splitConfig extends TestLoquatConfig(splitDataProcessing) {
+    val dataMappings: List[DataMapping[DataProcessing]] = sampleIds map { sampleId =>
+      DataMapping(sampleId, dataProcessing)(
+        remoteInput =
+          testData.merged.inS3(commonS3Prefix / "flash-test" / s"${sampleId}.merged.fastq") :~:
+          ∅,
+        remoteOutput =
+          readsChunks.inS3(commonS3Prefix / "split-test" / sampleId) :~:
+          ∅
+      )
+    }
+  }
+
+  case object splitLoquat extends TestLoquat(splitConfig)
+
+
+
   case object blastDataProcessing extends BlastDataProcessing(testData)
 
   case object blastConfig extends TestLoquatConfig(blastDataProcessing) {

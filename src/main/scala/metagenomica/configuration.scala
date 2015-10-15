@@ -33,6 +33,12 @@ case object configuration {
   type LCA = Option[NodeID]
   type BBH = Option[NodeID]
 
+
+  case object ChunksDataType extends AnyDataType { val label = "chunks" }
+
+  case object readsChunks extends Data(ChunksDataType, "reads-chunks")
+
+
   // TODO: move it somewhere up for global use
   def parseInt(str: String): Option[Int] = Try(str.toInt).toOption
 
