@@ -24,19 +24,12 @@ import collection.JavaConversions._
 import sys.process._
 
 
-trait AnySplitDataProcessing extends AnyDataProcessingBundle {
-
-  type MD <: AnyMetagenomicaData
-  val  md: MD
+case object splitDataProcessing extends DataProcessingBundle()(
+  input = readsFastq :^: DNil,
+  output = readsChunks :^: DNil
+) {
 
   def instructions: AnyInstructions = say("Splitting, cutting, separating")
-
-  val bundleDependencies: List[AnyBundle] = List()
-
-  type Input = MD#Merged :^: DNil
-  type Output = readsChunks.type :^: DNil
-  lazy val output = readsChunks :^: DNil
-
 
   def processData(
     dataMappingId: String,
@@ -51,7 +44,7 @@ trait AnySplitDataProcessing extends AnyDataProcessingBundle {
     LazyTry {
       outputDir.mkdir
 
-      lazy val chunks: Iterator[(Seq[String], Int)] = io.Source.fromFile( context.file(md.merged: MD#Merged).javaFile )
+      lazy val chunks: Iterator[(Seq[String], Int)] = io.Source.fromFile( context.file(readsFastq).javaFile )
         .getLines
         .grouped(4 * chunkSize)
         .zipWithIndex
@@ -71,15 +64,4 @@ trait AnySplitDataProcessing extends AnyDataProcessingBundle {
     )
 
   }
-}
-
-
-class SplitDataProcessing[MD0 <: AnyMetagenomicaData](val md0: MD0)(implicit
-  val parseInputFiles: ParseDenotations[(MD0#Merged :^: DNil)#LocationsAt[FileDataLocation], File],
-  val outputFilesToMap: ToMap[(readsChunks.type :^: DNil)#LocationsAt[FileDataLocation], AnyData, FileDataLocation]
-) extends AnySplitDataProcessing {
-  type MD = MD0
-  val  md = md0
-
-  val input = (md.merged: MD#Merged) :^: DNil
 }

@@ -57,7 +57,9 @@ trait AnyBlastDataProcessing extends AnyDataProcessingBundle {
   )
 
 
-  type Input = MD#Merged :^: DNil
+  type Input = readsFastq.type :^: DNil
+  lazy val input = readsFastq :^: DNil
+
   type Output = MD#BlastOut :^: DNil
 
 
@@ -69,7 +71,7 @@ trait AnyBlastDataProcessing extends AnyDataProcessingBundle {
     val totalOutput = context / "blastAll.csv"
 
     LazyTry {
-      lazy val quartets = io.Source.fromFile( context.file(md.merged: MD#Merged).javaFile ).getLines.grouped(4)
+      lazy val quartets = io.Source.fromFile( context.file(readsFastq).javaFile ).getLines.grouped(4)
       println(s"HAS NEXT: ${quartets.hasNext}")
 
       quartets foreach { quartet =>
@@ -117,12 +119,11 @@ trait AnyBlastDataProcessing extends AnyDataProcessingBundle {
 
 
 class BlastDataProcessing[MD0 <: AnyMetagenomicaData](val md0: MD0)(implicit
-  val parseInputFiles: ParseDenotations[(MD0#Merged :^: DNil)#LocationsAt[FileDataLocation], File],
+  val parseInputFiles: ParseDenotations[(readsFastq.type :^: DNil)#LocationsAt[FileDataLocation], File],
   val outputFilesToMap: ToMap[(MD0#BlastOut :^: DNil)#LocationsAt[FileDataLocation], AnyData, FileDataLocation]
 ) extends AnyBlastDataProcessing {
   type MD = MD0
   val  md = md0
 
-  val input = (md.merged: MD#Merged) :^: DNil
   val output = (md.blastOut: MD#BlastOut) :^: DNil
 }

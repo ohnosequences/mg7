@@ -15,6 +15,7 @@ import ohnosequences.statika.aws._, api._, amazonLinuxAMIs._
 import ohnosequences.awstools._, regions.Region._, ec2.InstanceType._
 import ohnosequences.awstools.s3._
 import ohnosequences.awstools.autoscaling._
+import com.amazonaws.auth.InstanceProfileCredentialsProvider
 
 import ohnosequences.flash.api._
 import ohnosequences.flash.data._
@@ -108,7 +109,7 @@ case object testLoquats {
           testData.reads2.inS3(commonS3Prefix / "reads" / s"${sampleId}_2.fastq.gz") :~:
           ∅,
         remoteOutput =
-          testData.merged.inS3(commonS3Prefix / "flash-test" / s"${sampleId}.merged.fastq") :~:
+          readsFastq.inS3(commonS3Prefix / "flash-test" / s"${sampleId}.merged.fastq") :~:
           testData.stats.inS3(commonS3Prefix / "flash-test" / s"${sampleId}.stats.txt") :~:
           ∅
       )
@@ -119,13 +120,11 @@ case object testLoquats {
 
 
 
-  case object splitDataProcessing extends SplitDataProcessing(testData)
-
   case object splitConfig extends TestLoquatConfig(splitDataProcessing) {
     val dataMappings: List[DataMapping[DataProcessing]] = sampleIds map { sampleId =>
       DataMapping(sampleId, dataProcessing)(
         remoteInput =
-          testData.merged.inS3(commonS3Prefix / "flash-test" / s"${sampleId}.merged.fastq") :~:
+          readsFastq.inS3(commonS3Prefix / "flash-test" / s"${sampleId}.merged.fastq") :~:
           ∅,
         remoteOutput =
           readsChunks.inS3(commonS3Prefix / "split-test" / sampleId) :~:
@@ -141,15 +140,24 @@ case object testLoquats {
   case object blastDataProcessing extends BlastDataProcessing(testData)
 
   case object blastConfig extends TestLoquatConfig(blastDataProcessing) {
-    val dataMappings: List[DataMapping[DataProcessing]] = sampleIds map { sampleId =>
-      DataMapping(sampleId, dataProcessing)(
-        remoteInput =
-          testData.merged.inS3(commonS3Prefix / "flash-test" / s"${sampleId}.merged.fastq") :~:
-          ∅,
-        remoteOutput =
-          testData.blastOut.inS3(commonS3Prefix / "blast-test" / s"${sampleId}.blast.csv") :~:
-          ∅
-      )
+
+    lazy val dataMappings: List[DataMapping[DataProcessing]] =
+      splitConfig.dataMappings flatMap { splitData: DataMapping[splitDataProcessing.type] =>
+
+        // CAUTION: this should be initialized on the manager instance
+        lazy val s3 = S3.create(new InstanceProfileCredentialsProvider())
+        lazy val s3address: AnyS3Address =
+          splitData.remoteOutput.lookup[readsChunks.type := S3DataLocation].value.location
+        lazy val objects: List[S3Object] = s3.listObjects(s3address.bucket, s3address.key)
+
+        objects.zipWithIndex.map { case (obj, n) =>
+          DataMapping(splitData.id, dataProcessing)(
+            remoteInput = readsFastq.inS3(obj) :~: ∅,
+            remoteOutput =
+              testData.blastOut.inS3(commonS3Prefix / "blast-test" / splitData.id / s"blast.${n}.csv") :~:
+              ∅
+          )
+        }
     }
   }
 

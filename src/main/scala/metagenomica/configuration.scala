@@ -34,8 +34,11 @@ case object configuration {
   type BBH = Option[NodeID]
 
 
-  case object ChunksDataType extends AnyDataType { val label = "chunks" }
+  case object FastqDataType extends AnyDataType { val label = "fastq" }
+  case object readsFastq extends Data(FastqDataType, "reads.fastq")
 
+  // many reads files:
+  case object ChunksDataType extends AnyDataType { val label = "chunks" }
   case object readsChunks extends Data(ChunksDataType, "reads-chunks")
 
 
@@ -68,7 +71,7 @@ case object configuration {
 
     type Merged >: MergedReads[ReadsType, Reads1, Reads2]
                 <: MergedReads[ReadsType, Reads1, Reads2]
-    implicit val merged: Merged = new MergedReads(readsType, reads1, reads2, flashOptions)
+    val merged: Merged = new MergedReads(readsType, reads1, reads2, flashOptions)
 
     type Stats >: MergedReadsStats[Merged]
                <: MergedReadsStats[Merged]
