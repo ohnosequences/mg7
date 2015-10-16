@@ -48,20 +48,23 @@ trait AnySplitDataProcessing extends AnyDataProcessingBundle {
     // TODO: move it to the config
     val chunkSize = 5
 
-    lazy val chunks: Iterator[(Seq[String], Int)] = io.Source.fromFile( context.file(md.merged: MD#Merged).javaFile )
-      .getLines
-      .grouped(4 * chunkSize)
-      .zipWithIndex
+    LazyTry {
+      outputDir.mkdir
 
-    chunks foreach { case (chunk, n) =>
-      Files.write(
-        (outputDir / s"chunk.${n}.fastq").toPath,
-        asJavaIterable(chunk),
-        StandardOpenOption.CREATE,
-        StandardOpenOption.WRITE
-      )
-    }
+      lazy val chunks: Iterator[(Seq[String], Int)] = io.Source.fromFile( context.file(md.merged: MD#Merged).javaFile )
+        .getLines
+        .grouped(4 * chunkSize)
+        .zipWithIndex
 
+      chunks foreach { case (chunk, n) =>
+        Files.write(
+          (outputDir / s"chunk.${n}.fastq").toPath,
+          asJavaIterable(chunk),
+          StandardOpenOption.CREATE,
+          StandardOpenOption.WRITE
+        )
+      }
+    } -&-
     success(
       "much blast, very success!",
       readsChunks.inFile(outputDir) :~: ∅
