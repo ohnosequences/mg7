@@ -102,6 +102,7 @@ case object testLoquats {
   case object flashDataProcessing extends FlashDataProcessing(testData)
 
   case object flashConfig extends TestLoquatConfig(flashDataProcessing) {
+
     val dataMappings: List[DataMapping[DataProcessing]] = sampleIds map { sampleId =>
       DataMapping(sampleId, dataProcessing)(
         remoteInput =
@@ -121,13 +122,13 @@ case object testLoquats {
 
 
   case object splitConfig extends TestLoquatConfig(splitDataProcessing) {
-    val dataMappings: List[DataMapping[DataProcessing]] = sampleIds map { sampleId =>
-      DataMapping(sampleId, dataProcessing)(
-        remoteInput =
-          readsFastq.inS3(commonS3Prefix / "flash-test" / s"${sampleId}.merged.fastq") :~:
-          ∅,
+
+    val dataMappings: List[DataMapping[DataProcessing]] = flashConfig.dataMappings.map { flashData =>
+      DataMapping(flashData.id, dataProcessing)(
+        // remoteInput = flashData.remoteOutput.take[(readsFastq.type := S3DataLocation) :~: ∅],
+        remoteInput = flashData.remoteOutput.take[DataMapping[DataProcessing]#RemoteInput],
         remoteOutput =
-          readsChunks.inS3(commonS3Prefix / "split-test" / sampleId) :~:
+          readsChunks.inS3(commonS3Prefix / "split-test" / flashData.id) :~:
           ∅
       )
     }
@@ -167,8 +168,10 @@ case object testLoquats {
   case object assignmentDataProcessing extends AssignmentDataProcessing(testData)
 
   case object assignmentConfig extends TestLoquatConfig(assignmentDataProcessing) {
+
     val dataMappings: List[DataMapping[DataProcessing]] = sampleIds map { sampleId =>
       DataMapping(sampleId, dataProcessing)(
+        // TODO:
         remoteInput =
           testData.blastOut.inS3(commonS3Prefix / "blast-test" / s"${sampleId}.blast.partial.csv") :~:
           ∅,
@@ -187,15 +190,13 @@ case object testLoquats {
   // case object countingDataProcessing extends CountingDataProcessing(testData)
 
   case object countingConfig extends TestLoquatConfig(countingDataProcessing) {
-    val dataMappings: List[DataMapping[DataProcessing]] = sampleIds map { sampleId =>
-      DataMapping(sampleId, dataProcessing)(
-        remoteInput =
-          lcaCSV.inS3(commonS3Prefix / "assignment-test" / s"${sampleId}.lca.csv") :~:
-          bbhCSV.inS3(commonS3Prefix / "assignment-test" / s"${sampleId}.bbh.csv") :~:
-          ∅,
+
+    val dataMappings: List[DataMapping[DataProcessing]] = assignmentConfig.dataMappings.map { assignmentData =>
+      DataMapping(assignmentData.id, dataProcessing)(
+        remoteInput = assignmentData.remoteOutput,
         remoteOutput =
-          lcaCountsCSV.inS3(commonS3Prefix / "counting-test" / s"${sampleId}.lca.counts.csv") :~:
-          bbhCountsCSV.inS3(commonS3Prefix / "counting-test" / s"${sampleId}.bbh.counts.csv") :~:
+          lcaCountsCSV.inS3(commonS3Prefix / "counting-test" / s"${assignmentData.id}.lca.counts.csv") :~:
+          bbhCountsCSV.inS3(commonS3Prefix / "counting-test" / s"${assignmentData.id}.bbh.counts.csv") :~:
           ∅
       )
     }
