@@ -17,7 +17,7 @@ import ohnosequences.datasets._, dataSets._, fileLocations._, illumina._, reads.
 
 import ohnosequences.fastarious._, fasta._, fastq._
 
-import java.io.{ BufferedWriter, FileWriter, File }
+import java.io.File
 import java.nio.file._
 import collection.JavaConversions._
 
