@@ -42,7 +42,11 @@ case object configuration {
   case object readsChunks extends Data(ChunksDataType, "reads-chunks")
 
 
-  // TODO: move it somewhere up for global use
+  case object blastChunks extends Data(ChunksDataType, "blast-chunks")
+
+  case object blastResult extends Data(CSVDataType, "blast.csv")
+
+
   def parseInt(str: String): Option[Int] = Try(str.toInt).toOption
 
 

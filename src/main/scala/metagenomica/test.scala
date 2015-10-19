@@ -138,6 +138,7 @@ case object testLoquats {
 
 
 
+
   case object blastDataProcessing extends BlastDataProcessing(testData)
 
   case object blastConfig extends TestLoquatConfig(blastDataProcessing) {
@@ -163,6 +164,28 @@ case object testLoquats {
   }
 
   case object blastLoquat extends TestLoquat(blastConfig)
+
+
+
+  case object mergeConfig extends TestLoquatConfig(mergeDataProcessing) {
+
+    lazy val dataMappings: List[DataMapping[DataProcessing]] =
+      splitConfig.dataMappings map { splitData =>
+
+        DataMapping(splitData.id, dataProcessing)(
+          remoteInput =
+            // blastChunks.inS3(commonS3Prefix / "blast-test" / splitData.id asFolder) :~:
+            blastChunks.inS3(commonS3Prefix / "split-test" / splitData.id) :~:
+            ∅,
+          remoteOutput =
+            blastResult.inS3(commonS3Prefix / "merge-test" / s"${splitData.id}.fastq") :~:
+            ∅
+        )
+    }
+  }
+
+  case object mergeLoquat extends TestLoquat(mergeConfig)
+
 
 
   case object assignmentDataProcessing extends AssignmentDataProcessing(testData)
