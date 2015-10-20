@@ -128,7 +128,7 @@ case object testLoquats {
         // remoteInput = flashData.remoteOutput.take[(readsFastq.type := S3DataLocation) :~: ∅],
         remoteInput = flashData.remoteOutput.take[DataMapping[DataProcessing]#RemoteInput],
         remoteOutput =
-          readsChunks.inS3(commonS3Prefix / "split-test" / flashData.id) :~:
+          readsChunks.inS3(commonS3Prefix / "split-test" / flashData.id asFolder) :~:
           ∅
       )
     }
@@ -175,7 +175,7 @@ case object testLoquats {
         DataMapping(splitData.id, dataProcessing)(
           remoteInput =
             // blastChunks.inS3(commonS3Prefix / "blast-test" / splitData.id asFolder) :~:
-            blastChunks.inS3(commonS3Prefix / "split-test" / splitData.id) :~:
+            blastChunks.inS3(commonS3Prefix / "split-test" / splitData.id asFolder) :~:
             ∅,
           remoteOutput =
             blastResult.inS3(commonS3Prefix / "merge-test" / s"${splitData.id}.fastq") :~:
