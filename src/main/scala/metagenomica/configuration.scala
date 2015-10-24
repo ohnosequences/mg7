@@ -104,9 +104,11 @@ case object configuration {
         // TODO: should it be configurable?
         optionValues   = blastn.defaults update (
           num_threads(1) :~:
+          word_size(42) :~:
           max_target_seqs(10) :~:
           ohnosequences.blast.api.evalue(0.001)  :~:
-          blastn.task(blastn.megablast) :~: ∅
+          blastn.task(blastn.megablast) :~:
+          ∅
         )
       )
     }

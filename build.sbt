@@ -35,6 +35,7 @@ libraryDependencies ++= Seq(
 )
 
 dependencyOverrides ++= Set(
+  "ohnosequences" %% "aws-statika" % "2.0.0-SNAPSHOT",
   "com.fasterxml.jackson.core" % "jackson-core"        % "2.3.2",
   "com.fasterxml.jackson.core" % "jackson-databind"    % "2.3.2",
   "com.fasterxml.jackson.core" % "jackson-annotations" % "2.3.2",
