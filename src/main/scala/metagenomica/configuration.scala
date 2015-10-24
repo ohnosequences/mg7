@@ -33,7 +33,20 @@ case object configuration {
   type LCA = Option[NodeID]
   type BBH = Option[NodeID]
 
-  // TODO: move it somewhere up for global use
+
+  case object FastqDataType extends AnyDataType { val label = "fastq" }
+  case object readsFastq extends Data(FastqDataType, "reads.fastq")
+
+  // many reads files:
+  case object ChunksDataType extends AnyDataType { val label = "chunks" }
+  case object readsChunks extends Data(ChunksDataType, "reads-chunks")
+
+
+  case object blastChunks extends Data(ChunksDataType, "blast-chunks")
+
+  case object blastResult extends Data(CSVDataType, "blast.csv")
+
+
   def parseInt(str: String): Option[Int] = Try(str.toInt).toOption
 
 
@@ -62,7 +75,7 @@ case object configuration {
 
     type Merged >: MergedReads[ReadsType, Reads1, Reads2]
                 <: MergedReads[ReadsType, Reads1, Reads2]
-    implicit val merged: Merged = new MergedReads(readsType, reads1, reads2, flashOptions)
+    val merged: Merged = new MergedReads(readsType, reads1, reads2, flashOptions)
 
     type Stats >: MergedReadsStats[Merged]
                <: MergedReadsStats[Merged]
@@ -91,9 +104,11 @@ case object configuration {
         // TODO: should it be configurable?
         optionValues   = blastn.defaults update (
           num_threads(1) :~:
+          word_size(42) :~:
           max_target_seqs(10) :~:
           ohnosequences.blast.api.evalue(0.001)  :~:
-          blastn.task(blastn.megablast) :~: ∅
+          blastn.task(blastn.megablast) :~:
+          ∅
         )
       )
     }

@@ -28,7 +28,7 @@ trait AnyFlashDataProcessing extends AnyDataProcessingBundle {
   val bundleDependencies: List[AnyBundle] = List( bundles.flash )
 
   type Input = MD#Reads1 :^: MD#Reads2 :^: DNil
-  type Output = MD#Merged :^: MD#Stats :^: DNil
+  type Output = readsFastq.type :^: MD#Stats :^: DNil
 
   def instructions: AnyInstructions = say("I'll be fast as a flash!")
 
@@ -68,7 +68,8 @@ trait AnyFlashDataProcessing extends AnyDataProcessingBundle {
     seqToInstructions(flashExpr.cmd) -&-
     success(
       s"FLASh merged reads from ${dataMappingId}, much success so fast",
-      (md.merged: MD#Merged).inFile(flashOutput.mergedReads)           :~:
+      // (md.merged: MD#Merged).inFile(flashOutput.mergedReads)           :~:
+      readsFastq.inFile(flashOutput.mergedReads)           :~:
       (md.stats: MD#Stats).inFile(flashOutput.lengthNumericHistogram) :~: ∅
     )
   }
@@ -76,11 +77,11 @@ trait AnyFlashDataProcessing extends AnyDataProcessingBundle {
 
 class FlashDataProcessing[MD0 <: AnyMetagenomicaData](val md0: MD0)(implicit
   val parseInputFiles: ParseDenotations[(MD0#Reads1 :^: MD0#Reads2 :^: DNil)#LocationsAt[FileDataLocation], File],
-  val outputFilesToMap: ToMap[(MD0#Merged :^: MD0#Stats :^: DNil)#LocationsAt[FileDataLocation], AnyData, FileDataLocation]
+  val outputFilesToMap: ToMap[(readsFastq.type :^: MD0#Stats :^: DNil)#LocationsAt[FileDataLocation], AnyData, FileDataLocation]
 ) extends AnyFlashDataProcessing {
   type MD = MD0
   val  md = md0
 
   lazy val input: Input = (md.reads1: MD#Reads1) :^: (md.reads2: MD#Reads2) :^: DNil
-  lazy val output: Output = (md.merged: MD#Merged) :^: (md.stats: MD#Stats) :^: DNil
+  lazy val output: Output = readsFastq :^: (md.stats: MD#Stats) :^: DNil
 }

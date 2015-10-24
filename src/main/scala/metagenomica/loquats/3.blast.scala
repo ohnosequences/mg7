@@ -17,7 +17,9 @@ import ohnosequences.datasets._, dataSets._, fileLocations._, illumina._, reads.
 
 import ohnosequences.fastarious._, fasta._, fastq._
 
-import java.io.{ BufferedWriter, FileWriter, File }
+import java.io.File
+import java.nio.file._
+import collection.JavaConversions._
 
 import sys.process._
 
@@ -27,28 +29,6 @@ trait AnyBlastDataProcessing extends AnyDataProcessingBundle {
   type MD <: AnyMetagenomicaData
   val md: MD
 
-  private def writeFastaToFile(v: ValueOf[FASTA], file: File): File = {
-
-    val bw = new BufferedWriter(new FileWriter(file))
-
-    v.toLines foreach { l => bw.write(l); bw.newLine }
-
-    bw.close()
-    file
-  }
-
-  private def appendTo(append: File, to: File): File = {
-    println(s"Appending [${append.getCanonicalPath}] to [${to.getCanonicalPath}]")
-
-    val bw = new BufferedWriter(new FileWriter(to, true))
-
-    io.Source.fromFile(append).getLines foreach { l => bw write l; bw.newLine }
-
-    bw.close
-    to
-  }
-
-
   def instructions: AnyInstructions = say("Let the blasting begin!")
 
   val bundleDependencies: List[AnyBundle] = List[AnyBundle](
@@ -57,7 +37,9 @@ trait AnyBlastDataProcessing extends AnyDataProcessingBundle {
   )
 
 
-  type Input = MD#Merged :^: DNil
+  type Input = readsFastq.type :^: DNil
+  lazy val input = readsFastq :^: DNil
+
   type Output = MD#BlastOut :^: DNil
 
 
@@ -69,20 +51,25 @@ trait AnyBlastDataProcessing extends AnyDataProcessingBundle {
     val totalOutput = context / "blastAll.csv"
 
     LazyTry {
-      lazy val quartets = io.Source.fromFile( context.file(md.merged: MD#Merged).javaFile ).getLines.grouped(4)
-      println(s"HAS NEXT: ${quartets.hasNext}")
+      lazy val quartets = io.Source.fromFile( context.file(readsFastq).javaFile ).getLines.grouped(4)
+      // println(s"HAS NEXT: ${quartets.hasNext}")
 
       quartets foreach { quartet =>
         println("======================")
         println(quartet.mkString("\n"))
 
         // we only care about the id and the seq here
-        val read = FASTA(
+        val read: ValueOf[FASTA] = FASTA(
             header(FastqId(quartet(0)).toFastaHeader) :~:
             fasta.sequence(FastaLines(quartet(1)))    :~: ∅
           )
 
-        val readFile = writeFastaToFile(read, context / "read.fa")
+        val readFile = context / "read.fa"
+        Files.write(
+          readFile.toPath,
+          asJavaIterable(read.toLines)
+        )
+
         val outFile = context / "blastRead.csv"
 
         val args = blastn.arguments(
@@ -97,10 +84,17 @@ trait AnyBlastDataProcessing extends AnyDataProcessingBundle {
 
         // BAM!!!
         val foo = expr.toSeq.!
-        println(s"EXIT CODE: ${foo}")
+        println(s"BLAST EXIT CODE: ${foo}")
 
         // we should have something in args getV out now. Append it!
-        appendTo(outFile, totalOutput)
+        println(s"Appending [${outFile.path}] to [${totalOutput.path}]")
+        Files.write(
+          totalOutput.toPath,
+          Files.readAllLines(outFile.toPath),
+          StandardOpenOption.CREATE,
+          StandardOpenOption.WRITE,
+          StandardOpenOption.APPEND
+        )
 
         // clean
         readFile.delete
@@ -117,12 +111,11 @@ trait AnyBlastDataProcessing extends AnyDataProcessingBundle {
 
 
 class BlastDataProcessing[MD0 <: AnyMetagenomicaData](val md0: MD0)(implicit
-  val parseInputFiles: ParseDenotations[(MD0#Merged :^: DNil)#LocationsAt[FileDataLocation], File],
+  val parseInputFiles: ParseDenotations[(readsFastq.type :^: DNil)#LocationsAt[FileDataLocation], File],
   val outputFilesToMap: ToMap[(MD0#BlastOut :^: DNil)#LocationsAt[FileDataLocation], AnyData, FileDataLocation]
 ) extends AnyBlastDataProcessing {
   type MD = MD0
   val  md = md0
 
-  val input = (md.merged: MD#Merged) :^: DNil
   val output = (md.blastOut: MD#BlastOut) :^: DNil
 }
