@@ -5,12 +5,12 @@ import ohnosequences.metagenomica.bundles
 
 import ohnosequences.metagenomica.bio4j._, taxonomyTree._, titanTaxonomyTree._
 
-import ohnosequences.loquat.dataProcessing._
-import ohnosequences.loquat.utils._
+import ohnosequences.loquat._, utils._
 
 import ohnosequences.statika.instructions._
 import ohnosequences.cosas._, typeSets._
 import ohnosequences.datasets._, dataSets._, fileLocations._
+import better.files._
 
 
 case object countingDataProcessing extends DataProcessingBundle(
@@ -69,8 +69,8 @@ case object countingDataProcessing extends DataProcessingBundle(
     import com.github.tototoshi.csv._
 
     // same thing that we do for lca and bbh
-    def processFile(f: file): file = {
-      val csvReader: CSVReader = CSVReader.open( f.javaFile )
+    def processFile(f: File): File = {
+      val csvReader: CSVReader = CSVReader.open( f.toJava )
       val counts: Map[TaxID, (Int, Int)] = accumulatedCounts(
         // FIXME: use some csv api instead of row(1)
         directCounts( csvReader.iterator.map{ row => row(1) }.toList )
@@ -78,15 +78,15 @@ case object countingDataProcessing extends DataProcessingBundle(
       csvReader.close
 
       val outFile = context / s"${f.name}.counts"
-      val csvWriter = CSVWriter.open(outFile.javaFile, append = true)
+      val csvWriter = CSVWriter.open(outFile.toJava, append = true)
       counts foreach { case (taxId, (dir, acc)) => csvWriter.writeRow( List(taxId, dir, acc) ) }
       csvWriter.close
 
       outFile
     }
 
-    val lcaOut: file = processFile( context.file(lcaCSV) )
-    val bbhOut: file = processFile( context.file(bbhCSV) )
+    val lcaOut: File = processFile( context.file(lcaCSV) )
+    val bbhOut: File = processFile( context.file(bbhCSV) )
 
     success(
       s"Results are written to ...",

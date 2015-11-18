@@ -10,11 +10,14 @@ import ohnosequences.flash.data._
 
 import ohnosequences.blast._, api._, data._, outputFields._
 
-import java.io.File
+import better.files._
 import scala.util.Try
 
 
 case object configuration {
+
+  implicit def genericParser[DDD <: AnyData](implicit d: DDD): DenotationParser[DDD, FileDataLocation, File] =
+    new DenotationParser(d, d.label)({ f: File => Some(FileDataLocation(f)) })
 
   case object CSVDataType extends AnyDataType { val label = "csv" }
 

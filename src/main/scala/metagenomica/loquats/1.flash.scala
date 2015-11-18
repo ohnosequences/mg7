@@ -3,7 +3,7 @@ package ohnosequences.metagenomica.loquats
 import ohnosequences.metagenomica.configuration._
 import ohnosequences.metagenomica.bundles
 
-import ohnosequences.loquat._, utils._, dataProcessing._
+import ohnosequences.loquat._, utils._
 
 import ohnosequences.statika.bundles._
 import ohnosequences.statika.instructions._
@@ -17,7 +17,7 @@ import ohnosequences.cosas._, typeSets._, types._
 import ops.typeSets._
 
 import ohnosequences.datasets._, dataSets._, fileLocations._, illumina._, reads._
-import java.io.File
+import better.files._
 
 
 trait AnyFlashDataProcessing extends AnyDataProcessingBundle {
@@ -38,20 +38,20 @@ trait AnyFlashDataProcessing extends AnyDataProcessingBundle {
     context: Context
   ): Instructions[OutputFiles] = {
 
-    val reads1gz: file = context.file(md.reads1: MD#Reads1)
-    val reads2gz: file = context.file(md.reads2: MD#Reads2)
+    val reads1gz: File = context.file(md.reads1: MD#Reads1)
+    val reads2gz: File = context.file(md.reads2: MD#Reads2)
 
-    val reads1fastq: file = reads1gz.rename( _.stripSuffix(".gz") )
-    val reads2fastq: file = reads2gz.rename( _.stripSuffix(".gz") )
+    val reads1fastq: File = File(reads1gz.path.toString.stripSuffix(".gz"))
+    val reads2fastq: File = File(reads2gz.path.toString.stripSuffix(".gz"))
 
     // define input
     lazy val flashInput = FlashInputAt(
-      new File(reads1fastq),
-      new File(reads2fastq)
+      reads1fastq.toJava,
+      reads2fastq.toJava
     )
 
     // define output
-    lazy val flashOutput = FlashOutputAt(context / "output", prefix = "")
+    lazy val flashOutput = FlashOutputAt((context / "output").toJava, prefix = "")
 
     // the FLASh cmd we are going to run
     lazy val flashExpr = FlashExpression(flash)(
@@ -63,14 +63,14 @@ trait AnyFlashDataProcessing extends AnyDataProcessingBundle {
     )
 
     // run expression, hope for the best
-    cmd("gunzip")(reads1gz) -&-
-    cmd("gunzip")(reads2gz) -&-
+    cmd("gunzip")(reads1gz.path.toString) -&-
+    cmd("gunzip")(reads2gz.path.toString) -&-
     seqToInstructions(flashExpr.cmd) -&-
     success(
       s"FLASh merged reads from ${dataMappingId}, much success so fast",
       // (md.merged: MD#Merged).inFile(flashOutput.mergedReads)           :~:
-      readsFastq.inFile(flashOutput.mergedReads)           :~:
-      (md.stats: MD#Stats).inFile(flashOutput.lengthNumericHistogram) :~: ∅
+      readsFastq.inFile(flashOutput.mergedReads.toScala) :~:
+      (md.stats: MD#Stats).inFile(flashOutput.lengthNumericHistogram.toScala) :~: ∅
     )
   }
 }

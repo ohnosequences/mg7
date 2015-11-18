@@ -8,8 +8,6 @@ import ohnosequencesBundles.statika._
 // import com.amazonaws.services.s3._
 // import com.amazonaws.services.s3.model._
 // import com.amazonaws.services.s3.transfer._
-//
-// import java.io.File
 
 import com.thinkaurelius.titan.core._
 import com.bio4j.titan.model.ncbiTaxonomy._
@@ -76,11 +74,12 @@ case object bio4jNCBITaxonomy extends AnyBio4jDist {
 
 case object bio4jBundleTest {
 
-  import ohnosequences.statika.aws._, api._, amazonLinuxAMIs._
+  import ohnosequences.statika.aws._
+  import ohnosequences.awstools.ec2._
   import ohnosequences.awstools.regions.Region._
 
   case object bio4jTaxonomyCompat extends Compatible(
-    amzn_ami_64bit(Ireland, Virtualization.HVM)(1),
+    amznAMIEnv(AmazonLinuxAMI(Ireland, HVM, InstanceStore)),
     bio4jNCBITaxonomy,
     generated.metadata.Metagenomica
   )

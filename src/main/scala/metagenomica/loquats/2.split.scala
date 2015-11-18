@@ -3,7 +3,7 @@ package ohnosequences.metagenomica.loquats
 import ohnosequences.metagenomica.configuration._
 import ohnosequences.metagenomica.bundles
 
-import ohnosequences.loquat._, dataProcessing._
+import ohnosequences.loquat._
 
 import ohnosequences.statika.bundles._
 import ohnosequences.statika.instructions._
@@ -17,7 +17,7 @@ import ohnosequences.datasets._, dataSets._, fileLocations._, illumina._, reads.
 
 import ohnosequences.fastarious._, fasta._, fastq._
 
-import java.io.File
+import better.files._
 import java.nio.file._
 import collection.JavaConversions._
 
@@ -42,16 +42,16 @@ case object splitDataProcessing extends DataProcessingBundle()(
     val chunkSize = 1
 
     LazyTry {
-      outputDir.mkdir
+      outputDir.createDirectories()
 
-      lazy val chunks: Iterator[(Seq[String], Int)] = io.Source.fromFile( context.file(readsFastq).javaFile )
+      lazy val chunks: Iterator[(Seq[String], Int)] = io.Source.fromFile( context.file(readsFastq).toJava )
         .getLines
         .grouped(4 * chunkSize)
         .zipWithIndex
 
       chunks foreach { case (chunk, n) =>
         Files.write(
-          (outputDir / s"chunk.${n}.fastq").toPath,
+          (outputDir / s"chunk.${n}.fastq").path,
           asJavaIterable(chunk),
           StandardOpenOption.CREATE,
           StandardOpenOption.WRITE

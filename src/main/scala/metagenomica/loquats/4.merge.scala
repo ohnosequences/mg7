@@ -3,7 +3,7 @@ package ohnosequences.metagenomica.loquats
 import ohnosequences.metagenomica.configuration._
 import ohnosequences.metagenomica.bundles
 
-import ohnosequences.loquat._, dataProcessing._
+import ohnosequences.loquat._
 
 import ohnosequences.statika.bundles._
 import ohnosequences.statika.instructions._
@@ -17,7 +17,7 @@ import ohnosequences.datasets._, dataSets._, fileLocations._, illumina._, reads.
 
 import ohnosequences.fastarious._, fasta._, fastq._
 
-import java.io.File
+import better.files._
 import java.nio.file._
 import collection.JavaConversions._
 
@@ -40,11 +40,11 @@ case object mergeDataProcessing extends DataProcessingBundle()(
 
     LazyTry {
       // only one level in depth:
-      context.file(blastChunks).listFiles foreach { chunk =>
+      context.file(blastChunks).list foreach { chunk =>
 
         Files.write(
-          outputFile.toPath,
-          Files.readAllLines(chunk.toPath),
+          outputFile.path,
+          Files.readAllLines(chunk.path),
           StandardOpenOption.CREATE,
           StandardOpenOption.WRITE,
           StandardOpenOption.APPEND

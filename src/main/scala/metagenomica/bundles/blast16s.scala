@@ -8,7 +8,7 @@ import com.amazonaws.services.s3._
 import com.amazonaws.services.s3.model._
 import com.amazonaws.services.s3.transfer._
 
-import java.io.File
+import better.files._
 
 
 case object blast16s extends Bundle() {
@@ -17,25 +17,25 @@ case object blast16s extends Bundle() {
   val name = "era7.16S.reference.sequences.0.1.0"
   val key = s"16s/${name}.tgz"
 
-  val destination: File = new File(s"${name}.tgz")
-  val location: File = new File(name)
-  val dbName: File = new File(s"${name}/${name}.fasta")
+  val destination: File = File(s"${name}.tgz")
+  val location: File = File(name)
+  val dbName: File = File(s"${name}/${name}.fasta")
 
   def instructions: AnyInstructions = {
 
     LazyTry {
       println(s"""Dowloading
         |from: s3://${bucket}/${key}
-        |to: ${destination.getCanonicalPath}
+        |to: ${destination.path}
         |""".stripMargin)
 
       // val transferManager = new TransferManager(new ProfileCredentialsProvider("default"))
       val transferManager = new TransferManager(new InstanceProfileCredentialsProvider())
-      val transfer = transferManager.download(bucket, key, destination)
+      val transfer = transferManager.download(bucket, key, destination.toJava)
       transfer.waitForCompletion
     } -&-
-    cmd("tar")("-xvzf", destination.getCanonicalPath) -&-
-    say(s"Reference database ${name} was dowloaded to ${location.getCanonicalPath}")
+    cmd("tar")("-xvzf", destination.path.toString) -&-
+    say(s"Reference database ${name} was dowloaded to ${location.path}")
 
   }
 }
@@ -43,11 +43,12 @@ case object blast16s extends Bundle() {
 
 case object blast16sTest {
 
-  import ohnosequences.statika.aws._, api._, amazonLinuxAMIs._
+  import ohnosequences.statika.aws._
+  import ohnosequences.awstools.ec2._
   import ohnosequences.awstools.regions.Region._
 
   case object blast16sCompat extends Compatible(
-    amzn_ami_64bit(Ireland, Virtualization.HVM)(1),
+    amznAMIEnv(AmazonLinuxAMI(Ireland, HVM, InstanceStore)),
     blast16s,
     generated.metadata.Metagenomica
   )

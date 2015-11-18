@@ -3,7 +3,7 @@ package ohnosequences.metagenomica.loquats
 import ohnosequences.metagenomica.configuration._
 import ohnosequences.metagenomica.bundles
 
-import ohnosequences.loquat._, dataProcessing._
+import ohnosequences.loquat._
 
 import ohnosequences.statika.bundles._
 import ohnosequences.statika.instructions._
@@ -17,7 +17,7 @@ import ohnosequences.datasets._, dataSets._, fileLocations._, illumina._, reads.
 
 import ohnosequences.fastarious._, fasta._, fastq._
 
-import java.io.File
+import better.files._
 import java.nio.file._
 import collection.JavaConversions._
 
@@ -51,7 +51,7 @@ trait AnyBlastDataProcessing extends AnyDataProcessingBundle {
     val totalOutput = context / "blastAll.csv"
 
     LazyTry {
-      lazy val quartets = io.Source.fromFile( context.file(readsFastq).javaFile ).getLines.grouped(4)
+      lazy val quartets = io.Source.fromFile( context.file(readsFastq).toJava ).getLines.grouped(4)
       // println(s"HAS NEXT: ${quartets.hasNext}")
 
       quartets foreach { quartet =>
@@ -66,16 +66,16 @@ trait AnyBlastDataProcessing extends AnyDataProcessingBundle {
 
         val readFile = context / "read.fa"
         Files.write(
-          readFile.toPath,
+          readFile.path,
           asJavaIterable(read.toLines)
         )
 
         val outFile = context / "blastRead.csv"
 
         val args = blastn.arguments(
-          db(bundles.blast16s.dbName) :~:
-          query(readFile) :~:
-          out(outFile) :~:
+          db(bundles.blast16s.dbName.toJava) :~:
+          query(readFile.toJava) :~:
+          out(outFile.toJava) :~:
           ∅
         )
 
@@ -89,16 +89,16 @@ trait AnyBlastDataProcessing extends AnyDataProcessingBundle {
         // we should have something in args getV out now. Append it!
         println(s"Appending [${outFile.path}] to [${totalOutput.path}]")
         Files.write(
-          totalOutput.toPath,
-          Files.readAllLines(outFile.toPath),
+          totalOutput.path,
+          Files.readAllLines(outFile.path),
           StandardOpenOption.CREATE,
           StandardOpenOption.WRITE,
           StandardOpenOption.APPEND
         )
 
         // clean
-        readFile.delete
-        outFile.delete
+        readFile.delete(true)
+        outFile.delete(true)
       }
     } -&-
     success(

@@ -4,7 +4,7 @@ import ohnosequences.metagenomica.configuration._
 import ohnosequences.metagenomica.bundles
 import ohnosequences.metagenomica.bio4j._, taxonomyTree.solution, titanTaxonomyTree._
 
-import ohnosequences.loquat.dataProcessing._
+import ohnosequences.loquat._
 
 import ohnosequences.statika.bundles._
 import ohnosequences.statika.instructions._
@@ -27,6 +27,8 @@ trait AnyAssignmentDataProcessing extends AnyDataProcessingBundle {
   val md: MD
 
   type Input = MD#BlastOut :^: DNil
+  // type Input >: MD#BlastOut :^: DNil <: MD#BlastOut :^: DNil
+
   type Output = lcaCSV.type :^: bbhCSV.type :^: DNil
   lazy val output = lcaCSV :^: bbhCSV :^: DNil
 
@@ -50,13 +52,13 @@ trait AnyAssignmentDataProcessing extends AnyDataProcessingBundle {
     import com.github.tototoshi.csv._
 
     // Reading TSV file with mapping gis-taxIds
-    val gisReader: CSVReader = CSVReader.open( bundles.filteredGIs.location )(new TSVFormat {})
+    val gisReader: CSVReader = CSVReader.open( bundles.filteredGIs.location.toJava )(new TSVFormat {})
     val gisMap: Map[GI, TaxID] = gisReader.iterator.map { row =>
       row(0) -> row(1)
     }.toMap
     gisReader.close
 
-    val blastReader: CSVReader = CSVReader.open( context.file(md.blastOut: MD#BlastOut).javaFile )
+    val blastReader: CSVReader = CSVReader.open( context.file(md.blastOut: MD#BlastOut).toJava )
 
     val assignments: Map[ReadID, (LCA, BBH)] = blastReader.iterator.toStream
       .groupBy { row =>
@@ -94,8 +96,8 @@ trait AnyAssignmentDataProcessing extends AnyDataProcessingBundle {
     val lcaFile = context / "lca.csv"
     val bbhFile = context / "bbh.csv"
 
-    val lcaWriter = CSVWriter.open(lcaFile.javaFile , append = true)
-    val bbhWriter = CSVWriter.open(bbhFile.javaFile , append = true)
+    val lcaWriter = CSVWriter.open(lcaFile.toJava , append = true)
+    val bbhWriter = CSVWriter.open(bbhFile.toJava , append = true)
 
     assignments foreach { case (readId, (lca, bbh)) =>
       lca foreach { nodeId => lcaWriter.writeRow(List(readId, nodeId)) }
@@ -122,5 +124,6 @@ class AssignmentDataProcessing[MD0 <: AnyMetagenomicaData](val md0: MD0)(implici
   type MD = MD0
   val  md = md0
 
-  val input = (md.blastOut: MD#BlastOut) :^: DNil
+  // type Input = MD#BlastOut :^: DNil
+  val  input: Input = (md.blastOut: MD#BlastOut) :^: DNil
 }
