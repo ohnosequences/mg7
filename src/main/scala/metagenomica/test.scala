@@ -2,31 +2,22 @@ package ohnosequences.metagenomica
 
 
 
-import ohnosequences.datasets._, dataSets._, fileLocations._, s3Locations._, illumina._, reads._
+import ohnosequences.datasets._, s3Locations._, illumina._
 
-import ohnosequences.cosas._, typeSets._, types._, records._, properties._
-import ohnosequences.cosas.ops.typeSets._
+import ohnosequences.cosas._, typeSets._, types._, properties._
 
-import ohnosequences.loquat._, utils._
+import ohnosequences.loquat._
 
 import ohnosequences.statika.bundles._
-import ohnosequences.statika.aws._
 
-import ohnosequences.awstools._, regions.Region._
 import ohnosequences.awstools.ec2._, InstanceType._
 import ohnosequences.awstools.s3._
 import ohnosequences.awstools.autoscaling._
 import com.amazonaws.auth.InstanceProfileCredentialsProvider
 
-import ohnosequences.flash.api._
-import ohnosequences.flash.data._
-
 import ohnosequences.blast.api._
-import ohnosequences.blast.data._
 
 import era7.project.loquats._
-
-import better.files._
 
 
 case object test {

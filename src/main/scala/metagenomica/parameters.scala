@@ -3,14 +3,12 @@ package ohnosequences.metagenomica
 import ohnosequences.cosas._, typeSets._, types._
 import ops.typeSets._
 
-import ohnosequences.datasets._, dataSets._, fileLocations._, illumina._, reads._, fileType._
+import ohnosequences.datasets._, illumina._
 
 import ohnosequences.flash.api._
-import ohnosequences.flash.data._
 
-import ohnosequences.{ blast => b }, b.api._, b.data._, outputFields._
+import ohnosequences.{ blast => b }, b.api._, b.data._
 
-import better.files._
 import scala.util.Try
 
 

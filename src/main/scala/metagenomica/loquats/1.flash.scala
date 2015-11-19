@@ -2,18 +2,15 @@ package ohnosequences.metagenomica.loquats
 
 import ohnosequences.metagenomica._
 
-import ohnosequences.loquat._, utils._
+import ohnosequences.loquat._
 
-import ohnosequences.statika.bundles._
 import ohnosequences.statika.instructions._
-import ohnosequences.statika.results._
 
-import ohnosequences.{ flash => f }, f.api._, f.data._
+import ohnosequences.{ flash => f }, f.api._
 
-import ohnosequences.cosas._, typeSets._, types._
-import ops.typeSets._
+import ohnosequences.cosas._, typeSets._
 
-import ohnosequences.datasets._, dataSets._, fileLocations._, illumina._, reads._
+import ohnosequences.datasets._, dataSets._, fileLocations._
 import better.files._
 
 

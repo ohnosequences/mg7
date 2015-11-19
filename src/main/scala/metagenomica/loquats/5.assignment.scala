@@ -5,18 +5,13 @@ import ohnosequences.metagenomica.bio4j._, taxonomyTree.solution, titanTaxonomyT
 
 import ohnosequences.loquat._
 
-import ohnosequences.statika.bundles._
 import ohnosequences.statika.instructions._
 
-import ohnosequences.cosas._, types._, typeSets._, properties._, records._
-import ops.typeSets._
+import ohnosequences.cosas._, typeSets._
 
-import ohnosequences.datasets._, dataSets._, fileLocations._, illumina._, reads._
+import ohnosequences.datasets._, dataSets._, fileLocations._
 
-import ohnosequences.fastarious.fasta._
-import ohnosequences.fastarious.fastq._
-
-import ohnosequences.{ blast => b }, b.api._, b.data._, outputFields._
+import ohnosequences.{ blast => b }, b.api._, outputFields._
 
 import java.io.{ BufferedWriter, FileWriter, File }
 import scala.util.Try

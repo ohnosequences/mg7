@@ -1,9 +1,6 @@
 package ohnosequences.metagenomica
 
-import ohnosequences.cosas._, typeSets._, types._
-import ops.typeSets._
-
-import ohnosequences.datasets._, dataSets._, fileLocations._, illumina._, reads._, fileType._
+import ohnosequences.datasets._, dataSets._, fileType._
 
 case object data {
 

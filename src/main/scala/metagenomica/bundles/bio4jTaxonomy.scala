@@ -1,6 +1,6 @@
 package ohnosequences.metagenomica.bundles
 
-import ohnosequences.statika._, bundles._, instructions._
+import ohnosequences.statika._, bundles._
 import ohnosequences.awstools.s3._
 import ohnosequencesBundles.statika._
 
@@ -12,7 +12,7 @@ import ohnosequencesBundles.statika._
 import com.thinkaurelius.titan.core._
 import com.bio4j.titan.model.ncbiTaxonomy._
 import com.bio4j.titan.util.DefaultTitanGraph
-import org.apache.commons.configuration.{ Configuration, BaseConfiguration }
+import org.apache.commons.configuration.Configuration
 
 
 case object bio4jNCBITaxonomy extends AnyBio4jDist {

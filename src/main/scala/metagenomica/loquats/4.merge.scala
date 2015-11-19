@@ -4,24 +4,14 @@ import ohnosequences.metagenomica._
 
 import ohnosequences.loquat._
 
-import ohnosequences.statika.bundles._
 import ohnosequences.statika.instructions._
 
-import ohnosequences.{ blast => b }, b.api._, b.data._, outputFields._
+import ohnosequences.cosas._, typeSets._, properties._, records._
 
-import ohnosequences.cosas._, types._, typeSets._, properties._, records._
-import ops.typeSets._
-
-import ohnosequences.datasets._, dataSets._, fileLocations._, illumina._, reads._
-
-import ohnosequences.fastarious.fasta._
-import ohnosequences.fastarious.fastq._
+import ohnosequences.datasets._, dataSets._, fileLocations._
 
 import better.files._
 import java.nio.file._
-import collection.JavaConversions._
-
-import sys.process._
 
 
 case object mergeDataProcessing extends DataProcessingBundle()(

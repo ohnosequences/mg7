@@ -4,7 +4,7 @@ import ohnosequences.metagenomica._
 
 import ohnosequences.metagenomica.bio4j._, taxonomyTree._, titanTaxonomyTree._
 
-import ohnosequences.loquat._, utils._
+import ohnosequences.loquat._
 
 import ohnosequences.statika.instructions._
 import ohnosequences.cosas._, typeSets._

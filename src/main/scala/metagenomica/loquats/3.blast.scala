@@ -4,16 +4,13 @@ import ohnosequences.metagenomica._
 
 import ohnosequences.loquat._
 
-import ohnosequences.statika.bundles._
 import ohnosequences.statika.instructions._
 
 import ohnosequences.blast.api._
-import ohnosequences.blast.data._, outputFields._
 
 import ohnosequences.cosas._, types._, typeSets._, properties._, records._
-import ops.typeSets._
 
-import ohnosequences.datasets._, dataSets._, fileLocations._, illumina._, reads._
+import ohnosequences.datasets._, dataSets._, fileLocations._
 
 import ohnosequences.fastarious._
 import ohnosequences.fastarious.fasta._
