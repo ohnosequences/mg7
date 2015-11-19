@@ -1,7 +1,6 @@
 package ohnosequences.metagenomica.loquats
 
-import ohnosequences.metagenomica.configuration._
-import ohnosequences.metagenomica.bundles
+import ohnosequences.metagenomica._
 
 import ohnosequences.loquat._, utils._
 
@@ -9,9 +8,7 @@ import ohnosequences.statika.bundles._
 import ohnosequences.statika.instructions._
 import ohnosequences.statika.results._
 
-import ohnosequences.flash._
-import ohnosequences.flash.api._
-import ohnosequences.flash.data._
+import ohnosequences.{ flash => f }, f.api._, f.data._
 
 import ohnosequences.cosas._, typeSets._, types._
 import ops.typeSets._
@@ -20,15 +17,13 @@ import ohnosequences.datasets._, dataSets._, fileLocations._, illumina._, reads.
 import better.files._
 
 
-trait AnyFlashDataProcessing extends AnyDataProcessingBundle {
-
-  type MD <: AnyMetagenomicaData
-  val md: MD
-
-  val bundleDependencies: List[AnyBundle] = List( bundles.flash )
-
-  type Input = MD#Reads1 :^: MD#Reads2 :^: DNil
-  type Output = readsFastq.type :^: MD#Stats :^: DNil
+case class flashDataProcessing[MD <: AnyMG7Parameters](val md: MD)
+extends DataProcessingBundle(
+  bundles.flash
+)(
+  input = data.pairedReads1 :^: data.pairedReads2 :^: DNil,
+  output = data.mergedReads :^: data.flashStats :^: DNil
+) {
 
   def instructions: AnyInstructions = say("I'll be fast as a flash!")
 
@@ -38,8 +33,8 @@ trait AnyFlashDataProcessing extends AnyDataProcessingBundle {
     context: Context
   ): Instructions[OutputFiles] = {
 
-    val reads1gz: File = context.file(md.reads1: MD#Reads1)
-    val reads2gz: File = context.file(md.reads2: MD#Reads2)
+    val reads1gz: File = context.file(data.pairedReads1)
+    val reads2gz: File = context.file(data.pairedReads2)
 
     val reads1fastq: File = File(reads1gz.path.toString.stripSuffix(".gz"))
     val reads2fastq: File = File(reads2gz.path.toString.stripSuffix(".gz"))
@@ -56,8 +51,8 @@ trait AnyFlashDataProcessing extends AnyDataProcessingBundle {
     // the FLASh cmd we are going to run
     lazy val flashExpr = FlashExpression(flash)(
       flash.arguments(
-        api.input(flashInput)   :~:
-        api.output(flashOutput) :~: ∅
+        f.api.input(flashInput)   :~:
+        f.api.output(flashOutput) :~: ∅
       ),
       md.flashOptions
     )
@@ -68,20 +63,8 @@ trait AnyFlashDataProcessing extends AnyDataProcessingBundle {
     seqToInstructions(flashExpr.cmd) -&-
     success(
       s"FLASh merged reads from ${dataMappingId}, much success so fast",
-      // (md.merged: MD#Merged).inFile(flashOutput.mergedReads)           :~:
-      readsFastq.inFile(flashOutput.mergedReads.toScala) :~:
-      (md.stats: MD#Stats).inFile(flashOutput.lengthNumericHistogram.toScala) :~: ∅
+      data.mergedReads.inFile(flashOutput.mergedReads.toScala) :~:
+      data.flashStats.inFile(flashOutput.lengthNumericHistogram.toScala) :~: ∅
     )
   }
-}
-
-class FlashDataProcessing[MD0 <: AnyMetagenomicaData](val md0: MD0)(implicit
-  val parseInputFiles: ParseDenotations[(MD0#Reads1 :^: MD0#Reads2 :^: DNil)#LocationsAt[FileDataLocation], File],
-  val outputFilesToMap: ToMap[(readsFastq.type :^: MD0#Stats :^: DNil)#LocationsAt[FileDataLocation], AnyData, FileDataLocation]
-) extends AnyFlashDataProcessing {
-  type MD = MD0
-  val  md = md0
-
-  lazy val input: Input = (md.reads1: MD#Reads1) :^: (md.reads2: MD#Reads2) :^: DNil
-  lazy val output: Output = readsFastq :^: (md.stats: MD#Stats) :^: DNil
 }

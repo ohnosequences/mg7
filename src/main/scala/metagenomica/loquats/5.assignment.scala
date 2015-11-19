@@ -1,7 +1,6 @@
 package ohnosequences.metagenomica.loquats
 
-import ohnosequences.metagenomica.configuration._
-import ohnosequences.metagenomica.bundles
+import ohnosequences.metagenomica._
 import ohnosequences.metagenomica.bio4j._, taxonomyTree.solution, titanTaxonomyTree._
 
 import ohnosequences.loquat._
@@ -14,31 +13,25 @@ import ops.typeSets._
 
 import ohnosequences.datasets._, dataSets._, fileLocations._, illumina._, reads._
 
-import ohnosequences.fastarious._, fasta._, fastq._
-import ohnosequences.blast._, api._, data._, outputFields._
+import ohnosequences.fastarious.fasta._
+import ohnosequences.fastarious.fastq._
+
+import ohnosequences.{ blast => b }, b.api._, b.data._, outputFields._
 
 import java.io.{ BufferedWriter, FileWriter, File }
 import scala.util.Try
 
 
-trait AnyAssignmentDataProcessing extends AnyDataProcessingBundle {
-
-  type MD <: AnyMetagenomicaData
-  val md: MD
-
-  type Input = MD#BlastOut :^: DNil
-  // type Input >: MD#BlastOut :^: DNil <: MD#BlastOut :^: DNil
-
-  type Output = lcaCSV.type :^: bbhCSV.type :^: DNil
-  lazy val output = lcaCSV :^: bbhCSV :^: DNil
-
-  val bundleDependencies: List[AnyBundle] = List[AnyBundle](
-    bundles.bio4jNCBITaxonomy,
-    bundles.filteredGIs
-  )
+case class assignmentDataProcessing[MD <: AnyMG7Parameters](val md: MD)
+extends DataProcessingBundle(
+  bundles.bio4jNCBITaxonomy,
+  bundles.filteredGIs
+)(
+  input = data.blastResult :^: DNil,
+  output = data.lcaCSV :^: data.bbhCSV :^: DNil
+) {
 
   def instructions: AnyInstructions = say("Let's see who is who!")
-
 
   // this method looks up particular column by its header
   private def column(row: Seq[String], header: AnyOutputField): Option[String] =
@@ -58,7 +51,7 @@ trait AnyAssignmentDataProcessing extends AnyDataProcessingBundle {
     }.toMap
     gisReader.close
 
-    val blastReader: CSVReader = CSVReader.open( context.file(md.blastOut: MD#BlastOut).toJava )
+    val blastReader: CSVReader = CSVReader.open( context.file(data.blastResult).toJava )
 
     val assignments: Map[ReadID, (LCA, BBH)] = blastReader.iterator.toStream
       .groupBy { row =>
@@ -109,21 +102,9 @@ trait AnyAssignmentDataProcessing extends AnyDataProcessingBundle {
 
     success(
       s"Results are written to [${lcaFile.path}] and [${bbhFile.path}]",
-      lcaCSV.inFile(lcaFile) :~:
-      bbhCSV.inFile(bbhFile) :~:
+      data.lcaCSV.inFile(lcaFile) :~:
+      data.bbhCSV.inFile(bbhFile) :~:
       ∅
     )
   }
-}
-
-
-class AssignmentDataProcessing[MD0 <: AnyMetagenomicaData](val md0: MD0)(implicit
-  val parseInputFiles: ParseDenotations[(MD0#BlastOut :^: DNil)#LocationsAt[FileDataLocation], File],
-  val outputFilesToMap: ToMap[(lcaCSV.type :^: bbhCSV.type :^: DNil)#LocationsAt[FileDataLocation], AnyData, FileDataLocation]
-) extends AnyAssignmentDataProcessing {
-  type MD = MD0
-  val  md = md0
-
-  // type Input = MD#BlastOut :^: DNil
-  val  input: Input = (md.blastOut: MD#BlastOut) :^: DNil
 }

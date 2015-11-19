@@ -1,7 +1,6 @@
 package ohnosequences.metagenomica.loquats
 
-import ohnosequences.metagenomica.configuration._
-import ohnosequences.metagenomica.bundles
+import ohnosequences.metagenomica._
 
 import ohnosequences.metagenomica.bio4j._, taxonomyTree._, titanTaxonomyTree._
 
@@ -15,8 +14,8 @@ import better.files._
 
 case object countingDataProcessing extends DataProcessingBundle(
   bundles.bio4jNCBITaxonomy
-)(input = lcaCSV :^: bbhCSV :^: DNil,
-  output = lcaCountsCSV :^: bbhCountsCSV :^: DNil
+)(input = data.lcaCSV :^: data.bbhCSV :^: DNil,
+  output = data.lcaCountsCSV :^: data.bbhCountsCSV :^: DNil
 ) {
 
   def instructions: AnyInstructions = say("I'm counting you!")
@@ -85,13 +84,13 @@ case object countingDataProcessing extends DataProcessingBundle(
       outFile
     }
 
-    val lcaOut: File = processFile( context.file(lcaCSV) )
-    val bbhOut: File = processFile( context.file(bbhCSV) )
+    val lcaOut: File = processFile( context.file(data.lcaCSV) )
+    val bbhOut: File = processFile( context.file(data.bbhCSV) )
 
     success(
       s"Results are written to ...",
-      lcaCountsCSV.inFile(lcaOut) :~:
-      bbhCountsCSV.inFile(bbhOut) :~:
+      data.lcaCountsCSV.inFile(lcaOut) :~:
+      data.bbhCountsCSV.inFile(bbhOut) :~:
       ∅
     )
   }

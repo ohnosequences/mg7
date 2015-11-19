@@ -1,21 +1,23 @@
 package ohnosequences.metagenomica.loquats
 
-import ohnosequences.metagenomica.configuration._
-import ohnosequences.metagenomica.bundles
+import ohnosequences.metagenomica._
 
 import ohnosequences.loquat._
 
 import ohnosequences.statika.bundles._
 import ohnosequences.statika.instructions._
 
-import ohnosequences.blast._, api._, data._, outputFields._
+import ohnosequences.blast.api._
+import ohnosequences.blast.data._, outputFields._
 
 import ohnosequences.cosas._, types._, typeSets._, properties._, records._
 import ops.typeSets._
 
 import ohnosequences.datasets._, dataSets._, fileLocations._, illumina._, reads._
 
-import ohnosequences.fastarious._, fasta._, fastq._
+import ohnosequences.fastarious._
+import ohnosequences.fastarious.fasta._
+import ohnosequences.fastarious.fastq._
 
 import better.files._
 import java.nio.file._
@@ -24,24 +26,16 @@ import collection.JavaConversions._
 import sys.process._
 
 
-trait AnyBlastDataProcessing extends AnyDataProcessingBundle {
-
-  type MD <: AnyMetagenomicaData
-  val md: MD
+case class blastDataProcessing[MD <: AnyMG7Parameters](val md: MD)
+extends DataProcessingBundle(
+  bundles.blast,
+  bundles.blast16s
+)(
+  input = data.readsChunk :^: DNil,
+  output = data.blastChunkOut :^: DNil
+) {
 
   def instructions: AnyInstructions = say("Let the blasting begin!")
-
-  val bundleDependencies: List[AnyBundle] = List[AnyBundle](
-    bundles.blast,
-    bundles.blast16s
-  )
-
-
-  type Input = readsFastq.type :^: DNil
-  lazy val input = readsFastq :^: DNil
-
-  type Output = MD#BlastOut :^: DNil
-
 
   def processData(
     dataMappingId: String,
@@ -51,11 +45,9 @@ trait AnyBlastDataProcessing extends AnyDataProcessingBundle {
     val totalOutput = context / "blastAll.csv"
 
     LazyTry {
-      lazy val quartets = io.Source.fromFile( context.file(readsFastq).toJava ).getLines.grouped(4)
-      // println(s"HAS NEXT: ${quartets.hasNext}")
+      lazy val quartets = io.Source.fromFile( context.file(data.readsChunk).toJava ).getLines.grouped(4)
 
       quartets foreach { quartet =>
-        println("======================")
         println(quartet.mkString("\n"))
 
         // we only care about the id and the seq here
@@ -83,8 +75,8 @@ trait AnyBlastDataProcessing extends AnyDataProcessingBundle {
         println(expr.toSeq.mkString(" "))
 
         // BAM!!!
-        val foo = expr.toSeq.!
-        println(s"BLAST EXIT CODE: ${foo}")
+        val exitCode = expr.toSeq.!
+        println(s"BLAST EXIT CODE: ${exitCode}")
 
         // we should have something in args getV out now. Append it!
         println(s"Appending [${outFile.path}] to [${totalOutput.path}]")
@@ -96,26 +88,15 @@ trait AnyBlastDataProcessing extends AnyDataProcessingBundle {
           StandardOpenOption.APPEND
         )
 
-        // clean
+        // clean up
         readFile.delete(true)
         outFile.delete(true)
       }
     } -&-
     success(
       "much blast, very success!",
-      (md.blastOut: MD#BlastOut).inFile(totalOutput) :~: ∅
+      data.blastChunkOut.inFile(totalOutput) :~: ∅
     )
 
   }
-}
-
-
-class BlastDataProcessing[MD0 <: AnyMetagenomicaData](val md0: MD0)(implicit
-  val parseInputFiles: ParseDenotations[(readsFastq.type :^: DNil)#LocationsAt[FileDataLocation], File],
-  val outputFilesToMap: ToMap[(MD0#BlastOut :^: DNil)#LocationsAt[FileDataLocation], AnyData, FileDataLocation]
-) extends AnyBlastDataProcessing {
-  type MD = MD0
-  val  md = md0
-
-  val output = (md.blastOut: MD#BlastOut) :^: DNil
 }

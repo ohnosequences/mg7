@@ -24,8 +24,6 @@ import ohnosequences.flash.data._
 import ohnosequences.blast.api._
 import ohnosequences.blast.data._
 
-import ohnosequences.metagenomica.configuration._
-
 import era7.project.loquats._
 
 import better.files._
@@ -34,7 +32,7 @@ import better.files._
 case object test {
   import ohnosequences.blast.api.outputFields._
 
-  case object outRec extends BlastOutputRecord(
+  case object blastOutRec extends BlastOutputRecord(
       qseqid   :&:
       qlen     :&:
       qstart   :&:
@@ -48,9 +46,9 @@ case object test {
       □
     )
 
-  case object testData extends MetagenomicaData(
+  case object testParameters extends MG7Parameters(
     readsType = illumina.PairedEnd(bp300, InsertSize(3000)),
-    blastOutRec = outRec
+    blastOutRec = blastOutRec
   )
 
   trait AnyTestLoquatConfig extends Era7LoquatConfig { config =>
@@ -72,7 +70,6 @@ case object test {
       terminateAfterInitialDataMappings = true
     )
 
-    // TODO: should we limit it to only MG7-related things?
     type DataProcessing <: AnyDataProcessingBundle
     val  dataProcessing: DataProcessing
 
@@ -96,23 +93,18 @@ case object testLoquats {
   val sampleIds: List[String] = List("ERR567374")
   val commonS3Prefix = S3Folder("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592")
 
-  // !!!
-  import testData._
 
-
-  case object flashDataProcessing extends FlashDataProcessing(testData)
-
-  case object flashConfig extends TestLoquatConfig(flashDataProcessing) {
+  case object flashConfig extends TestLoquatConfig(flashDataProcessing(testParameters)) {
 
     val dataMappings: List[DataMapping[DataProcessing]] = sampleIds map { sampleId =>
       DataMapping(sampleId, dataProcessing)(
         remoteInput =
-          testData.reads1.inS3(commonS3Prefix / "reads" / s"${sampleId}_1.fastq.gz") :~:
-          testData.reads2.inS3(commonS3Prefix / "reads" / s"${sampleId}_2.fastq.gz") :~:
+          data.pairedReads1.inS3(commonS3Prefix / "reads" / s"${sampleId}_1.fastq.gz") :~:
+          data.pairedReads2.inS3(commonS3Prefix / "reads" / s"${sampleId}_2.fastq.gz") :~:
           ∅,
         remoteOutput =
-          readsFastq.inS3(commonS3Prefix / "flash-test" / s"${sampleId}.merged.fastq") :~:
-          testData.stats.inS3(commonS3Prefix / "flash-test" / s"${sampleId}.stats.txt") :~:
+          data.mergedReads.inS3(commonS3Prefix / "flash-test" / s"${sampleId}.merged.fastq") :~:
+          data.flashStats.inS3(commonS3Prefix / "flash-test" / s"${sampleId}.stats.txt") :~:
           ∅
       )
     }
@@ -126,11 +118,9 @@ case object testLoquats {
 
     val dataMappings: List[DataMapping[DataProcessing]] = flashConfig.dataMappings.map { flashData =>
       DataMapping(flashData.id, dataProcessing)(
-        // remoteInput = flashData.remoteOutput.take[(readsFastq.type := S3DataLocation) :~: ∅],
+        // remoteInput = flashData.remoteOutput.take[(readsChunk.type := S3DataLocation) :~: ∅],
         remoteInput = flashData.remoteOutput.take[DataMapping[DataProcessing]#RemoteInput],
-        remoteOutput =
-          readsChunks.inS3(commonS3Prefix / "split-test" / flashData.id /) :~:
-          ∅
+        remoteOutput = data.readsChunks.inS3(commonS3Prefix / "split-test" / flashData.id /) :~: ∅
       )
     }
   }
@@ -138,11 +128,7 @@ case object testLoquats {
   case object splitLoquat extends TestLoquat(splitConfig)
 
 
-
-
-  case object blastDataProcessing extends BlastDataProcessing(testData)
-
-  case object blastConfig extends TestLoquatConfig(blastDataProcessing) {
+  case object blastConfig extends TestLoquatConfig(blastDataProcessing(testParameters)) {
 
     lazy val dataMappings: List[DataMapping[DataProcessing]] =
       splitConfig.dataMappings flatMap { splitData: DataMapping[splitDataProcessing.type] =>
@@ -150,15 +136,13 @@ case object testLoquats {
         // CAUTION: this should be initialized on the manager instance
         lazy val s3 = S3.create(new InstanceProfileCredentialsProvider())
         lazy val s3address: AnyS3Address =
-          splitData.remoteOutput.lookup[readsChunks.type := S3DataLocation].value.location
+          splitData.remoteOutput.lookup[data.readsChunks.type := S3DataLocation].value.location
         lazy val objects: List[S3Object] = s3.listObjects(s3address.bucket, s3address.key)
 
         objects.zipWithIndex.map { case (obj, n) =>
           DataMapping(splitData.id, dataProcessing)(
-            remoteInput = readsFastq.inS3(obj) :~: ∅,
-            remoteOutput =
-              testData.blastOut.inS3(commonS3Prefix / "blast-test" / splitData.id / s"blast.${n}.csv") :~:
-              ∅
+            remoteInput = data.readsChunk.inS3(obj) :~: ∅,
+            remoteOutput = data.blastChunkOut.inS3(commonS3Prefix / "blast-test" / splitData.id / s"blast.${n}.csv") :~: ∅
           )
         }
     }
@@ -176,10 +160,10 @@ case object testLoquats {
         DataMapping(splitData.id, dataProcessing)(
           remoteInput =
             // blastChunks.inS3(commonS3Prefix / "blast-test" / splitData.id /) :~:
-            blastChunks.inS3(commonS3Prefix / "split-test" / splitData.id /) :~:
+            data.blastChunks.inS3(commonS3Prefix / "split-test" / splitData.id /) :~:
             ∅,
           remoteOutput =
-            blastResult.inS3(commonS3Prefix / "merge-test" / s"${splitData.id}.fastq") :~:
+            data.blastResult.inS3(commonS3Prefix / "merge-test" / s"${splitData.id}.fastq") :~:
             ∅
         )
     }
@@ -188,44 +172,38 @@ case object testLoquats {
   case object mergeLoquat extends TestLoquat(mergeConfig)
 
 
+  case object assignmentConfig extends TestLoquatConfig(assignmentDataProcessing(testParameters)) {
 
-  // case object assignmentDataProcessing extends AssignmentDataProcessing(testData)
-  //
-  // case object assignmentConfig extends TestLoquatConfig(assignmentDataProcessing) {
-  //
-  //   val dataMappings: List[DataMapping[DataProcessing]] = sampleIds map { sampleId =>
-  //     DataMapping(sampleId, dataProcessing)(
-  //       // TODO:
-  //       remoteInput =
-  //         testData.blastOut.inS3(commonS3Prefix / "blast-test" / s"${sampleId}.blast.partial.csv") :~:
-  //         ∅,
-  //       remoteOutput =
-  //         lcaCSV.inS3(commonS3Prefix / "assignment-test" / s"${sampleId}.lca.csv") :~:
-  //         bbhCSV.inS3(commonS3Prefix / "assignment-test" / s"${sampleId}.bbh.csv") :~:
-  //         ∅
-  //     )
-  //   }
-  // }
-  //
-  // case object assignmentLoquat extends TestLoquat(assignmentConfig)
-  //
-  //
-  // // not needed!
-  // // case object countingDataProcessing extends CountingDataProcessing(testData)
-  //
-  // case object countingConfig extends TestLoquatConfig(countingDataProcessing) {
-  //
-  //   val dataMappings: List[DataMapping[DataProcessing]] = assignmentConfig.dataMappings.map { assignmentData =>
-  //     DataMapping(assignmentData.id, dataProcessing)(
-  //       remoteInput = assignmentData.remoteOutput,
-  //       remoteOutput =
-  //         lcaCountsCSV.inS3(commonS3Prefix / "counting-test" / s"${assignmentData.id}.lca.counts.csv") :~:
-  //         bbhCountsCSV.inS3(commonS3Prefix / "counting-test" / s"${assignmentData.id}.bbh.counts.csv") :~:
-  //         ∅
-  //     )
-  //   }
-  // }
-  //
-  // case object countingLoquat extends TestLoquat(countingConfig)
+    val dataMappings: List[DataMapping[DataProcessing]] = sampleIds map { sampleId =>
+      DataMapping(sampleId, dataProcessing)(
+        // TODO:
+        remoteInput =
+          data.blastResult.inS3(commonS3Prefix / "blast-test" / s"${sampleId}.blast.partial.csv") :~:
+          ∅,
+        remoteOutput =
+          data.lcaCSV.inS3(commonS3Prefix / "assignment-test" / s"${sampleId}.lca.csv") :~:
+          data.bbhCSV.inS3(commonS3Prefix / "assignment-test" / s"${sampleId}.bbh.csv") :~:
+          ∅
+      )
+    }
+  }
+
+  case object assignmentLoquat extends TestLoquat(assignmentConfig)
+
+
+  case object countingConfig extends TestLoquatConfig(countingDataProcessing) {
+
+    val dataMappings: List[DataMapping[DataProcessing]] = assignmentConfig.dataMappings.map { assignmentData =>
+      DataMapping(assignmentData.id, dataProcessing)(
+        remoteInput = assignmentData.remoteOutput,
+        remoteOutput =
+          data.lcaCountsCSV.inS3(commonS3Prefix / "counting-test" / s"${assignmentData.id}.lca.counts.csv") :~:
+          data.bbhCountsCSV.inS3(commonS3Prefix / "counting-test" / s"${assignmentData.id}.bbh.counts.csv") :~:
+          ∅
+      )
+    }
+  }
+
+  case object countingLoquat extends TestLoquat(countingConfig)
 
 }
