@@ -10,7 +10,7 @@ import ohnosequences.{ flash => f }, f.api._
 
 import ohnosequences.cosas._, typeSets._
 
-import ohnosequences.datasets._, dataSets._, fileLocations._
+import ohnosequences.datasets._
 import better.files._
 
 
@@ -18,8 +18,8 @@ case class flashDataProcessing[MD <: AnyMG7Parameters](val md: MD)
 extends DataProcessingBundle(
   bundles.flash
 )(
-  input = data.pairedReads1 :^: data.pairedReads2 :^: DNil,
-  output = data.mergedReads :^: data.flashStats :^: DNil
+  input = data.pairedReads1 :×: data.pairedReads2 :×: *[AnyData],
+  output = data.mergedReads :×: data.flashStats :×: *[AnyData]
 ) {
 
   def instructions: AnyInstructions = say("I'll be fast as a flash!")

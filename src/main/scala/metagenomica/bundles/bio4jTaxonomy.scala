@@ -1,6 +1,6 @@
 package ohnosequences.metagenomica.bundles
 
-import ohnosequences.statika._, bundles._
+import ohnosequences.statika._
 import ohnosequences.awstools.s3._
 import ohnosequencesBundles.statika._
 

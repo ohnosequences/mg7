@@ -9,7 +9,7 @@ import ohnosequences.statika.instructions._
 
 import ohnosequences.cosas._, typeSets._
 
-import ohnosequences.datasets._, dataSets._, fileLocations._
+import ohnosequences.datasets._
 
 import ohnosequences.{ blast => b }, b.api._, outputFields._
 

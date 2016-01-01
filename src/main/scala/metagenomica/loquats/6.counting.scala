@@ -8,7 +8,7 @@ import ohnosequences.loquat._
 
 import ohnosequences.statika.instructions._
 import ohnosequences.cosas._, typeSets._
-import ohnosequences.datasets._, dataSets._, fileLocations._
+import ohnosequences.datasets._
 import better.files._
 
 

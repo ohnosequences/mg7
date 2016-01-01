@@ -10,7 +10,7 @@ import ohnosequences.blast.api._
 
 import ohnosequences.cosas._, types._, typeSets._, properties._, records._
 
-import ohnosequences.datasets._, dataSets._, fileLocations._
+import ohnosequences.datasets._
 
 import ohnosequences.fastarious._
 import ohnosequences.fastarious.fasta._

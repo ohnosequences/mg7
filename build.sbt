@@ -15,26 +15,26 @@ resolvers := Seq(
 
 libraryDependencies ++= Seq(
   // APIs:
-  "ohnosequences" %% "flash"       % "0.2.0",
-  "ohnosequences" %% "blast"       % "0.2.0",
-  "ohnosequences" %% "fastarious"  % "0.2.0",
+  "ohnosequences" %% "flash"      % "0.3.0-SNAPSHOT",
+  "ohnosequences" %% "blast"      % "0.4.0-SNAPSHOT",
+  "ohnosequences" %% "fastarious" % "0.2.0",
   // generic tools:
-  "ohnosequences" %% "cosas"       % "0.8.0",
-  "ohnosequences" %% "loquat"      % "2.0.0-M5",
-  "ohnosequences" %% "datasets"    % "0.2.0",
-  "ohnosequences" %% "statika"     % "2.0.0-M4",
-  "ohnosequences" %% "aws-statika" % "2.0.0-M7",
+  "ohnosequences" %% "cosas"      % "0.8.0",
+  "ohnosequences" %% "datasets"   % "0.3.0",
+  "ohnosequences" %% "loquat"     % "2.0.0-M6",
+  "ohnosequences" %% "statika"    % "2.0.0-M5",
   // bundles:
   "ohnosequences-bundles" %% "flash"      % "0.1.0",
   "ohnosequences-bundles" %% "blast"      % "0.2.0",
   "ohnosequences-bundles" %% "bio4j-dist" % "0.1.0-M2",
   // utils:
-  "era7" %% "project-utils" % "0.1.0-M5",
+  // "era7" %% "project-utils" % "0.1.0-M5",
   // testing:
   "org.scalatest" %% "scalatest" % "2.2.5" % Test
 )
 
 dependencyOverrides ++= Set(
+  "ohnosequences" %% "statika"    % "2.0.0-M5",
   "commons-logging"            % "commons-logging"     % "1.1.3",
   "commons-codec"              % "commons-codec"       % "1.7",
   "org.apache.httpcomponents"  % "httpclient"          % "4.5.1",

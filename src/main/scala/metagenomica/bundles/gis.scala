@@ -1,6 +1,6 @@
 package ohnosequences.metagenomica.bundles
 
-import ohnosequences.statika._, bundles._, instructions._
+import ohnosequences.statika._
 
 import com.amazonaws.auth._
 import com.amazonaws.services.s3.transfer._
