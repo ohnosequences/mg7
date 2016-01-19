@@ -37,6 +37,10 @@ case object data {
   // after merging chunks:
   case object blastResult extends FileData("blast")("csv")
 
+  case object mergeInput extends DataSet(blastChunks :×: |[AnyData])
+  case object mergeOutput extends DataSet(blastResult :×: |[AnyData])
+
+
   // Assignment output:
   case object lcaCSV extends FileData("lca")("csv")
   case object bbhCSV extends FileData("bbh")("csv")

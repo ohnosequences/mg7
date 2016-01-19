@@ -1,51 +1,44 @@
-// package ohnosequences.metagenomica.loquats
-//
-// import ohnosequences.metagenomica._
-//
-// import ohnosequences.loquat._
-//
-// import ohnosequences.statika._
-//
-// import ohnosequences.cosas._, typeSets._, properties._, records._
-//
-// import ohnosequences.datasets._
-//
-// import better.files._
-// import java.nio.file._
-//
-//
-// case object mergeDataProcessing extends DataProcessingBundle()(
-//   input = data.blastChunks :^: DNil,
-//   output = data.blastResult :^: DNil
-// ) {
-//
-//   def instructions: AnyInstructions = say("Merging, joining, amalgamating!")
-//
-//   def processData(
-//     dataMappingId: String,
-//     context: Context
-//   ): Instructions[OutputFiles] = {
-//
-//     val outputFile = context / "whole.thing"
-//
-//     LazyTry {
-//       // only one level in depth:
-//       context.file(data.blastChunks).list foreach { chunk =>
-//
-//         Files.write(
-//           outputFile.path,
-//           Files.readAllLines(chunk.path),
-//           StandardOpenOption.CREATE,
-//           StandardOpenOption.WRITE,
-//           StandardOpenOption.APPEND
-//         )
-//
-//       }
-//     } -&-
-//     success(
-//       s"Everything is merged in [${outputFile.path}]",
-//       data.blastResult.inFile(outputFile) :~: ∅
-//     )
-//
-//   }
-// }
+package ohnosequences.metagenomica.loquats
+
+import ohnosequences.metagenomica._
+
+import ohnosequences.loquat._
+
+import ohnosequences.statika._
+
+import ohnosequences.cosas._, types._, klists._
+
+import ohnosequences.datasets._
+
+import better.files._
+import java.nio.file._
+
+
+case object mergeDataProcessing extends DataProcessingBundle()(
+  input = data.mergeInput,
+  output = data.mergeOutput
+) {
+
+  def instructions: AnyInstructions = say("Merging, joining, amalgamating!")
+
+  def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
+
+    val outputFile = context / "whole.thing"
+
+    LazyTry {
+      outputFile.createIfNotExists()
+
+      // only one level in depth:
+      context.inputFile(data.blastChunks).list foreach { chunkFile =>
+
+        outputFile.append( chunkFile.contentAsString )
+      }
+    } -&-
+    success(
+      s"Everything is merged in [${outputFile.path}]",
+      data.blastResult(outputFile) ::
+      *[AnyDenotation { type Value <: FileResource }]
+    )
+
+  }
+}
