@@ -25,12 +25,16 @@ case object data {
 
   // Blast input:
   case object readsChunk extends FileData("reads")("fastq")
-  // Blast output: (for each chunk)
+  // Blast output for each chunk:
   case object blastChunkOut extends FileData("blast.chunk")("csv")
 
-  // Blast output: (all output chunks together)
+  case object blastInput extends DataSet(readsChunk :×: |[AnyData])
+  case object blastOutput extends DataSet(blastChunkOut :×: |[AnyData])
+
+
+  // all output chunks together:
   case object blastChunks extends Data("blast-chunks")
-  // Blast output: (after merging chunks)
+  // after merging chunks:
   case object blastResult extends FileData("blast")("csv")
 
   // Assignment output:
