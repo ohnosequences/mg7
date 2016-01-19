@@ -24,9 +24,9 @@ libraryDependencies ++= Seq(
   "ohnosequences" %% "loquat"     % "2.0.0-M6",
   "ohnosequences" %% "statika"    % "2.0.0-M5",
   // bundles:
-  "ohnosequences-bundles" %% "flash"      % "0.1.0",
-  "ohnosequences-bundles" %% "blast"      % "0.2.0",
-  "ohnosequences-bundles" %% "bio4j-dist" % "0.1.0-M2",
+  "ohnosequences-bundles" %% "flash"      % "0.2.0",
+  "ohnosequences-bundles" %% "blast"      % "0.3.0",
+  "ohnosequences-bundles" %% "bio4j-dist" % "0.1.0",
   // utils:
   // "era7" %% "project-utils" % "0.1.0-M5",
   // testing:
@@ -34,7 +34,6 @@ libraryDependencies ++= Seq(
 )
 
 dependencyOverrides ++= Set(
-  "ohnosequences" %% "statika"    % "2.0.0-M5",
   "commons-logging"            % "commons-logging"     % "1.1.3",
   "commons-codec"              % "commons-codec"       % "1.7",
   "org.apache.httpcomponents"  % "httpclient"          % "4.5.1",
@@ -56,7 +55,7 @@ mergeStrategy in assembly ~= { old => {
 enablePlugins(BuildInfoPlugin)
 buildInfoPackage := "generated.metadata"
 buildInfoObject  := name.value.split("""\W""").map(_.capitalize).mkString
-buildInfoOptions := Seq(BuildInfoOption.Traits("ohnosequences.statika.bundles.AnyArtifactMetadata"))
+buildInfoOptions := Seq(BuildInfoOption.Traits("ohnosequences.statika.AnyArtifactMetadata"))
 buildInfoKeys    := Seq[BuildInfoKey](
   organization,
   version,

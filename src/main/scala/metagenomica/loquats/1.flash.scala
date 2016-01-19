@@ -4,13 +4,14 @@ import ohnosequences.metagenomica._
 
 import ohnosequences.loquat._
 
-import ohnosequences.statika.instructions._
+import ohnosequences.statika._
 
 import ohnosequences.{ flash => f }, f.api._
 
-import ohnosequences.cosas._, typeSets._
+import ohnosequences.cosas._, types._, klists._
 
 import ohnosequences.datasets._
+
 import better.files._
 
 
@@ -18,38 +19,36 @@ case class flashDataProcessing[MD <: AnyMG7Parameters](val md: MD)
 extends DataProcessingBundle(
   bundles.flash
 )(
-  input = data.pairedReads1 :×: data.pairedReads2 :×: *[AnyData],
-  output = data.mergedReads :×: data.flashStats :×: *[AnyData]
+  input = data.flashInput,
+  output = data.flashOutput
 ) {
 
   def instructions: AnyInstructions = say("I'll be fast as a flash!")
 
   // TODO FLASh stuff change options, derived from reads type
-  final def processData(
-    dataMappingId: String,
-    context: Context
-  ): Instructions[OutputFiles] = {
+  def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
 
-    val reads1gz: File = context.file(data.pairedReads1)
-    val reads2gz: File = context.file(data.pairedReads2)
+    val reads1gz: File = context.inputFile(data.pairedReads1)
+    val reads2gz: File = context.inputFile(data.pairedReads2)
 
     val reads1fastq: File = File(reads1gz.path.toString.stripSuffix(".gz"))
     val reads2fastq: File = File(reads2gz.path.toString.stripSuffix(".gz"))
 
     // define input
     lazy val flashInput = FlashInputAt(
-      reads1fastq.toJava,
-      reads2fastq.toJava
+      reads1fastq,
+      reads2fastq
     )
 
     // define output
-    lazy val flashOutput = FlashOutputAt((context / "output").toJava, prefix = "")
+    lazy val flashOutput = FlashOutputAt((context / "output"), prefix = "")
 
     // the FLASh cmd we are going to run
-    lazy val flashExpr = FlashExpression(flash)(
+    lazy val flashExpr = FlashExpression(
       flash.arguments(
-        f.api.input(flashInput)   :~:
-        f.api.output(flashOutput) :~: ∅
+        f.api.input(flashInput)   ::
+        f.api.output(flashOutput) ::
+        *[AnyDenotation]
       ),
       md.flashOptions
     )
@@ -59,9 +58,10 @@ extends DataProcessingBundle(
     cmd("gunzip")(reads2gz.path.toString) -&-
     seqToInstructions(flashExpr.cmd) -&-
     success(
-      s"FLASh merged reads from ${dataMappingId}, much success so fast",
-      data.mergedReads.inFile(flashOutput.mergedReads.toScala) :~:
-      data.flashStats.inFile(flashOutput.lengthNumericHistogram.toScala) :~: ∅
+      "FLASh merged reads, much success so fast",
+      data.mergedReads(flashOutput.mergedReads) ::
+      data.flashStats(flashOutput.lengthNumericHistogram) ::
+      *[AnyDenotation { type Value <: FileResource }]
     )
   }
 }

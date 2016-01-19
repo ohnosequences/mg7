@@ -7,7 +7,7 @@ case object blast extends Blast("2.2.31")
 
 
 case object blastBundleTesting {
-  import ohnosequences.statika.bundles._
+  import ohnosequences.statika._
   import ohnosequences.statika.aws._
   import ohnosequences.awstools.ec2._
   import ohnosequences.awstools.regions.Region._
