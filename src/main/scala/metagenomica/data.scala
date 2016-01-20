@@ -45,8 +45,15 @@ case object data {
   case object lcaCSV extends FileData("lca")("csv")
   case object bbhCSV extends FileData("bbh")("csv")
 
+  case object assignmentInput extends DataSet(blastResult :×: |[AnyData])
+  case object assignmentOutput extends DataSet(lcaCSV :×: bbhCSV :×: |[AnyData])
+
+
   // Counting output:
   case object lcaCountsCSV extends FileData("lca.counts")("csv")
   case object bbhCountsCSV extends FileData("bbh.counts")("csv")
+
+  case object countingInput extends DataSet(lcaCSV :×: bbhCSV :×: |[AnyData])
+  case object countingOutput extends DataSet(lcaCountsCSV :×: bbhCountsCSV :×: |[AnyData])
 
 }
