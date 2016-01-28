@@ -16,7 +16,7 @@ resolvers := Seq(
 libraryDependencies ++= Seq(
   // APIs:
   "ohnosequences" %% "flash"      % "0.3.0-SNAPSHOT",
-  "ohnosequences" %% "blast"      % "0.4.0-SNAPSHOT",
+  "ohnosequences" %% "blast-api"  % "0.5.0-SNAPSHOT",
   "ohnosequences" %% "fastarious" % "0.2.0",
   // generic tools:
   "ohnosequences" %% "cosas"      % "0.8.0",

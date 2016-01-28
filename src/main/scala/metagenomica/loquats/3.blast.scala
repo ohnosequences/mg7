@@ -59,29 +59,27 @@ extends DataProcessingBundle(
 
         val outFile = context / "blastRead.csv"
 
-        val args = blastn.arguments(
-          db(bundles.blast16s.dbName) ::
-          query(readFile) ::
-          out(outFile) ::
-          *[AnyDenotation]
-        )
-
-        val expr = BlastExpression(md.blastExprType)(
-          argumentValues = args,
-          optionValues   = blastn.defaults update (
+        val expr = blastn(
+          outputRecord = md.blastOutRec,
+          argumentValues = blastn.arguments(
+            db(bundles.blast16s.dbName) ::
+            query(readFile) ::
+            out(outFile) ::
+            *[AnyDenotation]
+          ).value,
+          optionValues   = blastn.defaults.update(
             num_threads(1) ::
             word_size(42) ::
             max_target_seqs(10) ::
             evalue(0.001) ::
-            blastn.task(blastn.megablast: blastn.Task) ::
+            blastn.task(blastn.megablast) ::
             *[AnyDenotation]
-          )
+          ).value
         )
-        // println(expr.toSeq.mkString(" "))
+        println(expr.toSeq.mkString(" "))
 
         // BAM!!!
-        // FIXME: uncomment:
-        val exitCode = 0 //expr.cmd.!
+        val exitCode = expr.toSeq.!
         println(s"BLAST EXIT CODE: ${exitCode}")
 
         // we should have something in args getV out now. Append it!
