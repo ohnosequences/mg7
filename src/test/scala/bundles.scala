@@ -2,7 +2,7 @@ package ohnosequences.metagenomica.tests
 
 import ohnosequences.metagenomica.bundles._
 
-import ohnosequences.statika._, aws._, bundles._
+import ohnosequences.statika._, aws._
 
 import ohnosequences.awstools.ec2._
 import ohnosequences.awstools.ec2.{Tag => Ec2Tag}

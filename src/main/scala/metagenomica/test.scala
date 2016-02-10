@@ -67,20 +67,16 @@ case object test {
       terminateAfterInitialDataMappings = true
     )
 
-    type DataProcessing <: AnyDataProcessingBundle
-    val  dataProcessing: DataProcessing
-
-    val dataMappings: List[DataMapping[DataProcessing]]
+    val dataMappings: List[AnyDataMapping]
   }
 
-  abstract class TestLoquatConfig[DP <: AnyDataProcessingBundle]
-    (val loquatName: String, val dataProcessing: DP) extends AnyTestLoquatConfig {
+  abstract class TestLoquatConfig(val loquatName: String) extends AnyTestLoquatConfig
 
-    type DataProcessing = DP
-  }
-
-  abstract class TestLoquat[LC <: AnyTestLoquatConfig](lc: LC)
-    extends Loquat[LC, LC#DataProcessing](lc, lc.dataProcessing)
+  abstract class TestLoquat[
+    LC <: AnyTestLoquatConfig,
+    DP <: AnyDataProcessingBundle
+  ](lc: LC, dp: DP)
+    extends Loquat[LC, DP](lc, dp)
 
 }
 
@@ -92,49 +88,40 @@ case object testLoquats {
   val commonS3Prefix = S3Folder("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592")
 
 
-  // case object flashConfig extends TestLoquatConfig("flash", flashDataProcessing(testParameters)) {
-  //
-  //   val dataMappings: List[DataMapping[DataProcessing]] = sampleIds map { sampleId =>
-  //     DataMapping(dataProcessing)(
-  //       remoteInput =
-  //         data.pairedReads1(commonS3Prefix / "reads" / s"${sampleId}_1.fastq.gz") ::
-  //         data.pairedReads2(commonS3Prefix / "reads" / s"${sampleId}_2.fastq.gz") ::
-  //         *[AnyDenotation { type Value = S3Resource }],
-  //       remoteOutput =
-  //         data.mergedReads(commonS3Prefix / "flash-test" / s"${sampleId}.merged.fastq") ::
-  //         data.flashStats(commonS3Prefix / "flash-test" / s"${sampleId}.stats.txt") ::
-  //         *[AnyDenotation { type Value <: S3Resource }]
-  //     )
-  //   }
-  // }
-  //
-  // case object flashLoquat extends TestLoquat(flashConfig)
+  case object flashConfig extends TestLoquatConfig("flash") {
 
-  // val l = flashConfig.dataMappings.head.remoteOutput//.find[data.mergedReads.type := S3Resource]
+    val dataMappings: List[AnyDataMapping] = sampleIds map { sampleId =>
+      DataMapping(sampleId)(
+        remoteInput = Map(
+          data.pairedReads1 -> S3Resource(commonS3Prefix / "reads" / s"${sampleId}_1.fastq.gz"),
+          data.pairedReads2 -> S3Resource(commonS3Prefix / "reads" / s"${sampleId}_2.fastq.gz")
+        ),
+        remoteOutput = Map(
+          data.mergedReads -> S3Resource(commonS3Prefix / "flash-test" / s"${sampleId}.merged.fastq"),
+          data.flashStats -> S3Resource(commonS3Prefix / "flash-test" / s"${sampleId}.stats.txt")
+        )
+      )
+    }
+  }
+
+  case object flashLoquat extends TestLoquat(flashConfig, flashDataProcessing(testParameters))
 
 
-  // case object splitConfig extends TestLoquatConfig("split", splitDataProcessing) {
-  //
-  //   val dataMappings: List[DataMapping[DataProcessing]] = flashConfig.dataMappings.zipWithIndex.map { case (flashData, n) =>
-  //     DataMapping(dataProcessing)(
-  //       // remoteInput = flashData.remoteOutput.take[(readsChunk.type := S3DataLocation) :~: ∅],
-  //       remoteInput =
-  //         flashData.remoteOutput.find[
-  //           data.mergedReads.type := S3Resource
-  //         // AnyDenotation {
-  //         //   type Tpe = data.mergedReads.type
-  //         //   type Value <: S3Resource
-  //         // }
-  //         ] ::
-  //         *[AnyDenotation { type Value <: AnyRemoteResource }],
-  //       remoteOutput =
-  //         data.readsChunks(commonS3Prefix / "split-test" / n.toString /) ::
-  //         *[AnyDenotation { type Value <: S3Resource }]
-  //     )
-  //   }
-  // }
-  //
-  // case object splitLoquat extends TestLoquat(splitConfig)
+  case object splitConfig extends TestLoquatConfig("split") {
+
+    val dataMappings: List[AnyDataMapping] = flashConfig.dataMappings.zipWithIndex.map { case (flashData, n) =>
+      DataMapping(flashData.id)(
+        remoteInput = Map(
+          data.mergedReads -> flashData.remoteOutput(data.mergedReads)
+        ),
+        remoteOutput = Map(
+          data.readsChunks -> S3Resource(commonS3Prefix / "split-test" / n.toString /)
+        )
+      )
+    }
+  }
+
+  case object splitLoquat extends TestLoquat(splitConfig, splitDataProcessing)
 
 
   // case object blastConfig extends TestLoquatConfig("blast", blastDataProcessing(testParameters)) {

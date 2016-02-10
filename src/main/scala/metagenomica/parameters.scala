@@ -1,6 +1,6 @@
 package ohnosequences.metagenomica
 
-import ohnosequences.cosas._, types._, klists._, fns._
+import ohnosequences.cosas._, types._, klists._
 
 import ohnosequences.datasets._
 
