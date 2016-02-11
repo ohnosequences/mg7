@@ -28,9 +28,9 @@ libraryDependencies ++= Seq(
   "ohnosequences-bundles" %% "blast"      % "0.3.0",
   "ohnosequences-bundles" %% "bio4j-dist" % "0.1.0",
   // utils:
-  // "era7" %% "project-utils" % "0.1.0-M5",
+  // "era7"          %% "defaults"  % "0.1.0-SNAPSHOT",
   // testing:
-  "org.scalatest" %% "scalatest" % "2.2.5" % Test
+  "org.scalatest" %% "scalatest" % "2.2.6" % Test
 )
 
 dependencyOverrides ++= Set(
@@ -62,3 +62,7 @@ buildInfoKeys    := Seq[BuildInfoKey](
   "artifact" -> name.value.toLowerCase,
   "artifactUrl" -> fatArtifactUrl.value
 )
+
+//// Uncomment for testing: ////
+// For including test code in the fat artifact:
+// unmanagedSourceDirectories in Compile += (scalaSource in Test).value
