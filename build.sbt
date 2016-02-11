@@ -65,4 +65,4 @@ buildInfoKeys    := Seq[BuildInfoKey](
 
 //// Uncomment for testing: ////
 // For including test code in the fat artifact:
-// unmanagedSourceDirectories in Compile += (scalaSource in Test).value
+unmanagedSourceDirectories in Compile += (scalaSource in Test).value
