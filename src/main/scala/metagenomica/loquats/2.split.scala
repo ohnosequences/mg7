@@ -27,7 +27,7 @@ case object splitDataProcessing extends DataProcessingBundle()(
     val outputDir = context / "chunks"
 
     // TODO: move it to the config
-    val chunkSize = 1
+    val chunkSize = 5
 
     LazyTry {
       outputDir.createDirectories()

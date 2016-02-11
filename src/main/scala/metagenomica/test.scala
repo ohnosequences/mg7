@@ -14,8 +14,7 @@ import ohnosequences.awstools.ec2._, InstanceType._
 import ohnosequences.awstools.s3._
 import ohnosequences.awstools.autoscaling._
 import ohnosequences.awstools.regions.Region._
-import com.amazonaws.auth.InstanceProfileCredentialsProvider
-import com.amazonaws.auth.profile._
+import com.amazonaws.auth._, profile._
 
 import ohnosequences.blast.api._
 
@@ -69,6 +68,8 @@ case object test {
     )
 
     val dataMappings: List[AnyDataMapping]
+
+    val checkInputObjects = true
   }
 
   abstract class TestLoquatConfig(val loquatName: String) extends AnyTestLoquatConfig
@@ -116,13 +117,13 @@ case object testLoquats {
 
   case object splitConfig extends TestLoquatConfig("split") {
 
-    val dataMappings: List[AnyDataMapping] = flashConfig.dataMappings.zipWithIndex.map { case (flashDM, n) =>
+    val dataMappings: List[AnyDataMapping] = flashConfig.dataMappings.map { flashDM =>
       DataMapping(flashDM.id)(
         remoteInput = Map(
           data.mergedReads -> flashDM.remoteOutput(data.mergedReads)
         ),
         remoteOutput = Map(
-          data.readsChunks -> S3Resource(commonS3Prefix / "split-test" / n.toString /)
+          data.readsChunks -> S3Resource(commonS3Prefix / "split-test" / flashDM.id /)
         )
       )
     }
@@ -133,18 +134,23 @@ case object testLoquats {
 
   case object blastConfig extends TestLoquatConfig("blast") {
 
-    lazy val dataMappings: List[AnyDataMapping] = splitConfig.dataMappings flatMap { splitDM =>
+    // NOTE: we don't want to check input objects here because they are too many and checking them one by one will likely fail
+    override val checkInputObjects = false
 
-      // CAUTION: this should be initialized on the manager instance
-      lazy val s3 = S3.create(new InstanceProfileCredentialsProvider())
-      // NOTE: this is just for local blastLoquat.check:
-      // lazy val s3 = S3.create(new ProfileCredentialsProvider("default"))
+    lazy val dataMappings: List[AnyDataMapping] = splitConfig.dataMappings.flatMap { splitDM =>
+
+      lazy val s3 = S3.create(
+        new AWSCredentialsProviderChain(
+          new InstanceProfileCredentialsProvider(),
+          new ProfileCredentialsProvider()
+        )
+      )
 
       lazy val s3address: AnyS3Address = splitDM.remoteOutput(data.readsChunks).resource
       lazy val objects: List[S3Object] = s3.listObjects(s3address.bucket, s3address.key)
 
       objects.zipWithIndex.map { case (obj, n) =>
-        DataMapping(splitDM.id)(
+        DataMapping(s"${splitDM.id}.${n}")(
           remoteInput = Map(
             data.readsChunk -> S3Resource(obj)
           ),
@@ -161,7 +167,7 @@ case object testLoquats {
 
   case object mergeConfig extends TestLoquatConfig("merge") {
 
-    lazy val dataMappings: List[AnyDataMapping] = blastConfig.dataMappings map { splitDM =>
+    lazy val dataMappings: List[AnyDataMapping] = splitConfig.dataMappings map { splitDM =>
 
       DataMapping(splitDM.id)(
         remoteInput = Map(
