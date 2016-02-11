@@ -1,87 +1,67 @@
 package ohnosequences.metagenomica.loquats
 
-import ohnosequences.metagenomica.configuration._
-import ohnosequences.metagenomica.bundles
+import ohnosequences.metagenomica._
 
-import ohnosequences.loquat._, utils._, dataProcessing._
+import ohnosequences.loquat._
 
-import ohnosequences.statika.bundles._
-import ohnosequences.statika.instructions._
-import ohnosequences.statika.results._
+import ohnosequences.statika._
 
-import ohnosequences.flash._
-import ohnosequences.flash.api._
-import ohnosequences.flash.data._
+import ohnosequences.{ flash => f }, f.api._
 
-import ohnosequences.cosas._, typeSets._, types._
-import ops.typeSets._
+import ohnosequences.cosas._, types._, klists._
 
-import ohnosequences.datasets._, dataSets._, fileLocations._, illumina._, reads._
-import java.io.File
+import ohnosequences.datasets._
+
+import better.files._
 
 
-trait AnyFlashDataProcessing extends AnyDataProcessingBundle {
-
-  type MD <: AnyMetagenomicaData
-  val md: MD
-
-  val bundleDependencies: List[AnyBundle] = List( bundles.flash )
-
-  type Input = MD#Reads1 :^: MD#Reads2 :^: DNil
-  type Output = readsFastq.type :^: MD#Stats :^: DNil
+case class flashDataProcessing[MD <: AnyMG7Parameters](val md: MD)
+extends DataProcessingBundle(
+  bundles.flash
+)(
+  input = data.flashInput,
+  output = data.flashOutput
+) {
 
   def instructions: AnyInstructions = say("I'll be fast as a flash!")
 
   // TODO FLASh stuff change options, derived from reads type
-  final def processData(
-    dataMappingId: String,
-    context: Context
-  ): Instructions[OutputFiles] = {
+  def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
 
-    val reads1gz: file = context.file(md.reads1: MD#Reads1)
-    val reads2gz: file = context.file(md.reads2: MD#Reads2)
+    val reads1gz: File = context.inputFile(data.pairedReads1)
+    val reads2gz: File = context.inputFile(data.pairedReads2)
 
-    val reads1fastq: file = reads1gz.rename( _.stripSuffix(".gz") )
-    val reads2fastq: file = reads2gz.rename( _.stripSuffix(".gz") )
+    val reads1fastq: File = File(reads1gz.path.toString.stripSuffix(".gz"))
+    val reads2fastq: File = File(reads2gz.path.toString.stripSuffix(".gz"))
 
     // define input
     lazy val flashInput = FlashInputAt(
-      new File(reads1fastq),
-      new File(reads2fastq)
+      reads1fastq,
+      reads2fastq
     )
 
     // define output
-    lazy val flashOutput = FlashOutputAt(context / "output", prefix = "")
+    lazy val flashOutput = FlashOutputAt((context / "output"), prefix = "")
 
     // the FLASh cmd we are going to run
-    lazy val flashExpr = FlashExpression(flash)(
+    lazy val flashExpr = FlashExpression(
       flash.arguments(
-        api.input(flashInput)   :~:
-        api.output(flashOutput) :~: ∅
+        f.api.input(flashInput)   ::
+        f.api.output(flashOutput) ::
+        *[AnyDenotation]
       ),
       md.flashOptions
     )
 
     // run expression, hope for the best
-    cmd("gunzip")(reads1gz) -&-
-    cmd("gunzip")(reads2gz) -&-
+    cmd("gunzip")(reads1gz.path.toString) -&-
+    cmd("gunzip")(reads2gz.path.toString) -&-
     seqToInstructions(flashExpr.cmd) -&-
     success(
-      s"FLASh merged reads from ${dataMappingId}, much success so fast",
-      // (md.merged: MD#Merged).inFile(flashOutput.mergedReads)           :~:
-      readsFastq.inFile(flashOutput.mergedReads)           :~:
-      (md.stats: MD#Stats).inFile(flashOutput.lengthNumericHistogram) :~: ∅
+      "FLASh merged reads, much success so fast",
+      data.mergedReads(flashOutput.mergedReads) ::
+      data.flashStats(flashOutput.lengthNumericHistogram) ::
+      *[AnyDenotation { type Value <: FileResource }]
     )
   }
-}
-
-class FlashDataProcessing[MD0 <: AnyMetagenomicaData](val md0: MD0)(implicit
-  val parseInputFiles: ParseDenotations[(MD0#Reads1 :^: MD0#Reads2 :^: DNil)#LocationsAt[FileDataLocation], File],
-  val outputFilesToMap: ToMap[(readsFastq.type :^: MD0#Stats :^: DNil)#LocationsAt[FileDataLocation], AnyData, FileDataLocation]
-) extends AnyFlashDataProcessing {
-  type MD = MD0
-  val  md = md0
-
-  lazy val input: Input = (md.reads1: MD#Reads1) :^: (md.reads2: MD#Reads2) :^: DNil
-  lazy val output: Output = readsFastq :^: (md.stats: MD#Stats) :^: DNil
 }

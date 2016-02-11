@@ -15,36 +15,29 @@ resolvers := Seq(
 
 libraryDependencies ++= Seq(
   // APIs:
-  "ohnosequences" %% "flash"       % "0.2.0-SNAPSHOT",
-  "ohnosequences" %% "blast"       % "0.2.0-SNAPSHOT",
-  "ohnosequences" %% "fastarious"  % "0.1.0-SNAPSHOT",
+  "ohnosequences" %% "flash"      % "0.3.0-SNAPSHOT",
+  "ohnosequences" %% "blast-api"  % "0.5.0-SNAPSHOT",
+  "ohnosequences" %% "fastarious" % "0.2.0",
   // generic tools:
-  "ohnosequences" %% "cosas"       % "0.7.1",
-  "ohnosequences" %% "loquat"      % "2.0.0-SNAPSHOT",
-  "ohnosequences" %% "datasets"    % "0.2.0-SNAPSHOT",
-  "ohnosequences" %% "statika"     % "2.0.0-M4",
-  "ohnosequences" %% "aws-statika" % "2.0.0-M4",
+  "ohnosequences" %% "cosas"      % "0.8.0",
+  "ohnosequences" %% "datasets"   % "0.3.0",
+  "ohnosequences" %% "loquat"     % "2.0.0-simple-mappings-SNAPSHOT",
+  "ohnosequences" %% "statika"    % "2.0.0-M5",
   // bundles:
-  "ohnosequences-bundles" %% "flash"      % "0.1.0",
-  "ohnosequences-bundles" %% "blast"      % "0.2.0",
-  "ohnosequences-bundles" %% "bio4j-dist" % "0.1.0-SNAPSHOT",
+  "ohnosequences-bundles" %% "flash"      % "0.2.0",
+  "ohnosequences-bundles" %% "blast"      % "0.3.0",
+  "ohnosequences-bundles" %% "bio4j-dist" % "0.1.0",
   // utils:
-  "era7" %% "project-utils" % "0.1.0-SNAPSHOT",
+  // "era7"          %% "defaults"  % "0.1.0-SNAPSHOT",
   // testing:
-  "org.scalatest" %% "scalatest" % "2.2.5" % Test
+  "org.scalatest" %% "scalatest" % "2.2.6" % Test
 )
 
 dependencyOverrides ++= Set(
-  "ohnosequences" %% "aws-statika" % "2.0.0-SNAPSHOT",
-  "com.fasterxml.jackson.core" % "jackson-core"        % "2.3.2",
-  "com.fasterxml.jackson.core" % "jackson-databind"    % "2.3.2",
-  "com.fasterxml.jackson.core" % "jackson-annotations" % "2.3.2",
   "commons-logging"            % "commons-logging"     % "1.1.3",
   "commons-codec"              % "commons-codec"       % "1.7",
-  "org.apache.httpcomponents"  % "httpclient"          % "4.5",
-  "org.slf4j"                  % "slf4j-api"           % "1.7.7",
-  //
-  "ohnosequences" %% "aws-scala-tools" % "0.14.0"
+  "org.apache.httpcomponents"  % "httpclient"          % "4.5.1",
+  "org.slf4j"                  % "slf4j-api"           % "1.7.7"
 )
 
 
@@ -62,10 +55,14 @@ mergeStrategy in assembly ~= { old => {
 enablePlugins(BuildInfoPlugin)
 buildInfoPackage := "generated.metadata"
 buildInfoObject  := name.value.split("""\W""").map(_.capitalize).mkString
-buildInfoOptions := Seq(BuildInfoOption.Traits("ohnosequences.statika.bundles.AnyArtifactMetadata"))
+buildInfoOptions := Seq(BuildInfoOption.Traits("ohnosequences.statika.AnyArtifactMetadata"))
 buildInfoKeys    := Seq[BuildInfoKey](
   organization,
   version,
   "artifact" -> name.value.toLowerCase,
   "artifactUrl" -> fatArtifactUrl.value
 )
+
+//// Uncomment for testing: ////
+// For including test code in the fat artifact:
+// unmanagedSourceDirectories in Compile += (scalaSource in Test).value

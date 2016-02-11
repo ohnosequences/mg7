@@ -7,13 +7,13 @@ case object blast extends Blast("2.2.31")
 
 
 case object blastBundleTesting {
-  import ohnosequences.statika.bundles._
-  import ohnosequences.statika.instructions._
-  import ohnosequences.statika.aws._, api._, amazonLinuxAMIs._
+  import ohnosequences.statika._
+  import ohnosequences.statika.aws._
+  import ohnosequences.awstools.ec2._
   import ohnosequences.awstools.regions.Region._
 
   case object blastCompat extends Compatible(
-    amzn_ami_64bit(Ireland, Virtualization.HVM)(1),
+    amznAMIEnv(AmazonLinuxAMI(Ireland, HVM, InstanceStore)),
     blast,
     generated.metadata.Metagenomica
   )

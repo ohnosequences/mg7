@@ -1,60 +1,43 @@
 package ohnosequences.metagenomica.loquats
 
-import ohnosequences.metagenomica.configuration._
-import ohnosequences.metagenomica.bundles
+import ohnosequences.metagenomica._
 
-import ohnosequences.loquat._, dataProcessing._
+import ohnosequences.loquat._
 
-import ohnosequences.statika.bundles._
-import ohnosequences.statika.instructions._
+import ohnosequences.statika._
 
-import ohnosequences.blast._, api._, data._, outputFields._
+import ohnosequences.cosas._, types._, klists._
 
-import ohnosequences.cosas._, types._, typeSets._, properties._, records._
-import ops.typeSets._
+import ohnosequences.datasets._
 
-import ohnosequences.datasets._, dataSets._, fileLocations._, illumina._, reads._
-
-import ohnosequences.fastarious._, fasta._, fastq._
-
-import java.io.File
+import better.files._
 import java.nio.file._
-import collection.JavaConversions._
-
-import sys.process._
 
 
 case object mergeDataProcessing extends DataProcessingBundle()(
-  input = blastChunks :^: DNil,
-  output = blastResult :^: DNil
+  input = data.mergeInput,
+  output = data.mergeOutput
 ) {
 
   def instructions: AnyInstructions = say("Merging, joining, amalgamating!")
 
-  def processData(
-    dataMappingId: String,
-    context: Context
-  ): Instructions[OutputFiles] = {
+  def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
 
     val outputFile = context / "whole.thing"
 
     LazyTry {
+      outputFile.createIfNotExists()
+
       // only one level in depth:
-      context.file(blastChunks).listFiles foreach { chunk =>
+      context.inputFile(data.blastChunks).list foreach { chunkFile =>
 
-        Files.write(
-          outputFile.toPath,
-          Files.readAllLines(chunk.toPath),
-          StandardOpenOption.CREATE,
-          StandardOpenOption.WRITE,
-          StandardOpenOption.APPEND
-        )
-
+        outputFile.append( chunkFile.contentAsString )
       }
     } -&-
     success(
       s"Everything is merged in [${outputFile.path}]",
-      blastResult.inFile(outputFile) :~: ∅
+      data.blastResult(outputFile) ::
+      *[AnyDenotation { type Value <: FileResource }]
     )
 
   }

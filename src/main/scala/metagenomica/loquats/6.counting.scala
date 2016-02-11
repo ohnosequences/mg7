@@ -1,22 +1,21 @@
 package ohnosequences.metagenomica.loquats
 
-import ohnosequences.metagenomica.configuration._
-import ohnosequences.metagenomica.bundles
+import ohnosequences.metagenomica._
 
 import ohnosequences.metagenomica.bio4j._, taxonomyTree._, titanTaxonomyTree._
 
-import ohnosequences.loquat.dataProcessing._
-import ohnosequences.loquat.utils._
+import ohnosequences.loquat._
 
-import ohnosequences.statika.instructions._
-import ohnosequences.cosas._, typeSets._
-import ohnosequences.datasets._, dataSets._, fileLocations._
+import ohnosequences.statika._
+import ohnosequences.cosas._, types._, klists._
+import ohnosequences.datasets._
+import better.files._
 
 
 case object countingDataProcessing extends DataProcessingBundle(
   bundles.bio4jNCBITaxonomy
-)(input = lcaCSV :^: bbhCSV :^: DNil,
-  output = lcaCountsCSV :^: bbhCountsCSV :^: DNil
+)(input = data.countingInput,
+  output = data.countingOutput
 ) {
 
   def instructions: AnyInstructions = say("I'm counting you!")
@@ -61,16 +60,13 @@ case object countingDataProcessing extends DataProcessingBundle(
     }
   }
 
-  def processData(
-    dataMappingId: String,
-    context: Context
-  ): Instructions[OutputFiles] = {
+  def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
 
     import com.github.tototoshi.csv._
 
     // same thing that we do for lca and bbh
-    def processFile(f: file): file = {
-      val csvReader: CSVReader = CSVReader.open( f.javaFile )
+    def processFile(f: File): File = {
+      val csvReader: CSVReader = CSVReader.open( f.toJava )
       val counts: Map[TaxID, (Int, Int)] = accumulatedCounts(
         // FIXME: use some csv api instead of row(1)
         directCounts( csvReader.iterator.map{ row => row(1) }.toList )
@@ -78,21 +74,21 @@ case object countingDataProcessing extends DataProcessingBundle(
       csvReader.close
 
       val outFile = context / s"${f.name}.counts"
-      val csvWriter = CSVWriter.open(outFile.javaFile, append = true)
+      val csvWriter = CSVWriter.open(outFile.toJava, append = true)
       counts foreach { case (taxId, (dir, acc)) => csvWriter.writeRow( List(taxId, dir, acc) ) }
       csvWriter.close
 
       outFile
     }
 
-    val lcaOut: file = processFile( context.file(lcaCSV) )
-    val bbhOut: file = processFile( context.file(bbhCSV) )
+    val lcaOut: File = processFile( context.inputFile(data.lcaCSV) )
+    val bbhOut: File = processFile( context.inputFile(data.bbhCSV) )
 
     success(
       s"Results are written to ...",
-      lcaCountsCSV.inFile(lcaOut) :~:
-      bbhCountsCSV.inFile(bbhOut) :~:
-      ∅
+      data.lcaCountsCSV(lcaOut) ::
+      data.bbhCountsCSV(bbhOut) ::
+      *[AnyDenotation { type Value <: FileResource }]
     )
   }
 }
