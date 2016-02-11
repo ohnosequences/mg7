@@ -15,7 +15,7 @@ import java.nio.file._
 import collection.JavaConversions._
 
 
-case object splitDataProcessing(params: AnyMG7Parameters) extends DataProcessingBundle()(
+case class splitDataProcessing(params: AnyMG7Parameters) extends DataProcessingBundle()(
   input = data.splitInput,
   output = data.splitOutput
 ) {

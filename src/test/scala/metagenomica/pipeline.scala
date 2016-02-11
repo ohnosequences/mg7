@@ -93,14 +93,16 @@ case object test {
     ))
   }.toMap
 
-  val dataflow = StandardDataflow(inputSamples, commonS3Prefix)
+  def outputS3Folder(id: SampleID, step: StepName): S3Folder = commonS3Prefix / id / step /
+
+  val dataflow = StandardDataflow(inputSamples, outputS3Folder)
 
 
   case object flashConfig extends TestLoquatConfig("flash", dataflow.flashDataMappings)
   case object flashLoquat extends Loquat(flashConfig, flashDataProcessing(testParameters))
 
   case object splitConfig extends TestLoquatConfig("split", dataflow.splitDataMappings)
-  case object splitLoquat extends Loquat(splitConfig, splitDataProcessing)
+  case object splitLoquat extends Loquat(splitConfig, splitDataProcessing(testParameters))
 
   case object blastConfig extends TestLoquatConfig("blast", dataflow.blastDataMappings) {
     // NOTE: we don't want to check input objects here because they are too many and

@@ -16,7 +16,10 @@ import ohnosequences.awstools.autoscaling._
 import ohnosequences.awstools.regions.Region._
 import com.amazonaws.auth._, profile._
 
-trait AnyDataflow {}
+trait AnyDataflow {
+
+  val outputS3Folder: (SampleID, StepName) => S3Folder
+}
 
 /* ## Standard Dataflow
 
@@ -31,7 +34,7 @@ trait AnyDataflow {}
 */
 case class StandardDataflow(
   val inputSamples: Map[ID, (S3Object, S3Object)],
-  val outputS3Folder: S3Folder
+  val outputS3Folder: (SampleID, StepName) => S3Folder
 ) extends AnyDataflow {
 
   lazy val flashDataMappings: List[AnyDataMapping] = inputSamples.toList.map {
@@ -43,8 +46,8 @@ case class StandardDataflow(
           data.pairedReads2 -> S3Resource(reads2S3Obj)
         ),
         remoteOutput = Map(
-          data.mergedReads -> S3Resource(outputS3Folder / "flash" / sampleId / s"${sampleId}.merged.fastq"),
-          data.flashStats  -> S3Resource(outputS3Folder / "flash" / sampleId / s"${sampleId}.stats.txt")
+          data.mergedReads -> S3Resource(outputS3Folder(sampleId, "flash") / s"${sampleId}.merged.fastq"),
+          data.flashStats  -> S3Resource(outputS3Folder(sampleId, "flash") / s"${sampleId}.stats.txt")
         )
       )
   }
@@ -57,7 +60,7 @@ case class StandardDataflow(
         data.mergedReads -> flashDM.remoteOutput(data.mergedReads)
       ),
       remoteOutput = Map(
-        data.readsChunks -> S3Resource(outputS3Folder / "split" / sampleId /)
+        data.readsChunks -> S3Resource(outputS3Folder(sampleId, "split"))
       )
     )
   }
@@ -83,7 +86,7 @@ case class StandardDataflow(
           data.readsChunk -> S3Resource(chunkS3Obj)
         ),
         remoteOutput = Map(
-          data.blastChunkOut -> S3Resource(outputS3Folder / "blast" / sampleId / s"blast.${n}.csv")
+          data.blastChunkOut -> S3Resource(outputS3Folder(sampleId, "blast") / s"blast.${n}.csv")
         )
       )
     }
@@ -94,10 +97,10 @@ case class StandardDataflow(
 
     DataMapping(sampleId)(
       remoteInput = Map(
-        data.blastChunks -> S3Resource(outputS3Folder / "blast" / sampleId /)
+        data.blastChunks -> S3Resource(outputS3Folder(sampleId, "blast"))
       ),
       remoteOutput = Map(
-        data.blastResult -> S3Resource(outputS3Folder / "merge" / sampleId / s"${sampleId}.blast.csv")
+        data.blastResult -> S3Resource(outputS3Folder(sampleId, "merge") / s"${sampleId}.blast.csv")
       )
     )
   }
@@ -108,8 +111,8 @@ case class StandardDataflow(
     DataMapping(sampleId)(
       remoteInput = mergeDM.remoteOutput,
       remoteOutput = Map(
-        data.lcaCSV -> S3Resource(outputS3Folder / "assignment" / sampleId / s"${sampleId}.lca.csv"),
-        data.bbhCSV -> S3Resource(outputS3Folder / "assignment" / sampleId / s"${sampleId}.bbh.csv")
+        data.lcaCSV -> S3Resource(outputS3Folder(sampleId, "assignment") / s"${sampleId}.lca.csv"),
+        data.bbhCSV -> S3Resource(outputS3Folder(sampleId, "assignment") / s"${sampleId}.bbh.csv")
       )
     )
   }
@@ -120,8 +123,8 @@ case class StandardDataflow(
     DataMapping(sampleId)(
       remoteInput = assignmentDM.remoteOutput,
       remoteOutput = Map(
-        data.lcaCountsCSV -> S3Resource(outputS3Folder / "counting" / sampleId / s"${sampleId}.lca.counts.csv"),
-        data.bbhCountsCSV -> S3Resource(outputS3Folder / "counting" / sampleId / s"${sampleId}.bbh.counts.csv")
+        data.lcaCountsCSV -> S3Resource(outputS3Folder(sampleId, "counting") / s"${sampleId}.lca.counts.csv"),
+        data.bbhCountsCSV -> S3Resource(outputS3Folder(sampleId, "counting") / s"${sampleId}.bbh.counts.csv")
       )
     )
   }
