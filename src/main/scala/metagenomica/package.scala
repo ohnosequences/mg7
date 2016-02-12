@@ -13,6 +13,8 @@ package object metagenomica {
   type LCA = Option[NodeID]
   type BBH = Option[NodeID]
 
+  type SampleID = ID
+  type StepName = String
 
   def parseInt(str: String): Option[Int] = Try(str.toInt).toOption
 

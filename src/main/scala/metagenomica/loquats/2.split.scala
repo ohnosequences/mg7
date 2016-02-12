@@ -15,7 +15,7 @@ import java.nio.file._
 import collection.JavaConversions._
 
 
-case object splitDataProcessing extends DataProcessingBundle()(
+case class splitDataProcessing(params: AnyMG7Parameters) extends DataProcessingBundle()(
   input = data.splitInput,
   output = data.splitOutput
 ) {
@@ -26,16 +26,13 @@ case object splitDataProcessing extends DataProcessingBundle()(
 
     val outputDir = context / "chunks"
 
-    // TODO: move it to the config
-    val chunkSize = 5
-
     LazyTry {
       outputDir.createDirectories()
 
       lazy val chunks: Iterator[(Seq[String], Int)] =
         context.inputFile(data.mergedReads)
           .lines
-          .grouped(4 * chunkSize)
+          .grouped(4 * params.chunkSize)
           .zipWithIndex
 
       chunks foreach { case (chunk, n) =>
@@ -44,8 +41,7 @@ case object splitDataProcessing extends DataProcessingBundle()(
           .overwrite(chunk.mkString("\n"))
       }
     } -&-
-    success(
-      "much blast, very success!",
+    success("chunk-chunk-chunk!",
       data.readsChunks(outputDir) ::
       *[AnyDenotation { type Value <: FileResource }]
     )
