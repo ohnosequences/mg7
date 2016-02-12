@@ -37,10 +37,11 @@ extends DataProcessingBundle(
     val totalOutput = context / "blastAll.csv"
 
     LazyTry {
-      lazy val quartets = io.Source.fromFile( context.inputFile(data.readsChunk).toJava ).getLines.grouped(4)
+      // NOTE: once we update to better-files 2.15.+, use `file.lineIterator` here (it's autoclosing):
+      lazy val source = io.Source.fromFile( context.inputFile(data.readsChunk).toJava )
 
-      quartets foreach { quartet =>
-        println(quartet.mkString("\n"))
+      source.getLines.grouped(4) foreach { quartet =>
+        // println(quartet.mkString("\n"))
 
         // we only care about the id and the seq here
         val read = FASTA(
@@ -89,6 +90,9 @@ extends DataProcessingBundle(
         readFile.delete(true)
         outFile.delete(true)
       }
+
+      // it's important to close the stream:
+      source.close()
     } -&-
     success(
       "much blast, very success!",
