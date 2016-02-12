@@ -17,8 +17,6 @@ import ohnosequences.fastarious.fasta._
 import ohnosequences.fastarious.fastq._
 
 import better.files._
-import java.nio.file._
-import collection.JavaConversions._
 
 import sys.process._
 
@@ -52,10 +50,9 @@ extends DataProcessingBundle(
           )
 
         val readFile = context / "read.fa"
-        Files.write(
-          readFile.path,
-          asJavaIterable(read.toLines)
-        )
+        readFile
+          .createIfNotExists()
+          .appendLines(read.toLines: _*)
 
         val outFile = context / "blastRead.csv"
 
@@ -84,13 +81,9 @@ extends DataProcessingBundle(
 
         // we should have something in args getV out now. Append it!
         println(s"Appending [${outFile.path}] to [${totalOutput.path}]")
-        Files.write(
-          totalOutput.path,
-          Files.readAllLines(outFile.path),
-          StandardOpenOption.CREATE,
-          StandardOpenOption.WRITE,
-          StandardOpenOption.APPEND
-        )
+        totalOutput
+          .createIfNotExists()
+          .append(outFile.contentAsString)
 
         // clean up
         readFile.delete(true)
