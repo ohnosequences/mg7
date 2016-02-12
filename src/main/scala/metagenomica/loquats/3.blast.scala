@@ -17,8 +17,6 @@ import ohnosequences.fastarious.fasta._
 import ohnosequences.fastarious.fastq._
 
 import better.files._
-import java.nio.file._
-import collection.JavaConversions._
 
 import sys.process._
 
@@ -39,10 +37,11 @@ extends DataProcessingBundle(
     val totalOutput = context / "blastAll.csv"
 
     LazyTry {
-      lazy val quartets = io.Source.fromFile( context.inputFile(data.readsChunk).toJava ).getLines.grouped(4)
+      // NOTE: once we update to better-files 2.15.+, use `file.lineIterator` here (it's autoclosing):
+      lazy val source = io.Source.fromFile( context.inputFile(data.readsChunk).toJava )
 
-      quartets foreach { quartet =>
-        println(quartet.mkString("\n"))
+      source.getLines.grouped(4) foreach { quartet =>
+        // println(quartet.mkString("\n"))
 
         // we only care about the id and the seq here
         val read = FASTA(
@@ -52,10 +51,9 @@ extends DataProcessingBundle(
           )
 
         val readFile = context / "read.fa"
-        Files.write(
-          readFile.path,
-          asJavaIterable(read.toLines)
-        )
+        readFile
+          .createIfNotExists()
+          .appendLines(read.toLines: _*)
 
         val outFile = context / "blastRead.csv"
 
@@ -84,18 +82,17 @@ extends DataProcessingBundle(
 
         // we should have something in args getV out now. Append it!
         println(s"Appending [${outFile.path}] to [${totalOutput.path}]")
-        Files.write(
-          totalOutput.path,
-          Files.readAllLines(outFile.path),
-          StandardOpenOption.CREATE,
-          StandardOpenOption.WRITE,
-          StandardOpenOption.APPEND
-        )
+        totalOutput
+          .createIfNotExists()
+          .append(outFile.contentAsString)
 
         // clean up
         readFile.delete(true)
         outFile.delete(true)
       }
+
+      // it's important to close the stream:
+      source.close()
     } -&-
     success(
       "much blast, very success!",

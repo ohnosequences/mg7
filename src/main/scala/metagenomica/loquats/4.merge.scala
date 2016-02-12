@@ -11,7 +11,6 @@ import ohnosequences.cosas._, types._, klists._
 import ohnosequences.datasets._
 
 import better.files._
-import java.nio.file._
 
 
 case object mergeDataProcessing extends DataProcessingBundle()(
