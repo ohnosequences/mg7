@@ -93,7 +93,8 @@ case object test {
     ))
   }.toMap
 
-  def outputS3Folder(id: SampleID, step: StepName): S3Folder = commonS3Prefix / id / step /
+  def outputS3Folder(sample: SampleID, step: StepName): S3Folder =
+    commonS3Prefix / s"${step}-test" / sample /
 
   val dataflow = StandardDataflow(inputSamples, outputS3Folder)
 

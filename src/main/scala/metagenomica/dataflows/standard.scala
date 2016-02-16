@@ -53,7 +53,7 @@ case class StandardDataflow(
   }
 
   lazy val splitDataMappings: List[AnyDataMapping] = flashDataMappings.map { flashDM =>
-    val sampleId = flashDM.id
+    val sampleId = flashDM.label
 
     DataMapping(sampleId)(
       remoteInput = Map(
@@ -66,7 +66,7 @@ case class StandardDataflow(
   }
 
   lazy val blastDataMappings: List[AnyDataMapping] = splitDataMappings.flatMap { splitDM =>
-    val sampleId = splitDM.id
+    val sampleId = splitDM.label
 
     lazy val s3 = S3.create(
       new AWSCredentialsProviderChain(
@@ -93,7 +93,7 @@ case class StandardDataflow(
   }
 
   lazy val mergeDataMappings: List[AnyDataMapping] = splitDataMappings.map { splitDM =>
-    val sampleId = splitDM.id
+    val sampleId = splitDM.label
 
     DataMapping(sampleId)(
       remoteInput = Map(
@@ -106,7 +106,7 @@ case class StandardDataflow(
   }
 
   lazy val assignmentDataMappings: List[AnyDataMapping] = mergeDataMappings.map { mergeDM =>
-    val sampleId = mergeDM.id
+    val sampleId = mergeDM.label
 
     DataMapping(sampleId)(
       remoteInput = mergeDM.remoteOutput,
@@ -118,7 +118,7 @@ case class StandardDataflow(
   }
 
   lazy val countingDataMappings: List[AnyDataMapping] = assignmentDataMappings.map { assignmentDM =>
-    val sampleId = assignmentDM.id
+    val sampleId = assignmentDM.label
 
     DataMapping(sampleId)(
       remoteInput = assignmentDM.remoteOutput,
