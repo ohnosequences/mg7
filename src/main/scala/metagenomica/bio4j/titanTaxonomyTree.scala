@@ -1,4 +1,4 @@
-package ohnosequences.metagenomica.bio4j
+package ohnosequences.mg7.bio4j
 
 import taxonomyTree._
 

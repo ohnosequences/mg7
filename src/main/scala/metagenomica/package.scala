@@ -1,8 +1,6 @@
 package ohnosequences
 
-import scala.util.Try
-
-package object metagenomica {
+package object mg7 {
 
   type ID = String
   type GI = ID
@@ -16,6 +14,6 @@ package object metagenomica {
   type SampleID = ID
   type StepName = String
 
-  def parseInt(str: String): Option[Int] = Try(str.toInt).toOption
+  def parseInt(str: String): Option[Int] = util.Try(str.toInt).toOption
 
 }

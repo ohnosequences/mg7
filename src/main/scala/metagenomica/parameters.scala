@@ -1,4 +1,4 @@
-package ohnosequences.metagenomica
+package ohnosequences.mg7
 
 import ohnosequences.cosas._, types._, klists._
 

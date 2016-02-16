@@ -1,4 +1,4 @@
-package ohnosequences.metagenomica.bundles
+package ohnosequences.mg7.bundles
 
 import ohnosequences.statika._
 
@@ -103,7 +103,7 @@ case object filtering {
   case object filterGIsCompat extends Compatible(
     amznAMIEnv(AmazonLinuxAMI(Ireland, HVM, InstanceStore)),
     filterGIs,
-    generated.metadata.Metagenomica
+    generated.metadata.mg7
   )
 
 }

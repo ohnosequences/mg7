@@ -1,6 +1,6 @@
-package ohnosequences.metagenomica.tests
+package ohnosequences.mg7.tests
 
-import ohnosequences.metagenomica.bio4j.taxonomyTree._
+import ohnosequences.mg7.bio4j.taxonomyTree._
 
 class LCATest extends org.scalatest.FunSuite {
 

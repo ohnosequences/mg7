@@ -1,6 +1,6 @@
-// package ohnosequences.metagenomica.tests
+// package ohnosequences.mg7.tests
 //
-// import ohnosequences.metagenomica.bundles._
+// import ohnosequences.mg7.bundles._
 //
 // import ohnosequences.statika._, aws._
 //
@@ -75,7 +75,7 @@
 //   }
 //
 //   ignore("testing blast bundle") {
-//     import ohnosequences.metagenomica.loquats.blast.blastDataProcessing._
+//     import ohnosequences.mg7.loquats.blast.blastDataProcessing._
 //
 //     val specs = blastCompat.instanceSpecs(
 //       instanceType = m3.medium,

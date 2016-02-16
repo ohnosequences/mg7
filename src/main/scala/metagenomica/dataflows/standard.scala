@@ -1,6 +1,6 @@
-package ohnosequences.metagenomica.dataflows
+package ohnosequences.mg7.dataflows
 
-import ohnosequences.metagenomica._
+import ohnosequences.mg7._
 
 import ohnosequences.datasets._
 

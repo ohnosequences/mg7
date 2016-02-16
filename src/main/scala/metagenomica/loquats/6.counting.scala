@@ -1,8 +1,8 @@
-package ohnosequences.metagenomica.loquats
+package ohnosequences.mg7.loquats
 
-import ohnosequences.metagenomica._
+import ohnosequences.mg7._
 
-import ohnosequences.metagenomica.bio4j._, taxonomyTree._, titanTaxonomyTree._
+import ohnosequences.mg7.bio4j._, taxonomyTree._, titanTaxonomyTree._
 
 import ohnosequences.loquat._
 

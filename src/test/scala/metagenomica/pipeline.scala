@@ -1,7 +1,7 @@
-package ohnosequences.metagenomica
+package ohnosequences.mg7
 
 
-import ohnosequences.metagenomica._, loquats._, dataflows._
+import ohnosequences.mg7._, loquats._, dataflows._
 
 import ohnosequences.datasets._, illumina._
 
@@ -45,7 +45,7 @@ case object test {
 
   trait AnyTestLoquatConfig extends AnyLoquatConfig { config =>
 
-    val metadata: AnyArtifactMetadata = generated.metadata.Metagenomica
+    val metadata: AnyArtifactMetadata = generated.metadata.mg7
 
     val iamRoleName = "loquat.testing"
     val logsBucketName = "loquat.testing"

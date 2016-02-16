@@ -1,4 +1,4 @@
-package ohnosequences.metagenomica.bundles
+package ohnosequences.mg7.bundles
 
 import ohnosequences.statika._
 import ohnosequences.awstools.s3._
@@ -81,7 +81,7 @@ case object bio4jBundleTest {
   case object bio4jTaxonomyCompat extends Compatible(
     amznAMIEnv(AmazonLinuxAMI(Ireland, HVM, InstanceStore)),
     bio4jNCBITaxonomy,
-    generated.metadata.Metagenomica
+    generated.metadata.mg7
   )
 
 }
