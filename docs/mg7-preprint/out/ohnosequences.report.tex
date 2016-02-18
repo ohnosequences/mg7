@@ -1,0 +1,430 @@
+
+% \documentclass[a4paper]{article}
+\documentclass[fontsize=8pt,paper=a4,pagesize,abstracton]{scrartcl}
+
+% to prevent funny stuff happening with old packages (I think)
+\usepackage{ifxetex}
+% xetex font-related packages
+\usepackage{fontspec,xltxtra,xunicode}
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% I don't know why this is here
+\usepackage{fixltx2e}
+
+%%% color definitions %%%
+\usepackage[usenames,dvipsnames,xetex]{xcolor}
+% old cyan variants %
+\definecolor{OldCyan}{RGB}{62,127,137}
+\definecolor{OldCyan-Dark}{RGB}{38,104,113}
+\definecolor{OldCyan-Light}{RGB}{86,156,166}
+\definecolor{OldCyan-Matte}{RGB}{62,113,120}
+\definecolor{OldCyan-MatteLight}{RGB}{95,158,166}
+% light amber variants %
+\definecolor{LightAmber}{RGB}{223,184,98}
+\definecolor{LightAmber-Dark}{RGB}{184,145,61}
+\definecolor{LightAmber-Light}{RGB}{231,195,118}
+\definecolor{LightAmber-Matte}{RGB}{195,165,100}
+\definecolor{LightAmber-MatteLight}{RGB}{231,199,131}
+% salmon variants %
+\definecolor{Salmon}{RGB}{223,107,98}
+\definecolor{Salmon-Dark}{RGB}{184,70,61}
+\definecolor{Salmon-Light}{RGB}{231,126,118}
+\definecolor{Salmon-Matte}{RGB}{195,107,100}
+\definecolor{Salmon-MatteLight}{RGB}{231,138,131}
+\definecolor{Grey}{RGB}{88,88,88}
+\definecolor{Grey-Light}{RGB}{129,129,129}
+\definecolor{Grey-Dark}{RGB}{65,65,65}
+% SOLARIZED
+\definecolor{solarized@base03}{HTML}{002B36}
+\definecolor{solarized@base02}{HTML}{073642}
+\definecolor{solarized@base01}{HTML}{586e75}
+\definecolor{solarized@base00}{HTML}{657b83}
+\definecolor{solarized@base0}{HTML}{839496}
+\definecolor{solarized@base1}{HTML}{93a1a1}
+\definecolor{solarized@base2}{HTML}{EEE8D5}
+\definecolor{solarized@base3}{HTML}{FDF6E3}
+\definecolor{solarized@yellow}{HTML}{B58900}
+\definecolor{solarized@orange}{HTML}{CB4B16}
+\definecolor{solarized@red}{HTML}{DC322F}
+\definecolor{solarized@magenta}{HTML}{D33682}
+\definecolor{solarized@violet}{HTML}{6C71C4}
+\definecolor{solarized@blue}{HTML}{268BD2}
+\definecolor{solarized@cyan}{HTML}{2AA198}
+\definecolor{solarized@green}{HTML}{859900}
+
+% math symbols and such
+\usepackage{amsmath}
+\usepackage{unicode-math}
+
+% english support
+\usepackage{polyglossia}
+\setmainlanguage{english}
+
+% paper size and lead
+\usepackage[$for(geometry)$$geometry$$sep$,$endfor$]{geometry}
+\geometry{a4paper}
+\usepackage{setspace}
+% default lead is 1.216666
+\setstretch{1.15}
+
+% Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{parskip}
+
+% references
+
+% for natbib
+$if(natbib)$
+  % \usepackage[numbers]{natbib}
+  % \bibliographystyle{agsm,dcu,kluwer}
+  \usepackage[natbibapa]{apacite}
+  \bibliographystyle{agsm}
+  % so that URLs break across lines
+  \renewcommand\harvardurl[1]{\textbf{URL:} \textcolor{OldCyan}{\url{#1}}}
+$endif$
+
+% for biblatex
+$if(biblatex)$
+\usepackage[
+  backend=biber,
+  texencoding=utf8,
+  bibencoding=utf8,
+  hyperref=true,
+  maxbibnames=15,
+  isbn=false,
+  dateabbrev=false,
+  style=ieee
+]{biblatex}
+
+\renewcommand*{\newunitpunct}{\space}
+\renewcommand{\bibfont}{\small}
+\setlength\bibitemsep{5pt}
+
+\renewbibmacro*{volume+number+eid}{%
+  \printfield{volume}%
+  \setunit{\,}% DELETED
+  \printfield{number}%
+  \setunit{.\space}%
+  \printfield{eid}}
+
+\DeclareFieldFormat[article,inbook,incollection,inproceedings,patent,thesis,unpublished]{volume}{\mkbibbold{#1}}
+\DeclareFieldFormat{date}{#1}
+\DeclareFieldFormat{pages}{#1\adddot}
+\DeclareFieldFormat[article,inbook,incollection,inproceedings,patent,thesis,unpublished]{number}{\mkbibparens{#1}\addcolon}
+
+\DeclareFieldFormat{doi}{\newline DOI: \href{https://dx.doi.org/#1}{#1}}
+\DeclareFieldFormat{url}{}
+\DeclareFieldFormat[unpublished]{url}{\newline URL: \href{#1}{#1}}
+\DeclareFieldFormat
+  [article,inbook,incollection,inproceedings,patent,thesis,unpublished]
+  {journaltitle}{\newline\emph{#1}}
+
+\DeclareFieldFormat
+  [article,inbook,incollection,inproceedings,patent,thesis,unpublished]
+  {title}{\textbf{#1}}
+
+\bibliography{$bibliography$}
+$endif$
+
+
+\usepackage{longtable}
+\usepackage{ctable}
+\usepackage{float}
+\usepackage[normalem]{ulem}
+% typography settings
+% default conf applied
+
+% Open Sans, a beautiful fontface
+\setmainfont[Mapping = tex-text, Color = Grey, BoldFont = {* Semibold}, BoldItalicFont = {* Semibold Italic}, ItalicFont = {* Italic}]{Open Sans}
+% sort of like Cambria Math; somehow matches a sans body text
+\setmathfont{Asana Math} % math font
+% font for sections: Bitter
+\newfontfamily\sectfont
+  [BoldFont={* Bold},
+   Numbers={OldStyle,Proportional},
+   Color = Grey,
+   Mapping = tex-text
+  ]
+  {Bitter}
+% the title font
+\newfontfamily\titlefont
+  [BoldFont={Open Sans},
+   Numbers={OldStyle,Proportional},
+   Mapping = tex-text
+  ]
+  {Open Sans Light}
+
+% for changing the sections font
+\usepackage{sectsty}
+\allsectionsfont{\sectfont\textmd}
+
+
+% verbatim and code highlighting: Solarized Light
+\usepackage{fancyvrb}
+\DefineShortVerb[commandchars=\\\{\}]{\|}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{fontsize=\footnotesize,%
+commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+% this is solarized light
+\definecolor{shadecolor}{RGB}{253,246,227} % solarized@base3
+\newenvironment{Shaded}{\vspace{\baselineskip}\begin{shaded}}{\end{shaded}\vspace{\baselineskip}}
+% colored backgrd for verb
+\let\oldverbatim=\verbatim
+\let\endoldverbatim=\endverbatim
+\renewenvironment{verbatim}[1]{%
+  \vspace{\baselineskip}
+  \scriptsize
+  \par\setstretch{1}
+  \begin{shaded}
+  \begin{oldverbatim}{#1}%
+}%
+{%
+  \end{oldverbatim}%
+  \end{shaded}
+  \vspace{\baselineskip}
+}
+
+\newcommand{\KeywordTok}[1]{\textbf{\textcolor{solarized@green}{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor{solarized@blue}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor{solarized@violet}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor{solarized@violet}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor{solarized@violet}{#1}}
+\newcommand{\CharTok}[1]{\textcolor{solarized@cyan}{#1}}
+\newcommand{\StringTok}[1]{\textcolor{solarized@cyan}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor{solarized@base1}{\textit{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor{solarized@base00}{#1}}
+\newcommand{\AlertTok}[1]{\textcolor{solarized@yellow}{\textbf{#1}}}
+\newcommand{\FunctionTok}[1]{\textcolor{solarized@blue}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor{solarized@base1}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor{solarized@red}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{\textcolor{solarized@base00}{#1}}
+
+% monospace also grey; Source Code Pro
+\setmonofont[Mapping=tex-ansi,Color=solarized@base00,Numbers=Lining,Ligatures=NoRequired]{Source Code Pro}
+
+% allow to break lines more easily on tt text
+% http://tex.stackexchange.com/questions/52850/temporarily-increase-the-limit-on-space-size
+\let\OldTexttt\texttt
+\renewcommand{\texttt}[1]{ \emergencystretch=2em \OldTexttt{#1} }
+% maybe?
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+
+% color fixes
+\makeatletter
+\newcommand{\globalcolor}[1]{%
+  \color{#1}\global\let\default@color\current@color
+}
+\makeatother
+
+\AtBeginDocument{\globalcolor{Grey}}
+\renewcommand{\textcolor}[2]{{\addfontfeature{Color=#1}#2}}
+
+$if(verbatim-in-note)$
+\usepackage{fancyvrb}
+$endif$
+
+% Lists formatting:
+% note sure what 'fancy enums' are; something to do with lists,
+% as the further comment suggests:
+$if(fancy-enums)$
+% -- Redefine labelwidth for lists; otherwise, the enumerate package will cause
+% -- markers to extend beyond the left margin.
+\makeatletter\AtBeginDocument{%
+  \renewcommand{\@listi}
+    {\setlength{\labelwidth}{4em}}
+}\makeatother
+\usepackage{enumerate}
+$endif$
+
+% tables
+\usepackage{tabu}
+\taburulecolor{Salmon-Dark}
+\let\quoteOld\quote
+\let\endquoteOld\endquote
+\renewenvironment{quote}{\vspace{\baselineskip}\itshape\quoteOld\begin{tabu}{|[2pt]p{.9\textwidth}}}{\end{tabu}\endquoteOld\vspace{\baselineskip}}
+
+% longtable needed by latest pandoc version
+\usepackage{longtable}
+
+\setupctable{
+captionskip=0pt, framerule=0pt, nostar,
+center, framesep=0pt, pos=tbp,
+continued=(continued), maxwidth=0pt, super,
+doinside={}, mincapwidth=0pt, table,
+framebg=1 1 1, nonotespar, topcap,
+framefg=.3 .1 .68, nosideways, width=0pt
+}
+
+$if(subscript)$
+\newcommand{\textsubscr}[1]{\ensuremath{_{\scriptsize\textrm{#1}}}}
+$endif$
+
+% math diagrams
+\usepackage[all]{xy}
+\xyoption{pdf}  % improves rendering
+
+\usepackage[breaklinks=true]{hyperref}
+\hypersetup{
+  setpagesize=false, % page size defined by xetex
+  unicode=false, % unicode breaks when used with xetex
+  xetex,
+  pdfnewwindow,
+  colorlinks,%
+  citecolor=OldCyan,%
+  filecolor=OldCyan,%
+  linkcolor=OldCyan,%
+  urlcolor=OldCyan,
+  urlbordercolor=OldCyan
+}
+
+\let\OldHref\href
+\renewcommand{\href}[2]{\OldHref[pdfnewwindow]{#1}{{#2}}}
+
+% ugly fix for latest pandoc
+\providecommand{\tightlist}{%
+\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+% ugly fix for link colors in xetex
+\makeatletter
+\def\HyColor@@@@UseColor#1\@nil{\addfontfeatures{Color=#1}}
+\makeatother
+
+% images
+$if(graphics)$
+\usepackage{graphicx}
+% -- We will generate all images so they have a width \maxwidth. This means
+% -- that they will get their normal width if they fit onto the page, but
+% -- are scaled down if they would overflow the margins.
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth
+\else\Gin@nat@width\fi}
+\makeatother
+\let\Oldincludegraphics\includegraphics
+\renewcommand{\includegraphics}[1]{\Oldincludegraphics[width=\maxwidth]{#1}}
+$endif$
+
+% this is wrong
+$if(numbersections)$
+$else$
+\setcounter{secnumdepth}{0}
+$endif$
+
+$if(verbatim-in-note)$
+\VerbatimFootnotes % -- allows verbatim text in footnotes
+$endif$
+
+$for(header-includes)$
+$header-includes$
+$endfor$
+
+$if(title)$
+  \title{\LARGE \bfseries $title$}
+$else$
+  \title{you need a title!}
+$endif$
+
+% authors
+\usepackage{authblk}
+$for(authors)$
+  \author[1]{\normalsize $authors.name$}
+$endfor$
+
+\affil[1]{\small
+  {\itshape\href{http://ohnosequences.com}{oh no sequences!}} research group, \href{http://www.era7bioinformatics.com}{Era7 bioinformatics}
+}
+
+\date{\normalsize \today}
+
+
+% page style!
+% spaces
+\setlength{\footskip}{3\baselineskip}
+\setlength{\headsep}{3\baselineskip}
+\setlength{\skip\footins}{0cm}
+% \setlength{\voffset}{-10pt}
+\setlength{\topmargin}{0pt}
+% \setlength{\textheight}{612pt}
+
+
+\makeatletter
+\let\Title\@title
+\let\Author\@author
+\makeatother
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+
+\renewcommand{\sectionmark}[1]{%
+\markboth{#1}{}}
+% \fancyheadoffset{0cm}
+\renewcommand{\headrulewidth}{.5pt}
+\renewcommand{\headrule}{\vbox to 0pt{\hbox
+to\headwidth{\dotfill}\vss}}
+
+\lhead{\titlefont $title$}
+% \chead{\titlefont {\color{Grey-Light}\leftmark}}
+\chead{}
+\rhead{\titlefont \thepage}
+
+\lfoot{\titlefont {{\color{Salmon-Dark}oh}{\color{LightAmber-Dark}no}{\color{Grey}sequences}{\color{Salmon-Dark}!} }}
+\cfoot{}
+\rfoot{\titlefont {\color{Grey-Light} era7 bioinformatics R\&D group}}
+% footer rule
+\renewcommand{\footruleskip}{0.66\baselineskip}
+\renewcommand{\footrulewidth}{.5pt}
+\renewcommand{\footrule}{{\color{LightAmber-MatteLight}%
+\vskip-\footruleskip\vskip-\footrulewidth
+\hrule width\headwidth height\footrulewidth\vskip\footruleskip}}
+
+\renewcommand{\footrule}{\vbox to 0pt{\hbox
+to\headwidth{\color{Salmon}{\dotfill}}\vss}}
+
+\begin{document}
+
+\maketitle
+
+$if(abstract)$
+\begin{abstract} % \footnotesize
+$abstract$
+\end{abstract}
+$endif$
+
+\thispagestyle{empty}
+
+$if(toc)$
+% \setcounter{tocdepth}{$toc-depth$}
+\tableofcontents
+$endif$
+
+\newpage
+
+$if(alignment)$
+\begin{$alignment$}
+$endif$
+
+$body$
+
+
+
+$if(alignment)$
+\end{$alignment$}
+$endif$
+
+$if(natbib)$
+  $if(biblio-files)$
+    $if(biblio-title)$
+      $if(book-class)$
+        \renewcommand\bibname{$biblio-title$}
+      $else$
+        \renewcommand\refname{$biblio-title$}
+      $endif$
+    $endif$
+  $endif$
+  \bibliography{$bibliography$}
+$endif$
+
+$if(biblatex)$
+  \printbibliography$if(biblio-title)$[title=$biblio-title$]$endif$
+$endif$
+
+\end{document}
