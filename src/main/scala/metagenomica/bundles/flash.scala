@@ -1,4 +1,4 @@
-package ohnosequences.metagenomica.bundles
+package ohnosequences.mg7.bundles
 
 import ohnosequencesBundles.statika.Flash
 

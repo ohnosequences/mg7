@@ -1,4 +1,4 @@
-package ohnosequences.metagenomica.bundles
+package ohnosequences.mg7.bundles
 
 import ohnosequences.statika._
 
@@ -47,7 +47,7 @@ case object blast16sTest {
   case object blast16sCompat extends Compatible(
     amznAMIEnv(AmazonLinuxAMI(Ireland, HVM, InstanceStore)),
     blast16s,
-    generated.metadata.Metagenomica
+    generated.metadata.mg7
   )
 
 }

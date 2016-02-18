@@ -1,6 +1,6 @@
 Nice.scalaProject
 
-name          := "metagenomica"
+name          := "mg7"
 organization  := "ohnosequences"
 description   := "metagenomica project"
 
@@ -54,7 +54,7 @@ mergeStrategy in assembly ~= { old => {
 
 enablePlugins(BuildInfoPlugin)
 buildInfoPackage := "generated.metadata"
-buildInfoObject  := name.value.split("""\W""").map(_.capitalize).mkString
+buildInfoObject  := name.value
 buildInfoOptions := Seq(BuildInfoOption.Traits("ohnosequences.statika.AnyArtifactMetadata"))
 buildInfoKeys    := Seq[BuildInfoKey](
   organization,

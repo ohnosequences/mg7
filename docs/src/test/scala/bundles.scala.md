@@ -1,3 +1,5 @@
+
+```scala
 // package ohnosequences.mg7.tests
 //
 // import ohnosequences.mg7.bundles._
@@ -89,3 +91,29 @@
 //   }
 //
 // }
+
+```
+
+
+
+
+[main/scala/metagenomica/bio4j/taxonomyTree.scala]: ../../main/scala/metagenomica/bio4j/taxonomyTree.scala.md
+[main/scala/metagenomica/bio4j/titanTaxonomyTree.scala]: ../../main/scala/metagenomica/bio4j/titanTaxonomyTree.scala.md
+[main/scala/metagenomica/bundles/bio4jTaxonomy.scala]: ../../main/scala/metagenomica/bundles/bio4jTaxonomy.scala.md
+[main/scala/metagenomica/bundles/blast.scala]: ../../main/scala/metagenomica/bundles/blast.scala.md
+[main/scala/metagenomica/bundles/blast16s.scala]: ../../main/scala/metagenomica/bundles/blast16s.scala.md
+[main/scala/metagenomica/bundles/flash.scala]: ../../main/scala/metagenomica/bundles/flash.scala.md
+[main/scala/metagenomica/bundles/gis.scala]: ../../main/scala/metagenomica/bundles/gis.scala.md
+[main/scala/metagenomica/data.scala]: ../../main/scala/metagenomica/data.scala.md
+[main/scala/metagenomica/dataflows/standard.scala]: ../../main/scala/metagenomica/dataflows/standard.scala.md
+[main/scala/metagenomica/loquats/1.flash.scala]: ../../main/scala/metagenomica/loquats/1.flash.scala.md
+[main/scala/metagenomica/loquats/2.split.scala]: ../../main/scala/metagenomica/loquats/2.split.scala.md
+[main/scala/metagenomica/loquats/3.blast.scala]: ../../main/scala/metagenomica/loquats/3.blast.scala.md
+[main/scala/metagenomica/loquats/4.merge.scala]: ../../main/scala/metagenomica/loquats/4.merge.scala.md
+[main/scala/metagenomica/loquats/5.assignment.scala]: ../../main/scala/metagenomica/loquats/5.assignment.scala.md
+[main/scala/metagenomica/loquats/6.counting.scala]: ../../main/scala/metagenomica/loquats/6.counting.scala.md
+[main/scala/metagenomica/package.scala]: ../../main/scala/metagenomica/package.scala.md
+[main/scala/metagenomica/parameters.scala]: ../../main/scala/metagenomica/parameters.scala.md
+[test/scala/bundles.scala]: bundles.scala.md
+[test/scala/lca.scala]: lca.scala.md
+[test/scala/metagenomica/pipeline.scala]: metagenomica/pipeline.scala.md
