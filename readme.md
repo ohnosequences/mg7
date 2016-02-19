@@ -4,7 +4,7 @@
 [![](https://img.shields.io/codacy/96ad3cc701a54c548deb4ef0d5564655.svg)](https://www.codacy.com/app/era7/mg7)
 [![](https://img.shields.io/github/release/ohnosequences/mg7.svg)](https://github.com/ohnosequences/mg7/releases/latest)
 [![](https://img.shields.io/badge/license-AGPLv3-blue.svg)](https://tldrlegal.com/license/gnu-affero-general-public-license-v3-%28agpl-3.0%29)
-[![](https://img.shields.io/badge/contact-gitter_chat-dd1054.svg)](https://gitter.im/ohnosequences/mg7)
+[![](https://img.shields.io/badge/contact-gitter_chat-dd1054.svg)](https://gitter.im/ohnosequences/mg7?utm_source=share-link&utm_medium=link&utm_campaign=share-link)
 
 A tool for 16S metagenomics data analysis using Scala and Amazon Web Services.
 
