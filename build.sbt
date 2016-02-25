@@ -15,13 +15,13 @@ resolvers := Seq(
 
 libraryDependencies ++= Seq(
   // APIs:
-  "ohnosequences" %% "flash"      % "0.3.0-SNAPSHOT",
-  "ohnosequences" %% "blast-api"  % "0.5.0-SNAPSHOT",
+  "ohnosequences" %% "flash"      % "0.3.0",
+  "ohnosequences" %% "blast-api"  % "0.4.1",
   "ohnosequences" %% "fastarious" % "0.2.0",
   // generic tools:
   "ohnosequences" %% "cosas"      % "0.8.0",
   "ohnosequences" %% "datasets"   % "0.3.0",
-  "ohnosequences" %% "loquat"     % "2.0.0-simple-mappings-SNAPSHOT",
+  "ohnosequences" %% "loquat"     % "2.0.0-M7",
   "ohnosequences" %% "statika"    % "2.0.0-M5",
   // bundles:
   "ohnosequences-bundles" %% "flash"      % "0.2.0",
