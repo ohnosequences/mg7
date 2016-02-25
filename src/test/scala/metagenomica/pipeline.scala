@@ -96,7 +96,7 @@ case object test {
   def outputS3Folder(sample: SampleID, step: StepName): S3Folder =
     commonS3Prefix / s"${step}-test" / sample /
 
-  val dataflow = StandardDataflow(inputSamples, outputS3Folder)
+  val dataflow = StandardDataflow(testParameters)(inputSamples, outputS3Folder)
 
 
   case object flashConfig extends TestLoquatConfig("flash", dataflow.flashDataMappings)

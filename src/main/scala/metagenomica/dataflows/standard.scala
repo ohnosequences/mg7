@@ -1,6 +1,6 @@
 package ohnosequences.mg7.dataflows
 
-import ohnosequences.mg7._
+import ohnosequences.mg7._, loquats._
 
 import ohnosequences.datasets._
 
@@ -32,7 +32,7 @@ trait AnyDataflow {
   5. assignment: assigning taxons (LCA and BBH)
   6. counting: counting assignments
 */
-case class StandardDataflow(
+case class StandardDataflow[P <: AnyMG7Parameters](val params: P)(
   val inputSamples: Map[ID, (S3Object, S3Object)],
   val outputS3Folder: (SampleID, StepName) => S3Folder
 ) extends AnyDataflow {
@@ -40,7 +40,7 @@ case class StandardDataflow(
   lazy val flashDataMappings: List[AnyDataMapping] = inputSamples.toList.map {
     case (sampleId, (reads1S3Obj, reads2S3Obj)) =>
 
-      DataMapping(sampleId)(
+      DataMapping(sampleId, flashDataProcessing(params))(
         remoteInput = Map(
           data.pairedReads1 -> S3Resource(reads1S3Obj),
           data.pairedReads2 -> S3Resource(reads2S3Obj)
@@ -55,7 +55,7 @@ case class StandardDataflow(
   lazy val splitDataMappings: List[AnyDataMapping] = flashDataMappings.map { flashDM =>
     val sampleId = flashDM.label
 
-    DataMapping(sampleId)(
+    DataMapping(sampleId, splitDataProcessing(params))(
       remoteInput = Map(
         data.mergedReads -> flashDM.remoteOutput(data.mergedReads)
       ),
@@ -81,7 +81,7 @@ case class StandardDataflow(
 
     chunks.zipWithIndex.map { case (chunkS3Obj, n) =>
 
-      DataMapping(s"${sampleId}.${n}")(
+      DataMapping(s"${sampleId}.${n}", blastDataProcessing(params))(
         remoteInput = Map(
           data.readsChunk -> S3Resource(chunkS3Obj)
         ),
@@ -95,7 +95,7 @@ case class StandardDataflow(
   lazy val mergeDataMappings: List[AnyDataMapping] = splitDataMappings.map { splitDM =>
     val sampleId = splitDM.label
 
-    DataMapping(sampleId)(
+    DataMapping(sampleId, mergeDataProcessing)(
       remoteInput = Map(
         data.blastChunks -> S3Resource(outputS3Folder(sampleId, "blast"))
       ),
@@ -108,7 +108,7 @@ case class StandardDataflow(
   lazy val assignmentDataMappings: List[AnyDataMapping] = mergeDataMappings.map { mergeDM =>
     val sampleId = mergeDM.label
 
-    DataMapping(sampleId)(
+    DataMapping(sampleId, assignmentDataProcessing(params))(
       remoteInput = mergeDM.remoteOutput,
       remoteOutput = Map(
         data.lcaCSV -> S3Resource(outputS3Folder(sampleId, "assignment") / s"${sampleId}.lca.csv"),
@@ -120,7 +120,7 @@ case class StandardDataflow(
   lazy val countingDataMappings: List[AnyDataMapping] = assignmentDataMappings.map { assignmentDM =>
     val sampleId = assignmentDM.label
 
-    DataMapping(sampleId)(
+    DataMapping(sampleId, countingDataProcessing)(
       remoteInput = assignmentDM.remoteOutput,
       remoteOutput = Map(
         data.lcaCountsCSV -> S3Resource(outputS3Folder(sampleId, "counting") / s"${sampleId}.lca.counts.csv"),
