@@ -8,15 +8,23 @@ import com.amazonaws.services.s3.transfer._
 import better.files._
 
 
-case object blast16s extends Bundle() {
-  // val region = "eu-west-1"
+// TODO: the non-bundle part of the trait could be put in the blast-api lib
+trait AnyBlastReferenceDB extends AnyBundle {
+  val bucket: String
+  val name: String
+  val key: String
+
+  val destination: File = File(s"${name}.tgz")
+  val location: File = File(name)
+
+  val dbName: File = File(s"${name}/${name}.fasta")
+}
+
+case object blast16s extends Bundle() with AnyBlastReferenceDB {
   val bucket = "resources.ohnosequences.com"
   val name = "era7.16S.reference.sequences.0.1.0"
   val key = s"16s/${name}.tgz"
 
-  val destination: File = File(s"${name}.tgz")
-  val location: File = File(name)
-  val dbName: File = File(s"${name}/${name}.fasta")
 
   def instructions: AnyInstructions = {
 

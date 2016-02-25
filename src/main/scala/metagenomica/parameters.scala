@@ -28,6 +28,8 @@ trait AnyMG7Parameters {
   /* This is the number of reads in each chunk after the `split` step */
   // TODO: would be nice to have Nat here
   val chunkSize: Int
+
+  val refDB: bundles.AnyBlastReferenceDB
 }
 
 abstract class MG7Parameters[

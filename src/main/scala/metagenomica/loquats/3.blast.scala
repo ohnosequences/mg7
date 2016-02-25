@@ -24,7 +24,7 @@ import sys.process._
 case class blastDataProcessing[MD <: AnyMG7Parameters](val md: MD)
 extends DataProcessingBundle(
   bundles.blast,
-  bundles.blast16s
+  md.refDB
 )(
   input = data.blastInput,
   output = data.blastOutput
@@ -60,7 +60,7 @@ extends DataProcessingBundle(
         val expr = blastn(
           outputRecord = md.blastOutRec,
           argumentValues = blastn.arguments(
-            db(bundles.blast16s.dbName) ::
+            db(md.refDB.dbName) ::
             query(readFile) ::
             out(outFile) ::
             *[AnyDenotation]
