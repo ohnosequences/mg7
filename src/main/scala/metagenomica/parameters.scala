@@ -29,7 +29,8 @@ trait AnyMG7Parameters {
   // TODO: would be nice to have Nat here
   val chunkSize: Int
 
-  val refDB: bundles.AnyBlastReferenceDB
+  val referenceDB: bundles.AnyBlastReferenceDB
+  val referenceMap: bundles.AnyReferenceMap
 }
 
 abstract class MG7Parameters[
@@ -37,7 +38,8 @@ abstract class MG7Parameters[
 ](val readsLength: illumina.Length,
   val blastOutRec: BR,
   val chunkSize: Int = 5,
-  val refDB: bundles.AnyBlastReferenceDB
+  val referenceDB: bundles.AnyBlastReferenceDB,
+  val referenceMap: bundles.AnyReferenceMap
 // )(implicit
   // TODO: add a check for minimal set of properties in the record (like bitscore and sgi)
 ) extends AnyMG7Parameters {

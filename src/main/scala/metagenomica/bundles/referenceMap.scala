@@ -1,39 +1,55 @@
 package ohnosequences.mg7.bundles
 
+import ohnosequences.mg7._
+
 import ohnosequences.statika._
+import ohnosequences.loquat.utils._
+import ohnosequences.awstools.s3.S3Object
 
 import com.amazonaws.auth._
 import com.amazonaws.services.s3.transfer._
 
 import better.files._
+import com.github.tototoshi.csv._
 
 
-sealed class GIsBundle(name: String) extends Bundle() {
-  val bucket = "resources.ohnosequences.com"
-  val key = s"16s/${name}"
+trait AnyReferenceMap extends AnyBundle {
+  val name: String
+  val s3Address: S3Object
 
-  val destination: File = File(name)
-  val location: File = destination
+  lazy val destination: File = File(name)
 
   def instructions: AnyInstructions = {
 
     LazyTry {
-      println(s"""Dowloading
-        |from: s3://${bucket}/${key}
-        |to: ${destination.path}
-        |""".stripMargin)
-
       // val transferManager = new TransferManager(new ProfileCredentialsProvider("default"))
       val transferManager = new TransferManager(new InstanceProfileCredentialsProvider())
-      val transfer = transferManager.download(bucket, key, destination.toJava)
-      transfer.waitForCompletion
+      transferManager.download(s3Address, destination)
     } -&-
-    say(s"GIs database ${name} was dowloaded and unpacked to ${location.path}")
+    say(s"Reference IDs mapping ${name} was dowloaded and unpacked to ${destination.path}")
+  }
+
+  def mapping: Map[ID, TaxID] = {
+    // Reading TSV file with mapping something-taxId
+    val tsvReader: CSVReader = CSVReader.open( destination.toJava )(new TSVFormat {})
+
+    val idsMap: Map[ID, TaxID] = tsvReader.iterator.map { row =>
+      row(0) -> row(1)
+    }.toMap
+
+    tsvReader.close
+
+    idsMap
   }
 }
 
+
+
 /* This is what will be used in the assignment loquat */
-case object filteredGIs extends GIsBundle("gi_taxid_filtered.csv")
+case object filteredGIs extends Bundle() with AnyReferenceMap {
+  val name = "gi_taxid_filtered.csv"
+  val s3Address = S3Object("resources.ohnosequences.com", s"16s/${name}")
+}
 
 
 case object filtering {
@@ -42,7 +58,10 @@ case object filtering {
   import ohnosequences.awstools.ec2._
   import ohnosequences.awstools.regions.Region._
 
-  case object originalGIs extends GIsBundle("gi_taxid_nucl.dmp")
+  case object originalGIs extends Bundle() with AnyReferenceMap {
+    val name = "gi_taxid_nucl.dmp"
+    val s3Address = S3Object("resources.ohnosequences.com", s"16s/${name}")
+  }
 
   // this is applied only once:
   case object filterGIs extends Bundle(originalGIs) {
@@ -75,7 +94,7 @@ case object filtering {
         val refGIs: Set[String] = io.Source.fromFile( referenceFile.toJava ).getLines.toSet
 
         import com.github.tototoshi.csv._
-        val csvReader = CSVReader.open(originalGIs.location.toJava)(new TSVFormat {})
+        val csvReader = CSVReader.open(originalGIs.destination.toJava)(new TSVFormat {})
         val csvWriter = CSVWriter.open(filteredFile.toJava, append = true)(new TSVFormat {})
 
         // iterating over huge GIs file and filtering it

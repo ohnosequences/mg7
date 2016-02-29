@@ -33,11 +33,6 @@ trait AnyBlastReferenceDB extends AnyBundle {
   }
 }
 
-abstract class BlastReferenceDB(
-  val name: String,
-  val s3Address: S3Object
-) extends Bundle() with AnyBlastReferenceDB
-
 
 // Here's the default one:
 case object blast16s extends Bundle() with AnyBlastReferenceDB {

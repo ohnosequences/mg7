@@ -16,11 +16,12 @@ import ohnosequences.{ blast => b }, b.api._, outputFields._
 import java.io.{ BufferedWriter, FileWriter, File }
 import scala.util.Try
 
+import com.github.tototoshi.csv._
 
 case class assignmentDataProcessing[MD <: AnyMG7Parameters](val md: MD)
 extends DataProcessingBundle(
   bundles.bio4jNCBITaxonomy,
-  bundles.filteredGIs
+  md.referenceMap
 )(
   input = data.assignmentInput,
   output = data.assignmentOutput
@@ -36,14 +37,7 @@ extends DataProcessingBundle(
 
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
 
-    import com.github.tototoshi.csv._
-
-    // Reading TSV file with mapping gis-taxIds
-    val gisReader: CSVReader = CSVReader.open( bundles.filteredGIs.location.toJava )(new TSVFormat {})
-    val gisMap: Map[GI, TaxID] = gisReader.iterator.map { row =>
-      row(0) -> row(1)
-    }.toMap
-    gisReader.close
+    val referenceMapping: Map[ID, TaxID] = md.referenceMap.mapping
 
     val blastReader: CSVReader = CSVReader.open( context.inputFile(data.blastResult).toJava )
 
@@ -62,11 +56,11 @@ extends DataProcessingBundle(
               val maxRow: Seq[String] = hits.maxBy { row: Seq[String] =>
                 column(row, bitscore).flatMap(parseInt).getOrElse(0)
               }
-              column(maxRow, sgi).flatMap(gisMap.get)
+              column(maxRow, sgi).flatMap(referenceMapping.get)
             }
 
           // for each hit row we take the column with GI and lookup its TaxID
-          val taxIds: List[TaxID] = hits.toList.flatMap(column(_, sgi)).flatMap(gisMap.get)
+          val taxIds: List[TaxID] = hits.toList.flatMap(column(_, sgi)).flatMap(referenceMapping.get)
           // then we generate Titan taxon nodes
           val nodes: List[TitanTaxonNode] = titanTaxonNodes(bundles.bio4jNCBITaxonomy.graph, taxIds)
           // and return the taxon node ID corresponding to the read
