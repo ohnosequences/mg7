@@ -28,13 +28,16 @@ trait AnyMG7Parameters {
   /* This is the number of reads in each chunk after the `split` step */
   // TODO: would be nice to have Nat here
   val chunkSize: Int
+
+  val refDB: bundles.AnyBlastReferenceDB
 }
 
 abstract class MG7Parameters[
   BR <: AnyBlastOutputRecord.For[blastn.type]
 ](val readsLength: illumina.Length,
   val blastOutRec: BR,
-  val chunkSize: Int = 5
+  val chunkSize: Int = 5,
+  val refDB: bundles.AnyBlastReferenceDB
 // )(implicit
   // TODO: add a check for minimal set of properties in the record (like bitscore and sgi)
 ) extends AnyMG7Parameters {
