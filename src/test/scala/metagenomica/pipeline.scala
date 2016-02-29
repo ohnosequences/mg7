@@ -39,7 +39,8 @@ case object test {
   case object testParameters extends MG7Parameters(
     readsLength = bp300,
     blastOutRec = blastOutRec,
-    refDB = bundles.blast16s
+    referenceDB = bundles.blast16s,
+    referenceMap = bundles.filteredGIs
   )
 
   val defaultAMI = AmazonLinuxAMI(Ireland, HVM, InstanceStore)
