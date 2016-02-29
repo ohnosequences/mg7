@@ -79,6 +79,10 @@ extends DataProcessingBundle(
     val lcaWriter = CSVWriter.open(lcaFile.toJava , append = true)
     val bbhWriter = CSVWriter.open(bbhFile.toJava , append = true)
 
+    // writing headers first:
+    lcaWriter.writeRow(List("Read-ID", "LCA-node"))
+    bbhWriter.writeRow(List("Read-ID", "BBH-node"))
+
     assignments foreach { case (readId, (lca, bbh)) =>
       lca foreach { nodeId => lcaWriter.writeRow(List(readId, nodeId)) }
       bbh foreach { nodeId => bbhWriter.writeRow(List(readId, nodeId)) }

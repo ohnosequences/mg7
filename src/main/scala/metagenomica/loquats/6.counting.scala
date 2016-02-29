@@ -9,7 +9,10 @@ import ohnosequences.loquat._
 import ohnosequences.statika._
 import ohnosequences.cosas._, types._, klists._
 import ohnosequences.datasets._
+
 import better.files._
+import com.github.tototoshi.csv._
+
 
 
 case object countingDataProcessing extends DataProcessingBundle(
@@ -62,8 +65,6 @@ case object countingDataProcessing extends DataProcessingBundle(
 
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
 
-    import com.github.tototoshi.csv._
-
     // same thing that we do for lca and bbh
     def processFile(f: File): File = {
       val csvReader: CSVReader = CSVReader.open( f.toJava )
@@ -75,6 +76,10 @@ case object countingDataProcessing extends DataProcessingBundle(
 
       val outFile = context / s"${f.name}.counts"
       val csvWriter = CSVWriter.open(outFile.toJava, append = true)
+
+      // writing headers first:
+      csvWriter.writeRow(List("Tax-ID", "Direct", "Accumulated"))
+
       counts foreach { case (taxId, (dir, acc)) => csvWriter.writeRow( List(taxId, dir, acc) ) }
       csvWriter.close
 
