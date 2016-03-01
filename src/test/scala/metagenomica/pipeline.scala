@@ -36,7 +36,22 @@ case object test {
       |[AnyOutputField]
     )
 
+  val commonS3Prefix = S3Folder("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592")
+
+  val sampleIds: List[ID] = List("ERR567374")
+
+  val inputSamples: Map[ID, (S3Resource, S3Resource)] = sampleIds.map { id =>
+    id -> ((
+      S3Resource(commonS3Prefix / "reads" / s"${id}_1.fastq.gz"),
+      S3Resource(commonS3Prefix / "reads" / s"${id}_2.fastq.gz")
+    ))
+  }.toMap
+
+  def testOutS3Folder(sample: SampleID, step: StepName): S3Folder =
+    commonS3Prefix / s"${step}-test" / sample /
+
   case object testParameters extends MG7Parameters(
+    outputS3Folder = testOutS3Folder,
     readsLength = bp300,
     blastOutRec = blastOutRec,
     referenceDB = bundles.rna16s
@@ -83,21 +98,7 @@ case object test {
     keypairName = "aalekhin"
   )
 
-  val commonS3Prefix = S3Folder("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592")
-
-  val sampleIds: List[ID] = List("ERR567374")
-
-  val inputSamples: Map[ID, (S3Object, S3Object)] = sampleIds.map { id =>
-    id -> ((
-      commonS3Prefix / "reads" / s"${id}_1.fastq.gz",
-      commonS3Prefix / "reads" / s"${id}_2.fastq.gz"
-    ))
-  }.toMap
-
-  def outputS3Folder(sample: SampleID, step: StepName): S3Folder =
-    commonS3Prefix / s"${step}-test" / sample /
-
-  val dataflow = StandardDataflow(testParameters)(inputSamples, outputS3Folder)
+  val dataflow = FullDataflow(testParameters)(inputSamples)
 
 
   case object flashConfig extends TestLoquatConfig("flash", dataflow.flashDataMappings)
