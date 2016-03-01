@@ -72,16 +72,16 @@ case object bio4jNCBITaxonomy extends AnyBio4jDist {
 // }
 
 
-case object bio4jBundleTest {
-
-  import ohnosequences.statika.aws._
-  import ohnosequences.awstools.ec2._
-  import ohnosequences.awstools.regions.Region._
-
-  case object bio4jTaxonomyCompat extends Compatible(
-    amznAMIEnv(AmazonLinuxAMI(Ireland, HVM, InstanceStore)),
-    bio4jNCBITaxonomy,
-    generated.metadata.mg7
-  )
-
-}
+// case object bio4jBundleTest {
+//
+//   import ohnosequences.statika.aws._
+//   import ohnosequences.awstools.ec2._
+//   import ohnosequences.awstools.regions.Region._
+//
+//   case object bio4jTaxonomyCompat extends Compatible(
+//     amznAMIEnv(AmazonLinuxAMI(Ireland, HVM, InstanceStore)),
+//     bio4jNCBITaxonomy,
+//     generated.metadata.mg7
+//   )
+//
+// }

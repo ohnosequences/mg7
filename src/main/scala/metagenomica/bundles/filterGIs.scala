@@ -79,10 +79,10 @@ case object filtering {
     }
   }
 
-  case object filterGIsCompat extends Compatible(
-    amznAMIEnv(AmazonLinuxAMI(Ireland, HVM, InstanceStore)),
-    filterGIs,
-    generated.metadata.mg7
-  )
+  // case object filterGIsCompat extends Compatible(
+  //   amznAMIEnv(AmazonLinuxAMI(Ireland, HVM, InstanceStore)),
+  //   filterGIs,
+  //   generated.metadata.mg7
+  // )
 
 }
