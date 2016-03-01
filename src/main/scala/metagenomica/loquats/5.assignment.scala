@@ -21,7 +21,7 @@ import com.github.tototoshi.csv._
 case class assignmentDataProcessing[MD <: AnyMG7Parameters](val md: MD)
 extends DataProcessingBundle(
   bundles.bio4jNCBITaxonomy,
-  md.referenceMap
+  md.referenceDB.idsMap
 )(
   input = data.assignmentInput,
   output = data.assignmentOutput
@@ -37,7 +37,7 @@ extends DataProcessingBundle(
 
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
 
-    val referenceMapping: Map[ID, TaxID] = md.referenceMap.mapping
+    val referenceMapping: Map[ID, TaxID] = md.referenceDB.idsMap.mapping
 
     val blastReader: CSVReader = CSVReader.open( context.inputFile(data.blastResult).toJava )
 
