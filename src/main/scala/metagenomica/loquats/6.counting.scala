@@ -66,7 +66,7 @@ case object countingDataProcessing extends DataProcessingBundle(
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
 
     // same thing that we do for lca and bbh
-    def processFile(f: File): File = {
+    def processFile(f: File): (File, File) = {
       val csvReader: CSVReader = CSVReader.open( f.toJava )
       val counts: Map[TaxID, (Int, Int)] = accumulatedCounts(
         // FIXME: use some csv api instead of row(1)
@@ -74,25 +74,36 @@ case object countingDataProcessing extends DataProcessingBundle(
       )
       csvReader.close
 
-      val outFile = context / s"${f.name}.counts"
-      val csvWriter = CSVWriter.open(outFile.toJava, append = true)
+      val outDirectFile = context / s"${f.name}.counts"
+      val outAccumFile  = context / s"${f.name}.counts"
 
-      // writing headers first:
-      csvWriter.writeRow(List("Tax-ID", "Direct", "Accumulated"))
+      val csvDirectWriter = CSVWriter.open(outDirectFile.toJava, append = true)
+      val csvAccumWriter  = CSVWriter.open(outAccumFile.toJava, append = true)
 
-      counts foreach { case (taxId, (dir, acc)) => csvWriter.writeRow( List(taxId, dir, acc) ) }
-      csvWriter.close
+      // headers:
+      csvDirectWriter.writeRow(List("Tax-ID", "Direct"))
+      csvAccumWriter.writeRow(List("Tax-ID", "Accumulated"))
 
-      outFile
+      counts foreach { case (taxId, (dir, acc)) =>
+        csvDirectWriter.writeRow( List(taxId, dir) )
+        csvAccumWriter.writeRow( List(taxId, acc) )
+      }
+
+      csvDirectWriter.close
+      csvAccumWriter.close
+
+      (outDirectFile, outAccumFile)
     }
 
-    val lcaOut: File = processFile( context.inputFile(data.lcaCSV) )
-    val bbhOut: File = processFile( context.inputFile(data.bbhCSV) )
+    val (lcaDirectOut, lcaAccumOut) = processFile( context.inputFile(data.lcaCSV) )
+    val (bbhDirectOut, bbhAccumOut) = processFile( context.inputFile(data.bbhCSV) )
 
     success(
       s"Results are written to ...",
-      data.lcaCountsCSV(lcaOut) ::
-      data.bbhCountsCSV(bbhOut) ::
+      data.lcaDirectCountsCSV(lcaDirectOut) ::
+      data.bbhDirectCountsCSV(bbhDirectOut) ::
+      data.lcaAccumCountsCSV(lcaAccumOut) ::
+      data.bbhAccumCountsCSV(bbhAccumOut) ::
       *[AnyDenotation { type Value <: FileResource }]
     )
   }

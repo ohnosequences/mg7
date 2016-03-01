@@ -123,8 +123,10 @@ case class StandardDataflow[P <: AnyMG7Parameters](val params: P)(
     DataMapping(sampleId, countingDataProcessing)(
       remoteInput = assignmentDM.remoteOutput,
       remoteOutput = Map(
-        data.lcaCountsCSV -> S3Resource(outputS3Folder(sampleId, "counting") / s"${sampleId}.lca.counts.csv"),
-        data.bbhCountsCSV -> S3Resource(outputS3Folder(sampleId, "counting") / s"${sampleId}.bbh.counts.csv")
+        data.lcaDirectCountsCSV -> S3Resource(outputS3Folder(sampleId, "counting") / s"${sampleId}.lca.direct.counts.csv"),
+        data.bbhDirectCountsCSV -> S3Resource(outputS3Folder(sampleId, "counting") / s"${sampleId}.bbh.direct.counts.csv"),
+        data.lcaAccumCountsCSV  -> S3Resource(outputS3Folder(sampleId, "counting") / s"${sampleId}.lca.accum.counts.csv"),
+        data.bbhAccumCountsCSV  -> S3Resource(outputS3Folder(sampleId, "counting") / s"${sampleId}.bbh.accum.counts.csv")
       )
     )
   }
