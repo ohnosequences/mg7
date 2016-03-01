@@ -1,5 +1,6 @@
 package ohnosequences
 
+import ohnosequences.mg7.bio4j.taxonomyTree._
 import ohnosequences.cosas._, types._, klists._
 import ohnosequences.blast.api._
 
@@ -10,8 +11,8 @@ package object mg7 {
   type ReadID = ID
   type NodeID = ID
 
-  type LCA = Option[NodeID]
-  type BBH = Option[NodeID]
+  type LCA = Option[AnyTaxonNode]
+  type BBH = Option[AnyTaxonNode]
 
   type SampleID = ID
   type StepName = String

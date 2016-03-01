@@ -8,7 +8,8 @@ case object taxonomyTree {
   trait AnyTaxonNode extends Any {
 
     def id: String
-    // TODO: any other useful information (i.e. name)
+    def name: String
+    def rank: String
 
     // root doesn't have parent
     def parent: Option[AnyTaxonNode]
