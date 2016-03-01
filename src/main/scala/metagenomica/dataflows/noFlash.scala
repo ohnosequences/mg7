@@ -18,7 +18,7 @@ import com.amazonaws.auth._, profile._
 
 /* ## No-flash Dataflow
 
-  No-flash dataflow consists of all steps of the MG7 pipeline:
+  No-flash dataflow consists of the following steps of the MG7 pipeline:
 
   2. split: splitting each dataset of reads on small chunks
   3. blast: processing each chunk of reads with blast
@@ -26,22 +26,18 @@ import com.amazonaws.auth._, profile._
   5. assignment: assigning taxons (LCA and BBH)
   6. counting: counting assignments
 */
-case class NoFlashDataflow[P <: AnyMG7Parameters](val params: P)(
-  val inputSamples: Map[ID, S3Object],
-  val outputS3Folder: (SampleID, StepName) => S3Folder
-) extends AnyDataflow {
+trait AnyNoFlashDataflow extends AnyDataflow {
 
-  type Params = P
+  val splitInputs: Map[SampleID, S3Resource]
 
-
-  lazy val splitDataMappings = inputSamples.toList.map { case (sampleId, readsS3Obj) =>
+  lazy val splitDataMappings = splitInputs.toList.map { case (sampleId, readsS3Resource) =>
 
     DataMapping(sampleId, splitDataProcessing(params))(
       remoteInput = Map(
-        data.mergedReads -> S3Resource(readsS3Obj)
+        data.mergedReads -> readsS3Resource
       ),
       remoteOutput = Map(
-        data.readsChunks -> S3Resource(outputS3Folder(sampleId, "split"))
+        data.readsChunks -> S3Resource(params.outputS3Folder(sampleId, "split"))
       )
     )
   }
@@ -67,7 +63,7 @@ case class NoFlashDataflow[P <: AnyMG7Parameters](val params: P)(
           data.readsChunk -> S3Resource(chunkS3Obj)
         ),
         remoteOutput = Map(
-          data.blastChunkOut -> S3Resource(outputS3Folder(sampleId, "blast") / s"blast.${n}.csv")
+          data.blastChunkOut -> S3Resource(params.outputS3Folder(sampleId, "blast") / s"blast.${n}.csv")
         )
       )
     }
@@ -78,10 +74,10 @@ case class NoFlashDataflow[P <: AnyMG7Parameters](val params: P)(
 
     DataMapping(sampleId, mergeDataProcessing)(
       remoteInput = Map(
-        data.blastChunks -> S3Resource(outputS3Folder(sampleId, "blast"))
+        data.blastChunks -> S3Resource(params.outputS3Folder(sampleId, "blast"))
       ),
       remoteOutput = Map(
-        data.blastResult -> S3Resource(outputS3Folder(sampleId, "merge") / s"${sampleId}.blast.csv")
+        data.blastResult -> S3Resource(params.outputS3Folder(sampleId, "merge") / s"${sampleId}.blast.csv")
       )
     )
   }
@@ -92,10 +88,17 @@ case class NoFlashDataflow[P <: AnyMG7Parameters](val params: P)(
     DataMapping(sampleId, assignmentDataProcessing(params))(
       remoteInput = mergeDM.remoteOutput,
       remoteOutput = Map(
-        data.lcaCSV -> S3Resource(outputS3Folder(sampleId, "assignment") / s"${sampleId}.lca.csv"),
-        data.bbhCSV -> S3Resource(outputS3Folder(sampleId, "assignment") / s"${sampleId}.bbh.csv")
+        data.lcaCSV -> S3Resource(params.outputS3Folder(sampleId, "assignment") / s"${sampleId}.lca.csv"),
+        data.bbhCSV -> S3Resource(params.outputS3Folder(sampleId, "assignment") / s"${sampleId}.bbh.csv")
       )
     )
   }
 
+}
+
+case class NoFlashDataflow[P <: AnyMG7Parameters](val params: P)(
+  val splitInputs: Map[SampleID, S3Resource]
+) extends AnyNoFlashDataflow {
+
+  type Params = P
 }

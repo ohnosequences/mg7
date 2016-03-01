@@ -2,16 +2,15 @@ package ohnosequences.mg7
 
 import ohnosequences.cosas._, types._, klists._
 
+import ohnosequences.awstools.s3._
 import ohnosequences.datasets._
-
 import ohnosequences.flash.api._
-
 import ohnosequences.blast.api._
-
-import scala.util.Try
 
 
 trait AnyMG7Parameters {
+
+  val outputS3Folder: (SampleID, StepName) => S3Folder
 
   val readsLength: illumina.Length
 
@@ -35,7 +34,9 @@ trait AnyMG7Parameters {
 
 abstract class MG7Parameters[
   BR <: AnyBlastOutputRecord.For[blastn.type]
-](val readsLength: illumina.Length,
+](
+  val outputS3Folder: (SampleID, StepName) => S3Folder,
+  val readsLength: illumina.Length,
   val blastOutRec: BR,
   val chunkSize: Int = 5,
   val referenceDB: bundles.AnyBlastReferenceDB,

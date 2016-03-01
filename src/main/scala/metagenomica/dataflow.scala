@@ -7,8 +7,6 @@ import ohnosequences.awstools.s3._
 
 trait AnyDataflow {
 
-  val outputS3Folder: (SampleID, StepName) => S3Folder
-
   // param-pam-pam
   type Params <: AnyMG7Parameters
   val  params: Params
@@ -29,8 +27,8 @@ trait AnyDataflow {
       DataMapping(sampleId, countingDataProcessing)(
         remoteInput = assignmentDM.remoteOutput,
         remoteOutput = Map(
-          data.lcaCountsCSV -> S3Resource(outputS3Folder(sampleId, "counting") / s"${sampleId}.lca.counts.csv"),
-          data.bbhCountsCSV -> S3Resource(outputS3Folder(sampleId, "counting") / s"${sampleId}.bbh.counts.csv")
+          data.lcaCountsCSV -> S3Resource(params.outputS3Folder(sampleId, "counting") / s"${sampleId}.lca.counts.csv"),
+          data.bbhCountsCSV -> S3Resource(params.outputS3Folder(sampleId, "counting") / s"${sampleId}.bbh.counts.csv")
         )
       )
     }
