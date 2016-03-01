@@ -24,6 +24,8 @@ trait AnyMG7Parameters {
   type BlastOutRec <: AnyBlastOutputRecord.For[blastn.type]
   val  blastOutRec: BlastOutRec
 
+  val blastOptions: blastn.OptionsVals
+
   /* This is the number of reads in each chunk after the `split` step */
   // TODO: would be nice to have Nat here
   val chunkSize: Int
@@ -37,6 +39,7 @@ abstract class MG7Parameters[
   val outputS3Folder: (SampleID, StepName) => S3Folder,
   val readsLength: illumina.Length,
   val blastOutRec: BR,
+  val blastOptions: blastn.OptionsVals,
   val chunkSize: Int = 5,
   val referenceDB: bundles.AnyReferenceDB
 // )(implicit

@@ -65,14 +65,15 @@ extends DataProcessingBundle(
             out(outFile) ::
             *[AnyDenotation]
           ).value,
-          optionValues   = blastn.defaults.update(
-            num_threads(1) ::
-            word_size(42) ::
-            max_target_seqs(10) ::
-            evalue(0.001) ::
-            blastn.task(blastn.megablast) ::
-            *[AnyDenotation]
-          ).value
+          optionValues = md.blastOptions
+          // blastn.defaults.update(
+          //   num_threads(1) ::
+          //   word_size(42) ::
+          //   max_target_seqs(10) ::
+          //   evalue(0.001) ::
+          //   blastn.task(blastn.megablast) ::
+          //   *[AnyDenotation]
+          // ).value
         )
         println(expr.toSeq.mkString(" "))
 
