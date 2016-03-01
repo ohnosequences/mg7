@@ -18,13 +18,14 @@ package object mg7 {
 
   def parseInt(str: String): Option[Int] = util.Try(str.toInt).toOption
 
-  val defaultBlastOptions: blastn.OptionsVals = blastn.defaults.update(
-    num_threads(1) ::
-    word_size(42) ::
-    max_target_seqs(10) ::
-    evalue(0.001) ::
-    blastn.task(blastn.megablast) ::
-    *[AnyDenotation]
-  ).value
+  val defaultBlastOptions: blastn.Options := blastn.OptionsVals =
+    blastn.defaults.update(
+      num_threads(1) ::
+      word_size(42) ::
+      max_target_seqs(10) ::
+      evalue(0.001) ::
+      blastn.task(blastn.megablast) ::
+      *[AnyDenotation]
+    )
 
 }

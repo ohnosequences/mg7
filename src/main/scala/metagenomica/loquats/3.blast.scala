@@ -64,7 +64,7 @@ extends DataProcessingBundle(
             query(readFile) ::
             out(outFile) ::
             *[AnyDenotation],
-          optionValues = md.blastOptions
+          optionValues = md.blastOptions.value
         )
         println(expr.toSeq.mkString(" "))
 

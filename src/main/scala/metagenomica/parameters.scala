@@ -24,7 +24,7 @@ trait AnyMG7Parameters {
   type BlastOutRec <: AnyBlastOutputRecord.For[blastn.type]
   val  blastOutRec: BlastOutRec
 
-  val blastOptions: blastn.OptionsVals
+  val blastOptions: blastn.Options := blastn.OptionsVals
 
   /* This is the number of reads in each chunk after the `split` step */
   // TODO: would be nice to have Nat here

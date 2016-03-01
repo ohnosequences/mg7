@@ -54,7 +54,7 @@ case object test {
     outputS3Folder = testOutS3Folder,
     readsLength = bp300,
     blastOutRec = blastOutRec,
-    blastOptions = defaultBlastOptions,
+    blastOptions = defaultBlastOptions.value,
     referenceDB = bundles.rna16s
   )
 
