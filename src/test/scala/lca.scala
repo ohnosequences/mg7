@@ -8,11 +8,15 @@ class LCATest extends org.scalatest.FunSuite {
 
     case object root extends AnyTaxonNode {
       val id = "root"
+      val name = "root"
+      val rank = ""
       val parent = None
     }
 
     class node(p: AnyTaxonNode) extends AnyTaxonNode {
       val id = this.toString
+      val name = id
+      val rank = ""
       val parent = Some(p)
     }
 

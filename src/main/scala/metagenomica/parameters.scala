@@ -7,6 +7,9 @@ import ohnosequences.datasets._
 import ohnosequences.flash.api._
 import ohnosequences.blast.api._
 
+sealed trait BlastInputFormat { val rows: Int }
+case object FastaInput extends BlastInputFormat { val rows = 2 }
+case object FastQInput extends BlastInputFormat { val rows = 4 }
 
 trait AnyMG7Parameters {
 
@@ -20,6 +23,8 @@ trait AnyMG7Parameters {
     max_overlap(readsLength.toInt) ::
     *[AnyDenotation]
   )
+
+  val blastInputFormat: BlastInputFormat
 
   type BlastOutRec <: AnyBlastOutputRecord.For[blastn.type]
   val  blastOutRec: BlastOutRec
@@ -38,6 +43,7 @@ abstract class MG7Parameters[
 ](
   val outputS3Folder: (SampleID, StepName) => S3Folder,
   val readsLength: illumina.Length,
+  val blastInputFormat: BlastInputFormat,
   val blastOutRec: BR,
   val blastOptions: blastn.Options := blastn.OptionsVals,
   val chunkSize: Int = 5,
