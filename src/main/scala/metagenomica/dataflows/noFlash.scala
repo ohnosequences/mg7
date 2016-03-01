@@ -16,45 +16,29 @@ import ohnosequences.awstools.autoscaling._
 import ohnosequences.awstools.regions.Region._
 import com.amazonaws.auth._, profile._
 
-/* ## Standard Dataflow
+/* ## No-flash Dataflow
 
-  Standard dataflow consists of all steps of the MG7 pipeline:
+  No-flash dataflow consists of all steps of the MG7 pipeline:
 
-  1. flash: merging paired end reads
   2. split: splitting each dataset of reads on small chunks
   3. blast: processing each chunk of reads with blast
   4. merge: merging blast chunks into complete results per original reads datasets
   5. assignment: assigning taxons (LCA and BBH)
   6. counting: counting assignments
 */
-case class StandardDataflow[P <: AnyMG7Parameters](val params: P)(
-  val inputSamples: Map[ID, (S3Object, S3Object)],
+case class NoFlashDataflow[P <: AnyMG7Parameters](val params: P)(
+  val inputSamples: Map[ID, S3Object],
   val outputS3Folder: (SampleID, StepName) => S3Folder
 ) extends AnyDataflow {
 
   type Params = P
 
-  lazy val flashDataMappings = inputSamples.toList.map {
-    case (sampleId, (reads1S3Obj, reads2S3Obj)) =>
 
-      DataMapping(sampleId, flashDataProcessing(params))(
-        remoteInput = Map(
-          data.pairedReads1 -> S3Resource(reads1S3Obj),
-          data.pairedReads2 -> S3Resource(reads2S3Obj)
-        ),
-        remoteOutput = Map(
-          data.mergedReads -> S3Resource(outputS3Folder(sampleId, "flash") / s"${sampleId}.merged.fastq"),
-          data.flashStats  -> S3Resource(outputS3Folder(sampleId, "flash") / s"${sampleId}.stats.txt")
-        )
-      )
-  }
-
-  lazy val splitDataMappings = flashDataMappings.map { flashDM =>
-    val sampleId = flashDM.label
+  lazy val splitDataMappings = inputSamples.toList.map { case (sampleId, readsS3Obj) =>
 
     DataMapping(sampleId, splitDataProcessing(params))(
       remoteInput = Map(
-        data.mergedReads -> flashDM.remoteOutput(data.mergedReads)
+        data.mergedReads -> S3Resource(readsS3Obj)
       ),
       remoteOutput = Map(
         data.readsChunks -> S3Resource(outputS3Folder(sampleId, "split"))
