@@ -27,10 +27,10 @@ trait AnyDataflow {
       DataMapping(sampleId, countingDataProcessing)(
         remoteInput = assignmentDM.remoteOutput,
         remoteOutput = Map(
-          data.lcaDirectCountsCSV -> S3Resource(outputS3Folder(sampleId, "counting") / s"${sampleId}.lca.direct.absolute.counts.csv"),
-          data.bbhDirectCountsCSV -> S3Resource(outputS3Folder(sampleId, "counting") / s"${sampleId}.bbh.direct.absolute.counts.csv"),
-          data.lcaAccumCountsCSV  -> S3Resource(outputS3Folder(sampleId, "counting") / s"${sampleId}.lca.accum.absolute.counts.csv"),
-          data.bbhAccumCountsCSV  -> S3Resource(outputS3Folder(sampleId, "counting") / s"${sampleId}.bbh.accum.absolute.counts.csv")
+          data.lcaDirectCountsCSV -> S3Resource(params.outputS3Folder(sampleId, "counting") / s"${sampleId}.lca.direct.absolute.counts.csv"),
+          data.bbhDirectCountsCSV -> S3Resource(params.outputS3Folder(sampleId, "counting") / s"${sampleId}.bbh.direct.absolute.counts.csv"),
+          data.lcaAccumCountsCSV  -> S3Resource(params.outputS3Folder(sampleId, "counting") / s"${sampleId}.lca.accum.absolute.counts.csv"),
+          data.bbhAccumCountsCSV  -> S3Resource(params.outputS3Folder(sampleId, "counting") / s"${sampleId}.bbh.accum.absolute.counts.csv")
         )
       )
     }
