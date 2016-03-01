@@ -56,7 +56,9 @@ extends DataProcessingBundle(
               val maxRow: Seq[String] = hits.maxBy { row: Seq[String] =>
                 column(row, bitscore).flatMap(parseInt).getOrElse(0)
               }
-              column(maxRow, sgi).flatMap(referenceMapping.get)
+              column(maxRow, sgi).flatMap(referenceMapping.get).flatMap { taxId =>
+                titanTaxonNode(bundles.bio4jNCBITaxonomy.graph, taxId)
+              }
             }
 
           // for each hit row we take the column with GI and lookup its TaxID
@@ -64,7 +66,7 @@ extends DataProcessingBundle(
           // then we generate Titan taxon nodes
           val nodes: List[TitanTaxonNode] = titanTaxonNodes(bundles.bio4jNCBITaxonomy.graph, taxIds)
           // and return the taxon node ID corresponding to the read
-          val lca: LCA = solution(nodes).node.map(_.id)
+          val lca: LCA = solution(nodes).node //.map(_.id)
 
           Some( (readId, (lca, bbh)) )
         }
@@ -80,13 +82,13 @@ extends DataProcessingBundle(
     val bbhWriter = CSVWriter.open(bbhFile.toJava , append = true)
 
     // writing headers first:
-    val header = List("Read-ID", "Tax-ID")
+    val header = List("Read-ID", "Tax-ID", "Tax-name", "Tax-rank")
     lcaWriter.writeRow(header)
     bbhWriter.writeRow(header)
 
     assignments foreach { case (readId, (lca, bbh)) =>
-      lca foreach { nodeId => lcaWriter.writeRow(List(readId, nodeId)) }
-      bbh foreach { nodeId => bbhWriter.writeRow(List(readId, nodeId)) }
+      lca foreach { node => lcaWriter.writeRow(List(readId, node.id, node.name, node.rank)) }
+      bbh foreach { node => bbhWriter.writeRow(List(readId, node.id, node.name, node.rank)) }
     }
 
     lcaWriter.close
