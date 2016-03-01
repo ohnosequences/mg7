@@ -59,21 +59,12 @@ extends DataProcessingBundle(
 
         val expr = blastn(
           outputRecord = md.blastOutRec,
-          argumentValues = blastn.arguments(
+          argumentValues =
             db(md.referenceDB.dbName) ::
             query(readFile) ::
             out(outFile) ::
-            *[AnyDenotation]
-          ).value,
+            *[AnyDenotation],
           optionValues = md.blastOptions
-          // blastn.defaults.update(
-          //   num_threads(1) ::
-          //   word_size(42) ::
-          //   max_target_seqs(10) ::
-          //   evalue(0.001) ::
-          //   blastn.task(blastn.megablast) ::
-          //   *[AnyDenotation]
-          // ).value
         )
         println(expr.toSeq.mkString(" "))
 
