@@ -56,13 +56,13 @@ extends DataProcessingBundle(
               val maxRow: Seq[String] = hits.maxBy { row: Seq[String] =>
                 column(row, bitscore).flatMap(parseInt).getOrElse(0)
               }
-              column(maxRow, sgi).flatMap(referenceMapping.get).flatMap { taxId =>
+              column(maxRow, sseqid).flatMap(referenceMapping.get).flatMap { taxId =>
                 titanTaxonNode(bundles.bio4jNCBITaxonomy.graph, taxId)
               }
             }
 
-          // for each hit row we take the column with GI and lookup its TaxID
-          val taxIds: List[TaxID] = hits.toList.flatMap(column(_, sgi)).flatMap(referenceMapping.get)
+          // for each hit row we take the column with ID and lookup its TaxID
+          val taxIds: List[TaxID] = hits.toList.flatMap(column(_, sseqid)).flatMap(referenceMapping.get)
           // then we generate Titan taxon nodes
           val nodes: List[TitanTaxonNode] = titanTaxonNodes(bundles.bio4jNCBITaxonomy.graph, taxIds)
           // and return the taxon node ID corresponding to the read

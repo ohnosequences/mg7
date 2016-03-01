@@ -17,24 +17,9 @@ import ohnosequences.awstools.autoscaling._
 import ohnosequences.awstools.regions.Region._
 import com.amazonaws.auth._, profile._
 
-import ohnosequences.blast.api._, outputFields._
 
 
 case object test {
-
-  case object blastOutRec extends BlastOutputRecord(
-      qseqid   :×:
-      qlen     :×:
-      qstart   :×:
-      qend     :×:
-      sseqid   :×:
-      slen     :×:
-      sstart   :×:
-      send     :×:
-      bitscore :×:
-      sgi      :×:
-      |[AnyOutputField]
-    )
 
   val commonS3Prefix = S3Folder("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592")
 
@@ -53,7 +38,7 @@ case object test {
   case object testParameters extends MG7Parameters(
     outputS3Folder = testOutS3Folder,
     readsLength = bp300,
-    blastOutRec = blastOutRec,
+    blastOutRec = defaultBlastOutRec,
     blastOptions = defaultBlastOptions.value,
     referenceDB = bundles.rna16s
   )

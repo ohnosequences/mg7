@@ -19,6 +19,21 @@ package object mg7 {
 
   def parseInt(str: String): Option[Int] = util.Try(str.toInt).toOption
 
+
+  case object defaultBlastOutRec extends BlastOutputRecord(
+      outputFields.qseqid   :×:
+      outputFields.qlen     :×:
+      outputFields.qstart   :×:
+      outputFields.qend     :×:
+      outputFields.sseqid   :×:
+      outputFields.slen     :×:
+      outputFields.sstart   :×:
+      outputFields.send     :×:
+      outputFields.bitscore :×:
+      outputFields.sgi      :×:
+      |[AnyOutputField]
+    )
+
   val defaultBlastOptions: blastn.Options := blastn.OptionsVals =
     blastn.defaults.update(
       num_threads(1) ::
