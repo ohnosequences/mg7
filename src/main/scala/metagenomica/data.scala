@@ -50,10 +50,18 @@ case object data {
 
 
   // Counting output:
-  case object lcaCountsCSV extends FileData("lca.counts")("csv")
-  case object bbhCountsCSV extends FileData("bbh.counts")("csv")
+  case object lcaDirectCountsCSV extends FileData("lca.direct.counts")("csv")
+  case object bbhDirectCountsCSV extends FileData("bbh.direct.counts")("csv")
+  case object lcaAccumCountsCSV extends FileData("lca.accum.counts")("csv")
+  case object bbhAccumCountsCSV extends FileData("bbh.accum.counts")("csv")
 
   case object countingInput extends DataSet(lcaCSV :×: bbhCSV :×: |[AnyData])
-  case object countingOutput extends DataSet(lcaCountsCSV :×: bbhCountsCSV :×: |[AnyData])
+  case object countingOutput extends DataSet(
+    lcaDirectCountsCSV :×:
+    bbhDirectCountsCSV :×:
+    lcaAccumCountsCSV :×: 
+    bbhAccumCountsCSV :×:
+    |[AnyData]
+  )
 
 }
