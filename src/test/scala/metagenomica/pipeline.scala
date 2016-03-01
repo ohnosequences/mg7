@@ -21,27 +21,14 @@ import com.amazonaws.auth._, profile._
 
 case object test {
 
-  val commonS3Prefix = S3Folder("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592")
-
-  val sampleIds: List[ID] = List("ERR567374")
-
-  val inputSamples: Map[ID, (S3Resource, S3Resource)] = sampleIds.map { id =>
-    id -> ((
-      S3Resource(commonS3Prefix / "reads" / s"${id}_1.fastq.gz"),
-      S3Resource(commonS3Prefix / "reads" / s"${id}_2.fastq.gz")
-    ))
-  }.toMap
-
-  def testOutS3Folder(sample: SampleID, step: StepName): S3Folder =
-    commonS3Prefix / s"${step}-test" / sample /
-
   case object testParameters extends MG7Parameters(
     outputS3Folder = testOutS3Folder,
     readsLength = bp300,
     blastInputFormat = FastQInput,
     blastOutRec = defaultBlastOutRec,
     blastOptions = defaultBlastOptions,
-    referenceDB = bundles.rna16s
+    referenceDB = bundles.rnaCentral,
+    chunkSize = 3
   )
 
   val defaultAMI = AmazonLinuxAMI(Ireland, HVM, InstanceStore)
@@ -85,11 +72,30 @@ case object test {
     keypairName = "aalekhin"
   )
 
-  val dataflow = FullDataflow(testParameters)(inputSamples)
+
+  val commonS3Prefix = S3Folder("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592")
+
+  val sampleIds: List[ID] = List("ERR567374")
+
+  def testOutS3Folder(sampleId: SampleID, step: StepName): S3Folder =
+    commonS3Prefix / s"${step}-test" / sampleId /
+
+  val inputSamples: Map[ID, (S3Resource, S3Resource)] = sampleIds.map { id =>
+    id -> ((
+      S3Resource(commonS3Prefix / "reads" / s"${id}_1.fastq.gz"),
+      S3Resource(commonS3Prefix / "reads" / s"${id}_2.fastq.gz")
+    ))
+  }.toMap
+
+  val splitInputs: Map[ID, S3Resource] = sampleIds.map { sampleId =>
+    sampleId -> S3Resource(commonS3Prefix / "flash-test" / s"${sampleId}.merged.fastq")
+  }.toMap
+
+  val dataflow = NoFlashDataflow(testParameters)(splitInputs)
 
 
-  case object flashConfig extends TestLoquatConfig("flash", dataflow.flashDataMappings)
-  case object flashLoquat extends Loquat(flashConfig, flashDataProcessing(testParameters))
+  // case object flashConfig extends TestLoquatConfig("flash", dataflow.flashDataMappings)
+  // case object flashLoquat extends Loquat(flashConfig, flashDataProcessing(testParameters))
 
   case object splitConfig extends TestLoquatConfig("split", dataflow.splitDataMappings)
   case object splitLoquat extends Loquat(splitConfig, splitDataProcessing(testParameters))
