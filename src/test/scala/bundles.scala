@@ -48,16 +48,16 @@
 //     }
 //   }
 //
-//   ignore("testing blast16s bundle") {
-//     import blast16sTest._
+//   ignore("testing rna16s bundle") {
+//     import rna16sTest._
 //
-//     val specs = blast16sCompat.instanceSpecs(
+//     val specs = rna16sCompat.instanceSpecs(
 //       instanceType = m3.medium,
 //       user.awsAccount.keypair.name,
 //       Some(era7.aws.roles.projects.name)
 //     )
 //
-//     val instances = launchAndWait(ec2, blast16sCompat.name, specs)
+//     val instances = launchAndWait(ec2, rna16sCompat.name, specs)
 //     assert{ instances.length == 1 }
 //   }
 //

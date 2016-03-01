@@ -54,8 +54,7 @@ case object test {
     outputS3Folder = testOutS3Folder,
     readsLength = bp300,
     blastOutRec = blastOutRec,
-    referenceDB = bundles.blast16s,
-    referenceMap = bundles.filteredGIs
+    referenceDB = bundles.rna16s
   )
 
   val defaultAMI = AmazonLinuxAMI(Ireland, HVM, InstanceStore)
