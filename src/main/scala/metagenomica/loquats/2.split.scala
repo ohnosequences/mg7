@@ -32,7 +32,7 @@ case class splitDataProcessing(params: AnyMG7Parameters) extends DataProcessingB
       lazy val chunks: Iterator[(Seq[String], Int)] =
         context.inputFile(data.mergedReads)
           .lines
-          .grouped(4 * params.chunkSize)
+          .grouped(params.blastInputFormat.rows * params.chunkSize)
           .zipWithIndex
 
       chunks foreach { case (chunk, n) =>
