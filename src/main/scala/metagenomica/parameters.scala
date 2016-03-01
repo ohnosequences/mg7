@@ -39,7 +39,7 @@ abstract class MG7Parameters[
   val outputS3Folder: (SampleID, StepName) => S3Folder,
   val readsLength: illumina.Length,
   val blastOutRec: BR,
-  val blastOptions: blastn.OptionsVals,
+  val blastOptions: blastn.Options := blastn.OptionsVals,
   val chunkSize: Int = 5,
   val referenceDB: bundles.AnyReferenceDB
 // )(implicit
