@@ -12,9 +12,7 @@ import ohnosequences.cosas._, types._, klists._
 
 import ohnosequences.datasets._
 
-import ohnosequences.fastarious._
-import ohnosequences.fastarious.fasta._
-import ohnosequences.fastarious.fastq._
+import ohnosequences.fastarious._, fasta._
 
 import better.files._
 
@@ -38,22 +36,18 @@ extends DataProcessingBundle(
 
     LazyTry {
       // NOTE: once we update to better-files 2.15.+, use `file.lineIterator` here (it's autoclosing):
-      lazy val source = io.Source.fromFile( context.inputFile(data.readsChunk).toJava )
+      lazy val source = io.Source.fromFile( context.inputFile(data.fastaChunk).toJava )
 
-      source.getLines.grouped(md.splitInputFormat.rows) foreach { quartet =>
-        // println(quartet.mkString("\n"))
+      fasta.parseMapFromLines(source.getLines) foreach { fastaMap =>
 
-        // we only care about the id and the seq here
         val read = FASTA(
-            header(FastqId(quartet(0)).toFastaHeader) ::
-            fasta.sequence(FastaSequence(quartet(1)))    ::
-            *[AnyDenotation]
-          )
+          header(FastaHeader(fastaMap(fasta.header.label))) ::
+          sequence(FastaSequence(fastaMap(fasta.sequence.label))) ::
+          *[AnyDenotation]
+        )
 
         val readFile = context / "read.fa"
-        readFile
-          .createIfNotExists()
-          .appendLine(read.toLines)
+        readFile.overwrite(read.toLines)
 
         val outFile = context / "blastRead.csv"
 

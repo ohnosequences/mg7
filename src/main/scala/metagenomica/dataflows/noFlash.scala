@@ -37,7 +37,7 @@ trait AnyNoFlashDataflow extends AnyDataflow {
         data.mergedReads -> readsS3Resource
       ),
       remoteOutput = Map(
-        data.readsChunks -> S3Resource(params.outputS3Folder(sampleId, "split"))
+        data.fastaChunks -> S3Resource(params.outputS3Folder(sampleId, "split"))
       )
     )
   }
@@ -52,7 +52,7 @@ trait AnyNoFlashDataflow extends AnyDataflow {
       )
     )
 
-    lazy val chunksS3Folder: AnyS3Address = splitDM.remoteOutput(data.readsChunks).resource
+    lazy val chunksS3Folder: AnyS3Address = splitDM.remoteOutput(data.fastaChunks).resource
 
     lazy val chunks: List[S3Object] = s3.listObjects(chunksS3Folder.bucket, chunksS3Folder.key)
 
@@ -60,7 +60,7 @@ trait AnyNoFlashDataflow extends AnyDataflow {
 
       DataMapping(s"${sampleId}.${n}", blastDataProcessing(params))(
         remoteInput = Map(
-          data.readsChunk -> S3Resource(chunkS3Obj)
+          data.fastaChunk -> S3Resource(chunkS3Obj)
         ),
         remoteOutput = Map(
           data.blastChunkOut -> S3Resource(params.outputS3Folder(sampleId, "blast") / s"blast.${n}.csv")
