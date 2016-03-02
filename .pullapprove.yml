@@ -1,10 +1,10 @@
 approve_by_comment: true
-approve_regex: '^(:\+1:|Approved|OK)|LGTM'
+approve_regex: '^(:\+1:|:shipit:|Approved|OK)|LGTM'
 reject_regex: '^(:-1:|Rejected)'
-reject_value: -1
+# reject_value: -1
 reset_on_push: true
 reset_on_reopened: true
-author_approval: ignored
+# author_approval: ignored
 reviewers:
     - # maintainer has to approve everything that is _merged to master_
         name: maintainer
