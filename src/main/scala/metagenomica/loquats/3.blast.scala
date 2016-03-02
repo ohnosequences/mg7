@@ -46,14 +46,14 @@ extends DataProcessingBundle(
         // we only care about the id and the seq here
         val read = FASTA(
             header(FastqId(quartet(0)).toFastaHeader) ::
-            fasta.sequence(FastaLines(quartet(1)))    ::
+            fasta.sequence(FastaSequence(quartet(1)))    ::
             *[AnyDenotation]
           )
 
         val readFile = context / "read.fa"
         readFile
           .createIfNotExists()
-          .appendLines(read.toLines: _*)
+          .appendLine(read.toLines)
 
         val outFile = context / "blastRead.csv"
 
