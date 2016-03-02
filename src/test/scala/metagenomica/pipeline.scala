@@ -9,7 +9,7 @@ import ohnosequences.cosas._, types._, klists._
 
 import ohnosequences.loquat._
 
-import ohnosequences.statika._
+import ohnosequences.statika._, aws._
 
 import ohnosequences.awstools.ec2._, InstanceType._
 import ohnosequences.awstools.s3._
@@ -45,7 +45,7 @@ case object test {
       purchaseModel = Spot(maxPrice = Some(0.1))
     )
 
-    val workersConfig = WorkersConfig(
+    val workersConfig: AnyWorkersConfig = WorkersConfig(
       instanceSpecs = InstanceSpecs(defaultAMI, m3.medium),
       purchaseModel = Spot(maxPrice = Some(0.1)),
       groupSize = AutoScalingGroupSize(0, 1, 10)
@@ -110,7 +110,16 @@ case object test {
   case object mergeConfig extends TestLoquatConfig("merge", dataflow.mergeDataMappings)
   case object mergeLoquat extends Loquat(mergeConfig, mergeDataProcessing)
 
-  case object assignmentConfig extends TestLoquatConfig("assignment", dataflow.assignmentDataMappings)
+  case object assignmentConfig extends TestLoquatConfig("assignment", dataflow.assignmentDataMappings) {
+
+    override lazy val amiEnv = amznAMIEnv(ami, javaHeap = 3)
+
+    override val workersConfig: AnyWorkersConfig = WorkersConfig(
+      instanceSpecs = InstanceSpecs(defaultAMI, r3.large),
+      purchaseModel = Spot(maxPrice = Some(0.4)),
+      groupSize = AutoScalingGroupSize(0, 1, 10)
+    )
+  }
   case object assignmentLoquat extends Loquat(assignmentConfig, assignmentDataProcessing(testParameters))
 
   case object countingConfig extends TestLoquatConfig("counting", dataflow.countingDataMappings)
