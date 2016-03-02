@@ -69,6 +69,12 @@ extends DataProcessingBundle(
 
         // BAM!!!
         expr.toSeq.!!
+        // low-level alternative
+        // val p = Runtime.getRuntime.exec(expr.toSeq.mkString(" "))
+        // // block until p finishes
+        // p.waitFor
+        // p.getInputStream.close; p.getOutputStream.close; p.getErrorStream.close
+        // p.destroy
         // println(s"BLAST EXIT CODE: ${exitCode}")
 
         // we should have something in args getV out now. Append it!
