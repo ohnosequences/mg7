@@ -17,7 +17,7 @@ libraryDependencies ++= Seq(
   // APIs:
   "ohnosequences" %% "flash"      % "0.3.0",
   "ohnosequences" %% "blast-api"  % "0.4.1",
-  "ohnosequences" %% "fastarious" % "0.2.0",
+  "ohnosequences" %% "fastarious" % "0.4.0",
   // generic tools:
   "ohnosequences" %% "cosas"      % "0.8.0",
   "ohnosequences" %% "datasets"   % "0.3.0",
@@ -42,27 +42,27 @@ dependencyOverrides ++= Set(
 
 
 
-// fatArtifactSettings
-//
-// // copied from bio4j-titan:
-// mergeStrategy in assembly ~= { old => {
-//     case "log4j.properties"                       => MergeStrategy.filterDistinctLines
-//     case PathList("org", "apache", "commons", _*) => MergeStrategy.first
-//     case x                                        => old(x)
-//   }
-// }
-//
-// enablePlugins(BuildInfoPlugin)
-// buildInfoPackage := "generated.metadata"
-// buildInfoObject  := name.value
-// buildInfoOptions := Seq(BuildInfoOption.Traits("ohnosequences.statika.AnyArtifactMetadata"))
-// buildInfoKeys    := Seq[BuildInfoKey](
-//   organization,
-//   version,
-//   "artifact" -> name.value.toLowerCase,
-//   "artifactUrl" -> fatArtifactUrl.value
-// )
+fatArtifactSettings
+
+// copied from bio4j-titan:
+mergeStrategy in assembly ~= { old => {
+    case "log4j.properties"                       => MergeStrategy.filterDistinctLines
+    case PathList("org", "apache", "commons", _*) => MergeStrategy.first
+    case x                                        => old(x)
+  }
+}
+
+enablePlugins(BuildInfoPlugin)
+buildInfoPackage := "generated.metadata"
+buildInfoObject  := name.value
+buildInfoOptions := Seq(BuildInfoOption.Traits("ohnosequences.statika.AnyArtifactMetadata"))
+buildInfoKeys    := Seq[BuildInfoKey](
+  organization,
+  version,
+  "artifact" -> name.value.toLowerCase,
+  "artifactUrl" -> fatArtifactUrl.value
+)
 
 //// Uncomment for testing: ////
 // For including test code in the fat artifact:
-// unmanagedSourceDirectories in Compile += (scalaSource in Test).value
+unmanagedSourceDirectories in Compile += (scalaSource in Test).value / "metagenomica"

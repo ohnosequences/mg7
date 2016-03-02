@@ -38,7 +38,7 @@ extends DataProcessingBundle(
 
     LazyTry {
       // NOTE: once we update to better-files 2.15.+, use `file.lineIterator` here (it's autoclosing):
-      lazy val source = io.Source.fromFile( context.inputFile(data.readsChunk).toJava )
+      val source = io.Source.fromFile( context.inputFile(data.readsChunk).toJava )
 
       source.getLines.grouped(md.blastInputFormat.rows) foreach { quartet =>
         // println(quartet.mkString("\n"))
@@ -46,41 +46,29 @@ extends DataProcessingBundle(
         // we only care about the id and the seq here
         val read = FASTA(
             header(FastqId(quartet(0)).toFastaHeader) ::
-            fasta.sequence(FastaLines(quartet(1)))    ::
+            fasta.sequence(FastaSequence(quartet(1)))    ::
             *[AnyDenotation]
           )
 
-        val readFile = context / "read.fa"
-        readFile
-          .createIfNotExists()
-          .appendLines(read.toLines: _*)
-
-        val outFile = context / "blastRead.csv"
+        val inFile = (context / "read.fa").overwrite(read.toLines)
+        val outFile = (context / "blastRead.csv").clear()
 
         val expr = blastn(
           outputRecord = md.blastOutRec,
           argumentValues =
             db(md.referenceDB.dbName) ::
-            query(readFile) ::
+            query(inFile) ::
             out(outFile) ::
             *[AnyDenotation],
           optionValues = md.blastOptions.value
         )
         println(expr.toSeq.mkString(" "))
 
-        // BAM!!!
-        val exitCode = expr.toSeq.!
-        println(s"BLAST EXIT CODE: ${exitCode}")
+        // BAM!!
+        expr.toSeq.!!
 
-        // we should have something in args getV out now. Append it!
-        println(s"Appending [${outFile.path}] to [${totalOutput.path}]")
-        totalOutput
-          .createIfNotExists()
-          .append(outFile.contentAsString)
-
-        // clean up
-        readFile.delete(true)
-        outFile.delete(true)
+        // append results for this read to the total output
+        totalOutput.append(outFile.contentAsString)
       }
 
       // it's important to close the stream:
