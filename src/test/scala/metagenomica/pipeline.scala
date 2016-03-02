@@ -36,12 +36,16 @@ case object test {
     commonS3Prefix / s"${step}-test" / sample /
 
   case object testParameters extends MG7Parameters(
-    outputS3Folder = testOutS3Folder,
+    // outputS3Folder = testOutS3Folder,
+    outputS3Folder = { (sampleId, stepName) =>
+      S3Folder("loquat.testing", "mg7-test") / stepName / sampleId /
+    },
     readsLength = bp300,
     blastInputFormat = FastQInput,
     blastOutRec = defaultBlastOutRec,
     blastOptions = defaultBlastOptions,
-    referenceDB = bundles.rna16s
+    referenceDB = bundles.rnaCentral,
+    chunkSize = 1
   )
 
   val defaultAMI = AmazonLinuxAMI(Ireland, HVM, InstanceStore)
