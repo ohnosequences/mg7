@@ -50,41 +50,25 @@ extends DataProcessingBundle(
             *[AnyDenotation]
           )
 
-        val readFile = context / "read.fa"
-
-        readFile.append(read.toLines)
-
-        val outFile = context / "blastRead.csv"
+        val inFile = (context / "read.fa").overwrite(read.toLines)
+        val outFile = (context / "blastRead.csv").clear()
 
         val expr = blastn(
           outputRecord = md.blastOutRec,
           argumentValues =
             db(md.referenceDB.dbName) ::
-            query(readFile) ::
+            query(inFile) ::
             out(outFile) ::
             *[AnyDenotation],
           optionValues = md.blastOptions.value
         )
         println(expr.toSeq.mkString(" "))
 
-        // BAM!!!
+        // BAM!!
         expr.toSeq.!!
-        // low-level alternative
-        // val p = Runtime.getRuntime.exec(expr.toSeq.mkString(" "))
-        // // block until p finishes
-        // p.waitFor
-        // p.getInputStream.close; p.getOutputStream.close; p.getErrorStream.close
-        // p.destroy
-        // println(s"BLAST EXIT CODE: ${exitCode}")
 
-        // we should have something in args getV out now. Append it!
-        println(s"Appending [${outFile.path}] to [${totalOutput.path}]")
         // append results for this read to the total output
-        totalOutput << outFile.contentAsString
-
-        // clean up
-        readFile.clear
-        outFile.clear
+        totalOutput.append(outFile.contentAsString)
       }
 
       // it's important to close the stream:
