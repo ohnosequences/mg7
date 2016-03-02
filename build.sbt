@@ -17,7 +17,7 @@ libraryDependencies ++= Seq(
   // APIs:
   "ohnosequences" %% "flash"      % "0.3.0",
   "ohnosequences" %% "blast-api"  % "0.4.1",
-  "ohnosequences" %% "fastarious" % "0.2.0",
+  "ohnosequences" %% "fastarious" % "0.4.0",
   // generic tools:
   "ohnosequences" %% "cosas"      % "0.8.0",
   "ohnosequences" %% "datasets"   % "0.3.0",
