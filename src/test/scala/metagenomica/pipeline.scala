@@ -36,10 +36,7 @@ case object test {
     commonS3Prefix / s"${step}-test" / sample /
 
   case object testParameters extends MG7Parameters(
-    // outputS3Folder = testOutS3Folder,
-    outputS3Folder = { (sampleId, stepName) =>
-      S3Folder("loquat.testing", "mg7-test") / stepName / sampleId /
-    },
+    outputS3Folder = testOutS3Folder,
     readsLength = bp300,
     blastInputFormat = FastQInput,
     blastOutRec = defaultBlastOutRec,
