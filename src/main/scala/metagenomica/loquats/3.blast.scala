@@ -46,7 +46,7 @@ extends DataProcessingBundle(
           *[AnyDenotation]
         )
 
-        val inFile = (context / "read.fa").overwrite(read.toLines)
+        val inFile = (context / "read.fa").overwrite(read.toLines.stripSuffix("\n"))
         val outFile = (context / "blastRead.csv").clear()
 
         val expr = blastn(
