@@ -11,7 +11,6 @@ import ohnosequences.cosas._, types._, klists._
 import ohnosequences.datasets._
 
 import better.files._
-import java.nio.file._
 import collection.JavaConversions._
 
 
@@ -29,17 +28,27 @@ case class splitDataProcessing(params: AnyMG7Parameters) extends DataProcessingB
     LazyTry {
       outputDir.createDirectories()
 
-      lazy val chunks: Iterator[(Seq[String], Int)] =
-        context.inputFile(data.mergedReads)
-          .lines
-          .grouped(params.blastInputFormat.rows * params.chunkSize)
-          .zipWithIndex
+      val lines: Iterator[String] = context.inputFile(data.mergedReads).lines
 
-      chunks foreach { case (chunk, n) =>
-        (outputDir / s"chunk.${n}.fastq")
-          .createIfNotExists()
-          .overwrite(chunk.mkString("\n"))
+      lazy val fastas: Iterator[FASTA] = params.splitInputFormat match {
+        // if input is FastQ, each read is just 4 lines
+        case FastQInput => lines.grouped(4).map {
+          
+        }
+        // if it's Fasta, we parse it, group and discard unparsed pieces
+        case FastaInput =>
+          fasta.parseFastaFromLines(lines)
+            .flatMap { _.right.toOption }
       }
+
+      fastas
+        .grouped(params.splitChunkSize)
+        .zipWithIndex
+        .foreach { case (chunk, n) =>
+          (outputDir / s"chunk.${n}.fastq")
+            .createIfNotExists()
+            .overwrite(chunk.mkString("\n"))
+        }
     } -&-
     success("chunk-chunk-chunk!",
       data.readsChunks(outputDir) ::

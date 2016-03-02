@@ -40,7 +40,7 @@ extends DataProcessingBundle(
       // NOTE: once we update to better-files 2.15.+, use `file.lineIterator` here (it's autoclosing):
       lazy val source = io.Source.fromFile( context.inputFile(data.readsChunk).toJava )
 
-      source.getLines.grouped(md.blastInputFormat.rows) foreach { quartet =>
+      source.getLines.grouped(md.splitInputFormat.rows) foreach { quartet =>
         // println(quartet.mkString("\n"))
 
         // we only care about the id and the seq here
