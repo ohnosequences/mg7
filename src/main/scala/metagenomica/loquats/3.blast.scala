@@ -73,6 +73,7 @@ extends DataProcessingBundle(
         // val p = Runtime.getRuntime.exec(expr.toSeq.mkString(" "))
         // // block until p finishes
         // p.waitFor
+        // p.getInputStream.close; p.getOutputStream.close; p.getErrorStream.close
         // p.destroy
         // println(s"BLAST EXIT CODE: ${exitCode}")
 
