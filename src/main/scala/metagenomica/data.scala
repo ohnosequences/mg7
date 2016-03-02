@@ -17,18 +17,18 @@ case object data {
 
 
   // Reads after splitting (multiple files in a virtual S3 folder):
-  case object readsChunks extends Data("reads-chunks")
+  case object fastaChunks extends Data("reads-chunks")
 
   case object splitInput extends DataSet(mergedReads :×: |[AnyData])
-  case object splitOutput extends DataSet(readsChunks :×: |[AnyData])
+  case object splitOutput extends DataSet(fastaChunks :×: |[AnyData])
 
 
   // Blast input:
-  case object readsChunk extends FileData("reads")("fastq")
+  case object fastaChunk extends FileData("reads")("fastq")
   // Blast output for each chunk:
   case object blastChunkOut extends FileData("blast.chunk")("csv")
 
-  case object blastInput extends DataSet(readsChunk :×: |[AnyData])
+  case object blastInput extends DataSet(fastaChunk :×: |[AnyData])
   case object blastOutput extends DataSet(blastChunkOut :×: |[AnyData])
 
 
@@ -59,7 +59,7 @@ case object data {
   case object countingOutput extends DataSet(
     lcaDirectCountsCSV :×:
     bbhDirectCountsCSV :×:
-    lcaAccumCountsCSV :×: 
+    lcaAccumCountsCSV :×:
     bbhAccumCountsCSV :×:
     |[AnyData]
   )
