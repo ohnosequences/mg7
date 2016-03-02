@@ -41,7 +41,8 @@ case object test {
     splitInputFormat = FastQInput,
     blastOutRec = defaultBlastOutRec,
     blastOptions = defaultBlastOptions,
-    referenceDB = bundles.rna16s
+    referenceDB = bundles.rnaCentral,
+    chunkSize = 1
   )
 
   val defaultAMI = AmazonLinuxAMI(Ireland, HVM, InstanceStore)
