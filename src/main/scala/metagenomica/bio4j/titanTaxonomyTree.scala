@@ -24,8 +24,10 @@ case object titanTaxonomyTree {
   case class TitanTaxonNode(titanTaxon: TitanNCBITaxon) extends AnyVal with AnyTaxonNode {
 
     def id: String = titanTaxon.id()
-    def name: String = titanTaxon.name()
-    def rank: String = titanTaxon.taxonomicRank()
+    // These methods may return null
+    def name:           String = Option(titanTaxon.name()).getOrElse("")
+    def scientificName: String = Option(titanTaxon.scientificName()).getOrElse("")
+    def rank:           String = Option(titanTaxon.taxonomicRank()).getOrElse("")
 
     def parent: Option[TitanTaxonNode] =
       optional(titanTaxon.ncbiTaxonParent_inV) map TitanTaxonNode
