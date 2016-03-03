@@ -74,8 +74,8 @@ case object countingDataProcessing extends DataProcessingBundle(
       )
       csvReader.close
 
-      val outDirectFile = context / s"${f.name}.counts"
-      val outAccumFile  = context / s"${f.name}.counts"
+      val outDirectFile = context / s"${f.name}.direct.counts"
+      val outAccumFile  = context / s"${f.name}.accum.counts"
 
       val csvDirectWriter = CSVWriter.open(outDirectFile.toJava, append = true)
       val csvAccumWriter  = CSVWriter.open(outAccumFile.toJava, append = true)
