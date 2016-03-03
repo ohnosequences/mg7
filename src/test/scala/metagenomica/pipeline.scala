@@ -24,11 +24,11 @@ case object test {
   case object testParameters extends MG7Parameters(
     outputS3Folder = testOutS3Folder,
     readsLength = bp300,
-    blastInputFormat = FastQInput,
+    splitInputFormat = FastQInput,
     blastOutRec = defaultBlastOutRec,
     blastOptions = defaultBlastOptions,
     referenceDB = bundles.rnaCentral,
-    chunkSize = 3
+    chunkSize = 10
   )
 
   val defaultAMI = AmazonLinuxAMI(Ireland, HVM, InstanceStore)
