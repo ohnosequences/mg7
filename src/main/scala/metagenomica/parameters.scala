@@ -47,10 +47,10 @@ abstract class MG7Parameters[
   val outputS3Folder: (SampleID, StepName) => S3Folder,
   val readsLength: illumina.Length,
   val splitInputFormat: SplitInputFormat = FastQInput,
-  val blastOutRec: BR,
-  val blastOptions: blastn.Options := blastn.OptionsVals,
-  val splitChunkSize: Int = 5,
-  val referenceDB: bundles.AnyReferenceDB
+  val blastOutRec: BR = defaultBlastOutRec,
+  val blastOptions: blastn.Options := blastn.OptionsVals = defaultBlastOptions,
+  val splitChunkSize: Int = 10,
+  val referenceDB: bundles.AnyReferenceDB = bundles.rnaCentral
 // )(implicit
   // TODO: add a check for minimal set of properties in the record (like bitscore and sgi)
 ) extends AnyMG7Parameters {
