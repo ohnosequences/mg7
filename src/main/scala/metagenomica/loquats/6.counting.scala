@@ -68,11 +68,10 @@ case object countingDataProcessing extends DataProcessingBundle(
     // same thing that we do for lca and bbh
     def processFile(f: File): (File, File) = {
       val csvReader: CSVReader = CSVReader.open( f.toJava )
-      val counts: Map[TaxID, (Int, Int)] = accumulatedCounts(
-        // FIXME: use some csv api instead of row(1)
-        directCounts( csvReader.iterator.map{ row => row(1) }.toList )
-      )
+      val taxIDs: List[TaxID] = csvReader.allWithHeaders.map{ row => row(columnNames.TaxID) }
       csvReader.close
+
+      val counts: Map[TaxID, (Int, Int)] = accumulatedCounts( directCounts(taxIDs) )
 
       val outDirectFile = context / s"${f.name}.direct.counts"
       val outAccumFile  = context / s"${f.name}.accum.counts"
@@ -81,8 +80,8 @@ case object countingDataProcessing extends DataProcessingBundle(
       val csvAccumWriter  = CSVWriter.open(outAccumFile.toJava, append = true)
 
       // headers:
-      csvDirectWriter.writeRow(List("Tax-ID", "Direct"))
-      csvAccumWriter.writeRow(List("Tax-ID", "Accumulated"))
+      csvDirectWriter.writeRow(List(columnNames.TaxID, "Direct"))
+      csvAccumWriter.writeRow(List(columnNames.TaxID, "Accumulated"))
 
       counts foreach { case (taxId, (dir, acc)) =>
         csvDirectWriter.writeRow( List(taxId, dir) )

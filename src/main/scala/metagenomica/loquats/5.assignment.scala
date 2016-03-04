@@ -82,7 +82,13 @@ extends DataProcessingBundle(
     val bbhWriter = CSVWriter.open(bbhFile.toJava, append = true)
 
     // writing headers first:
-    val header = List("Read-ID", "Tax-ID", "Tax-name", "Tax-scientific-name", "Tax-rank")
+    val header = List(
+      columnNames.ReadID,
+      columnNames.TaxID,
+      columnNames.TaxName,
+      columnNames.TaxSciName,
+      columnNames.TaxRank
+    )
     lcaWriter.writeRow(header)
     bbhWriter.writeRow(header)
 

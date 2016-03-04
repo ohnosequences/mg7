@@ -19,6 +19,15 @@ package object mg7 {
 
   def parseInt(str: String): Option[Int] = util.Try(str.toInt).toOption
 
+  case object columnNames {
+
+    val ReadID = "Read-ID"
+    val TaxID = "Tax-ID"
+    val TaxName = "Tax-name"
+    val TaxSciName = "Tax-scientific-name"
+    val TaxRank = "Tax-rank"
+  }
+
 
   case object defaultBlastOutRec extends BlastOutputRecord(
       outputFields.qseqid   :×:
