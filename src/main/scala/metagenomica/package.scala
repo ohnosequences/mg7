@@ -25,6 +25,7 @@ package object mg7 {
     val TaxID = "Tax-ID"
     val TaxName = "Tax-name"
     val TaxRank = "Tax-rank"
+    val Count = "Count"
   }
 
 

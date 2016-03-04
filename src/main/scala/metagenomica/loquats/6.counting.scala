@@ -68,26 +68,36 @@ case object countingDataProcessing extends DataProcessingBundle(
     // same thing that we do for lca and bbh
     def processFile(f: File): (File, File) = {
       val csvReader: CSVReader = CSVReader.open( f.toJava )
-      val taxIDs: List[TaxID] = csvReader.allWithHeaders.map{ row => row(columnNames.TaxID) }
+      val taxons: Map[TaxID, (String, String)] = csvReader.allWithHeaders.map { row =>
+        row(columnNames.TaxID) -> ( (row(columnNames.TaxName), row(columnNames.TaxRank)) )
+      }.toMap
       csvReader.close
 
-      val counts: Map[TaxID, (Int, Int)] = accumulatedCounts( directCounts(taxIDs) )
+      val counts: Map[TaxID, (Int, Int)] = accumulatedCounts( directCounts(taxons.keys.toList) )
 
-      val outDirectFile = context / s"${f.name}.direct.counts"
-      val outAccumFile  = context / s"${f.name}.accum.counts"
+      val filesPrefix: String = f.name.stripSuffix(".csv")
+      val outDirectFile = context / s"${filesPrefix}.direct.counts"
+      val outAccumFile  = context / s"${filesPrefix}.accum.counts"
 
       val csvDirectWriter = CSVWriter.open(outDirectFile.toJava, append = true)
       val csvAccumWriter  = CSVWriter.open(outAccumFile.toJava, append = true)
 
-      // headers:
-      csvDirectWriter.writeRow(List(columnNames.TaxID, "Direct"))
-      csvAccumWriter.writeRow(List(columnNames.TaxID, "Accumulated"))
+      def headerFor(file: File) = List(
+        columnNames.TaxID,
+        columnNames.TaxRank,
+        columnNames.TaxName,
+        file.name.replaceAll("\\.", "-")
+      )
+      csvDirectWriter.writeRow(headerFor(outDirectFile))
+      csvAccumWriter.writeRow(headerFor(outAccumFile))
 
-      counts foreach { case (taxId, (dir, acc)) =>
+      counts foreach { case (taxId, (direct, accum)) =>
+
+        val (name, rank) = taxons.get(taxId).getOrElse(("", ""))
         // We write only non-zero direct counts
-        if (dir > 0) { csvDirectWriter.writeRow( List(taxId, dir) ) }
+        if (direct > 0) { csvDirectWriter.writeRow( List(taxId, rank, name, direct) ) }
         // Accumulated counts shouldn't be ever a zero
-        csvAccumWriter.writeRow( List(taxId, acc) )
+        csvAccumWriter.writeRow( List(taxId, rank, name, accum) )
       }
 
       csvDirectWriter.close
