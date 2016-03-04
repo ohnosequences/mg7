@@ -86,15 +86,14 @@ extends DataProcessingBundle(
       columnNames.ReadID,
       columnNames.TaxID,
       columnNames.TaxName,
-      columnNames.TaxSciName,
       columnNames.TaxRank
     )
     lcaWriter.writeRow(header)
     bbhWriter.writeRow(header)
 
     assignments foreach { case (readId, (lca, bbh)) =>
-      lca foreach { node => lcaWriter.writeRow(List(readId, node.id, node.name, node.scientificName, node.rank)) }
-      bbh foreach { node => bbhWriter.writeRow(List(readId, node.id, node.name, node.scientificName, node.rank)) }
+      lca foreach { node => lcaWriter.writeRow(List(readId, node.id, node.name, node.rank)) }
+      bbh foreach { node => bbhWriter.writeRow(List(readId, node.id, node.name, node.rank)) }
     }
 
     lcaWriter.close

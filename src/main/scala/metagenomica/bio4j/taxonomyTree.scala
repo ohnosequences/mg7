@@ -9,7 +9,6 @@ case object taxonomyTree {
 
     def id: String
     def name: String
-    def scientificName: String
     def rank: String
 
     // root doesn't have parent

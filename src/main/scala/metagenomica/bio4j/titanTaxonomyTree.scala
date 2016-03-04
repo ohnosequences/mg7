@@ -25,9 +25,8 @@ case object titanTaxonomyTree {
 
     def id: String = titanTaxon.id()
     // These methods may return null
-    def name:           String = Option(titanTaxon.name()).getOrElse("")
-    def scientificName: String = Option(titanTaxon.scientificName()).getOrElse("")
-    def rank:           String = Option(titanTaxon.taxonomicRank()).getOrElse("")
+    def name: String = Option( titanTaxon.name() ).getOrElse("")
+    def rank: String = Option( titanTaxon.taxonomicRank() ).getOrElse("")
 
     def parent: Option[TitanTaxonNode] =
       optional(titanTaxon.ncbiTaxonParent_inV) map TitanTaxonNode
