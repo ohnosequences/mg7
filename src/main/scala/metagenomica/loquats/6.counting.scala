@@ -75,20 +75,21 @@ case object countingDataProcessing extends DataProcessingBundle(
 
       val counts: Map[TaxID, (Int, Int)] = accumulatedCounts( directCounts(taxons.keys.toList) )
 
-      val outDirectFile = context / s"${f.name}.direct.counts"
-      val outAccumFile  = context / s"${f.name}.accum.counts"
+      val filesPrefix: String = f.name.stripSuffix(".csv")
+      val outDirectFile = context / s"${filesPrefix}.direct.counts"
+      val outAccumFile  = context / s"${filesPrefix}.accum.counts"
 
       val csvDirectWriter = CSVWriter.open(outDirectFile.toJava, append = true)
       val csvAccumWriter  = CSVWriter.open(outAccumFile.toJava, append = true)
 
-      val header = List(
+      def headerFor(file: File) = List(
         columnNames.TaxID,
         columnNames.TaxRank,
         columnNames.TaxName,
-        columnNames.Count
+        file.name.replaceAll("\\.", "-")
       )
-      csvDirectWriter.writeRow(header)
-      csvAccumWriter.writeRow(header)
+      csvDirectWriter.writeRow(headerFor(outDirectFile))
+      csvAccumWriter.writeRow(headerFor(outAccumFile))
 
       counts foreach { case (taxId, (direct, accum)) =>
 
