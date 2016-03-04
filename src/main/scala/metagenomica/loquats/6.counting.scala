@@ -84,7 +84,9 @@ case object countingDataProcessing extends DataProcessingBundle(
       csvAccumWriter.writeRow(List(columnNames.TaxID, "Accumulated"))
 
       counts foreach { case (taxId, (dir, acc)) =>
-        csvDirectWriter.writeRow( List(taxId, dir) )
+        // We write only non-zero direct counts
+        if (dir > 0) { csvDirectWriter.writeRow( List(taxId, dir) ) }
+        // Accumulated counts shouldn't be ever a zero
         csvAccumWriter.writeRow( List(taxId, acc) )
       }
 
