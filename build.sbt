@@ -26,14 +26,12 @@ libraryDependencies ++= Seq(
   // bundles:
   "ohnosequences-bundles" %% "flash"      % "0.2.0",
   "ohnosequences-bundles" %% "blast"      % "0.3.0",
-  "ohnosequences-bundles" %% "bio4j-dist" % "0.1.0",
+  "ohnosequences-bundles" %% "bio4j-dist" % "0.2.0",
   // testing:
   "org.scalatest" %% "scalatest" % "2.2.6" % Test
 )
 
 dependencyOverrides ++= Set(
-  "bio4j" % "bio4j"       % "0.12.0-SNAPSHOT",
-  "bio4j" % "bio4j-titan" % "0.4.0-SNAPSHOT",
   "commons-logging"            % "commons-logging"     % "1.1.3",
   "commons-codec"              % "commons-codec"       % "1.7",
   "org.apache.httpcomponents"  % "httpclient"          % "4.5.1",
