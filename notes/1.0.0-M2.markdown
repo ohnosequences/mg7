@@ -1,0 +1,20 @@
+This milestone release is huge. It contains a lot of improvements and some important fixes. Here are some higlights:
+
+* Features and improvements:
+  - #4, #15: The BLAST reference database and IDs mapping is now configurable
+  - #17: Added RNACentral reference DB (as the default one now)
+  - #18: BLAST options are now configurable
+  - #16: A dataflow API was improved and a pipeline without the Flash step was added
+  - ~~#20~~ #24: For pipelines without Flash you can choose between FASTA and FASTQ input format
+  - Output tables improvements:
+    + #10: Added CSV-headers
+    + #19, #23, #27: Added _taxonomic rank_ and _name_ columns
+    + #6: Split each counts table on two: direct/accumulated
+    + #30: Zero direct counts are filtered out
+
+* Important fixes:
+  - #28: Bio4j-NCBITaxonomy database was updated with an important fix for the taxonomic names
+  - #26: Ongoing effort to solve the "Too many open files" exception has been moved to [ohnosequences/loquat#56](https://github.com/ohnosequences/loquat/pull/56)
+
+
+See the full list of pull requests merged in this release in the [v1.0-M2 milestone](https://github.com/ohnosequences/mg7/issues?q=milestone%3Av1.0-M2).
