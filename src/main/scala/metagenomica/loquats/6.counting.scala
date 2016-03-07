@@ -13,6 +13,7 @@ import ohnosequences.datasets._
 import better.files._
 import com.github.tototoshi.csv._
 
+import com.bio4j.titan.model.ncbiTaxonomy.TitanNCBITaxonomyGraph
 
 
 case object countingDataProcessing extends DataProcessingBundle(
@@ -20,6 +21,8 @@ case object countingDataProcessing extends DataProcessingBundle(
 )(input = data.countingInput,
   output = data.countingOutput
 ) {
+
+  lazy val taxonomyGraph: TitanNCBITaxonomyGraph = bundles.bio4jNCBITaxonomy.graph
 
   def instructions: AnyInstructions = say("I'm counting you!")
 
@@ -51,7 +54,7 @@ case object countingDataProcessing extends DataProcessingBundle(
     counts.foldLeft(
       Map[TaxID, (Int, Int)]()
     ) { case (acc, (id, count)) =>
-      val node: Option[TitanTaxonNode] = titanTaxonNode(bundles.bio4jNCBITaxonomy.graph, id)
+      val node: Option[TitanTaxonNode] = titanTaxonNode(taxonomyGraph, id)
       val ancestors: Seq[AnyTaxonNode] = node.map{ n => pathToTheRoot(n, Seq()) }.getOrElse(Seq())
 
       ancestors.foldLeft(
@@ -66,16 +69,15 @@ case object countingDataProcessing extends DataProcessingBundle(
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
 
     // same thing that we do for lca and bbh
-    def processFile(f: File): (File, File) = {
-      val csvReader: CSVReader = CSVReader.open( f.toJava )
-      val taxons: Map[TaxID, (String, String)] = csvReader.allWithHeaders.map { row =>
-        row(columnNames.TaxID) -> ( (row(columnNames.TaxName), row(columnNames.TaxRank)) )
-      }.toMap
-      csvReader.close
+    def processFile(assignmentsFile: File): (File, File) = {
 
-      val counts: Map[TaxID, (Int, Int)] = accumulatedCounts( directCounts(taxons.keys.toList) )
+      val assignmentsReader: CSVReader = CSVReader.open( assignmentsFile.toJava )
+      val taxIDs: List[TaxID] = assignmentsReader.allWithHeaders.map { row => row(columnNames.TaxID) }
+      assignmentsReader.close
 
-      val filesPrefix: String = f.name.stripSuffix(".csv")
+      val counts: Map[TaxID, (Int, Int)] = accumulatedCounts( directCounts(taxIDs) )
+
+      val filesPrefix: String = assignmentsFile.name.stripSuffix(".csv")
       val outDirectFile = context / s"${filesPrefix}.direct.counts"
       val outAccumFile  = context / s"${filesPrefix}.accum.counts"
 
@@ -91,13 +93,16 @@ case object countingDataProcessing extends DataProcessingBundle(
       csvDirectWriter.writeRow(headerFor(outDirectFile))
       csvAccumWriter.writeRow(headerFor(outAccumFile))
 
-      counts foreach { case (taxId, (direct, accum)) =>
+      counts foreach { case (taxID, (direct, accum)) =>
 
-        val (name, rank) = taxons.get(taxId).getOrElse(("", ""))
+        val node: Option[TitanTaxonNode] = titanTaxonNode(taxonomyGraph, taxID)
+        val name: String = node.map(_.name).getOrElse("")
+        val rank: String = node.map(_.rank).getOrElse("")
+
         // We write only non-zero direct counts
-        if (direct > 0) { csvDirectWriter.writeRow( List(taxId, rank, name, direct) ) }
+        if (direct > 0) { csvDirectWriter.writeRow( List(taxID, rank, name, direct) ) }
         // Accumulated counts shouldn't be ever a zero
-        csvAccumWriter.writeRow( List(taxId, rank, name, accum) )
+        csvAccumWriter.writeRow( List(taxID, rank, name, accum) )
       }
 
       csvDirectWriter.close
