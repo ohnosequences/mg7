@@ -10,11 +10,15 @@ class LCATest extends org.scalatest.FunSuite {
 
     case object root extends AnyTaxonNode {
       val id = "root"
+      val name = "root"
+      val rank = ""
       val parent = None
     }
 
     class node(p: AnyTaxonNode) extends AnyTaxonNode {
       val id = this.toString
+      val name = id
+      val rank = ""
       val parent = Some(p)
     }
 
@@ -125,10 +129,13 @@ class LCATest extends org.scalatest.FunSuite {
 [main/scala/metagenomica/bio4j/titanTaxonomyTree.scala]: ../../main/scala/metagenomica/bio4j/titanTaxonomyTree.scala.md
 [main/scala/metagenomica/bundles/bio4jTaxonomy.scala]: ../../main/scala/metagenomica/bundles/bio4jTaxonomy.scala.md
 [main/scala/metagenomica/bundles/blast.scala]: ../../main/scala/metagenomica/bundles/blast.scala.md
-[main/scala/metagenomica/bundles/blast16s.scala]: ../../main/scala/metagenomica/bundles/blast16s.scala.md
+[main/scala/metagenomica/bundles/filterGIs.scala]: ../../main/scala/metagenomica/bundles/filterGIs.scala.md
 [main/scala/metagenomica/bundles/flash.scala]: ../../main/scala/metagenomica/bundles/flash.scala.md
-[main/scala/metagenomica/bundles/gis.scala]: ../../main/scala/metagenomica/bundles/gis.scala.md
+[main/scala/metagenomica/bundles/referenceDB.scala]: ../../main/scala/metagenomica/bundles/referenceDB.scala.md
+[main/scala/metagenomica/bundles/referenceMap.scala]: ../../main/scala/metagenomica/bundles/referenceMap.scala.md
 [main/scala/metagenomica/data.scala]: ../../main/scala/metagenomica/data.scala.md
+[main/scala/metagenomica/dataflow.scala]: ../../main/scala/metagenomica/dataflow.scala.md
+[main/scala/metagenomica/dataflows/noFlash.scala]: ../../main/scala/metagenomica/dataflows/noFlash.scala.md
 [main/scala/metagenomica/dataflows/standard.scala]: ../../main/scala/metagenomica/dataflows/standard.scala.md
 [main/scala/metagenomica/loquats/1.flash.scala]: ../../main/scala/metagenomica/loquats/1.flash.scala.md
 [main/scala/metagenomica/loquats/2.split.scala]: ../../main/scala/metagenomica/loquats/2.split.scala.md

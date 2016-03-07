@@ -16,10 +16,13 @@ case object flash extends Flash("1.2.11")
 [main/scala/metagenomica/bio4j/titanTaxonomyTree.scala]: ../bio4j/titanTaxonomyTree.scala.md
 [main/scala/metagenomica/bundles/bio4jTaxonomy.scala]: bio4jTaxonomy.scala.md
 [main/scala/metagenomica/bundles/blast.scala]: blast.scala.md
-[main/scala/metagenomica/bundles/blast16s.scala]: blast16s.scala.md
+[main/scala/metagenomica/bundles/filterGIs.scala]: filterGIs.scala.md
 [main/scala/metagenomica/bundles/flash.scala]: flash.scala.md
-[main/scala/metagenomica/bundles/gis.scala]: gis.scala.md
+[main/scala/metagenomica/bundles/referenceDB.scala]: referenceDB.scala.md
+[main/scala/metagenomica/bundles/referenceMap.scala]: referenceMap.scala.md
 [main/scala/metagenomica/data.scala]: ../data.scala.md
+[main/scala/metagenomica/dataflow.scala]: ../dataflow.scala.md
+[main/scala/metagenomica/dataflows/noFlash.scala]: ../dataflows/noFlash.scala.md
 [main/scala/metagenomica/dataflows/standard.scala]: ../dataflows/standard.scala.md
 [main/scala/metagenomica/loquats/1.flash.scala]: ../loquats/1.flash.scala.md
 [main/scala/metagenomica/loquats/2.split.scala]: ../loquats/2.split.scala.md

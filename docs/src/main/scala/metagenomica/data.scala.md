@@ -14,24 +14,24 @@ case object data {
   case object mergedReads extends FileData("reads")("fastq")
   case object flashStats extends FileData("stats")("txt")
 
-  case object flashInput extends DataSet(pairedReads1 :×: pairedReads2 :×: |[AnyData])
-  case object flashOutput extends DataSet(mergedReads :×: flashStats :×: |[AnyData])
+  case object flashInput extends DataSet(pairedReads1 :?: pairedReads2 :?: |[AnyData])
+  case object flashOutput extends DataSet(mergedReads :?: flashStats :?: |[AnyData])
 
 
   // Reads after splitting (multiple files in a virtual S3 folder):
-  case object readsChunks extends Data("reads-chunks")
+  case object fastaChunks extends Data("reads-chunks")
 
-  case object splitInput extends DataSet(mergedReads :×: |[AnyData])
-  case object splitOutput extends DataSet(readsChunks :×: |[AnyData])
+  case object splitInput extends DataSet(mergedReads :?: |[AnyData])
+  case object splitOutput extends DataSet(fastaChunks :?: |[AnyData])
 
 
   // Blast input:
-  case object readsChunk extends FileData("reads")("fastq")
+  case object fastaChunk extends FileData("reads")("fastq")
   // Blast output for each chunk:
   case object blastChunkOut extends FileData("blast.chunk")("csv")
 
-  case object blastInput extends DataSet(readsChunk :×: |[AnyData])
-  case object blastOutput extends DataSet(blastChunkOut :×: |[AnyData])
+  case object blastInput extends DataSet(fastaChunk :?: |[AnyData])
+  case object blastOutput extends DataSet(blastChunkOut :?: |[AnyData])
 
 
   // all output chunks together:
@@ -39,24 +39,32 @@ case object data {
   // after merging chunks:
   case object blastResult extends FileData("blast")("csv")
 
-  case object mergeInput extends DataSet(blastChunks :×: |[AnyData])
-  case object mergeOutput extends DataSet(blastResult :×: |[AnyData])
+  case object mergeInput extends DataSet(blastChunks :?: |[AnyData])
+  case object mergeOutput extends DataSet(blastResult :?: |[AnyData])
 
 
   // Assignment output:
   case object lcaCSV extends FileData("lca")("csv")
   case object bbhCSV extends FileData("bbh")("csv")
 
-  case object assignmentInput extends DataSet(blastResult :×: |[AnyData])
-  case object assignmentOutput extends DataSet(lcaCSV :×: bbhCSV :×: |[AnyData])
+  case object assignmentInput extends DataSet(blastResult :?: |[AnyData])
+  case object assignmentOutput extends DataSet(lcaCSV :?: bbhCSV :?: |[AnyData])
 
 
   // Counting output:
-  case object lcaCountsCSV extends FileData("lca.counts")("csv")
-  case object bbhCountsCSV extends FileData("bbh.counts")("csv")
+  case object lcaDirectCountsCSV extends FileData("lca.direct.counts")("csv")
+  case object bbhDirectCountsCSV extends FileData("bbh.direct.counts")("csv")
+  case object lcaAccumCountsCSV extends FileData("lca.accum.counts")("csv")
+  case object bbhAccumCountsCSV extends FileData("bbh.accum.counts")("csv")
 
-  case object countingInput extends DataSet(lcaCSV :×: bbhCSV :×: |[AnyData])
-  case object countingOutput extends DataSet(lcaCountsCSV :×: bbhCountsCSV :×: |[AnyData])
+  case object countingInput extends DataSet(lcaCSV :?: bbhCSV :?: |[AnyData])
+  case object countingOutput extends DataSet(
+    lcaDirectCountsCSV :?:
+    bbhDirectCountsCSV :?:
+    lcaAccumCountsCSV :?:
+    bbhAccumCountsCSV :?:
+    |[AnyData]
+  )
 
 }
 
@@ -69,10 +77,13 @@ case object data {
 [main/scala/metagenomica/bio4j/titanTaxonomyTree.scala]: bio4j/titanTaxonomyTree.scala.md
 [main/scala/metagenomica/bundles/bio4jTaxonomy.scala]: bundles/bio4jTaxonomy.scala.md
 [main/scala/metagenomica/bundles/blast.scala]: bundles/blast.scala.md
-[main/scala/metagenomica/bundles/blast16s.scala]: bundles/blast16s.scala.md
+[main/scala/metagenomica/bundles/filterGIs.scala]: bundles/filterGIs.scala.md
 [main/scala/metagenomica/bundles/flash.scala]: bundles/flash.scala.md
-[main/scala/metagenomica/bundles/gis.scala]: bundles/gis.scala.md
+[main/scala/metagenomica/bundles/referenceDB.scala]: bundles/referenceDB.scala.md
+[main/scala/metagenomica/bundles/referenceMap.scala]: bundles/referenceMap.scala.md
 [main/scala/metagenomica/data.scala]: data.scala.md
+[main/scala/metagenomica/dataflow.scala]: dataflow.scala.md
+[main/scala/metagenomica/dataflows/noFlash.scala]: dataflows/noFlash.scala.md
 [main/scala/metagenomica/dataflows/standard.scala]: dataflows/standard.scala.md
 [main/scala/metagenomica/loquats/1.flash.scala]: loquats/1.flash.scala.md
 [main/scala/metagenomica/loquats/2.split.scala]: loquats/2.split.scala.md

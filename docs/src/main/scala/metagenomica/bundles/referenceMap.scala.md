@@ -2,56 +2,61 @@
 ```scala
 package ohnosequences.mg7.bundles
 
+import ohnosequences.mg7._
+
 import ohnosequences.statika._
+import ohnosequences.loquat.utils._
+import ohnosequences.awstools.s3.S3Object
 
 import com.amazonaws.auth._
 import com.amazonaws.services.s3.transfer._
 
 import better.files._
+import com.github.tototoshi.csv._
 
 
-case object blast16s extends Bundle() {
-  // val region = "eu-west-1"
-  val bucket = "resources.ohnosequences.com"
-  val name = "era7.16S.reference.sequences.0.1.0"
-  val key = s"16s/${name}.tgz"
+trait AnyReferenceIDsMap extends AnyBundle {
+  val name: String
+  val s3Address: S3Object
 
-  val destination: File = File(s"${name}.tgz")
-  val location: File = File(name)
-  val dbName: File = File(s"${name}/${name}.fasta")
+  lazy val destination: File = File(name)
 
   def instructions: AnyInstructions = {
 
     LazyTry {
-      println(s"""Dowloading
-        |from: s3://${bucket}/${key}
-        |to: ${destination.path}
-        |""".stripMargin)
-
       // val transferManager = new TransferManager(new ProfileCredentialsProvider("default"))
       val transferManager = new TransferManager(new InstanceProfileCredentialsProvider())
-      val transfer = transferManager.download(bucket, key, destination.toJava)
-      transfer.waitForCompletion
+      transferManager.download(s3Address, destination)
     } -&-
-    cmd("tar")("-xvzf", destination.path.toString) -&-
-    say(s"Reference database ${name} was dowloaded to ${location.path}")
+    say(s"Reference IDs mapping ${name} was dowloaded and unpacked to ${destination.path}")
+  }
 
+  def mapping: Map[ID, TaxID] = {
+    // Reading TSV file with mapping something-taxId
+    val tsvReader: CSVReader = CSVReader.open( destination.toJava )(new TSVFormat {})
+
+    val idsMap: Map[ID, TaxID] = tsvReader.iterator.map { row =>
+      row(0) -> row(1)
+    }.toMap
+
+    tsvReader.close
+
+    idsMap
   }
 }
+```
 
+This is what will be used in the assignment loquat
 
-case object blast16sTest {
+```scala
+case object filteredGIs extends Bundle() with AnyReferenceIDsMap {
+  val name = "gi_taxid_filtered.csv"
+  val s3Address = S3Object("resources.ohnosequences.com", s"16s/${name}")
+}
 
-  import ohnosequences.statika.aws._
-  import ohnosequences.awstools.ec2._
-  import ohnosequences.awstools.regions.Region._
-
-  case object blast16sCompat extends Compatible(
-    amznAMIEnv(AmazonLinuxAMI(Ireland, HVM, InstanceStore)),
-    blast16s,
-    generated.metadata.mg7
-  )
-
+case object rnaCentralIDsMap extends Bundle() with AnyReferenceIDsMap {
+  val name = "id2taxa.filtered.4.0.tsv"
+  val s3Address = S3Object("resources.ohnosequences.com", s"rnacentral/4.0/${name}")
 }
 
 ```
@@ -63,10 +68,13 @@ case object blast16sTest {
 [main/scala/metagenomica/bio4j/titanTaxonomyTree.scala]: ../bio4j/titanTaxonomyTree.scala.md
 [main/scala/metagenomica/bundles/bio4jTaxonomy.scala]: bio4jTaxonomy.scala.md
 [main/scala/metagenomica/bundles/blast.scala]: blast.scala.md
-[main/scala/metagenomica/bundles/blast16s.scala]: blast16s.scala.md
+[main/scala/metagenomica/bundles/filterGIs.scala]: filterGIs.scala.md
 [main/scala/metagenomica/bundles/flash.scala]: flash.scala.md
-[main/scala/metagenomica/bundles/gis.scala]: gis.scala.md
+[main/scala/metagenomica/bundles/referenceDB.scala]: referenceDB.scala.md
+[main/scala/metagenomica/bundles/referenceMap.scala]: referenceMap.scala.md
 [main/scala/metagenomica/data.scala]: ../data.scala.md
+[main/scala/metagenomica/dataflow.scala]: ../dataflow.scala.md
+[main/scala/metagenomica/dataflows/noFlash.scala]: ../dataflows/noFlash.scala.md
 [main/scala/metagenomica/dataflows/standard.scala]: ../dataflows/standard.scala.md
 [main/scala/metagenomica/loquats/1.flash.scala]: ../loquats/1.flash.scala.md
 [main/scala/metagenomica/loquats/2.split.scala]: ../loquats/2.split.scala.md

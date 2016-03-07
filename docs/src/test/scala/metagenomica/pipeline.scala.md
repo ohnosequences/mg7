@@ -11,7 +11,7 @@ import ohnosequences.cosas._, types._, klists._
 
 import ohnosequences.loquat._
 
-import ohnosequences.statika._
+import ohnosequences.statika._, aws._
 
 import ohnosequences.awstools.ec2._, InstanceType._
 import ohnosequences.awstools.s3._
@@ -19,28 +19,13 @@ import ohnosequences.awstools.autoscaling._
 import ohnosequences.awstools.regions.Region._
 import com.amazonaws.auth._, profile._
 
-import ohnosequences.blast.api._, outputFields._
 
 
 case object test {
 
-  case object blastOutRec extends BlastOutputRecord(
-      qseqid   :×:
-      qlen     :×:
-      qstart   :×:
-      qend     :×:
-      sseqid   :×:
-      slen     :×:
-      sstart   :×:
-      send     :×:
-      bitscore :×:
-      sgi      :×:
-      |[AnyOutputField]
-    )
-
   case object testParameters extends MG7Parameters(
-    readsLength = bp300,
-    blastOutRec = blastOutRec
+    outputS3Folder = testOutS3Folder,
+    readsLength = bp300
   )
 
   val defaultAMI = AmazonLinuxAMI(Ireland, HVM, InstanceStore)
@@ -57,7 +42,7 @@ case object test {
       purchaseModel = Spot(maxPrice = Some(0.1))
     )
 
-    val workersConfig = WorkersConfig(
+    val workersConfig: AnyWorkersConfig = WorkersConfig(
       instanceSpecs = InstanceSpecs(defaultAMI, m3.medium),
       purchaseModel = Spot(maxPrice = Some(0.1)),
       groupSize = AutoScalingGroupSize(0, 1, 10)
@@ -84,25 +69,30 @@ case object test {
     keypairName = "aalekhin"
   )
 
+
   val commonS3Prefix = S3Folder("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592")
 
   val sampleIds: List[ID] = List("ERR567374")
 
-  val inputSamples: Map[ID, (S3Object, S3Object)] = sampleIds.map { id =>
+  def testOutS3Folder(sampleId: SampleID, step: StepName): S3Folder =
+    commonS3Prefix / s"${step}-test" / sampleId /
+
+  val inputSamples: Map[ID, (S3Resource, S3Resource)] = sampleIds.map { id =>
     id -> ((
-      commonS3Prefix / "reads" / s"${id}_1.fastq.gz",
-      commonS3Prefix / "reads" / s"${id}_2.fastq.gz"
+      S3Resource(commonS3Prefix / "reads" / s"${id}_1.fastq.gz"),
+      S3Resource(commonS3Prefix / "reads" / s"${id}_2.fastq.gz")
     ))
   }.toMap
 
-  def outputS3Folder(sample: SampleID, step: StepName): S3Folder =
-    commonS3Prefix / s"${step}-test" / sample /
+  val splitInputs: Map[ID, S3Resource] = sampleIds.map { sampleId =>
+    sampleId -> S3Resource(commonS3Prefix / "flash-test" / s"${sampleId}.merged.fastq")
+  }.toMap
 
-  val dataflow = StandardDataflow(testParameters)(inputSamples, outputS3Folder)
+  val dataflow = NoFlashDataflow(testParameters)(splitInputs)
 
 
-  case object flashConfig extends TestLoquatConfig("flash", dataflow.flashDataMappings)
-  case object flashLoquat extends Loquat(flashConfig, flashDataProcessing(testParameters))
+  // case object flashConfig extends TestLoquatConfig("flash", dataflow.flashDataMappings)
+  // case object flashLoquat extends Loquat(flashConfig, flashDataProcessing(testParameters))
 
   case object splitConfig extends TestLoquatConfig("split", dataflow.splitDataMappings)
   case object splitLoquat extends Loquat(splitConfig, splitDataProcessing(testParameters))
@@ -117,7 +107,16 @@ case object test {
   case object mergeConfig extends TestLoquatConfig("merge", dataflow.mergeDataMappings)
   case object mergeLoquat extends Loquat(mergeConfig, mergeDataProcessing)
 
-  case object assignmentConfig extends TestLoquatConfig("assignment", dataflow.assignmentDataMappings)
+  case object assignmentConfig extends TestLoquatConfig("assignment", dataflow.assignmentDataMappings) {
+
+    override lazy val amiEnv = amznAMIEnv(ami, javaHeap = 3)
+
+    override val workersConfig: AnyWorkersConfig = WorkersConfig(
+      instanceSpecs = InstanceSpecs(defaultAMI, r3.large),
+      purchaseModel = Spot(maxPrice = Some(0.4)),
+      groupSize = AutoScalingGroupSize(0, 1, 10)
+    )
+  }
   case object assignmentLoquat extends Loquat(assignmentConfig, assignmentDataProcessing(testParameters))
 
   case object countingConfig extends TestLoquatConfig("counting", dataflow.countingDataMappings)
@@ -134,10 +133,13 @@ case object test {
 [main/scala/metagenomica/bio4j/titanTaxonomyTree.scala]: ../../../main/scala/metagenomica/bio4j/titanTaxonomyTree.scala.md
 [main/scala/metagenomica/bundles/bio4jTaxonomy.scala]: ../../../main/scala/metagenomica/bundles/bio4jTaxonomy.scala.md
 [main/scala/metagenomica/bundles/blast.scala]: ../../../main/scala/metagenomica/bundles/blast.scala.md
-[main/scala/metagenomica/bundles/blast16s.scala]: ../../../main/scala/metagenomica/bundles/blast16s.scala.md
+[main/scala/metagenomica/bundles/filterGIs.scala]: ../../../main/scala/metagenomica/bundles/filterGIs.scala.md
 [main/scala/metagenomica/bundles/flash.scala]: ../../../main/scala/metagenomica/bundles/flash.scala.md
-[main/scala/metagenomica/bundles/gis.scala]: ../../../main/scala/metagenomica/bundles/gis.scala.md
+[main/scala/metagenomica/bundles/referenceDB.scala]: ../../../main/scala/metagenomica/bundles/referenceDB.scala.md
+[main/scala/metagenomica/bundles/referenceMap.scala]: ../../../main/scala/metagenomica/bundles/referenceMap.scala.md
 [main/scala/metagenomica/data.scala]: ../../../main/scala/metagenomica/data.scala.md
+[main/scala/metagenomica/dataflow.scala]: ../../../main/scala/metagenomica/dataflow.scala.md
+[main/scala/metagenomica/dataflows/noFlash.scala]: ../../../main/scala/metagenomica/dataflows/noFlash.scala.md
 [main/scala/metagenomica/dataflows/standard.scala]: ../../../main/scala/metagenomica/dataflows/standard.scala.md
 [main/scala/metagenomica/loquats/1.flash.scala]: ../../../main/scala/metagenomica/loquats/1.flash.scala.md
 [main/scala/metagenomica/loquats/2.split.scala]: ../../../main/scala/metagenomica/loquats/2.split.scala.md

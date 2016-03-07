@@ -2,44 +2,17 @@
 ```scala
 package ohnosequences.mg7.bundles
 
+import ohnosequences.mg7._
+
 import ohnosequences.statika._
+import ohnosequences.loquat.utils._
+import ohnosequences.awstools.s3.S3Object
 
 import com.amazonaws.auth._
 import com.amazonaws.services.s3.transfer._
 
 import better.files._
-
-
-sealed class GIsBundle(name: String) extends Bundle() {
-  val bucket = "resources.ohnosequences.com"
-  val key = s"16s/${name}"
-
-  val destination: File = File(name)
-  val location: File = destination
-
-  def instructions: AnyInstructions = {
-
-    LazyTry {
-      println(s"""Dowloading
-        |from: s3://${bucket}/${key}
-        |to: ${destination.path}
-        |""".stripMargin)
-
-      // val transferManager = new TransferManager(new ProfileCredentialsProvider("default"))
-      val transferManager = new TransferManager(new InstanceProfileCredentialsProvider())
-      val transfer = transferManager.download(bucket, key, destination.toJava)
-      transfer.waitForCompletion
-    } -&-
-    say(s"GIs database ${name} was dowloaded and unpacked to ${location.path}")
-  }
-}
-```
-
-This is what will be used in the assignment loquat
-
-```scala
-case object filteredGIs extends GIsBundle("gi_taxid_filtered.csv")
-
+import com.github.tototoshi.csv._
 
 case object filtering {
 
@@ -47,7 +20,10 @@ case object filtering {
   import ohnosequences.awstools.ec2._
   import ohnosequences.awstools.regions.Region._
 
-  case object originalGIs extends GIsBundle("gi_taxid_nucl.dmp")
+  case object originalGIs extends Bundle() with AnyReferenceIDsMap {
+    val name = "gi_taxid_nucl.dmp"
+    val s3Address = S3Object("resources.ohnosequences.com", s"16s/${name}")
+  }
 
   // this is applied only once:
   case object filterGIs extends Bundle(originalGIs) {
@@ -80,7 +56,7 @@ case object filtering {
         val refGIs: Set[String] = io.Source.fromFile( referenceFile.toJava ).getLines.toSet
 
         import com.github.tototoshi.csv._
-        val csvReader = CSVReader.open(originalGIs.location.toJava)(new TSVFormat {})
+        val csvReader = CSVReader.open(originalGIs.destination.toJava)(new TSVFormat {})
         val csvWriter = CSVWriter.open(filteredFile.toJava, append = true)(new TSVFormat {})
 
         // iterating over huge GIs file and filtering it
@@ -105,11 +81,11 @@ case object filtering {
     }
   }
 
-  case object filterGIsCompat extends Compatible(
-    amznAMIEnv(AmazonLinuxAMI(Ireland, HVM, InstanceStore)),
-    filterGIs,
-    generated.metadata.mg7
-  )
+  // case object filterGIsCompat extends Compatible(
+  //   amznAMIEnv(AmazonLinuxAMI(Ireland, HVM, InstanceStore)),
+  //   filterGIs,
+  //   generated.metadata.mg7
+  // )
 
 }
 
@@ -122,10 +98,13 @@ case object filtering {
 [main/scala/metagenomica/bio4j/titanTaxonomyTree.scala]: ../bio4j/titanTaxonomyTree.scala.md
 [main/scala/metagenomica/bundles/bio4jTaxonomy.scala]: bio4jTaxonomy.scala.md
 [main/scala/metagenomica/bundles/blast.scala]: blast.scala.md
-[main/scala/metagenomica/bundles/blast16s.scala]: blast16s.scala.md
+[main/scala/metagenomica/bundles/filterGIs.scala]: filterGIs.scala.md
 [main/scala/metagenomica/bundles/flash.scala]: flash.scala.md
-[main/scala/metagenomica/bundles/gis.scala]: gis.scala.md
+[main/scala/metagenomica/bundles/referenceDB.scala]: referenceDB.scala.md
+[main/scala/metagenomica/bundles/referenceMap.scala]: referenceMap.scala.md
 [main/scala/metagenomica/data.scala]: ../data.scala.md
+[main/scala/metagenomica/dataflow.scala]: ../dataflow.scala.md
+[main/scala/metagenomica/dataflows/noFlash.scala]: ../dataflows/noFlash.scala.md
 [main/scala/metagenomica/dataflows/standard.scala]: ../dataflows/standard.scala.md
 [main/scala/metagenomica/loquats/1.flash.scala]: ../loquats/1.flash.scala.md
 [main/scala/metagenomica/loquats/2.split.scala]: ../loquats/2.split.scala.md

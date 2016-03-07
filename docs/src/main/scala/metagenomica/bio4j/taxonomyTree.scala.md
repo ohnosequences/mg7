@@ -15,7 +15,8 @@ This is just an abstract representation of the taxonomy tree nodes
   trait AnyTaxonNode extends Any {
 
     def id: String
-    // TODO: any other useful information (i.e. name)
+    def name: String
+    def rank: String
 
     // root doesn't have parent
     def parent: Option[AnyTaxonNode]
@@ -116,10 +117,13 @@ Find the "solution" of the algorithmfor a set of nodes
 [main/scala/metagenomica/bio4j/titanTaxonomyTree.scala]: titanTaxonomyTree.scala.md
 [main/scala/metagenomica/bundles/bio4jTaxonomy.scala]: ../bundles/bio4jTaxonomy.scala.md
 [main/scala/metagenomica/bundles/blast.scala]: ../bundles/blast.scala.md
-[main/scala/metagenomica/bundles/blast16s.scala]: ../bundles/blast16s.scala.md
+[main/scala/metagenomica/bundles/filterGIs.scala]: ../bundles/filterGIs.scala.md
 [main/scala/metagenomica/bundles/flash.scala]: ../bundles/flash.scala.md
-[main/scala/metagenomica/bundles/gis.scala]: ../bundles/gis.scala.md
+[main/scala/metagenomica/bundles/referenceDB.scala]: ../bundles/referenceDB.scala.md
+[main/scala/metagenomica/bundles/referenceMap.scala]: ../bundles/referenceMap.scala.md
 [main/scala/metagenomica/data.scala]: ../data.scala.md
+[main/scala/metagenomica/dataflow.scala]: ../dataflow.scala.md
+[main/scala/metagenomica/dataflows/noFlash.scala]: ../dataflows/noFlash.scala.md
 [main/scala/metagenomica/dataflows/standard.scala]: ../dataflows/standard.scala.md
 [main/scala/metagenomica/loquats/1.flash.scala]: ../loquats/1.flash.scala.md
 [main/scala/metagenomica/loquats/2.split.scala]: ../loquats/2.split.scala.md

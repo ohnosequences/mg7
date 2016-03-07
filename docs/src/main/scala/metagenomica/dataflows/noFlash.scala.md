@@ -19,11 +19,10 @@ import ohnosequences.awstools.regions.Region._
 import com.amazonaws.auth._, profile._
 ```
 
-## Standard Dataflow
+## No-flash Dataflow
 
-  Standard dataflow consists of all steps of the MG7 pipeline:
+  No-flash dataflow consists of the following steps of the MG7 pipeline:
 
-  1. flash: merging paired end reads
   2. split: splitting each dataset of reads on small chunks
   3. blast: processing each chunk of reads with blast
   4. merge: merging blast chunks into complete results per original reads datasets
@@ -32,33 +31,79 @@ import com.amazonaws.auth._, profile._
 
 
 ```scala
-trait AnyFullDataflow extends AnyNoFlashDataflow {
+trait AnyNoFlashDataflow extends AnyDataflow {
 
-  val flashInputs: Map[SampleID, (S3Resource, S3Resource)]
+  val splitInputs: Map[SampleID, S3Resource]
 
-  lazy val flashDataMappings = flashInputs.toList.map {
-    case (sampleId, (reads1S3Resource, reads2S3Resource)) =>
+  lazy val splitDataMappings = splitInputs.toList.map { case (sampleId, readsS3Resource) =>
 
-      DataMapping(sampleId, flashDataProcessing(params))(
-        remoteInput = Map(
-          data.pairedReads1 -> reads1S3Resource,
-          data.pairedReads2 -> reads2S3Resource
-        ),
-        remoteOutput = Map(
-          data.mergedReads -> S3Resource(params.outputS3Folder(sampleId, "flash") / s"${sampleId}.merged.fastq"),
-          data.flashStats  -> S3Resource(params.outputS3Folder(sampleId, "flash") / s"${sampleId}.stats.txt")
-        )
+    DataMapping(sampleId, splitDataProcessing(params))(
+      remoteInput = Map(
+        data.mergedReads -> readsS3Resource
+      ),
+      remoteOutput = Map(
+        data.fastaChunks -> S3Resource(params.outputS3Folder(sampleId, "split"))
       )
+    )
   }
 
-  val splitInputs: Map[SampleID, S3Resource] = flashDataMappings.map { flashDM =>
-    flashDM.label -> flashDM.remoteOutput(data.mergedReads)
-  }.toMap
+  lazy val blastDataMappings = splitDataMappings.flatMap { splitDM =>
+    val sampleId = splitDM.label
+
+    lazy val s3 = S3.create(
+      new AWSCredentialsProviderChain(
+        new InstanceProfileCredentialsProvider(),
+        new ProfileCredentialsProvider()
+      )
+    )
+
+    lazy val chunksS3Folder: AnyS3Address = splitDM.remoteOutput(data.fastaChunks).resource
+
+    lazy val chunks: List[S3Object] = s3.listObjects(chunksS3Folder.bucket, chunksS3Folder.key)
+
+    chunks.zipWithIndex.map { case (chunkS3Obj, n) =>
+
+      DataMapping(s"${sampleId}.${n}", blastDataProcessing(params))(
+        remoteInput = Map(
+          data.fastaChunk -> S3Resource(chunkS3Obj)
+        ),
+        remoteOutput = Map(
+          data.blastChunkOut -> S3Resource(params.outputS3Folder(sampleId, "blast") / s"blast.${n}.csv")
+        )
+      )
+    }
+  }
+
+  lazy val mergeDataMappings = splitDataMappings.map { splitDM =>
+    val sampleId = splitDM.label
+
+    DataMapping(sampleId, mergeDataProcessing)(
+      remoteInput = Map(
+        data.blastChunks -> S3Resource(params.outputS3Folder(sampleId, "blast"))
+      ),
+      remoteOutput = Map(
+        data.blastResult -> S3Resource(params.outputS3Folder(sampleId, "merge") / s"${sampleId}.blast.csv")
+      )
+    )
+  }
+
+  lazy val assignmentDataMappings = mergeDataMappings.map { mergeDM =>
+    val sampleId = mergeDM.label
+
+    DataMapping(sampleId, assignmentDataProcessing(params))(
+      remoteInput = mergeDM.remoteOutput,
+      remoteOutput = Map(
+        data.lcaCSV -> S3Resource(params.outputS3Folder(sampleId, "assignment") / s"${sampleId}.lca.csv"),
+        data.bbhCSV -> S3Resource(params.outputS3Folder(sampleId, "assignment") / s"${sampleId}.bbh.csv")
+      )
+    )
+  }
+
 }
 
-case class FullDataflow[P <: AnyMG7Parameters](val params: P)(
-  val flashInputs: Map[SampleID, (S3Resource, S3Resource)]
-) extends AnyFullDataflow {
+case class NoFlashDataflow[P <: AnyMG7Parameters](val params: P)(
+  val splitInputs: Map[SampleID, S3Resource]
+) extends AnyNoFlashDataflow {
 
   type Params = P
 }

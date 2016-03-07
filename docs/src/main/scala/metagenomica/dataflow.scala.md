@@ -1,59 +1,49 @@
 
 ```scala
-package ohnosequences
+package ohnosequences.mg7
 
-import ohnosequences.mg7.bio4j.taxonomyTree._
-import ohnosequences.cosas._, types._, klists._
-import ohnosequences.blast.api._
+import ohnosequences.mg7.loquats._
+import ohnosequences.loquat._
+import ohnosequences.datasets._
+import ohnosequences.awstools.s3._
 
-package object mg7 {
+trait AnyDataflow {
 
-  type ID = String
-  type TaxID = ID
-  type ReadID = ID
-  type NodeID = ID
+  // param-pam-pam
+  type Params <: AnyMG7Parameters
+  val  params: Params
+```
 
-  type LCA = Option[AnyTaxonNode]
-  type BBH = Option[AnyTaxonNode]
+The essential steps of any MG7 dataflow are
+- BLAST
 
-  type SampleID = ID
-  type StepName = String
+```scala
+  val blastDataMappings: List[DataMapping[blastDataProcessing[Params]]]
+```
 
-  def parseInt(str: String): Option[Int] = util.Try(str.toInt).toOption
+- Assignment
 
-  case object columnNames {
+```scala
+  val assignmentDataMappings: List[DataMapping[assignmentDataProcessing[Params]]]
+```
 
-    val ReadID = "Read-ID"
-    val TaxID = "Tax-ID"
-    val TaxName = "Tax-name"
-    val TaxRank = "Tax-rank"
-    val Count = "Count"
-  }
+- Counting
 
+```scala
+  lazy val countingDataMappings: List[DataMapping[countingDataProcessing.type]] =
+    assignmentDataMappings.map { assignmentDM =>
+      val sampleId = assignmentDM.label
 
-  case object defaultBlastOutRec extends BlastOutputRecord(
-      outputFields.qseqid   :?:
-      outputFields.qlen     :?:
-      outputFields.qstart   :?:
-      outputFields.qend     :?:
-      outputFields.sseqid   :?:
-      outputFields.slen     :?:
-      outputFields.sstart   :?:
-      outputFields.send     :?:
-      outputFields.bitscore :?:
-      outputFields.sgi      :?:
-      |[AnyOutputField]
-    )
-
-  val defaultBlastOptions: blastn.Options := blastn.OptionsVals =
-    blastn.defaults.update(
-      num_threads(1) ::
-      word_size(42) ::
-      max_target_seqs(10) ::
-      evalue(0.001) ::
-      blastn.task(blastn.megablast) ::
-      *[AnyDenotation]
-    )
+      DataMapping(sampleId, countingDataProcessing)(
+        remoteInput = assignmentDM.remoteOutput,
+        remoteOutput = Map(
+          data.lcaDirectCountsCSV -> S3Resource(params.outputS3Folder(sampleId, "counting") / s"${sampleId}.lca.direct.absolute.counts.csv"),
+          data.bbhDirectCountsCSV -> S3Resource(params.outputS3Folder(sampleId, "counting") / s"${sampleId}.bbh.direct.absolute.counts.csv"),
+          data.lcaAccumCountsCSV  -> S3Resource(params.outputS3Folder(sampleId, "counting") / s"${sampleId}.lca.accum.absolute.counts.csv"),
+          data.bbhAccumCountsCSV  -> S3Resource(params.outputS3Folder(sampleId, "counting") / s"${sampleId}.bbh.accum.absolute.counts.csv")
+        )
+      )
+    }
 
 }
 

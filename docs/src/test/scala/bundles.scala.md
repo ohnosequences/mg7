@@ -50,16 +50,16 @@
 //     }
 //   }
 //
-//   ignore("testing blast16s bundle") {
-//     import blast16sTest._
+//   ignore("testing rna16s bundle") {
+//     import rna16sTest._
 //
-//     val specs = blast16sCompat.instanceSpecs(
+//     val specs = rna16sCompat.instanceSpecs(
 //       instanceType = m3.medium,
 //       user.awsAccount.keypair.name,
 //       Some(era7.aws.roles.projects.name)
 //     )
 //
-//     val instances = launchAndWait(ec2, blast16sCompat.name, specs)
+//     val instances = launchAndWait(ec2, rna16sCompat.name, specs)
 //     assert{ instances.length == 1 }
 //   }
 //
@@ -101,10 +101,13 @@
 [main/scala/metagenomica/bio4j/titanTaxonomyTree.scala]: ../../main/scala/metagenomica/bio4j/titanTaxonomyTree.scala.md
 [main/scala/metagenomica/bundles/bio4jTaxonomy.scala]: ../../main/scala/metagenomica/bundles/bio4jTaxonomy.scala.md
 [main/scala/metagenomica/bundles/blast.scala]: ../../main/scala/metagenomica/bundles/blast.scala.md
-[main/scala/metagenomica/bundles/blast16s.scala]: ../../main/scala/metagenomica/bundles/blast16s.scala.md
+[main/scala/metagenomica/bundles/filterGIs.scala]: ../../main/scala/metagenomica/bundles/filterGIs.scala.md
 [main/scala/metagenomica/bundles/flash.scala]: ../../main/scala/metagenomica/bundles/flash.scala.md
-[main/scala/metagenomica/bundles/gis.scala]: ../../main/scala/metagenomica/bundles/gis.scala.md
+[main/scala/metagenomica/bundles/referenceDB.scala]: ../../main/scala/metagenomica/bundles/referenceDB.scala.md
+[main/scala/metagenomica/bundles/referenceMap.scala]: ../../main/scala/metagenomica/bundles/referenceMap.scala.md
 [main/scala/metagenomica/data.scala]: ../../main/scala/metagenomica/data.scala.md
+[main/scala/metagenomica/dataflow.scala]: ../../main/scala/metagenomica/dataflow.scala.md
+[main/scala/metagenomica/dataflows/noFlash.scala]: ../../main/scala/metagenomica/dataflows/noFlash.scala.md
 [main/scala/metagenomica/dataflows/standard.scala]: ../../main/scala/metagenomica/dataflows/standard.scala.md
 [main/scala/metagenomica/loquats/1.flash.scala]: ../../main/scala/metagenomica/loquats/1.flash.scala.md
 [main/scala/metagenomica/loquats/2.split.scala]: ../../main/scala/metagenomica/loquats/2.split.scala.md
