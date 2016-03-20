@@ -50,7 +50,7 @@ package object mg7 {
     out.gaps        :×:
     out.gapopen     :×:
     out.qcovs       :×:
-    |[AnyBlastOutputField]
+    |[AnyOutputField]
   )
 
   val defaultBlastOptions: blastn.Options := blastn.OptionsVals =
