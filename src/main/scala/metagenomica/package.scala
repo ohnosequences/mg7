@@ -2,7 +2,7 @@ package ohnosequences
 
 import ohnosequences.mg7.bio4j.taxonomyTree._
 import ohnosequences.cosas._, types._, klists._
-import ohnosequences.blast.api._
+import ohnosequences.blast.api.{ outputFields => out, _ }
 
 package object mg7 {
 
@@ -30,18 +30,28 @@ package object mg7 {
 
 
   case object defaultBlastOutRec extends BlastOutputRecord(
-      outputFields.qseqid   :×:
-      outputFields.qlen     :×:
-      outputFields.qstart   :×:
-      outputFields.qend     :×:
-      outputFields.sseqid   :×:
-      outputFields.slen     :×:
-      outputFields.sstart   :×:
-      outputFields.send     :×:
-      outputFields.bitscore :×:
-      outputFields.sgi      :×:
-      |[AnyOutputField]
-    )
+    // query
+    out.qseqid      :×:
+    out.qstart      :×:
+    out.qend        :×:
+    out.qlen        :×:
+    // reference
+    out.sseqid      :×:
+    out.sstart      :×:
+    out.send        :×:
+    out.slen        :×:
+    // alignment
+    out.evalue      :×:
+    out.score       :×:
+    out.bitscore    :×:
+    out.length      :×:
+    out.pident      :×:
+    out.mismatch    :×:
+    out.gaps        :×:
+    out.gapopen     :×:
+    out.qcovs       :×:
+    |[AnyOutputField]
+  )
 
   val defaultBlastOptions: blastn.Options := blastn.OptionsVals =
     blastn.defaults.update(
