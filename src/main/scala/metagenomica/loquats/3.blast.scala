@@ -38,15 +38,9 @@ extends DataProcessingBundle(
       // NOTE: once we update to better-files 2.15.+, use `file.lineIterator` here (it's autoclosing):
       val source = io.Source.fromFile( context.inputFile(data.fastaChunk).toJava )
 
-      fasta.parseMapFromLines(source.getLines) foreach { fastaMap =>
+      fasta.parseFastaDropErrors(source.getLines) foreach { read =>
 
-        val read = FASTA(
-          header(FastaHeader(fastaMap(fasta.header.label))) ::
-          sequence(FastaSequence(fastaMap(fasta.sequence.label))) ::
-          *[AnyDenotation]
-        )
-
-        val inFile = (context / "read.fa").overwrite(read.toLines.stripSuffix("\n"))
+        val inFile = (context / "read.fa").overwrite(read.asString)
         val outFile = (context / "blastRead.csv").clear()
 
         val expr = blastn(
