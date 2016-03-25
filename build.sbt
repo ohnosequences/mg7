@@ -6,7 +6,7 @@ description   := "metagenomica project"
 
 bucketSuffix  := "era7.com"
 
-scalaVersion := "2.11.7"
+scalaVersion := "2.11.8"
 
 resolvers := Seq(
   "Era7 public maven releases"  at s3("releases.era7.com").toHttps(s3region.value.toString),
@@ -17,7 +17,7 @@ libraryDependencies ++= Seq(
   // APIs:
   "ohnosequences" %% "flash"      % "0.3.0",
   "ohnosequences" %% "blast-api"  % "0.5.1",
-  "ohnosequences" %% "fastarious" % "0.4.0",
+  "ohnosequences" %% "fastarious" % "0.5.1",
   // generic tools:
   "ohnosequences" %% "cosas"      % "0.8.0",
   "ohnosequences" %% "datasets"   % "0.3.0",
