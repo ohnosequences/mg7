@@ -13,6 +13,8 @@ trait AnyDataflow {
 
   /* The essential steps of any MG7 dataflow are */
 
+  val splitDataMappings: List[DataMapping[splitDataProcessing]]
+
   /* - BLAST */
   val blastDataMappings: List[DataMapping[blastDataProcessing[Params]]]
 
@@ -21,11 +23,13 @@ trait AnyDataflow {
 
   /* - Counting */
   lazy val countingDataMappings: List[DataMapping[countingDataProcessing.type]] =
-    assignmentDataMappings.map { assignmentDM =>
+    assignmentDataMappings.zip(splitDataMappings).map { case (assignmentDM, splitDM) =>
       val sampleId = assignmentDM.label
 
       DataMapping(sampleId, countingDataProcessing)(
-        remoteInput = assignmentDM.remoteOutput,
+        remoteInput =
+          assignmentDM.remoteOutput +
+          (data.totalReadsNumber -> splitDM.remoteOutput(data.totalReadsNumber)),
         remoteOutput = Map(
           data.lcaDirectCountsCSV -> S3Resource(params.outputS3Folder(sampleId, "counting") / s"${sampleId}.lca.direct.absolute.counts.csv"),
           data.bbhDirectCountsCSV -> S3Resource(params.outputS3Folder(sampleId, "counting") / s"${sampleId}.bbh.direct.absolute.counts.csv"),
