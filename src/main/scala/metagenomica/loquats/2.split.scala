@@ -51,7 +51,7 @@ case class splitDataProcessing(params: AnyMG7Parameters) extends DataProcessingB
     } -&-
     success("chunk-chunk-chunk!",
       data.fastaChunks(outputDir) ::
-      data.totalReadsNumber(readsCount) ::
+      data.mergedReadsNumber(readsCount) ::
       *[AnyDenotation { type Value <: FileResource }]
     )
 

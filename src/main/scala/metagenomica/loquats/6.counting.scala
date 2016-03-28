@@ -68,7 +68,7 @@ case object countingDataProcessing extends DataProcessingBundle(
 
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
 
-    val totalReadsNumber: Int = parseInt(
+    val mergedReadsNumber: Int = parseInt(
       context.inputFile(data.lcaCSV).contentAsString
     ).getOrElse(1)
 
@@ -113,11 +113,11 @@ case object countingDataProcessing extends DataProcessingBundle(
         // We write only non-zero direct counts
         if (direct > 0) {
           csvDirectWriter.writeRow( List(taxID, rank, name, direct) )
-          csvDirectFreqWriter.writeRow( List(taxID, rank, name, direct / totalReadsNumber) )
+          csvDirectFreqWriter.writeRow( List(taxID, rank, name, direct / mergedReadsNumber) )
         }
         // Accumulated counts shouldn't be ever a zero
         csvAccumWriter.writeRow( List(taxID, rank, name, accum) )
-        csvAccumFreqWriter.writeRow( List(taxID, rank, name, accum / totalReadsNumber) )
+        csvAccumFreqWriter.writeRow( List(taxID, rank, name, accum / mergedReadsNumber) )
       }
 
       csvDirectWriter.close

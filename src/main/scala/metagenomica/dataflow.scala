@@ -29,7 +29,7 @@ trait AnyDataflow {
       DataMapping(sampleId, countingDataProcessing)(
         remoteInput =
           assignmentDM.remoteOutput +
-          (data.totalReadsNumber -> splitDM.remoteOutput(data.totalReadsNumber)),
+          (data.mergedReadsNumber -> splitDM.remoteOutput(data.mergedReadsNumber)),
         remoteOutput = Map(
           data.lcaDirectCountsCSV -> S3Resource(params.outputS3Folder(sampleId, "counting") / s"${sampleId}.lca.direct.absolute.counts.csv"),
           data.lcaAccumCountsCSV  -> S3Resource(params.outputS3Folder(sampleId, "counting") / s"${sampleId}.lca.accum.absolute.counts.csv"),
