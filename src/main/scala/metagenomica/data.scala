@@ -52,9 +52,14 @@ case object data {
 
   // Counting output:
   case object lcaDirectCountsCSV extends FileData("lca.direct.counts")("csv")
-  case object bbhDirectCountsCSV extends FileData("bbh.direct.counts")("csv")
   case object lcaAccumCountsCSV extends FileData("lca.accum.counts")("csv")
+  case object lcaDirectFreqCountsCSV extends FileData("lca.direct.frequency.counts")("csv")
+  case object lcaAccumFreqCountsCSV extends FileData("lca.accum.frequency.counts")("csv")
+
+  case object bbhDirectCountsCSV extends FileData("bbh.direct.counts")("csv")
   case object bbhAccumCountsCSV extends FileData("bbh.accum.counts")("csv")
+  case object bbhDirectFreqCountsCSV extends FileData("bbh.direct.frequency.counts")("csv")
+  case object bbhAccumFreqCountsCSV extends FileData("bbh.accum.frequency.counts")("csv")
 
   case object countingInput extends DataSet(
     lcaCSV :×:
@@ -64,9 +69,13 @@ case object data {
   )
   case object countingOutput extends DataSet(
     lcaDirectCountsCSV :×:
-    bbhDirectCountsCSV :×:
     lcaAccumCountsCSV :×:
+    lcaDirectFreqCountsCSV :×:
+    lcaAccumFreqCountsCSV :×:
+    bbhDirectCountsCSV :×:
     bbhAccumCountsCSV :×:
+    bbhDirectFreqCountsCSV :×:
+    bbhAccumFreqCountsCSV :×:
     |[AnyData]
   )
 

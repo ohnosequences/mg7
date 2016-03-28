@@ -32,9 +32,13 @@ trait AnyDataflow {
           (data.totalReadsNumber -> splitDM.remoteOutput(data.totalReadsNumber)),
         remoteOutput = Map(
           data.lcaDirectCountsCSV -> S3Resource(params.outputS3Folder(sampleId, "counting") / s"${sampleId}.lca.direct.absolute.counts.csv"),
-          data.bbhDirectCountsCSV -> S3Resource(params.outputS3Folder(sampleId, "counting") / s"${sampleId}.bbh.direct.absolute.counts.csv"),
           data.lcaAccumCountsCSV  -> S3Resource(params.outputS3Folder(sampleId, "counting") / s"${sampleId}.lca.accum.absolute.counts.csv"),
-          data.bbhAccumCountsCSV  -> S3Resource(params.outputS3Folder(sampleId, "counting") / s"${sampleId}.bbh.accum.absolute.counts.csv")
+          data.lcaDirectFreqCountsCSV -> S3Resource(params.outputS3Folder(sampleId, "counting") / s"${sampleId}.lca.direct.frequency.counts.csv"),
+          data.lcaAccumFreqCountsCSV  -> S3Resource(params.outputS3Folder(sampleId, "counting") / s"${sampleId}.lca.accum.frequency.counts.csv"),
+          data.bbhDirectCountsCSV -> S3Resource(params.outputS3Folder(sampleId, "counting") / s"${sampleId}.bbh.direct.absolute.counts.csv"),
+          data.bbhAccumCountsCSV  -> S3Resource(params.outputS3Folder(sampleId, "counting") / s"${sampleId}.bbh.accum.absolute.counts.csv"),
+          data.bbhDirectFreqCountsCSV -> S3Resource(params.outputS3Folder(sampleId, "counting") / s"${sampleId}.bbh.direct.frequency.counts.csv"),
+          data.bbhAccumFreqCountsCSV  -> S3Resource(params.outputS3Folder(sampleId, "counting") / s"${sampleId}.bbh.accum.frequency.counts.csv")
         )
       )
     }
