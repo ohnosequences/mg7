@@ -39,12 +39,22 @@ case object data {
 
 
   // all output chunks together:
-  case object blastChunks extends Data("blast-chunks")
+  case object blastChunksFolder extends Data("blast-chunks")
+  case object blastNoHitsFolder extends Data("blast-chunks")
   // after merging chunks:
   case object blastResult extends FileData("blast")("csv")
+  case object blastNoHits extends Data("blast.no-hits")
 
-  case object mergeInput extends DataSet(blastChunks :×: |[AnyData])
-  case object mergeOutput extends DataSet(blastResult :×: |[AnyData])
+  case object mergeInput extends DataSet(
+    blastChunksFolder :×:
+    blastNoHitsFolder :×: 
+    |[AnyData]
+  )
+  case object mergeOutput extends DataSet(
+    blastResult :×:
+    blastNoHits :×:
+    |[AnyData]
+  )
 
 
   // Assignment output:

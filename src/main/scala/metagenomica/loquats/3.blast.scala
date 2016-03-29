@@ -60,7 +60,7 @@ extends DataProcessingBundle(
 
         val output = outFile.contentAsString
         // if not BLAST hits, recording read's header
-        if (output.isEmpty) noHits.append(read.getV(header).toString)
+        if (output.isEmpty) noHits.appendLine(read.getV(header).toString)
         // append results for this read to the total output
         else totalOutput.append(output)
       }
