@@ -33,6 +33,7 @@ extends DataProcessingBundle(
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
 
     val totalOutput = context / "blastAll.csv"
+    val noHits = context / "no.hits"
 
     LazyTry {
       // NOTE: once we update to better-files 2.15.+, use `file.lineIterator` here (it's autoclosing):
@@ -57,8 +58,11 @@ extends DataProcessingBundle(
         // BAM!!
         expr.toSeq.!!
 
+        val output = outFile.contentAsString
+        // if not BLAST hits, recording read's header
+        if (output.isEmpty) noHits.append(read.getV(header).toString)
         // append results for this read to the total output
-        totalOutput.append(outFile.contentAsString)
+        else totalOutput.append(output)
       }
 
       // it's important to close the stream:
@@ -67,6 +71,7 @@ extends DataProcessingBundle(
     success(
       "much blast, very success!",
       data.blastChunkOut(totalOutput) ::
+      data.noHitsHeaders(noHits) ::
       *[AnyDenotation { type Value <: FileResource }]
     )
 

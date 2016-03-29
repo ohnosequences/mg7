@@ -28,9 +28,14 @@ case object data {
   case object fastaChunk extends FileData("reads")("fastq")
   // Blast output for each chunk:
   case object blastChunkOut extends FileData("blast.chunk")("csv")
+  case object noHitsHeaders extends Data("no-blast-hits")
 
   case object blastInput extends DataSet(fastaChunk :×: |[AnyData])
-  case object blastOutput extends DataSet(blastChunkOut :×: |[AnyData])
+  case object blastOutput extends DataSet(
+    blastChunkOut :×:
+    noHitsHeaders :×:
+    |[AnyData]
+  )
 
 
   // all output chunks together:

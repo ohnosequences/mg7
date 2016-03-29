@@ -64,7 +64,8 @@ trait AnyNoFlashDataflow extends AnyDataflow {
           data.fastaChunk -> S3Resource(chunkS3Obj)
         ),
         remoteOutput = Map(
-          data.blastChunkOut -> S3Resource(params.outputS3Folder(sampleId, "blast") / s"blast.${n}.csv")
+          data.blastChunkOut -> S3Resource(params.outputS3Folder(sampleId, "blast") / "results" / s"blast.${n}.csv"),
+          data.noHitsHeaders -> S3Resource(params.outputS3Folder(sampleId, "blast") / "no-hits" / s"no-hits.${n}.csv")
         )
       )
     }
@@ -75,7 +76,7 @@ trait AnyNoFlashDataflow extends AnyDataflow {
 
     DataMapping(sampleId, mergeDataProcessing)(
       remoteInput = Map(
-        data.blastChunks -> S3Resource(params.outputS3Folder(sampleId, "blast"))
+        data.blastChunks -> S3Resource(params.outputS3Folder(sampleId, "blast") / "results" /)
       ),
       remoteOutput = Map(
         data.blastResult -> S3Resource(params.outputS3Folder(sampleId, "merge") / s"${sampleId}.blast.csv")
