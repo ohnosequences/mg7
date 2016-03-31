@@ -41,6 +41,7 @@ case class splitDataProcessing(params: AnyMG7Parameters) extends DataProcessingB
       fastas1
         .grouped(params.splitChunkSize)
         .zipWithIndex
+        // TODO: replace it with a tailrec function
         .foreach { case (chunk, n) =>
 
           (outputDir / s"chunk.${n}.fasta")

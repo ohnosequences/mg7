@@ -9,11 +9,19 @@ case object data {
   case object pairedReads1 extends FileData("reads1")("fastq.gz")
   case object pairedReads2 extends FileData("reads2")("fastq.gz")
 
-  case object mergedReads extends FileData("reads")("fastq")
-  case object flashStats extends FileData("stats")("txt")
+  case object mergedReads    extends FileData("reads")("fastq")
+  case object pair1NotMerged extends FileData("pair1.not-merged")("fastq")
+  case object pair2NotMerged extends FileData("pair2.not-merged")("fastq")
+  case object flashHistogram extends FileData("stats")("txt")
 
-  case object flashInput extends DataSet(pairedReads1 :×: pairedReads2 :×: |[AnyData])
-  case object flashOutput extends DataSet(mergedReads :×: flashStats :×: |[AnyData])
+  case object flashInput  extends DataSet(pairedReads1 :×: pairedReads2 :×: |[AnyData])
+  case object flashOutput extends DataSet(
+    mergedReads :×:
+    pair1NotMerged :×:
+    pair2NotMerged :×: 
+    flashHistogram :×:
+    |[AnyData]
+  )
 
 
   // Reads after splitting (multiple files in a virtual S3 folder):
@@ -47,7 +55,7 @@ case object data {
 
   case object mergeInput extends DataSet(
     blastChunksFolder :×:
-    blastNoHitsFolder :×: 
+    blastNoHitsFolder :×:
     |[AnyData]
   )
   case object mergeOutput extends DataSet(

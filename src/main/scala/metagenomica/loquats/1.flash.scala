@@ -60,7 +60,9 @@ extends DataProcessingBundle(
     success(
       "FLASh merged reads, much success so fast",
       data.mergedReads(flashOutput.mergedReads) ::
-      data.flashStats(flashOutput.lengthNumericHistogram) ::
+      data.pair1NotMerged(flashOutput.pair1NotMerged) ::
+      data.pair2NotMerged(flashOutput.pair2NotMerged) ::
+      data.flashHistogram(flashOutput.lengthNumericHistogram) ::
       *[AnyDenotation { type Value <: FileResource }]
     )
   }

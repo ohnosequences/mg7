@@ -39,8 +39,7 @@ case object mergeDataProcessing extends DataProcessingBundle()(
         noHitsMerged.append( noHitsChunk.contentAsString )
       }
     } -&-
-    success(
-      s"Everything is merged in [${blastMerged.path}]",
+    success(s"Everything is merged",
       data.blastResult(blastMerged) ::
       data.blastNoHits(noHitsMerged) ::
       *[AnyDenotation { type Value <: FileResource }]

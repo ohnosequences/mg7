@@ -40,8 +40,10 @@ trait AnyFullDataflow extends AnyNoFlashDataflow {
           data.pairedReads2 -> reads2S3Resource
         ),
         remoteOutput = Map(
-          data.mergedReads -> S3Resource(params.outputS3Folder(sampleId, "flash") / s"${sampleId}.merged.fastq"),
-          data.flashStats  -> S3Resource(params.outputS3Folder(sampleId, "flash") / s"${sampleId}.stats.txt")
+          data.mergedReads    -> S3Resource(params.outputS3Folder(sampleId, "flash") / s"${sampleId}.merged.fastq"),
+          data.pair1NotMerged -> S3Resource(params.outputS3Folder(sampleId, "flash") / s"${sampleId}.pair1.not-merged.fastq"),
+          data.pair2NotMerged -> S3Resource(params.outputS3Folder(sampleId, "flash") / s"${sampleId}.pair2.not-merged.fastq"),
+          data.flashHistogram -> S3Resource(params.outputS3Folder(sampleId, "flash") / s"${sampleId}.hist")
         )
       )
   }
