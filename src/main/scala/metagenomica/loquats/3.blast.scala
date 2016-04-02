@@ -44,15 +44,16 @@ extends DataProcessingBundle(
         val inFile = (context / "read.fa").overwrite(read.asString)
         val outFile = (context / "blastRead.csv").clear()
 
-        val expr = blastn(
+        val expr = BlastExpression(md.blastCommand)(
           outputRecord = md.blastOutRec,
           argumentValues =
-            db(md.referenceDB.dbName) ::
+            db(Set(md.referenceDB.dbName)) ::
             query(inFile) ::
             out(outFile) ::
             *[AnyDenotation],
-          optionValues = md.blastOptions.value
-        )
+          optionValues = md.blastOptions
+        )(md.argValsToSeq, md.optValsToSeq)
+
         println(expr.toSeq.mkString(" "))
 
         // BAM!!
