@@ -61,14 +61,14 @@ package object mg7 {
     |[AnyOutputField]
   )
 
-  val defaultBlastOptions: blastn.Options := blastn.OptionsVals =
-    blastn.defaults.update(
-      num_threads(1)                ::
-      word_size(42)                 ::
-      max_target_seqs(10)           ::
-      evalue(BigDecimal(0.001))     ::
-      blastn.task(blastn.megablast) ::
-      *[AnyDenotation]
-    )
+  // val defaultBlastOptions: blastn.Options := blastn.OptionsVals =
+  //   blastn.defaults.update(
+  //     num_threads(1)                ::
+  //     word_size(42)                 ::
+  //     max_target_seqs(10)           ::
+  //     evalue(BigDecimal(0.001))     ::
+  //     blastn.task(blastn.megablast) ::
+  //     *[AnyDenotation]
+  //   )
 
 }
