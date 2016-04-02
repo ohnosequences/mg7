@@ -49,15 +49,16 @@ trait AnyMG7Parameters {
   val optValsToSeq: BlastOptionsToSeq[BlastCommand#OptionsVals] // has to be provided implicitly
 }
 
-abstract class MG7Parameters[
+class MG7Parameters[
   BC <: AnyBlastCommand { type ArgumentsVals = BlastArgumentsVals },
   BR <: AnyBlastOutputRecord.For[BC]
 ](val outputS3Folder: (SampleID, StepName) => S3Folder,
   val readsLength: illumina.Length,
   val splitInputFormat: SplitInputFormat = FastQInput,
+  val splitChunkSize: Int = 10,
+  val blastCommand: BC = blastn,
   val blastOutRec: BR = defaultBlastOutRec,
   val blastOptions: BC#OptionsVals = defaultBlastOptions.value,
-  val splitChunkSize: Int = 10,
   val referenceDB: bundles.AnyReferenceDB = bundles.rnaCentral
 )(implicit
   val optValsToSeq: BlastOptionsToSeq[BC#OptionsVals]
