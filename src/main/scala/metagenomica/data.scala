@@ -29,7 +29,7 @@ case object data {
   case object mergedReadsNumber extends Data("merged-reads-number")
 
   case object splitInput extends DataSet(mergedReads :×: |[AnyData])
-  case object splitOutput extends DataSet(fastaChunks :×: mergedReadsNumber :×: |[AnyData])
+  case object splitOutput extends DataSet(fastaChunks :×: |[AnyData])
 
 
   // Blast input:
