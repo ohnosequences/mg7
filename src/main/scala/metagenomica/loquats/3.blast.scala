@@ -72,7 +72,7 @@ extends DataProcessingBundle(
     success(
       "much blast, very success!",
       data.blastChunkOut(totalOutput) ::
-      data.noHitsHeaders(noHits) ::
+      data.noHitsChunk(noHits) ::
       *[AnyDenotation { type Value <: FileResource }]
     )
 

@@ -36,12 +36,12 @@ case object data {
   case object fastaChunk extends FileData("reads")("fastq")
   // Blast output for each chunk:
   case object blastChunkOut extends FileData("blast.chunk")("csv")
-  case object noHitsHeaders extends Data("no-blast-hits")
+  case object noHitsChunk extends Data("no-blast-hits.fa")
 
   case object blastInput extends DataSet(fastaChunk :×: |[AnyData])
   case object blastOutput extends DataSet(
     blastChunkOut :×:
-    noHitsHeaders :×:
+    noHitsChunk :×:
     |[AnyData]
   )
 
@@ -51,7 +51,7 @@ case object data {
   case object blastNoHitsFolder extends Data("blast-no-hits")
   // after merging chunks:
   case object blastResult extends FileData("blast")("csv")
-  case object blastNoHits extends Data("blast.no-hits")
+  case object blastNoHits extends Data("blast.no-hits.fa")
 
   case object mergeInput extends DataSet(
     blastChunksFolder :×:
