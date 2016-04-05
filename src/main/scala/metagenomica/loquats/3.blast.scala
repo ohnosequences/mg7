@@ -32,8 +32,8 @@ extends DataProcessingBundle(
 
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
 
-    val totalOutput = context / "blastAll.csv"
-    val noHits = context / "no.hits"
+    val totalOutput = (context / "blastAll.csv").createIfNotExists()
+    val noHits = (context / "no.hits").createIfNotExists()
 
     LazyTry {
       // NOTE: once we update to better-files 2.15.+, use `file.lineIterator` here (it's autoclosing):
@@ -44,15 +44,16 @@ extends DataProcessingBundle(
         val inFile = (context / "read.fa").overwrite(read.asString)
         val outFile = (context / "blastRead.csv").clear()
 
-        val expr = blastn(
+        val expr = BlastExpression(md.blastCommand)(
           outputRecord = md.blastOutRec,
           argumentValues =
-            db(md.referenceDB.dbName) ::
+            db(Set(md.referenceDB.dbName)) ::
             query(inFile) ::
             out(outFile) ::
             *[AnyDenotation],
-          optionValues = md.blastOptions.value
-        )
+          optionValues = md.blastOptions
+        )(md.argValsToSeq, md.optValsToSeq)
+
         println(expr.toSeq.mkString(" "))
 
         // BAM!!

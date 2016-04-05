@@ -18,7 +18,7 @@ case object data {
   case object flashOutput extends DataSet(
     mergedReads :×:
     pair1NotMerged :×:
-    pair2NotMerged :×: 
+    pair2NotMerged :×:
     flashHistogram :×:
     |[AnyData]
   )
@@ -48,7 +48,7 @@ case object data {
 
   // all output chunks together:
   case object blastChunksFolder extends Data("blast-chunks")
-  case object blastNoHitsFolder extends Data("blast-chunks")
+  case object blastNoHitsFolder extends Data("blast-no-hits")
   // after merging chunks:
   case object blastResult extends FileData("blast")("csv")
   case object blastNoHits extends Data("blast.no-hits")

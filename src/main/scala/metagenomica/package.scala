@@ -2,7 +2,7 @@ package ohnosequences
 
 import ohnosequences.mg7.bio4j.taxonomyTree._
 import ohnosequences.cosas._, types._, klists._
-import ohnosequences.blast.api.{ outputFields => out, _ }
+import ohnosequences.blast.api._
 
 package object mg7 {
 
@@ -29,6 +29,14 @@ package object mg7 {
   }
 
 
+  type BlastArgumentsVals =
+    (db.type    := db.Raw)    ::
+    (query.type := query.Raw) ::
+    (out.type   := out.Raw)   ::
+    *[AnyDenotation]
+
+
+  import ohnosequences.blast.api.{ outputFields => out }
   case object defaultBlastOutRec extends BlastOutputRecord(
     // query
     out.qseqid      :×:
@@ -53,14 +61,14 @@ package object mg7 {
     |[AnyOutputField]
   )
 
-  val defaultBlastOptions: blastn.Options := blastn.OptionsVals =
-    blastn.defaults.update(
-      num_threads(1)                ::
-      word_size(42)                 ::
-      max_target_seqs(10)           ::
-      evalue(BigDecimal(0.001))     ::
-      blastn.task(blastn.megablast) ::
-      *[AnyDenotation]
-    )
+  // val defaultBlastOptions: blastn.Options := blastn.OptionsVals =
+  //   blastn.defaults.update(
+  //     num_threads(1)                ::
+  //     word_size(42)                 ::
+  //     max_target_seqs(10)           ::
+  //     evalue(BigDecimal(0.001))     ::
+  //     blastn.task(blastn.megablast) ::
+  //     *[AnyDenotation]
+  //   )
 
 }

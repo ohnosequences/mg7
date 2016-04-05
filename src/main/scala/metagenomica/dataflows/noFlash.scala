@@ -80,7 +80,8 @@ trait AnyNoFlashDataflow extends AnyDataflow {
         data.blastNoHitsFolder -> S3Resource(params.outputS3Folder(sampleId, "blast") / "no-hits" /)
       ),
       remoteOutput = Map(
-        data.blastResult -> S3Resource(params.outputS3Folder(sampleId, "merge") / s"${sampleId}.blast.csv")
+        data.blastResult -> S3Resource(params.outputS3Folder(sampleId, "merge") / s"${sampleId}.blast.csv"),
+        data.blastNoHits -> S3Resource(params.outputS3Folder(sampleId, "merge") / s"${sampleId}.no-hits")
       )
     )
   }
