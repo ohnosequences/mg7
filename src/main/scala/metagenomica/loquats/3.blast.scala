@@ -60,8 +60,8 @@ extends DataProcessingBundle(
         expr.toSeq.!!
 
         val output = outFile.contentAsString
-        // if not BLAST hits, recording read's header
-        if (output.isEmpty) noHits.appendLine(read.getV(header).toString)
+        // if not BLAST hits, recording the read
+        if (output.isEmpty) noHits.appendLine(read.asString)
         // append results for this read to the total output
         else totalOutput.append(output)
       }
