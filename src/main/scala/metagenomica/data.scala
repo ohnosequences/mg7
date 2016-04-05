@@ -68,9 +68,15 @@ case object data {
   // Assignment output:
   case object lcaCSV extends FileData("lca")("csv")
   case object bbhCSV extends FileData("bbh")("csv")
+  case object lcaNotAssigned extends FileData("lca")("not-assigned")
+  case object bbhNotAssigned extends FileData("bbh")("not-assigned")
 
   case object assignmentInput extends DataSet(blastResult :×: |[AnyData])
-  case object assignmentOutput extends DataSet(lcaCSV :×: bbhCSV :×: |[AnyData])
+  case object assignmentOutput extends DataSet(
+    lcaCSV :×: lcaNotAssigned :×:
+    bbhCSV :×: bbhNotAssigned :×:
+    |[AnyData]
+  )
 
 
   // Counting output:
