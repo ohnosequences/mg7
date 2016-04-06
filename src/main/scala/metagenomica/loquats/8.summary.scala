@@ -45,7 +45,7 @@ case object summaryDataProcessing extends DataProcessingBundle()(
       // only one level in depth:
       context.inputFile(data.sampleStatsFolder).list foreach { sampleStats =>
 
-        val csvReader = CSVReader.open( sampleStats.toJava )
+        val csvReader = newCSVReader(sampleStats)
         val rows = csvReader.allWithHeaders().map{ _.values.toSeq }
 
         csvWriter.writeAll(rows)

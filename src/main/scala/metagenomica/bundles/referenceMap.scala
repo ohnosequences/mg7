@@ -31,6 +31,7 @@ trait AnyReferenceIDsMap extends AnyBundle {
 
   def mapping: Map[ID, TaxID] = {
     // Reading TSV file with mapping something-taxId
+    // FIXME: once we generate the new DB, use here UnixCSVFormat
     val tsvReader: CSVReader = CSVReader.open( destination.toJava )(new TSVFormat {})
 
     val idsMap: Map[ID, TaxID] = tsvReader.iterator.map { row =>

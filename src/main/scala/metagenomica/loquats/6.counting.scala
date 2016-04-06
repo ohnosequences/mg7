@@ -75,7 +75,7 @@ case object countingDataProcessing extends DataProcessingBundle(
     // same thing that we do for lca and bbh
     def processFile(assignmentsFile: File): (File, File, File, File) = {
 
-      val assignmentsReader: CSVReader = CSVReader.open( assignmentsFile.toJava )
+      val assignmentsReader: CSVReader = newCSVReader(assignmentsFile)
       val taxIDs: List[TaxID] = assignmentsReader.allWithHeaders.map { row => row(columnNames.TaxID) }
       assignmentsReader.close
 

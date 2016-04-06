@@ -39,7 +39,7 @@ extends DataProcessingBundle(
 
     val referenceMapping: Map[ID, TaxID] = md.referenceDB.idsMap.mapping
 
-    val blastReader: CSVReader = CSVReader.open( context.inputFile(data.blastResult).toJava )
+    val blastReader: CSVReader = newCSVReader(context.inputFile(data.blastResult))
 
     val assignments: Map[ReadID, (LCA, BBH)] = blastReader.iterator.toStream
       // grouping rows by the read id

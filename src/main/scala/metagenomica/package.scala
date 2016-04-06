@@ -23,12 +23,15 @@ package object mg7 {
   def parseInt(str: String): Option[Int] = util.Try(str.toInt).toOption
 
 
-  case object CSVFormat extends DefaultCSVFormat {
+  case object UnixCSVFormat extends DefaultCSVFormat {
     override val lineTerminator: String = "\n"
   }
 
   def newCSVWriter(file: File): CSVWriter =
-    CSVWriter.open(file.toJava, append = true)(CSVFormat)
+    CSVWriter.open(file.toJava, append = true)(UnixCSVFormat)
+
+  def newCSVReader(file: File): CSVReader =
+    CSVReader.open(file.toJava)(UnixCSVFormat)
 
 
   case object columnNames {
