@@ -27,15 +27,15 @@ case class splitDataProcessing(params: AnyMG7Parameters) extends DataProcessingB
 
       val lines: Iterator[String] = context.inputFile(data.mergedReads).lines
 
-      lazy val fastas: Iterator[String] = params.splitInputFormat match {
+      val fastasIterator: Iterator[String] = params.splitInputFormat match {
         // if input is FastQ, we parse it, convert it to FASTA and get String version
-        case FastQInput =>   fastq.parseFastqDropErrors(lines).map(_.toFASTA.asString)
+        case FastQInput => fastq.parseFastqDropErrors(lines).map(_.toFASTA.asString)
         // if it's Fasta, we parse it and get String version
         case FastaInput => fasta.parseFastaDropErrors(lines).map(_.asString)
       }
 
       // group it
-      fastas
+      fastasIterator
         .grouped(params.splitChunkSize)
         .zipWithIndex
         .foreach { case (chunk, n) =>
