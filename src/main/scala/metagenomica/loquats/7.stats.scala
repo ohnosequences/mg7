@@ -40,15 +40,16 @@ case object statsDataProcessing extends DataProcessingBundle()(
     val sampleID: String = context.inputFile(data.sampleID).contentAsString
 
     LazyTry {
-      val stats = Map[String, String](
-        "Sample-ID"        -> sampleID,
-        "Input-pairs"      -> countReads( context.inputFile(data.pairedReads1) ).toString,
-        "Merged"           -> countReads( context.inputFile(data.mergedReads) ).toString,
-        "Not-merged"       -> countReads( context.inputFile(data.pair1NotMerged) ).toString,
-        "No-Blast-hits"    -> countReads( context.inputFile(data.blastNoHits) ).toString,
-        "LCA-not-assigned" -> countLines( context.inputFile(data.lcaNotAssigned) ).toString,
-        "BBH-not-assigned" -> countLines( context.inputFile(data.bbhNotAssigned) ).toString
-      )
+      // NOTE: careful, the order has to coincide:
+      val stats: Map[String, String] = columnNames.statsHeader.zip(List(
+        sampleID,
+        countReads( context.inputFile(data.pairedReads1) ).toString,
+        countReads( context.inputFile(data.mergedReads) ).toString,
+        countReads( context.inputFile(data.pair1NotMerged) ).toString,
+        countReads( context.inputFile(data.blastNoHits) ).toString,
+        countLines( context.inputFile(data.lcaNotAssigned) ).toString,
+        countLines( context.inputFile(data.bbhNotAssigned) ).toString
+      )).toMap
 
       val csvWriter = CSVWriter.open(statsCSV.toJava, append = true)
 

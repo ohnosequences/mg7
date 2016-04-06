@@ -116,7 +116,7 @@ case object data {
 
 
   case object sampleID extends FileData("sample-id")("txt")
-  case object sampleStatsCSV extends FileData("stats")("csv")
+  case object sampleStatsCSV extends FileData("sample.stats")("csv")
 
   case object statsInput extends DataSet(
     sampleID       :×:
@@ -132,4 +132,19 @@ case object data {
     sampleStatsCSV :×:
     |[AnyData]
   )
+
+
+  case object sampleStatsFolder extends Data("stats")
+  case object summaryStatsCSV extends FileData("summary.stats")("csv")
+
+  case object summaryInput extends DataSet(
+    sampleStatsFolder :×:
+    |[AnyData]
+  )
+  case object summaryOutput extends DataSet(
+    summaryStatsCSV :×:
+    |[AnyData]
+  )
+
+
 }

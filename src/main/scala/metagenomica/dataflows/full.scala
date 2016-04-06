@@ -74,10 +74,22 @@ trait AnyFullDataflow extends AnyNoFlashDataflow {
         data.bbhNotAssigned -> outputs(data.bbhNotAssigned)
       ),
       remoteOutput = Map(
-        data.sampleStatsCSV -> S3Resource(params.outputS3Folder(sampleId, "stats") / s"${sampleId}.stats.csv")
+        data.sampleStatsCSV -> S3Resource(params.outputS3Folder("summary", "stats") / s"${sampleId}.stats.csv")
       )
     )
   }
+
+
+  lazy val summaryDataMappings = statsDataMappings.map { statsDM =>
+
+    DataMapping("summmary", summaryDataProcessing)(
+      remoteInput = statsDM.remoteOutput,
+      remoteOutput = Map(
+        data.summaryStatsCSV -> S3Resource(params.outputS3Folder("summary", "stats") / s"summary.csv")
+      )
+    )
+  }
+
 }
 
 case class FullDataflow[P <: AnyMG7Parameters](val params: P)(

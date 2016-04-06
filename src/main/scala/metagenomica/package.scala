@@ -26,6 +26,16 @@ package object mg7 {
     val TaxName = "Tax-name"
     val TaxRank = "Tax-rank"
     val Count   = "Count"
+
+    val statsHeader: List[String] = List(
+      "Sample-ID",
+      "Input-pairs",
+      "Merged",
+      "Not-merged",
+      "No-Blast-hits",
+      "LCA-not-assigned",
+      "BBH-not-assigned"
+    )
   }
 
 
