@@ -51,7 +51,7 @@ case object statsDataProcessing extends DataProcessingBundle()(
         countLines( context.inputFile(data.bbhNotAssigned) ).toString
       )).toMap
 
-      val csvWriter = CSVWriter.open(statsCSV.toJava, append = true)
+      val csvWriter = newCSVWriter(statsCSV)
 
       // header:
       csvWriter.writeRow(stats.keys.toSeq)

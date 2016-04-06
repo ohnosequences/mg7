@@ -79,8 +79,8 @@ extends DataProcessingBundle(
     val no_bbhFile = (context / "output" / "bbh.not-assigned").createIfNotExists()
 
 
-    val lcaWriter = CSVWriter.open(lcaFile.toJava, append = true)
-    val bbhWriter = CSVWriter.open(bbhFile.toJava, append = true)
+    val lcaWriter = newCSVWriter(lcaFile)
+    val bbhWriter = newCSVWriter(bbhFile)
 
     // writing headers first:
     val header = List(

@@ -88,10 +88,10 @@ case object countingDataProcessing extends DataProcessingBundle(
       val outDirectFreqFile = context / s"${filesPrefix}.direct.frequency.counts"
       val outAccumFreqFile  = context / s"${filesPrefix}.accum.frequency.counts"
 
-      val csvDirectWriter = CSVWriter.open(outDirectFile.toJava, append = true)
-      val csvAccumWriter  = CSVWriter.open(outAccumFile.toJava, append = true)
-      val csvDirectFreqWriter = CSVWriter.open(outDirectFreqFile.toJava, append = true)
-      val csvAccumFreqWriter  = CSVWriter.open(outAccumFreqFile.toJava, append = true)
+      val csvDirectWriter = newCSVWriter(outDirectFile)
+      val csvAccumWriter  = newCSVWriter(outAccumFile)
+      val csvDirectFreqWriter = newCSVWriter(outDirectFreqFile)
+      val csvAccumFreqWriter  = newCSVWriter(outAccumFreqFile)
 
       def headerFor(file: File) = List(
         columnNames.TaxID,

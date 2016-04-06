@@ -4,6 +4,9 @@ import ohnosequences.mg7.bio4j.taxonomyTree._
 import ohnosequences.cosas._, types._, klists._
 import ohnosequences.blast.api._
 
+import com.github.tototoshi.csv._
+import better.files._
+
 package object mg7 {
 
   type ID = String
@@ -18,6 +21,15 @@ package object mg7 {
   type StepName = String
 
   def parseInt(str: String): Option[Int] = util.Try(str.toInt).toOption
+
+
+  case object CSVFormat extends DefaultCSVFormat {
+    override val lineTerminator: String = "\n"
+  }
+
+  def newCSVWriter(file: File): CSVWriter =
+    CSVWriter.open(file.toJava, append = true)(CSVFormat)
+
 
   case object columnNames {
 
