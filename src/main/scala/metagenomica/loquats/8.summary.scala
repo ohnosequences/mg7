@@ -39,7 +39,7 @@ case object summaryDataProcessing extends DataProcessingBundle()(
     val summaryCSV: File = (context / "output" / "summary.csv").createIfNotExists()
 
     LazyTry {
-      val csvWriter = CSVWriter.open(summaryCSV.toJava, append = true)
+      val csvWriter = newCSVWriter(summaryCSV)
       csvWriter.writeRow(columnNames.statsHeader)
 
       // only one level in depth:
