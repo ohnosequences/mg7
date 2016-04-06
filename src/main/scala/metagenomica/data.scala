@@ -14,7 +14,11 @@ case object data {
   case object pair2NotMerged extends FileData("pair2.not-merged")("fastq")
   case object flashHistogram extends FileData("stats")("txt")
 
-  case object flashInput  extends DataSet(pairedReads1 :×: pairedReads2 :×: |[AnyData])
+  case object flashInput  extends DataSet(
+    pairedReads1 :×:
+    pairedReads2 :×:
+    |[AnyData]
+  )
   case object flashOutput extends DataSet(
     mergedReads :×:
     pair1NotMerged :×:
@@ -73,8 +77,10 @@ case object data {
 
   case object assignmentInput extends DataSet(blastResult :×: |[AnyData])
   case object assignmentOutput extends DataSet(
-    lcaCSV :×: lcaNotAssigned :×:
-    bbhCSV :×: bbhNotAssigned :×:
+    lcaCSV :×:
+    lcaNotAssigned :×:
+    bbhCSV :×:
+    bbhNotAssigned :×:
     |[AnyData]
   )
 
@@ -108,4 +114,22 @@ case object data {
     |[AnyData]
   )
 
+
+  case object sampleID extends FileData("sample-id")("txt")
+  case object sampleStatsCSV extends FileData("stats")("csv")
+
+  case object statsInput extends DataSet(
+    sampleID       :×:
+    pairedReads1   :×:
+    mergedReads    :×:
+    pair1NotMerged :×:
+    blastNoHits    :×:
+    lcaNotAssigned :×:
+    bbhNotAssigned :×:
+    |[AnyData]
+  )
+  case object statsOutput extends DataSet(
+    sampleStatsCSV :×:
+    |[AnyData]
+  )
 }

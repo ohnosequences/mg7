@@ -38,7 +38,6 @@ trait AnyNoFlashDataflow extends AnyDataflow {
       ),
       remoteOutput = Map(
         data.fastaChunks -> S3Resource(params.outputS3Folder(sampleId, "split"))
-        // data.mergedReadsNumber -> S3Resource(params.outputS3Folder(sampleId, "split") / "mergedReadsNumber")
       )
     )
   }

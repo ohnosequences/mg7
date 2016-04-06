@@ -21,11 +21,11 @@ package object mg7 {
 
   case object columnNames {
 
-    val ReadID = "Read-ID"
-    val TaxID = "Tax-ID"
+    val ReadID  = "Read-ID"
+    val TaxID   = "Tax-ID"
     val TaxName = "Tax-name"
     val TaxRank = "Tax-rank"
-    val Count = "Count"
+    val Count   = "Count"
   }
 
 

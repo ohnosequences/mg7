@@ -51,6 +51,33 @@ trait AnyFullDataflow extends AnyNoFlashDataflow {
   val splitInputs: Map[SampleID, S3Resource] = flashDataMappings.map { flashDM =>
     flashDM.label -> flashDM.remoteOutput(data.mergedReads)
   }.toMap
+
+
+  lazy val statsDataMappings = List[List[AnyDataMapping]](
+    flashDataMappings,
+    mergeDataMappings,
+    assignmentDataMappings
+  ).flatten
+  .groupBy { _.label }
+  .map { case (sampleId: String, dms: List[AnyDataMapping]) =>
+    val outputs: Map[AnyData, S3Resource] =
+      dms.map{ _.remoteOutput }.foldLeft(Map[AnyData, S3Resource]()){ _ ++ _ }
+
+    DataMapping(sampleId, statsDataProcessing)(
+      remoteInput = Map(
+        data.sampleID       -> outputs(data.sampleID),
+        data.pairedReads1   -> outputs(data.pairedReads1),
+        data.mergedReads    -> outputs(data.mergedReads),
+        data.pair1NotMerged -> outputs(data.pair1NotMerged),
+        data.blastNoHits    -> outputs(data.blastNoHits),
+        data.lcaNotAssigned -> outputs(data.lcaNotAssigned),
+        data.bbhNotAssigned -> outputs(data.bbhNotAssigned)
+      ),
+      remoteOutput = Map(
+        data.sampleStatsCSV -> S3Resource(params.outputS3Folder(sampleId, "stats") / s"${sampleId}.stats.csv")
+      )
+    )
+  }
 }
 
 case class FullDataflow[P <: AnyMG7Parameters](val params: P)(
