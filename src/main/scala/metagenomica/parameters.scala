@@ -33,27 +33,38 @@ trait AnyMG7Parameters {
   val splitInputFormat: SplitInputFormat
 
   /* BLAST parameters */
-  type BlastOutRec <: AnyBlastOutputRecord.For[blastn.type]
+  type BlastCommand <: AnyBlastCommand {
+    type ArgumentsVals = BlastArgumentsVals
+  }
+  val  blastCommand: BlastCommand
+
+  type BlastOutRec <: AnyBlastOutputRecord.For[BlastCommand]
   val  blastOutRec: BlastOutRec
 
-  val blastOptions: blastn.Options := blastn.OptionsVals
+  val blastOptions: BlastCommand#OptionsVals
 
   val referenceDB: bundles.AnyReferenceDB
+
+  val argValsToSeq: BlastOptionsToSeq[BlastArgumentsVals] = implicitly[BlastOptionsToSeq[BlastArgumentsVals]]
+  val optValsToSeq: BlastOptionsToSeq[BlastCommand#OptionsVals] // has to be provided implicitly
 }
 
-abstract class MG7Parameters[
-  BR <: AnyBlastOutputRecord.For[blastn.type]
-](
-  val outputS3Folder: (SampleID, StepName) => S3Folder,
+class MG7Parameters[
+  BC <: AnyBlastCommand { type ArgumentsVals = BlastArgumentsVals },
+  BR <: AnyBlastOutputRecord.For[BC]
+](val outputS3Folder: (SampleID, StepName) => S3Folder,
   val readsLength: illumina.Length,
   val splitInputFormat: SplitInputFormat = FastQInput,
-  val blastOutRec: BR = defaultBlastOutRec,
-  val blastOptions: blastn.Options := blastn.OptionsVals = defaultBlastOptions,
   val splitChunkSize: Int = 10,
+  val blastCommand: BC, // = blastn,
+  val blastOutRec: BR, // = defaultBlastOutRec,
+  val blastOptions: BC#OptionsVals, // = defaultBlastOptions.value,
   val referenceDB: bundles.AnyReferenceDB = bundles.rnaCentral
-// )(implicit
+)(implicit
+  val optValsToSeq: BlastOptionsToSeq[BC#OptionsVals]
   // TODO: add a check for minimal set of properties in the record (like bitscore and sgi)
 ) extends AnyMG7Parameters {
 
+  type BlastCommand = BC
   type BlastOutRec = BR
 }

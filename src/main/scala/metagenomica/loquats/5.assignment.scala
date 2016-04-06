@@ -46,20 +46,18 @@ extends DataProcessingBundle(
       .groupBy { column(_, qseqid) }
       .flatMap {
         case (None, _) => None
+        case (_, hits) if hits.isEmpty => None
         case (Some(readId), hits) => {
 
-          val bbh: BBH =
-            // this shouldn't happen, but let's be careful
-            if (hits.isEmpty) None
-            else {
-              // best blast score is just a maximum in the `bitscore` column
-              val maxRow: Seq[String] = hits.maxBy { row: Seq[String] =>
-                column(row, bitscore).flatMap(parseInt).getOrElse(0)
-              }
-              column(maxRow, sseqid).flatMap(referenceMapping.get).flatMap { taxId =>
-                titanTaxonNode(bundles.bio4jNCBITaxonomy.graph, taxId)
-              }
+          val bbh: BBH = {
+            // best blast score is just a maximum in the `bitscore` column
+            val maxRow: Seq[String] = hits.maxBy { row: Seq[String] =>
+              column(row, bitscore).flatMap(parseInt).getOrElse(0)
             }
+            column(maxRow, sseqid).flatMap(referenceMapping.get).flatMap { taxId =>
+              titanTaxonNode(bundles.bio4jNCBITaxonomy.graph, taxId)
+            }
+          }
 
           // for each hit row we take the column with ID and lookup its TaxID
           val taxIds: List[TaxID] = hits.toList.flatMap(column(_, sseqid)).flatMap(referenceMapping.get)
@@ -75,8 +73,11 @@ extends DataProcessingBundle(
     blastReader.close
 
     // Now we will write these two types of result to two separate files
-    val lcaFile = context / "lca.csv"
-    val bbhFile = context / "bbh.csv"
+    val lcaFile    = (context / "output" / "lca.csv").createIfNotExists()
+    val bbhFile    = (context / "output" / "bbh.csv").createIfNotExists()
+    val no_lcaFile = (context / "output" / "lca.not-assigned").createIfNotExists()
+    val no_bbhFile = (context / "output" / "bbh.not-assigned").createIfNotExists()
+
 
     val lcaWriter = CSVWriter.open(lcaFile.toJava, append = true)
     val bbhWriter = CSVWriter.open(bbhFile.toJava, append = true)
@@ -92,17 +93,28 @@ extends DataProcessingBundle(
     bbhWriter.writeRow(header)
 
     assignments foreach { case (readId, (lca, bbh)) =>
-      lca foreach { node => lcaWriter.writeRow(List(readId, node.id, node.name, node.rank)) }
-      bbh foreach { node => bbhWriter.writeRow(List(readId, node.id, node.name, node.rank)) }
+      lca match {
+        case Some(node) => lcaWriter.writeRow(List(readId, node.id, node.name, node.rank))
+        // TODO: it should also write one of the subject sequences ID
+        case None => no_lcaFile.appendLine(readId)
+      }
+      bbh match {
+        case Some(node) => bbhWriter.writeRow(List(readId, node.id, node.name, node.rank))
+        // TODO: it should also write one of the subject sequences ID
+        case None => no_bbhFile.appendLine(readId)
+      }
     }
 
     lcaWriter.close
     bbhWriter.close
 
-    success(
-      s"Results are written to [${lcaFile.path}] and [${bbhFile.path}]",
+    success(s"Results are ready",
+      // LCA
       data.lcaCSV(lcaFile) ::
+      data.lcaNotAssigned(no_lcaFile) ::
+      // BBH
       data.bbhCSV(bbhFile) ::
+      data.bbhNotAssigned(no_bbhFile) ::
       *[AnyDenotation { type Value <: FileResource }]
     )
   }

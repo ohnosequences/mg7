@@ -37,8 +37,7 @@ trait AnyNoFlashDataflow extends AnyDataflow {
         data.mergedReads -> readsS3Resource
       ),
       remoteOutput = Map(
-        data.fastaChunks -> S3Resource(params.outputS3Folder(sampleId, "split")),
-        data.mergedReadsNumber -> S3Resource(params.outputS3Folder(sampleId, "split") / "mergedReadsNumber")
+        data.fastaChunks -> S3Resource(params.outputS3Folder(sampleId, "split"))
       )
     )
   }
@@ -64,7 +63,8 @@ trait AnyNoFlashDataflow extends AnyDataflow {
           data.fastaChunk -> S3Resource(chunkS3Obj)
         ),
         remoteOutput = Map(
-          data.blastChunkOut -> S3Resource(params.outputS3Folder(sampleId, "blast") / s"blast.${n}.csv")
+          data.blastChunkOut -> S3Resource(params.outputS3Folder(sampleId, "blast") / "chunks" / s"blast.${n}.csv"),
+          data.noHitsChunk -> S3Resource(params.outputS3Folder(sampleId, "blast") / "no-hits" / s"no-hits.${n}.fa")
         )
       )
     }
@@ -75,10 +75,12 @@ trait AnyNoFlashDataflow extends AnyDataflow {
 
     DataMapping(sampleId, mergeDataProcessing)(
       remoteInput = Map(
-        data.blastChunks -> S3Resource(params.outputS3Folder(sampleId, "blast"))
+        data.blastChunksFolder -> S3Resource(params.outputS3Folder(sampleId, "blast") / "chunks" /),
+        data.blastNoHitsFolder -> S3Resource(params.outputS3Folder(sampleId, "blast") / "no-hits" /)
       ),
       remoteOutput = Map(
-        data.blastResult -> S3Resource(params.outputS3Folder(sampleId, "merge") / s"${sampleId}.blast.csv")
+        data.blastResult -> S3Resource(params.outputS3Folder(sampleId, "merge") / s"${sampleId}.blast.csv"),
+        data.blastNoHits -> S3Resource(params.outputS3Folder(sampleId, "merge") / s"${sampleId}.no-hits.fa")
       )
     )
   }
@@ -90,7 +92,9 @@ trait AnyNoFlashDataflow extends AnyDataflow {
       remoteInput = mergeDM.remoteOutput,
       remoteOutput = Map(
         data.lcaCSV -> S3Resource(params.outputS3Folder(sampleId, "assignment") / s"${sampleId}.lca.csv"),
-        data.bbhCSV -> S3Resource(params.outputS3Folder(sampleId, "assignment") / s"${sampleId}.bbh.csv")
+        data.bbhCSV -> S3Resource(params.outputS3Folder(sampleId, "assignment") / s"${sampleId}.bbh.csv"),
+        data.lcaNotAssigned -> S3Resource(params.outputS3Folder(sampleId, "assignment") / s"${sampleId}.lca.not-assigned"),
+        data.bbhNotAssigned -> S3Resource(params.outputS3Folder(sampleId, "assignment") / s"${sampleId}.bbh.not-assigned")
       )
     )
   }

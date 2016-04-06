@@ -21,7 +21,6 @@ case class splitDataProcessing(params: AnyMG7Parameters) extends DataProcessingB
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
 
     val outputDir = context / "chunks"
-    val readsCount = outputDir / "reads-count"
 
     LazyTry {
       outputDir.createDirectories()
@@ -35,10 +34,8 @@ case class splitDataProcessing(params: AnyMG7Parameters) extends DataProcessingB
         case FastaInput => fasta.parseFastaDropErrors(lines).map(_.asString)
       }
 
-      val (fastas1, fastas2) = fastasIterator.duplicate
-
       // group it
-      fastas1
+      fastasIterator
         .grouped(params.splitChunkSize)
         .zipWithIndex
         .foreach { case (chunk, n) =>
@@ -46,12 +43,9 @@ case class splitDataProcessing(params: AnyMG7Parameters) extends DataProcessingB
           (outputDir / s"chunk.${n}.fasta")
             .overwrite(chunk.mkString("\n"))
         }
-
-      readsCount.overwrite(fastas2.length.toString)
     } -&-
     success("chunk-chunk-chunk!",
       data.fastaChunks(outputDir) ::
-      data.mergedReadsNumber(readsCount) ::
       *[AnyDenotation { type Value <: FileResource }]
     )
 

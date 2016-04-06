@@ -22,20 +22,26 @@ case object mergeDataProcessing extends DataProcessingBundle()(
 
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
 
-    val outputFile = context / "whole.thing"
+    val blastMerged = (context / "blast.csv").createIfNotExists()
+    val noHitsMerged = (context / "blast.no-hits").createIfNotExists()
 
     LazyTry {
-      outputFile.createIfNotExists()
-
       // only one level in depth:
-      context.inputFile(data.blastChunks).list foreach { chunkFile =>
+      context.inputFile(data.blastChunksFolder).list foreach { chunkFile =>
 
-        outputFile.append( chunkFile.contentAsString )
+        blastMerged.append( chunkFile.contentAsString )
       }
     } -&-
-    success(
-      s"Everything is merged in [${outputFile.path}]",
-      data.blastResult(outputFile) ::
+    LazyTry {
+      // only one level in depth:
+      context.inputFile(data.blastNoHitsFolder).list foreach { noHitsChunk =>
+
+        noHitsMerged.append( noHitsChunk.contentAsString )
+      }
+    } -&-
+    success(s"Everything is merged",
+      data.blastResult(blastMerged) ::
+      data.blastNoHits(noHitsMerged) ::
       *[AnyDenotation { type Value <: FileResource }]
     )
 
