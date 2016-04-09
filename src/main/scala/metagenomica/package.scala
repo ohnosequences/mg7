@@ -21,14 +21,15 @@ package object mg7 {
   type StepName = String
 
   def parseInt(str: String): Option[Int] = util.Try(str.toInt).toOption
+  def parseDouble(str: String): Option[Double] = util.Try(str.toDouble).toOption
 
 
   case object UnixCSVFormat extends DefaultCSVFormat {
     override val lineTerminator: String = "\n"
   }
 
-  def newCSVWriter(file: File): CSVWriter =
-    CSVWriter.open(file.toJava, append = true)(UnixCSVFormat)
+  def newCSVWriter(file: File, append: Boolean = true): CSVWriter =
+    CSVWriter.open(file.toJava, append)(UnixCSVFormat)
 
   def newCSVReader(file: File): CSVReader =
     CSVReader.open(file.toJava)(UnixCSVFormat)

@@ -23,10 +23,26 @@ case class blastDataProcessing[MD <: AnyMG7Parameters](val md: MD)
 extends DataProcessingBundle(
   bundles.blast,
   md.referenceDB
-)(
-  input = data.blastInput,
+)(input  = data.blastInput,
   output = data.blastOutput
 ) {
+  private val header: Seq[AnyOutputField] = md.blastOutRec.keys.types.asList
+
+  def filterResult(blastResult: File): Iterator[Seq[String]] = {
+    val csvReader = newCSVReader(blastResult)
+
+    val filtered = csvReader.iterator.filter { values =>
+
+      val qcovs = csv.Row(header, values).select(outputFields.qcovs)
+
+      parseDouble(qcovs).map(_ > 99.5).getOrElse(false)
+      // TODO: any other conditions? it's easy to add this to the config
+    }
+
+    csvReader.close()
+
+    filtered
+  }
 
   def instructions: AnyInstructions = say("Let the blasting begin!")
 
@@ -38,6 +54,7 @@ extends DataProcessingBundle(
     LazyTry {
       // NOTE: once we update to better-files 2.15.+, use `file.lineIterator` here (it's autoclosing):
       val source = io.Source.fromFile( context.inputFile(data.fastaChunk).toJava )
+      val totalOutputWriter = newCSVWriter(totalOutput, append = true)
 
       fasta.parseFastaDropErrors(source.getLines) foreach { read =>
 
@@ -59,15 +76,17 @@ extends DataProcessingBundle(
         // BAM!!
         expr.toSeq.!!
 
-        val output = outFile.contentAsString
+        val filteredRows: Iterator[Seq[String]] = filterResult(outFile)
+
         // if not BLAST hits, recording the read
-        if (output.isEmpty) noHits.appendLine(read.asString)
+        if (filteredRows.isEmpty) noHits.appendLine(read.asString)
         // append results for this read to the total output
-        else totalOutput.append(output)
+        else filteredRows.foreach { totalOutputWriter.writeRow(_) }
       }
 
       // it's important to close the stream:
       source.close()
+      totalOutputWriter.close()
     } -&-
     success(
       "much blast, very success!",
