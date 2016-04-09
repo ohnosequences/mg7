@@ -4,7 +4,7 @@ import ohnosequences.mg7.bio4j.taxonomyTree._
 import ohnosequences.cosas._, types._, klists._
 import ohnosequences.blast.api._
 
-import com.github.tototoshi.csv._
+// import com.github.tototoshi.csv._
 import better.files._
 
 package object mg7 {
@@ -22,37 +22,6 @@ package object mg7 {
 
   def parseInt(str: String): Option[Int] = util.Try(str.toInt).toOption
   def parseDouble(str: String): Option[Double] = util.Try(str.toDouble).toOption
-
-
-  case object UnixCSVFormat extends DefaultCSVFormat {
-    override val lineTerminator: String = "\n"
-  }
-
-  def newCSVWriter(file: File, append: Boolean = true): CSVWriter =
-    CSVWriter.open(file.toJava, append)(UnixCSVFormat)
-
-  def newCSVReader(file: File): CSVReader =
-    CSVReader.open(file.toJava)(UnixCSVFormat)
-
-
-  case object columnNames {
-
-    val ReadID  = "Read-ID"
-    val TaxID   = "Tax-ID"
-    val TaxName = "Tax-name"
-    val TaxRank = "Tax-rank"
-    val Count   = "Count"
-
-    val statsHeader: List[String] = List(
-      "Sample-ID",
-      "Input-pairs",
-      "Merged",
-      "Not-merged",
-      "No-Blast-hits",
-      "LCA-not-assigned",
-      "BBH-not-assigned"
-    )
-  }
 
 
   type BlastArgumentsVals =

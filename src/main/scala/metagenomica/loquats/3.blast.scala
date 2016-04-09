@@ -29,7 +29,7 @@ extends DataProcessingBundle(
   private val header: Seq[AnyOutputField] = md.blastOutRec.keys.types.asList
 
   def filterResult(blastResult: File): Iterator[Seq[String]] = {
-    val csvReader = newCSVReader(blastResult)
+    val csvReader = csv.newReader(blastResult)
 
     val filtered = csvReader.iterator.filter { values =>
 
@@ -54,7 +54,7 @@ extends DataProcessingBundle(
     LazyTry {
       // NOTE: once we update to better-files 2.15.+, use `file.lineIterator` here (it's autoclosing):
       val source = io.Source.fromFile( context.inputFile(data.fastaChunk).toJava )
-      val totalOutputWriter = newCSVWriter(totalOutput, append = true)
+      val totalOutputWriter = csv.newWriter(totalOutput, append = true)
 
       fasta.parseFastaDropErrors(source.getLines) foreach { read =>
 

@@ -39,7 +39,7 @@ extends DataProcessingBundle(
 
     val referenceMapping: Map[ID, TaxID] = md.referenceDB.idsMap.mapping
 
-    val blastReader: CSVReader = newCSVReader(context.inputFile(data.blastResult))
+    val blastReader: CSVReader = csv.newReader(context.inputFile(data.blastResult))
 
     val assignments: Map[ReadID, (LCA, BBH)] = blastReader.iterator.toStream
       // grouping rows by the read id
@@ -79,15 +79,15 @@ extends DataProcessingBundle(
     val no_bbhFile = (context / "output" / "bbh.not-assigned").createIfNotExists()
 
 
-    val lcaWriter = newCSVWriter(lcaFile)
-    val bbhWriter = newCSVWriter(bbhFile)
+    val lcaWriter = csv.newWriter(lcaFile)
+    val bbhWriter = csv.newWriter(bbhFile)
 
     // writing headers first:
     val header = List(
-      columnNames.ReadID,
-      columnNames.TaxID,
-      columnNames.TaxName,
-      columnNames.TaxRank
+      csv.columnNames.ReadID,
+      csv.columnNames.TaxID,
+      csv.columnNames.TaxName,
+      csv.columnNames.TaxRank
     )
     lcaWriter.writeRow(header)
     bbhWriter.writeRow(header)

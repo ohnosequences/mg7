@@ -41,7 +41,7 @@ case object statsDataProcessing extends DataProcessingBundle()(
 
     LazyTry {
       // NOTE: careful, the order has to coincide:
-      val stats: Map[String, String] = columnNames.statsHeader.zip(List(
+      val stats: Map[String, String] = csv.columnNames.statsHeader.zip(List(
         sampleID,
         countReads( context.inputFile(data.pairedReads1) ).toString,
         countReads( context.inputFile(data.mergedReads) ).toString,
@@ -51,7 +51,7 @@ case object statsDataProcessing extends DataProcessingBundle()(
         countLines( context.inputFile(data.bbhNotAssigned) ).toString
       )).toMap
 
-      val csvWriter = newCSVWriter(statsCSV)
+      val csvWriter = csv.newWriter(statsCSV)
 
       // header:
       csvWriter.writeRow(stats.keys.toSeq)
