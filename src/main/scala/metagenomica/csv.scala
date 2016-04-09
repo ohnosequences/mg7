@@ -1,5 +1,7 @@
 package ohnosequences.mg7
 
+import ohnosequences.cosas._, types._, klists._, typeUnions._
+
 import com.github.tototoshi.csv._
 import better.files._
 
@@ -17,6 +19,7 @@ case object csv {
   def newReader(file: File): CSVReader =
     CSVReader.open(file.toJava)(UnixCSVFormat)
 
+  // TODO: rewrite this with product types:
   case object columnNames {
 
     val ReadID  = "Read-ID"
@@ -36,13 +39,31 @@ case object csv {
     )
   }
 
-  case class Row[H](
-    val header: Seq[H],
+  case class Row[Hs <: AnyProductType](
+    val header: Hs,
     val values: Seq[String]
   ) {
 
-    def toMap: Map[H, String] = header.zip(values).toMap
+    def toMap: Map[AnyType, String] = header.types.asList.zip(values).toMap
 
-    def select(column: H): String = this.toMap.apply(column)
+    def select[C <: AnyType](column: C)
+      // NOTE: we cannot check this in a generic code, because the header is left free
+      // (implicit check: C isOneOf Hs#Types#AllTypes)
+      : String =
+        this.toMap.apply(column)
   }
+
+  case class Reader[Hs <: AnyProductType](val header: Hs, val csvReader: CSVReader) {
+
+    def rows: Iterator[Row[Hs]] = csvReader.iterator.map { Row(header, _) }
+  }
+
+  implicit def toCSVReader[Hs <: AnyProductType](r: Reader[Hs]): CSVReader = r.csvReader
+
+  case object Reader {
+
+    def apply[Hs <: AnyProductType](header: Hs, file: File): Reader[Hs] =
+      Reader(header, CSVReader.open(file.toJava)(UnixCSVFormat))
+  }
+
 }

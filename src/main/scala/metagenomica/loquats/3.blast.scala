@@ -26,14 +26,12 @@ extends DataProcessingBundle(
 )(input  = data.blastInput,
   output = data.blastOutput
 ) {
-  private val header: Seq[AnyOutputField] = md.blastOutRec.keys.types.asList
-
   def filterResult(blastResult: File): Iterator[Seq[String]] = {
-    val csvReader = csv.newReader(blastResult)
+    val csvReader = csv.Reader(md.blastOutRec.keys, blastResult)
 
-    val filtered = csvReader.iterator.filter { values =>
+    val filtered = csvReader.rows.filter { row =>
 
-      val qcovs = csv.Row(header, values).select(outputFields.qcovs)
+      val qcovs: String = row.select(outputFields.qcovs)
 
       parseDouble(qcovs).map(_ > 99.5).getOrElse(false)
       // TODO: any other conditions? it's easy to add this to the config
@@ -41,7 +39,7 @@ extends DataProcessingBundle(
 
     csvReader.close()
 
-    filtered
+    filtered.map{ _.values }
   }
 
   def instructions: AnyInstructions = say("Let the blasting begin!")
