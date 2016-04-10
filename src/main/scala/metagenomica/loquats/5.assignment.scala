@@ -16,7 +16,6 @@ import ohnosequences.{ blast => b }, b.api._, outputFields._
 import java.io.{ BufferedWriter, FileWriter, File }
 import scala.util.Try
 
-import com.github.tototoshi.csv._
 
 case class assignmentDataProcessing[MD <: AnyMG7Parameters](val md: MD)
 extends DataProcessingBundle(
@@ -26,48 +25,46 @@ extends DataProcessingBundle(
   input = data.assignmentInput,
   output = data.assignmentOutput
 ) {
+  // For the output fields implicits
+  import md._
 
   def instructions: AnyInstructions = say("Let's see who is who!")
 
-  private val headers: Seq[String] = md.blastOutRec.keys.types.asList.map{ _.label }
+  // private val headers: Seq[String] = md.blastOutRec.keys.types.asList.map{ _.label }
 
   // this method looks up particular column by its header
-  private def column(row: Seq[String], header: AnyOutputField): Option[String] =
-    headers.zip(row).toMap.get(header.label)
+  // private def column(row: Seq[String], header: AnyOutputField): Option[String] =
+  //   headers.zip(row).toMap.get(header.label)
 
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
 
     val referenceMapping: Map[ID, TaxID] = md.referenceDB.idsMap.mapping
 
-    val blastReader: CSVReader = csv.newReader(context.inputFile(data.blastResult))
+    val blastReader = csv.Reader(md.blastOutRec.keys, context.inputFile(data.blastResult))
 
-    val assignments: Map[ReadID, (LCA, BBH)] = blastReader.iterator.toStream
+    val assignments: Map[ReadID, (LCA, BBH)] = blastReader.rows
       // grouping rows by the read id
-      .groupBy { column(_, qseqid) }
-      .flatMap {
-        case (None, _) => None
-        case (_, hits) if hits.isEmpty => None
-        case (Some(readId), hits) => {
+      .toStream.groupBy { _.select(qseqid) }
+      .map { case (readId, hits) =>
 
-          val bbh: BBH = {
-            // best blast score is just a maximum in the `bitscore` column
-            val maxRow: Seq[String] = hits.maxBy { row: Seq[String] =>
-              column(row, bitscore).flatMap(parseInt).getOrElse(0)
-            }
-            column(maxRow, sseqid).flatMap(referenceMapping.get).flatMap { taxId =>
-              titanTaxonNode(bundles.bio4jNCBITaxonomy.graph, taxId)
-            }
+        val bbh: BBH = {
+          // best blast score is just a maximum in the `bitscore` column
+          val maxRow = hits.maxBy { row =>
+            parseInt(row.select(bitscore)).getOrElse(0)
           }
-
-          // for each hit row we take the column with ID and lookup its TaxID
-          val taxIds: List[TaxID] = hits.toList.flatMap(column(_, sseqid)).flatMap(referenceMapping.get)
-          // then we generate Titan taxon nodes
-          val nodes: List[TitanTaxonNode] = titanTaxonNodes(bundles.bio4jNCBITaxonomy.graph, taxIds)
-          // and return the taxon node ID corresponding to the read
-          val lca: LCA = solution(nodes).node //.map(_.id)
-
-          Some( (readId, (lca, bbh)) )
+          referenceMapping.get(maxRow.select(sseqid)).flatMap { taxId =>
+            titanTaxonNode(bundles.bio4jNCBITaxonomy.graph, taxId)
+          }
         }
+
+        // for each hit row we take the column with ID and lookup its TaxID
+        val taxIds: List[TaxID] = hits.toList.map{ _.select(sseqid) }.flatMap(referenceMapping.get)
+        // then we generate Titan taxon nodes
+        val nodes: List[TitanTaxonNode] = titanTaxonNodes(bundles.bio4jNCBITaxonomy.graph, taxIds)
+        // and return the taxon node ID corresponding to the read
+        val lca: LCA = solution(nodes).node
+
+        (readId, (lca, bbh))
       }
 
     blastReader.close
