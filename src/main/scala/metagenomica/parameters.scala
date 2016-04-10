@@ -84,9 +84,9 @@ abstract class MG7Parameters[
   val readsLength: illumina.Length,
   val splitInputFormat: SplitInputFormat = FastQInput,
   val splitChunkSize: Int = 10,
-  val blastCommand: BC, // = blastn,
-  val blastOutRec: BlastOutputRecord[BK], // = defaultBlastOutRec,
-  val blastOptions: BC#OptionsVals, // = defaultBlastOptions.value,
+  val blastCommand: BC = blastn,
+  val blastOutRec: BlastOutputRecord[BK]  = defaultBlastOutRec,
+  val blastOptions: BC#OptionsVals        = defaultBlastnOptions.value,
   val referenceDB: bundles.AnyReferenceDB = bundles.rnaCentral
 )(implicit
   val optValsToSeq: BlastOptionsToSeq[BC#OptionsVals],
@@ -99,6 +99,4 @@ abstract class MG7Parameters[
 
   type BlastCommand = BC
   type BlastOutRecKeys = BK
-
-  // val blastFilter: csv.Row[BlastOutRecKeys] => Boolean = defaul
 }
