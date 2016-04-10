@@ -68,7 +68,7 @@ trait AnyMG7Parameters {
   val defaultBlastFilter: csv.Row[BlastOutRecKeys] => Boolean = { row =>
 
     val qcovs: String = row.select(outputFields.qcovs)
-    parseDouble(qcovs).map(_ > 99.5).getOrElse(false)
+    parseDouble(qcovs).map(_ > 98.0).getOrElse(false)
   }
 }
 
