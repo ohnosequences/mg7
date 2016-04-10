@@ -31,7 +31,7 @@ extends DataProcessingBundle(
 
     val filtered = csvReader.rows.filter { row =>
 
-      val qcovs: String = row.select(outputFields.qcovs)
+      val qcovs: String = row.select(outputFields.qcovs)(md.has_qcovs)
 
       parseDouble(qcovs).map(_ > 99.5).getOrElse(false)
       // TODO: any other conditions? it's easy to add this to the config
@@ -76,9 +76,9 @@ extends DataProcessingBundle(
 
         val filteredRows: Iterator[Seq[String]] = filterResult(outFile)
 
-        // if not BLAST hits, recording the read
+        // if no BLAST hits, recording the read
         if (filteredRows.isEmpty) noHits.appendLine(read.asString)
-        // append results for this read to the total output
+        // otherwise appending results to the total output
         else filteredRows.foreach { totalOutputWriter.writeRow(_) }
       }
 

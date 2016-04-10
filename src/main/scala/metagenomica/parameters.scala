@@ -1,11 +1,12 @@
 package ohnosequences.mg7
 
-import ohnosequences.cosas._, types._, klists._
+import ohnosequences.cosas._, types._, klists._, typeUnions._
 
 import ohnosequences.awstools.s3._
 import ohnosequences.datasets._
 import ohnosequences.flash.api._
 import ohnosequences.blast.api._
+import ohnosequences.blast.api.{ outputFields => out }
 
 sealed trait SplitInputFormat
 case object FastaInput extends SplitInputFormat
@@ -38,33 +39,54 @@ trait AnyMG7Parameters {
   }
   val  blastCommand: BlastCommand
 
-  type BlastOutRec <: AnyBlastOutputRecord.For[BlastCommand]
-  val  blastOutRec: BlastOutRec
+  type BlastOutRecKeys <: AnyBlastOutputFields{
+    type Types <: AnyKList {
+      type Bound <: AnyOutputField
+      type Union <: BlastCommand#ValidOutputFields#Types#Union
+    }
+  }
+  val  blastOutRec: BlastOutputRecord[BlastOutRecKeys]
 
   val blastOptions: BlastCommand#OptionsVals
 
   val referenceDB: bundles.AnyReferenceDB
 
-  val argValsToSeq: BlastOptionsToSeq[BlastArgumentsVals] = implicitly[BlastOptionsToSeq[BlastArgumentsVals]]
-  val optValsToSeq: BlastOptionsToSeq[BlastCommand#OptionsVals] // has to be provided implicitly
+  implicit val argValsToSeq: BlastOptionsToSeq[BlastArgumentsVals] = implicitly[BlastOptionsToSeq[BlastArgumentsVals]]
+  implicit val optValsToSeq: BlastOptionsToSeq[BlastCommand#OptionsVals] // has to be provided implicitly
+
+  // The minimal set of the output fields neccessary for the MG7 generic code
+  implicit val has_qseqid:   out.qseqid.type   isOneOf BlastOutRecKeys#Types#AllTypes
+  implicit val has_sseqid:   out.sseqid.type   isOneOf BlastOutRecKeys#Types#AllTypes
+  implicit val has_bitscore: out.bitscore.type isOneOf BlastOutRecKeys#Types#AllTypes
+  implicit val has_pident:   out.pident.type   isOneOf BlastOutRecKeys#Types#AllTypes
+  implicit val has_qcovs:    out.qcovs.type    isOneOf BlastOutRecKeys#Types#AllTypes
 }
 
 class MG7Parameters[
   BC <: AnyBlastCommand { type ArgumentsVals = BlastArgumentsVals },
-  BR <: AnyBlastOutputRecord.For[BC]
+  BK <: AnyBlastOutputFields {
+    type Types <: AnyKList {
+      type Bound <: AnyOutputField
+      type Union <: BC#ValidOutputFields#Types#Union
+    }
+  }
 ](val outputS3Folder: (SampleID, StepName) => S3Folder,
   val readsLength: illumina.Length,
   val splitInputFormat: SplitInputFormat = FastQInput,
   val splitChunkSize: Int = 10,
   val blastCommand: BC, // = blastn,
-  val blastOutRec: BR, // = defaultBlastOutRec,
+  val blastOutRec: BlastOutputRecord[BK], // = defaultBlastOutRec,
   val blastOptions: BC#OptionsVals, // = defaultBlastOptions.value,
   val referenceDB: bundles.AnyReferenceDB = bundles.rnaCentral
 )(implicit
-  val optValsToSeq: BlastOptionsToSeq[BC#OptionsVals]
-  // TODO: add a check for minimal set of properties in the record (like bitscore and sgi)
+  val optValsToSeq: BlastOptionsToSeq[BC#OptionsVals],
+  val has_qseqid:   out.qseqid.type   isOneOf BK#Types#AllTypes,
+  val has_sseqid:   out.sseqid.type   isOneOf BK#Types#AllTypes,
+  val has_bitscore: out.bitscore.type isOneOf BK#Types#AllTypes,
+  val has_pident:   out.pident.type   isOneOf BK#Types#AllTypes,
+  val has_qcovs:    out.qcovs.type    isOneOf BK#Types#AllTypes
 ) extends AnyMG7Parameters {
 
   type BlastCommand = BC
-  type BlastOutRec = BR
+  type BlastOutRecKeys = BK
 }
