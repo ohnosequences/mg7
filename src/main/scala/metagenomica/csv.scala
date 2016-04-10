@@ -46,11 +46,10 @@ case object csv {
 
     def toMap: Map[AnyType, String] = header.types.asList.zip(values).toMap
 
-    def select[C <: AnyType](column: C)
-      // NOTE: we cannot check this in a generic code, because the header is left free
-      // (implicit check: C isOneOf Hs#Types#AllTypes)
-      : String =
-        this.toMap.apply(column)
+    def select[C <: AnyType](column: C)(implicit 
+      check: C isOneOf Hs#Types#AllTypes
+    ): String =
+      this.toMap.apply(column)
   }
 
   case class Reader[Hs <: AnyProductType](val header: Hs, val csvReader: CSVReader) {
