@@ -1,7 +1,7 @@
 package ohnosequences
 
 import ohnosequences.mg7.bio4j.taxonomyTree._
-import ohnosequences.cosas._, types._, klists._
+import ohnosequences.cosas._, types._, klists._, typeUnions._
 import ohnosequences.blast.api._
 
 // import com.github.tototoshi.csv._
@@ -30,15 +30,6 @@ package object mg7 {
     (out.type   := out.Raw)   ::
     *[AnyDenotation]
 
-  case object AnyBlastOutputFields {
-
-    type For[BC <: AnyBlastCommand] = AnyBlastOutputFields {
-      type Types <: AnyKList {
-        type Bound <: AnyOutputField
-        type Union <: BC#ValidOutputFields#Types#Union
-      }
-    }
-  }
 
   import ohnosequences.blast.api.{ outputFields => out }
   case object defaultBlastOutRec extends BlastOutputRecord(
@@ -65,28 +56,6 @@ package object mg7 {
     |[AnyOutputField]
   )
 
-  type NeccessaryBlastOutputFields =
-    out.qseqid.type   ::
-    out.sseqid.type   ::
-    out.bitscore.type ::
-    out.pident.type   ::
-    out.qcovs.type    ::
-    *[AnyOutputField]
-
-  // case object AnyBlastOutRec {
-  //
-  //   /* expressing that the record has only those keys that are in the command's ValidOutputFields product */
-  //   type For[C <: AnyBlastCommand] =
-  //     AnyBlastOutputRecord {
-  //       type Keys <: AnyBlastOutputFields {
-  //         type Types <: AnyKList {
-  //           type Bound <: AnyOutputField
-  //           type Union <: C#ValidOutputFields#Types#Union
-  //         }
-  //       }
-  //     }
-  // }
-
   // val defaultBlastOptions: blastn.Options := blastn.OptionsVals =
   //   blastn.defaults.update(
   //     num_threads(1)                ::
@@ -96,5 +65,4 @@ package object mg7 {
   //     blastn.task(blastn.megablast) ::
   //     *[AnyDenotation]
   //   )
-
 }

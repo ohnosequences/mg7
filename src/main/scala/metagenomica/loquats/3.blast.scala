@@ -26,16 +26,11 @@ extends DataProcessingBundle(
 )(input  = data.blastInput,
   output = data.blastOutput
 ) {
+
   def filterResult(blastResult: File): Iterator[Seq[String]] = {
     val csvReader = csv.Reader(md.blastOutRec.keys, blastResult)
 
-    val filtered = csvReader.rows.filter { row =>
-
-      val qcovs: String = row.select(outputFields.qcovs)(md.has_qcovs)
-
-      parseDouble(qcovs).map(_ > 99.5).getOrElse(false)
-      // TODO: any other conditions? it's easy to add this to the config
-    }
+    val filtered = csvReader.rows.filter(md.blastFilter)
 
     csvReader.close()
 

@@ -60,9 +60,19 @@ trait AnyMG7Parameters {
   implicit val has_bitscore: out.bitscore.type isOneOf BlastOutRecKeys#Types#AllTypes
   implicit val has_pident:   out.pident.type   isOneOf BlastOutRecKeys#Types#AllTypes
   implicit val has_qcovs:    out.qcovs.type    isOneOf BlastOutRecKeys#Types#AllTypes
+
+  // NOTE: this is not exposed among other constructor arguments, but you can _override_ it
+  val blastFilter: csv.Row[BlastOutRecKeys] => Boolean = defaultBlastFilter
+
+  // NOTE: this default is defined here to have has_qcovs implicit in the scope
+  val defaultBlastFilter: csv.Row[BlastOutRecKeys] => Boolean = { row =>
+
+    val qcovs: String = row.select(outputFields.qcovs)
+    parseDouble(qcovs).map(_ > 99.5).getOrElse(false)
+  }
 }
 
-class MG7Parameters[
+abstract class MG7Parameters[
   BC <: AnyBlastCommand { type ArgumentsVals = BlastArgumentsVals },
   BK <: AnyBlastOutputFields {
     type Types <: AnyKList {
@@ -89,4 +99,6 @@ class MG7Parameters[
 
   type BlastCommand = BC
   type BlastOutRecKeys = BK
+
+  // val blastFilter: csv.Row[BlastOutRecKeys] => Boolean = defaul
 }
