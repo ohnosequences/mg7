@@ -1,10 +1,10 @@
 package ohnosequences
 
 import ohnosequences.mg7.bio4j.taxonomyTree._
-import ohnosequences.cosas._, types._, klists._
+import ohnosequences.cosas._, types._, klists._, typeUnions._
 import ohnosequences.blast.api._
 
-import com.github.tototoshi.csv._
+// import com.github.tototoshi.csv._
 import better.files._
 
 package object mg7 {
@@ -21,37 +21,7 @@ package object mg7 {
   type StepName = String
 
   def parseInt(str: String): Option[Int] = util.Try(str.toInt).toOption
-
-
-  case object UnixCSVFormat extends DefaultCSVFormat {
-    override val lineTerminator: String = "\n"
-  }
-
-  def newCSVWriter(file: File): CSVWriter =
-    CSVWriter.open(file.toJava, append = true)(UnixCSVFormat)
-
-  def newCSVReader(file: File): CSVReader =
-    CSVReader.open(file.toJava)(UnixCSVFormat)
-
-
-  case object columnNames {
-
-    val ReadID  = "Read-ID"
-    val TaxID   = "Tax-ID"
-    val TaxName = "Tax-name"
-    val TaxRank = "Tax-rank"
-    val Count   = "Count"
-
-    val statsHeader: List[String] = List(
-      "Sample-ID",
-      "Input-pairs",
-      "Merged",
-      "Not-merged",
-      "No-Blast-hits",
-      "LCA-not-assigned",
-      "BBH-not-assigned"
-    )
-  }
+  def parseDouble(str: String): Option[Double] = util.Try(str.toDouble).toOption
 
 
   type BlastArgumentsVals =
@@ -86,14 +56,20 @@ package object mg7 {
     |[AnyOutputField]
   )
 
-  // val defaultBlastOptions: blastn.Options := blastn.OptionsVals =
-  //   blastn.defaults.update(
-  //     num_threads(1)                ::
-  //     word_size(42)                 ::
-  //     max_target_seqs(10)           ::
-  //     evalue(BigDecimal(0.001))     ::
-  //     blastn.task(blastn.megablast) ::
-  //     *[AnyDenotation]
-  //   )
-
+  // We set here all options explicitly
+  val defaultBlastnOptions: blastn.Options := blastn.OptionsVals =
+    blastn.options(
+      num_threads(1) ::
+      blastn.task(blastn.blastn) ::
+      evalue(BigDecimal(1E-5)) ::
+      max_target_seqs(500) ::
+      strand(Strands.both) ::
+      word_size(28) ::
+      show_gis(false) ::
+      ungapped(false) ::
+      penalty(-2)  ::
+      reward(1) ::
+      perc_identity(99.5) ::
+      *[AnyDenotation]
+    )
 }
