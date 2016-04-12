@@ -1,4 +1,4 @@
-package ohnosequences.mg7.bundles
+package ohnosequences.mg7.bio4j
 
 import ohnosequences.statika._
 import ohnosequences.awstools.s3._
@@ -10,7 +10,7 @@ import com.bio4j.titan.util.DefaultTitanGraph
 import org.apache.commons.configuration.Configuration
 
 
-case object bio4jNCBITaxonomy extends AnyBio4jDist {
+case object taxonomyBundle extends AnyBio4jDist {
 
   lazy val s3folder: S3Folder = S3Folder("resources.ohnosequences.com", "16s/bio4j-taxonomy/")
 
