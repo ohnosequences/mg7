@@ -100,3 +100,29 @@ abstract class MG7Parameters[
   type BlastCommand = BC
   type BlastOutRecKeys = BK
 }
+
+
+import ohnosequences.blast.api.{ outputFields => out }
+case object defaultBlastOutRec extends BlastOutputRecord(
+  // query
+  out.qseqid      :×:
+  out.qstart      :×:
+  out.qend        :×:
+  out.qlen        :×:
+  // reference
+  out.sseqid      :×:
+  out.sstart      :×:
+  out.send        :×:
+  out.slen        :×:
+  // alignment
+  out.evalue      :×:
+  out.score       :×:
+  out.bitscore    :×:
+  out.length      :×:
+  out.pident      :×:
+  out.mismatch    :×:
+  out.gaps        :×:
+  out.gapopen     :×:
+  out.qcovs       :×:
+  |[AnyOutputField]
+)

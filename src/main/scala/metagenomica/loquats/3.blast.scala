@@ -27,16 +27,6 @@ extends DataProcessingBundle(
   output = data.blastOutput
 ) {
 
-  def filterResult(blastResult: File): Iterator[Seq[String]] = {
-    val csvReader = csv.Reader(md.blastOutRec.keys, blastResult)
-
-    val filtered = csvReader.rows.filter(md.blastFilter)
-
-    csvReader.close()
-
-    filtered.map{ _.values }
-  }
-
   def instructions: AnyInstructions = say("Let the blasting begin!")
 
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
@@ -50,6 +40,7 @@ extends DataProcessingBundle(
       val totalOutputWriter = csv.newWriter(totalOutput, append = true)
 
       fasta.parseFastaDropErrors(source.getLines) foreach { read =>
+        println(s"\nRunning BLAST for the read ${read.getV(header).id}")
 
         val inFile = (context / "read.fa").overwrite(read.asString)
         val outFile = (context / "blastRead.csv").clear()
@@ -69,15 +60,34 @@ extends DataProcessingBundle(
         // BAM!!
         expr.toSeq.!!
 
-        val filteredRows: Iterator[Seq[String]] = filterResult(outFile)
+        val csvReader = csv.Reader(defaultBlastOutRec.keys, outFile)
 
-        // if no BLAST hits, recording the read
-        if (filteredRows.isEmpty) noHits.appendLine(read.asString)
-        // otherwise appending results to the total output
-        else filteredRows.foreach { totalOutputWriter.writeRow(_) }
+        val seq = csvReader.rows.toSeq
+
+        println(s"- There are ${seq.length} hits")
+
+        // TODO: at the moment this filter is fixed, but it should be configurable
+        val filteredRows: Seq[Seq[String]] = seq.filter { row =>
+
+          val qcovs: String = row.select(outputFields.qcovs)
+          parseDouble(qcovs).map(_ > 98.0).getOrElse(false)
+
+        }.map{ _.values }
+
+        println(s"- After filtering only ${filteredRows.length} hits left")
+
+        if (filteredRows.isEmpty) {
+          println(s"- Recording read ${read.getV(header).id} in no-hits")
+          noHits.appendLine(read.asString)
+        } else {
+          println(s"- Appending filtered results to the total chunk output")
+          totalOutputWriter.writeAll(filteredRows)
+        }
+
+        csvReader.close()
       }
 
-      // it's important to close the stream:
+      // it's important to close things in the end:
       source.close()
       totalOutputWriter.close()
     } -&-
