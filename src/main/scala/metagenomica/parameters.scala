@@ -8,6 +8,9 @@ import ohnosequences.flash.api._
 import ohnosequences.blast.api._
 import ohnosequences.blast.api.{ outputFields => out }
 
+import era7bio.db._
+
+
 sealed trait SplitInputFormat
 case object FastaInput extends SplitInputFormat
 case object FastQInput extends SplitInputFormat
@@ -49,7 +52,7 @@ trait AnyMG7Parameters {
 
   val blastOptions: BlastCommand#OptionsVals
 
-  val referenceDB: bundles.AnyReferenceDB
+  val referenceDB: BlastDBRelease[AnyBlastDB]
 
   implicit val argValsToSeq: BlastOptionsToSeq[BlastArgumentsVals] = implicitly[BlastOptionsToSeq[BlastArgumentsVals]]
   implicit val optValsToSeq: BlastOptionsToSeq[BlastCommand#OptionsVals] // has to be provided implicitly
@@ -87,7 +90,7 @@ abstract class MG7Parameters[
   val blastCommand: BC = blastn,
   val blastOutRec: BlastOutputRecord[BK]  = defaultBlastOutRec,
   val blastOptions: BC#OptionsVals        = defaultBlastnOptions.value,
-  val referenceDB: bundles.AnyReferenceDB = bundles.rnaCentral
+  val referenceDB: BlastDBRelease[AnyBlastDB]
 )(implicit
   val optValsToSeq: BlastOptionsToSeq[BC#OptionsVals],
   val has_qseqid:   out.qseqid.type   isOneOf BK#Types#AllTypes,

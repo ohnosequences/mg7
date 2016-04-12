@@ -9,6 +9,10 @@ import better.files._
 
 case object csv {
 
+  case object UnixTSVFormat extends TSVFormat {
+    override val lineTerminator: String = "\n"
+  }
+
   case object UnixCSVFormat extends DefaultCSVFormat {
     override val lineTerminator: String = "\n"
   }
@@ -46,7 +50,7 @@ case object csv {
 
     def toMap: Map[AnyType, String] = header.types.asList.zip(values).toMap
 
-    def select[C <: AnyType](column: C)(implicit 
+    def select[C <: AnyType](column: C)(implicit
       check: C isOneOf Hs#Types#AllTypes
     ): String =
       this.toMap.apply(column)
