@@ -39,11 +39,15 @@ case object statsDataProcessing extends DataProcessingBundle()(
     val statsCSV: File = context / "output" / "stats.csv"
     val sampleID: String = context.inputFile(data.sampleID).contentAsString
 
+    val reads1gz: File = context.inputFile(data.pairedReads1)
+    val reads1fastq: File = File(reads1gz.path.toString.stripSuffix(".gz"))
+
+    cmd("gunzip")(reads1gz.path.toString) -&-
     LazyTry {
       // NOTE: careful, the order has to coincide:
       val stats: Map[String, String] = csv.columnNames.statsHeader.zip(List(
         sampleID,
-        countReads( context.inputFile(data.pairedReads1) ).toString,
+        countReads( reads1fastq ).toString,
         countReads( context.inputFile(data.mergedReads) ).toString,
         countReads( context.inputFile(data.pair1NotMerged) ).toString,
         countReads( context.inputFile(data.blastNoHits) ).toString
