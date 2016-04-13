@@ -32,7 +32,7 @@ case object summaryDataProcessing extends DataProcessingBundle()(
   def countLines(file: File): Integer = { file.lines.length }
 
 
-  def instructions: ohnosequences.statika.AnyInstructions = ???
+  def instructions: ohnosequences.statika.AnyInstructions = say("Running summary loquat")
 
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
 
