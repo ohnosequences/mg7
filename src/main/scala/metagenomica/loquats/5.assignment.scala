@@ -68,11 +68,8 @@ extends DataProcessingBundle(
     blastReader.close
 
     // Now we will write these two types of result to two separate files
-    val lcaFile    = (context / "output" / "lca.csv").createIfNotExists()
-    val bbhFile    = (context / "output" / "bbh.csv").createIfNotExists()
-    val no_lcaFile = (context / "output" / "lca.not-assigned").createIfNotExists()
-    val no_bbhFile = (context / "output" / "bbh.not-assigned").createIfNotExists()
-
+    val lcaFile = (context / "output" / "lca.csv").createIfNotExists()
+    val bbhFile = (context / "output" / "bbh.csv").createIfNotExists()
 
     val lcaWriter = csv.newWriter(lcaFile)
     val bbhWriter = csv.newWriter(bbhFile)
@@ -88,28 +85,16 @@ extends DataProcessingBundle(
     bbhWriter.writeRow(header)
 
     assignments foreach { case (readId, (lca, bbh)) =>
-      lca match {
-        case Some(node) => lcaWriter.writeRow(List(readId, node.id, node.name, node.rank))
-        // TODO: it should also write one of the subject sequences ID
-        case None => no_lcaFile.appendLine(readId)
-      }
-      bbh match {
-        case Some(node) => bbhWriter.writeRow(List(readId, node.id, node.name, node.rank))
-        // TODO: it should also write one of the subject sequences ID
-        case None => no_bbhFile.appendLine(readId)
-      }
+      lca.foreach{ node => lcaWriter.writeRow(List(readId, node.id, node.name, node.rank)) }
+      bbh.foreach{ node => bbhWriter.writeRow(List(readId, node.id, node.name, node.rank)) }
     }
 
     lcaWriter.close
     bbhWriter.close
 
     success(s"Results are ready",
-      // LCA
       data.lcaCSV(lcaFile) ::
-      data.lcaNotAssigned(no_lcaFile) ::
-      // BBH
       data.bbhCSV(bbhFile) ::
-      data.bbhNotAssigned(no_bbhFile) ::
       *[AnyDenotation { type Value <: FileResource }]
     )
   }

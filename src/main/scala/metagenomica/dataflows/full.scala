@@ -31,7 +31,7 @@ trait AnyFullDataflow extends AnyNoFlashDataflow {
 
   val flashInputs: Map[SampleID, (S3Resource, S3Resource)]
 
-  lazy val flashDataMappings = flashInputs.toList.map {
+  lazy val flashDataMappings: List[AnyDataMapping] = flashInputs.toList.map {
     case (sampleId, (reads1S3Resource, reads2S3Resource)) =>
 
       DataMapping(sampleId, flashDataProcessing(params))(
@@ -53,34 +53,32 @@ trait AnyFullDataflow extends AnyNoFlashDataflow {
   }.toMap
 
 
-  lazy val statsDataMappings = List[List[AnyDataMapping]](
+  lazy val statsDataMappings: List[AnyDataMapping] = List[List[AnyDataMapping]](
     flashDataMappings,
     mergeDataMappings,
     assignmentDataMappings
   ).flatten
   .groupBy { _.label }
-  .map { case (sampleId: String, dms: List[AnyDataMapping]) =>
+  .map { case (sampleID: String, dms: List[AnyDataMapping]) =>
     val outputs: Map[AnyData, S3Resource] =
       dms.map{ _.remoteOutput }.foldLeft(Map[AnyData, S3Resource]()){ _ ++ _ }
 
-    DataMapping(sampleId, statsDataProcessing)(
-      remoteInput = Map(
-        data.sampleID       -> outputs(data.sampleID),
-        data.pairedReads1   -> outputs(data.pairedReads1),
+    DataMapping(sampleID, statsDataProcessing)(
+      remoteInput = Map[AnyData, AnyRemoteResource](
+        data.sampleID       -> MessageResource(sampleID),
+        data.pairedReads1   -> flashInputs(sampleID)._1,
         data.mergedReads    -> outputs(data.mergedReads),
         data.pair1NotMerged -> outputs(data.pair1NotMerged),
-        data.blastNoHits    -> outputs(data.blastNoHits),
-        data.lcaNotAssigned -> outputs(data.lcaNotAssigned),
-        data.bbhNotAssigned -> outputs(data.bbhNotAssigned)
+        data.blastNoHits    -> outputs(data.blastNoHits)
       ),
       remoteOutput = Map(
-        data.sampleStatsCSV -> S3Resource(params.outputS3Folder("summary", "stats") / s"${sampleId}.stats.csv")
+        data.sampleStatsCSV -> S3Resource(params.outputS3Folder("summary", "stats") / s"${sampleID}.stats.csv")
       )
     )
-  }
+  }.toList
 
 
-  lazy val summaryDataMappings = statsDataMappings.map { statsDM =>
+  lazy val summaryDataMappings: List[AnyDataMapping] = statsDataMappings.map { statsDM =>
 
     DataMapping("summmary", summaryDataProcessing)(
       remoteInput = statsDM.remoteOutput,

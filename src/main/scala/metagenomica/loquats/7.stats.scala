@@ -46,9 +46,7 @@ case object statsDataProcessing extends DataProcessingBundle()(
         countReads( context.inputFile(data.pairedReads1) ).toString,
         countReads( context.inputFile(data.mergedReads) ).toString,
         countReads( context.inputFile(data.pair1NotMerged) ).toString,
-        countReads( context.inputFile(data.blastNoHits) ).toString,
-        countLines( context.inputFile(data.lcaNotAssigned) ).toString,
-        countLines( context.inputFile(data.bbhNotAssigned) ).toString
+        countReads( context.inputFile(data.blastNoHits) ).toString
       )).toMap
 
       val csvWriter = csv.newWriter(statsCSV)

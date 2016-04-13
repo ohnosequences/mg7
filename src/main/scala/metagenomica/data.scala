@@ -30,7 +30,6 @@ case object data {
 
   // Reads after splitting (multiple files in a virtual S3 folder):
   case object fastaChunks extends Data("reads-chunks")
-  case object mergedReadsNumber extends Data("merged-reads-number")
 
   case object splitInput extends DataSet(mergedReads :×: |[AnyData])
   case object splitOutput extends DataSet(fastaChunks :×: |[AnyData])
@@ -72,15 +71,11 @@ case object data {
   // Assignment output:
   case object lcaCSV extends FileData("lca")("csv")
   case object bbhCSV extends FileData("bbh")("csv")
-  case object lcaNotAssigned extends FileData("lca")("not-assigned")
-  case object bbhNotAssigned extends FileData("bbh")("not-assigned")
 
   case object assignmentInput extends DataSet(blastResult :×: |[AnyData])
   case object assignmentOutput extends DataSet(
     lcaCSV :×:
-    lcaNotAssigned :×:
     bbhCSV :×:
-    bbhNotAssigned :×:
     |[AnyData]
   )
 
@@ -99,7 +94,6 @@ case object data {
   case object countingInput extends DataSet(
     lcaCSV :×:
     bbhCSV :×:
-    mergedReadsNumber :×:
     |[AnyData]
   )
   case object countingOutput extends DataSet(
@@ -124,8 +118,6 @@ case object data {
     mergedReads    :×:
     pair1NotMerged :×:
     blastNoHits    :×:
-    lcaNotAssigned :×:
-    bbhNotAssigned :×:
     |[AnyData]
   )
   case object statsOutput extends DataSet(

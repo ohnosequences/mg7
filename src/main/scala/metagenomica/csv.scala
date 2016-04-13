@@ -37,9 +37,7 @@ case object csv {
       "Input-pairs",
       "Merged",
       "Not-merged",
-      "No-Blast-hits",
-      "LCA-not-assigned",
-      "BBH-not-assigned"
+      "No-Blast-hits"
     )
   }
 
