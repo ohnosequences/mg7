@@ -59,20 +59,20 @@ trait AnyFullDataflow extends AnyNoFlashDataflow {
     assignmentDataMappings
   ).flatten
   .groupBy { _.label }
-  .map { case (sampleId: String, dms: List[AnyDataMapping]) =>
+  .map { case (sampleID: String, dms: List[AnyDataMapping]) =>
     val outputs: Map[AnyData, S3Resource] =
       dms.map{ _.remoteOutput }.foldLeft(Map[AnyData, S3Resource]()){ _ ++ _ }
 
-    DataMapping(sampleId, statsDataProcessing)(
-      remoteInput = Map(
-        data.sampleID       -> outputs(data.sampleID),
-        data.pairedReads1   -> outputs(data.pairedReads1),
+    DataMapping(sampleID, statsDataProcessing)(
+      remoteInput = Map[AnyData, AnyRemoteResource](
+        data.sampleID       -> MessageResource(sampleID),
+        data.pairedReads1   -> flashInputs(sampleID)._1,
         data.mergedReads    -> outputs(data.mergedReads),
         data.pair1NotMerged -> outputs(data.pair1NotMerged),
         data.blastNoHits    -> outputs(data.blastNoHits)
       ),
       remoteOutput = Map(
-        data.sampleStatsCSV -> S3Resource(params.outputS3Folder("summary", "stats") / s"${sampleId}.stats.csv")
+        data.sampleStatsCSV -> S3Resource(params.outputS3Folder("summary", "stats") / s"${sampleID}.stats.csv")
       )
     )
   }.toList
