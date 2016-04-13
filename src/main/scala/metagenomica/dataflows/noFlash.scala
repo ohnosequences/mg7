@@ -89,7 +89,9 @@ trait AnyNoFlashDataflow extends AnyDataflow {
     val sampleId = mergeDM.label
 
     DataMapping(sampleId, assignmentDataProcessing(params))(
-      remoteInput = mergeDM.remoteOutput,
+      remoteInput = Map(
+        data.blastResult -> mergeDM.remoteOutput(data.blastResult)
+      ),
       remoteOutput = Map(
         data.lcaCSV -> S3Resource(params.outputS3Folder(sampleId, "assignment") / s"${sampleId}.lca.csv"),
         data.bbhCSV -> S3Resource(params.outputS3Folder(sampleId, "assignment") / s"${sampleId}.bbh.csv"),
