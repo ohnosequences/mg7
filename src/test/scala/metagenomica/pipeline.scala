@@ -20,10 +20,11 @@ case object test {
 
   case object testParameters extends MG7Parameters(
     outputS3Folder = testOutS3Folder,
-    readsLength = bp300
+    readsLength = bp300,
     // blastCommand = blastn,
     // blastOutRec  = defaultBlastOutRec,
     // blastOptions = defaultBlastnOptions.value
+    referenceDB  = era7bio.db.rna16s.release
   ) {
 
     // an example of how you can add some conditions to the filter predicate

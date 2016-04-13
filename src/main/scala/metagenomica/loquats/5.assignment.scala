@@ -2,25 +2,24 @@ package ohnosequences.mg7.loquats
 
 import ohnosequences.mg7._
 import ohnosequences.mg7.bio4j._, taxonomyTree.solution, titanTaxonomyTree._
-
 import ohnosequences.loquat._
-
 import ohnosequences.statika._
-
 import ohnosequences.cosas._, types._, klists._
-
 import ohnosequences.datasets._
+import ohnosequences.blast.api._, outputFields._
 
-import ohnosequences.{ blast => b }, b.api._, outputFields._
+import com.bio4j.titan.model.ncbiTaxonomy.TitanNCBITaxonomyGraph
 
 import java.io.{ BufferedWriter, FileWriter, File }
 import scala.util.Try
 
+import com.github.tototoshi.csv._
+
 
 case class assignmentDataProcessing[MD <: AnyMG7Parameters](val md: MD)
 extends DataProcessingBundle(
-  bundles.bio4jNCBITaxonomy,
-  md.referenceDB.idsMap
+  bio4j.taxonomyBundle,
+  md.referenceDB
 )(
   input = data.assignmentInput,
   output = data.assignmentOutput
@@ -28,17 +27,15 @@ extends DataProcessingBundle(
   // For the output fields implicits
   import md._
 
+  lazy val taxonomyGraph: TitanNCBITaxonomyGraph = bio4j.taxonomyBundle.graph
+
   def instructions: AnyInstructions = say("Let's see who is who!")
-
-  // private val headers: Seq[String] = md.blastOutRec.keys.types.asList.map{ _.label }
-
-  // this method looks up particular column by its header
-  // private def column(row: Seq[String], header: AnyOutputField): Option[String] =
-  //   headers.zip(row).toMap.get(header.label)
 
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
 
-    val referenceMapping: Map[ID, TaxID] = md.referenceDB.idsMap.mapping
+    val tsvReader = CSVReader.open( md.referenceDB.id2taxa.toJava )(csv.UnixTSVFormat)
+
+    val referenceMap: Map[ID, TaxID] = tsvReader.iterator.map{ row => row(0) -> row(1) }.toMap
 
     val blastReader = csv.Reader(md.blastOutRec.keys, context.inputFile(data.blastResult))
 
@@ -52,21 +49,22 @@ extends DataProcessingBundle(
           val maxRow = hits.maxBy { row =>
             parseInt(row.select(bitscore)).getOrElse(0)
           }
-          referenceMapping.get(maxRow.select(sseqid)).flatMap { taxId =>
-            titanTaxonNode(bundles.bio4jNCBITaxonomy.graph, taxId)
+          referenceMap.get(maxRow.select(sseqid)).flatMap { taxId =>
+            titanTaxonNode(taxonomyGraph, taxId)
           }
         }
 
         // for each hit row we take the column with ID and lookup its TaxID
-        val taxIds: List[TaxID] = hits.toList.map{ _.select(sseqid) }.flatMap(referenceMapping.get)
+        val taxIds: List[TaxID] = hits.toList.map{ _.select(sseqid) }.flatMap(referenceMap.get)
         // then we generate Titan taxon nodes
-        val nodes: List[TitanTaxonNode] = titanTaxonNodes(bundles.bio4jNCBITaxonomy.graph, taxIds)
+        val nodes: List[TitanTaxonNode] = titanTaxonNodes(taxonomyGraph, taxIds)
         // and return the taxon node ID corresponding to the read
         val lca: LCA = solution(nodes).node
 
         (readId, (lca, bbh))
       }
 
+    tsvReader.close
     blastReader.close
 
     // Now we will write these two types of result to two separate files

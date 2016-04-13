@@ -31,31 +31,6 @@ package object mg7 {
     *[AnyDenotation]
 
 
-  import ohnosequences.blast.api.{ outputFields => out }
-  case object defaultBlastOutRec extends BlastOutputRecord(
-    // query
-    out.qseqid      :×:
-    out.qstart      :×:
-    out.qend        :×:
-    out.qlen        :×:
-    // reference
-    out.sseqid      :×:
-    out.sstart      :×:
-    out.send        :×:
-    out.slen        :×:
-    // alignment
-    out.evalue      :×:
-    out.score       :×:
-    out.bitscore    :×:
-    out.length      :×:
-    out.pident      :×:
-    out.mismatch    :×:
-    out.gaps        :×:
-    out.gapopen     :×:
-    out.qcovs       :×:
-    |[AnyOutputField]
-  )
-
   // We set here all options explicitly
   val defaultBlastnOptions: blastn.Options := blastn.OptionsVals =
     blastn.options(

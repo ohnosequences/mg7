@@ -1,41 +1,26 @@
 package ohnosequences.mg7.loquats
 
 import ohnosequences.mg7._
-
 import ohnosequences.loquat._
-
 import ohnosequences.statika._
-
 import ohnosequences.blast.api._
-
 import ohnosequences.cosas._, types._, klists._
-
 import ohnosequences.datasets._
-
 import ohnosequences.fastarious._, fasta._
 
 import better.files._
-
 import sys.process._
 
 
+case object blastBundle extends ohnosequencesBundles.statika.Blast("2.2.31")
+
 case class blastDataProcessing[MD <: AnyMG7Parameters](val md: MD)
 extends DataProcessingBundle(
-  bundles.blast,
+  blastBundle,
   md.referenceDB
 )(input  = data.blastInput,
   output = data.blastOutput
 ) {
-
-  def filterResult(blastResult: File): Iterator[Seq[String]] = {
-    val csvReader = csv.Reader(md.blastOutRec.keys, blastResult)
-
-    val filtered = csvReader.rows.filter(md.blastFilter)
-
-    csvReader.close()
-
-    filtered.map{ _.values }
-  }
 
   def instructions: AnyInstructions = say("Let the blasting begin!")
 
@@ -50,34 +35,41 @@ extends DataProcessingBundle(
       val totalOutputWriter = csv.newWriter(totalOutput, append = true)
 
       fasta.parseFastaDropErrors(source.getLines) foreach { read =>
+        println(s"\nRunning BLAST for the read ${read.getV(header).id}")
 
         val inFile = (context / "read.fa").overwrite(read.asString)
         val outFile = (context / "blastRead.csv").clear()
 
-        val expr = BlastExpression(md.blastCommand)(
-          outputRecord = md.blastOutRec,
-          argumentValues =
-            db(Set(md.referenceDB.dbName)) ::
-            query(inFile) ::
-            out(outFile) ::
-            *[AnyDenotation],
-          optionValues = md.blastOptions
-        )(md.argValsToSeq, md.optValsToSeq)
+        val expr = md.blastExpr(inFile, outFile)
 
         println(expr.toSeq.mkString(" "))
 
         // BAM!!
         expr.toSeq.!!
 
-        val filteredRows: Iterator[Seq[String]] = filterResult(outFile)
+        val csvReader = csv.Reader(md.blastOutRec.keys, outFile)
 
-        // if no BLAST hits, recording the read
-        if (filteredRows.isEmpty) noHits.appendLine(read.asString)
-        // otherwise appending results to the total output
-        else filteredRows.foreach { totalOutputWriter.writeRow(_) }
+        val allHits: Seq[csv.Row[md.BlastOutRecKeys]] = csvReader.rows.toSeq
+
+        println(s"- There are ${allHits.length} hits")
+
+        // TODO: at the moment this filter is fixed, but it should be configurable
+        val filteredHits: Seq[csv.Row[md.BlastOutRecKeys]] = allHits.filter(md.blastFilter)
+
+        println(s"- After filtering there are ${filteredHits.length} hits")
+
+        if (filteredHits.isEmpty) {
+          println(s"- Recording read ${read.getV(header).id} in no-hits")
+          noHits.appendLine(read.asString)
+        } else {
+          println(s"- Appending filtered results to the total chunk output")
+          totalOutputWriter.writeAll(filteredHits.map{ _.values })
+        }
+
+        csvReader.close()
       }
 
-      // it's important to close the stream:
+      // it's important to close things in the end:
       source.close()
       totalOutputWriter.close()
     } -&-

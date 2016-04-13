@@ -16,18 +16,20 @@ resolvers := Seq(
 libraryDependencies ++= Seq(
   // APIs:
   "ohnosequences" %% "flash"      % "0.3.0",
+  "ohnosequences" %% "fastarious" % "0.6.0",
   "ohnosequences" %% "blast-api"  % "0.7.0",
-  "ohnosequences" %% "fastarious" % "0.5.2",
   // generic tools:
-  "ohnosequences" %% "cosas"      % "0.8.0",
-  "ohnosequences" %% "datasets"   % "0.3.0",
-  "ohnosequences" %% "loquat"     % "2.0.0-M8-SNAPSHOT",
-  "ohnosequences" %% "statika"    % "2.0.0-M5",
+  "ohnosequences" %% "cosas"        % "0.8.0",
+  "ohnosequences" %% "datasets"     % "0.3.0",
+  "ohnosequences" %% "loquat"       % "2.0.0-M8-SNAPSHOT",
+  "ohnosequences" %% "statika"      % "2.0.0-M5",
+  "era7bio"       %% "rnacentraldb" % "0.2.1",
   // bundles:
   "ohnosequences-bundles" %% "flash"      % "0.2.0",
   "ohnosequences-bundles" %% "blast"      % "0.3.0",
   "ohnosequences-bundles" %% "bio4j-dist" % "0.2.0",
   // testing:
+  "era7bio"       %% "db-rna16s" % "0.2.0" % Test,
   "org.scalatest" %% "scalatest" % "2.2.6" % Test
 )
 
@@ -40,27 +42,27 @@ dependencyOverrides ++= Set(
 
 
 
-//// Uncomment for testing: ////
-fatArtifactSettings
-
-// copied from bio4j-titan:
-mergeStrategy in assembly ~= { old => {
-    case "log4j.properties"                       => MergeStrategy.filterDistinctLines
-    case PathList("org", "apache", "commons", _*) => MergeStrategy.first
-    case x                                        => old(x)
-  }
-}
-
-enablePlugins(BuildInfoPlugin)
-buildInfoPackage := "generated.metadata"
-buildInfoObject  := name.value
-buildInfoOptions := Seq(BuildInfoOption.Traits("ohnosequences.statika.AnyArtifactMetadata"))
-buildInfoKeys    := Seq[BuildInfoKey](
-  organization,
-  version,
-  "artifact" -> name.value.toLowerCase,
-  "artifactUrl" -> fatArtifactUrl.value
-)
-
-// For including test code in the fat artifact:
-unmanagedSourceDirectories in Compile += (scalaSource in Test).value / "metagenomica"
+// //// Uncomment for testing: ////
+// fatArtifactSettings
+//
+// // copied from bio4j-titan:
+// mergeStrategy in assembly ~= { old => {
+//     case "log4j.properties"                       => MergeStrategy.filterDistinctLines
+//     case PathList("org", "apache", "commons", _*) => MergeStrategy.first
+//     case x                                        => old(x)
+//   }
+// }
+//
+// enablePlugins(BuildInfoPlugin)
+// buildInfoPackage := "generated.metadata"
+// buildInfoObject  := name.value
+// buildInfoOptions := Seq(BuildInfoOption.Traits("ohnosequences.statika.AnyArtifactMetadata"))
+// buildInfoKeys    := Seq[BuildInfoKey](
+//   organization,
+//   version,
+//   "artifact" -> name.value.toLowerCase,
+//   "artifactUrl" -> fatArtifactUrl.value
+// )
+// 
+// // For including test code in the fat artifact:
+// unmanagedSourceDirectories in Compile += (scalaSource in Test).value / "metagenomica"

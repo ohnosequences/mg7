@@ -8,6 +8,11 @@ import ohnosequences.flash.api._
 import ohnosequences.blast.api._
 import ohnosequences.blast.api.{ outputFields => out }
 
+import era7bio.db._
+
+import better.files._
+
+
 sealed trait SplitInputFormat
 case object FastaInput extends SplitInputFormat
 case object FastQInput extends SplitInputFormat
@@ -49,10 +54,26 @@ trait AnyMG7Parameters {
 
   val blastOptions: BlastCommand#OptionsVals
 
-  val referenceDB: bundles.AnyReferenceDB
+  val referenceDB: AnyBlastDBRelease
 
-  implicit val argValsToSeq: BlastOptionsToSeq[BlastArgumentsVals] = implicitly[BlastOptionsToSeq[BlastArgumentsVals]]
-  implicit val optValsToSeq: BlastOptionsToSeq[BlastCommand#OptionsVals] // has to be provided implicitly
+  // has to be provided implicitly
+  implicit val argValsToSeq: BlastOptionsToSeq[BlastArgumentsVals]
+  implicit val optValsToSeq: BlastOptionsToSeq[BlastCommand#OptionsVals]
+
+  def blastExpr(inFile: File, outFile: File):
+    BlastExpression[BlastCommand, BlastOutputRecord[BlastOutRecKeys]] = {
+
+    BlastExpression(blastCommand)(
+      outputRecord = blastOutRec,
+      argumentValues =
+        db(Set(referenceDB.dbName)) ::
+        query(inFile) ::
+        ohnosequences.blast.api.out(outFile) ::
+        *[AnyDenotation],
+      optionValues = blastOptions
+    )(argValsToSeq, optValsToSeq)
+  }
+
 
   // The minimal set of the output fields neccessary for the MG7 generic code
   implicit val has_qseqid:   out.qseqid.type   isOneOf BlastOutRecKeys#Types#AllTypes
@@ -62,12 +83,11 @@ trait AnyMG7Parameters {
   implicit val has_qcovs:    out.qcovs.type    isOneOf BlastOutRecKeys#Types#AllTypes
 
   // NOTE: this is not exposed among other constructor arguments, but you can _override_ it
-  val blastFilter: csv.Row[BlastOutRecKeys] => Boolean = defaultBlastFilter
+  def blastFilter(row: csv.Row[BlastOutRecKeys]): Boolean = defaultBlastFilter(row)
 
   // NOTE: this default is defined here to have has_qcovs implicit in the scope
-  val defaultBlastFilter: csv.Row[BlastOutRecKeys] => Boolean = { row =>
-
-    val qcovs: String = row.select(outputFields.qcovs)
+  def defaultBlastFilter(row: csv.Row[BlastOutRecKeys]): Boolean = {
+    val qcovs: String = row.select(outputFields.qcovs)(has_qcovs)
     parseDouble(qcovs).map(_ > 98.0).getOrElse(false)
   }
 }
@@ -87,8 +107,9 @@ abstract class MG7Parameters[
   val blastCommand: BC = blastn,
   val blastOutRec: BlastOutputRecord[BK]  = defaultBlastOutRec,
   val blastOptions: BC#OptionsVals        = defaultBlastnOptions.value,
-  val referenceDB: bundles.AnyReferenceDB = bundles.rnaCentral
+  val referenceDB: AnyBlastDBRelease
 )(implicit
+  val argValsToSeq: BlastOptionsToSeq[BC#ArgumentsVals],
   val optValsToSeq: BlastOptionsToSeq[BC#OptionsVals],
   val has_qseqid:   out.qseqid.type   isOneOf BK#Types#AllTypes,
   val has_sseqid:   out.sseqid.type   isOneOf BK#Types#AllTypes,
@@ -100,3 +121,28 @@ abstract class MG7Parameters[
   type BlastCommand = BC
   type BlastOutRecKeys = BK
 }
+
+
+case object defaultBlastOutRec extends BlastOutputRecord(
+  // query
+  out.qseqid      :×:
+  out.qstart      :×:
+  out.qend        :×:
+  out.qlen        :×:
+  // reference
+  out.sseqid      :×:
+  out.sstart      :×:
+  out.send        :×:
+  out.slen        :×:
+  // alignment
+  out.evalue      :×:
+  out.score       :×:
+  out.bitscore    :×:
+  out.length      :×:
+  out.pident      :×:
+  out.mismatch    :×:
+  out.gaps        :×:
+  out.gapopen     :×:
+  out.qcovs       :×:
+  |[AnyOutputField]
+)
