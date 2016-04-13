@@ -40,43 +40,30 @@ extends DataProcessingBundle(
         val inFile = (context / "read.fa").overwrite(read.asString)
         val outFile = (context / "blastRead.csv").clear()
 
-        val expr = BlastExpression(md.blastCommand)(
-          outputRecord = md.blastOutRec,
-          argumentValues =
-            db(Set(md.referenceDB.dbName)) ::
-            query(inFile) ::
-            out(outFile) ::
-            *[AnyDenotation],
-          optionValues = md.blastOptions
-        )(md.argValsToSeq, md.optValsToSeq)
+        val expr = md.blastExpr(inFile, outFile)
 
         println(expr.toSeq.mkString(" "))
 
         // BAM!!
         expr.toSeq.!!
 
-        val csvReader = csv.Reader(defaultBlastOutRec.keys, outFile)
+        val csvReader = csv.Reader(md.blastOutRec.keys, outFile)
 
-        val seq = csvReader.rows.toSeq
+        val allHits: Seq[csv.Row[md.BlastOutRecKeys]] = csvReader.rows.toSeq
 
-        println(s"- There are ${seq.length} hits")
+        println(s"- There are ${allHits.length} hits")
 
         // TODO: at the moment this filter is fixed, but it should be configurable
-        val filteredRows: Seq[Seq[String]] = seq.filter { row =>
+        val filteredHits: Seq[csv.Row[md.BlastOutRecKeys]] = allHits.filter(md.blastFilter)
 
-          val qcovs: String = row.select(outputFields.qcovs)
-          parseDouble(qcovs).map(_ > 98.0).getOrElse(false)
+        println(s"- After filtering there are ${filteredHits.length} hits")
 
-        }.map{ _.values }
-
-        println(s"- After filtering only ${filteredRows.length} hits left")
-
-        if (filteredRows.isEmpty) {
+        if (filteredHits.isEmpty) {
           println(s"- Recording read ${read.getV(header).id} in no-hits")
           noHits.appendLine(read.asString)
         } else {
           println(s"- Appending filtered results to the total chunk output")
-          totalOutputWriter.writeAll(filteredRows)
+          totalOutputWriter.writeAll(filteredHits.map{ _.values })
         }
 
         csvReader.close()
