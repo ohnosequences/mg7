@@ -17,12 +17,12 @@ import com.bio4j.titan.model.ncbiTaxonomy.TitanNCBITaxonomyGraph
 
 
 case object countingDataProcessing extends DataProcessingBundle(
-  bundles.bio4jNCBITaxonomy
+  bio4j.taxonomyBundle
 )(input = data.countingInput,
   output = data.countingOutput
 ) {
 
-  lazy val taxonomyGraph: TitanNCBITaxonomyGraph = bundles.bio4jNCBITaxonomy.graph
+  lazy val taxonomyGraph: TitanNCBITaxonomyGraph = bio4j.taxonomyBundle.graph
 
   def instructions: AnyInstructions = say("I'm counting you!")
 
@@ -75,8 +75,8 @@ case object countingDataProcessing extends DataProcessingBundle(
     // same thing that we do for lca and bbh
     def processFile(assignmentsFile: File): (File, File, File, File) = {
 
-      val assignmentsReader: CSVReader = newCSVReader(assignmentsFile)
-      val taxIDs: List[TaxID] = assignmentsReader.allWithHeaders.map { row => row(columnNames.TaxID) }
+      val assignmentsReader: CSVReader = csv.newReader(assignmentsFile)
+      val taxIDs: List[TaxID] = assignmentsReader.allWithHeaders.map { row => row(csv.columnNames.TaxID) }
       assignmentsReader.close
 
       val counts: Map[TaxID, (Int, Int)] = accumulatedCounts( directCounts(taxIDs) )
@@ -88,15 +88,15 @@ case object countingDataProcessing extends DataProcessingBundle(
       val outDirectFreqFile = context / s"${filesPrefix}.direct.frequency.counts"
       val outAccumFreqFile  = context / s"${filesPrefix}.accum.frequency.counts"
 
-      val csvDirectWriter = newCSVWriter(outDirectFile)
-      val csvAccumWriter  = newCSVWriter(outAccumFile)
-      val csvDirectFreqWriter = newCSVWriter(outDirectFreqFile)
-      val csvAccumFreqWriter  = newCSVWriter(outAccumFreqFile)
+      val csvDirectWriter = csv.newWriter(outDirectFile)
+      val csvAccumWriter  = csv.newWriter(outAccumFile)
+      val csvDirectFreqWriter = csv.newWriter(outDirectFreqFile)
+      val csvAccumFreqWriter  = csv.newWriter(outAccumFreqFile)
 
       def headerFor(file: File) = List(
-        columnNames.TaxID,
-        columnNames.TaxRank,
-        columnNames.TaxName,
+        csv.columnNames.TaxID,
+        csv.columnNames.TaxRank,
+        csv.columnNames.TaxName,
         file.name.replaceAll("\\.", "-")
       )
       csvDirectWriter.writeRow(headerFor(outDirectFile))

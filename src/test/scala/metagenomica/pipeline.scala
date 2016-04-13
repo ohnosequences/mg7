@@ -2,14 +2,11 @@ package ohnosequences.mg7
 
 
 import ohnosequences.mg7._, loquats._, dataflows._
-
 import ohnosequences.datasets._, illumina._
-
 import ohnosequences.cosas._, types._, klists._
-
 import ohnosequences.loquat._
-
 import ohnosequences.statika._, aws._
+import ohnosequences.blast.api._
 
 import ohnosequences.awstools.ec2._, InstanceType._
 import ohnosequences.awstools.s3._
@@ -23,8 +20,19 @@ case object test {
 
   case object testParameters extends MG7Parameters(
     outputS3Folder = testOutS3Folder,
-    readsLength = bp300
-  )
+    readsLength = bp300,
+    // blastCommand = blastn,
+    // blastOutRec  = defaultBlastOutRec,
+    // blastOptions = defaultBlastnOptions.value
+    referenceDB  = era7bio.db.rna16s.release
+  ) {
+
+    // an example of how you can add some conditions to the filter predicate
+    override val blastFilter: csv.Row[BlastOutRecKeys] => Boolean = { row =>
+      defaultBlastFilter(row) ||
+      parseInt(row.select(outputFields.bitscore)).map{ _ > 42 }.getOrElse(false)
+    }
+  }
 
   val defaultAMI = AmazonLinuxAMI(Ireland, HVM, InstanceStore)
 

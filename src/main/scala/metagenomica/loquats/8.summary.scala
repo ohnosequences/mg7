@@ -32,20 +32,20 @@ case object summaryDataProcessing extends DataProcessingBundle()(
   def countLines(file: File): Integer = { file.lines.length }
 
 
-  def instructions: ohnosequences.statika.AnyInstructions = ???
+  def instructions: ohnosequences.statika.AnyInstructions = say("Running summary loquat")
 
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
 
     val summaryCSV: File = (context / "output" / "summary.csv").createIfNotExists()
 
     LazyTry {
-      val csvWriter = newCSVWriter(summaryCSV)
-      csvWriter.writeRow(columnNames.statsHeader)
+      val csvWriter = csv.newWriter(summaryCSV)
+      csvWriter.writeRow(csv.columnNames.statsHeader)
 
       // only one level in depth:
       context.inputFile(data.sampleStatsFolder).list foreach { sampleStats =>
 
-        val csvReader = newCSVReader(sampleStats)
+        val csvReader = csv.newReader(sampleStats)
         val rows = csvReader.allWithHeaders().map{ _.values.toSeq }
 
         csvWriter.writeAll(rows)
