@@ -14,10 +14,11 @@ import ohnosequences.datasets._
 
 import better.files._
 
+case object flashBundle extends ohnosequencesBundles.statika.Flash("1.2.11")
 
 case class flashDataProcessing[MD <: AnyMG7Parameters](val md: MD)
 extends DataProcessingBundle(
-  bundles.flash
+  flashBundle
 )(
   input = data.flashInput,
   output = data.flashOutput

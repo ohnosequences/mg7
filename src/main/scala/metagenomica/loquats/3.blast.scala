@@ -1,27 +1,22 @@
 package ohnosequences.mg7.loquats
 
 import ohnosequences.mg7._
-
 import ohnosequences.loquat._
-
 import ohnosequences.statika._
-
 import ohnosequences.blast.api._
-
 import ohnosequences.cosas._, types._, klists._
-
 import ohnosequences.datasets._
-
 import ohnosequences.fastarious._, fasta._
 
 import better.files._
-
 import sys.process._
 
 
+case object blastBundle extends ohnosequencesBundles.statika.Blast("2.2.31")
+
 case class blastDataProcessing[MD <: AnyMG7Parameters](val md: MD)
 extends DataProcessingBundle(
-  bundles.blast,
+  blastBundle,
   md.referenceDB
 )(input  = data.blastInput,
   output = data.blastOutput
