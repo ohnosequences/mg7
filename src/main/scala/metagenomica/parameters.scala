@@ -52,7 +52,7 @@ trait AnyMG7Parameters {
 
   val blastOptions: BlastCommand#OptionsVals
 
-  val referenceDB: BlastDBRelease[AnyBlastDB]
+  val referenceDB: AnyBlastDBRelease
 
   implicit val argValsToSeq: BlastOptionsToSeq[BlastArgumentsVals] = implicitly[BlastOptionsToSeq[BlastArgumentsVals]]
   implicit val optValsToSeq: BlastOptionsToSeq[BlastCommand#OptionsVals] // has to be provided implicitly
@@ -90,7 +90,7 @@ abstract class MG7Parameters[
   val blastCommand: BC = blastn,
   val blastOutRec: BlastOutputRecord[BK]  = defaultBlastOutRec,
   val blastOptions: BC#OptionsVals        = defaultBlastnOptions.value,
-  val referenceDB: BlastDBRelease[AnyBlastDB]
+  val referenceDB: AnyBlastDBRelease
 )(implicit
   val optValsToSeq: BlastOptionsToSeq[BC#OptionsVals],
   val has_qseqid:   out.qseqid.type   isOneOf BK#Types#AllTypes,
