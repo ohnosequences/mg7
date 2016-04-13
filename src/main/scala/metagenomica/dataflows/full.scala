@@ -31,7 +31,7 @@ trait AnyFullDataflow extends AnyNoFlashDataflow {
 
   val flashInputs: Map[SampleID, (S3Resource, S3Resource)]
 
-  lazy val flashDataMappings = flashInputs.toList.map {
+  lazy val flashDataMappings: List[AnyDataMapping] = flashInputs.toList.map {
     case (sampleId, (reads1S3Resource, reads2S3Resource)) =>
 
       DataMapping(sampleId, flashDataProcessing(params))(
@@ -53,7 +53,7 @@ trait AnyFullDataflow extends AnyNoFlashDataflow {
   }.toMap
 
 
-  lazy val statsDataMappings = List[List[AnyDataMapping]](
+  lazy val statsDataMappings: List[AnyDataMapping] = List[List[AnyDataMapping]](
     flashDataMappings,
     mergeDataMappings,
     assignmentDataMappings
@@ -69,18 +69,16 @@ trait AnyFullDataflow extends AnyNoFlashDataflow {
         data.pairedReads1   -> outputs(data.pairedReads1),
         data.mergedReads    -> outputs(data.mergedReads),
         data.pair1NotMerged -> outputs(data.pair1NotMerged),
-        data.blastNoHits    -> outputs(data.blastNoHits),
-        data.lcaNotAssigned -> outputs(data.lcaNotAssigned),
-        data.bbhNotAssigned -> outputs(data.bbhNotAssigned)
+        data.blastNoHits    -> outputs(data.blastNoHits)
       ),
       remoteOutput = Map(
         data.sampleStatsCSV -> S3Resource(params.outputS3Folder("summary", "stats") / s"${sampleId}.stats.csv")
       )
     )
-  }
+  }.toList
 
 
-  lazy val summaryDataMappings = statsDataMappings.map { statsDM =>
+  lazy val summaryDataMappings: List[AnyDataMapping] = statsDataMappings.map { statsDM =>
 
     DataMapping("summmary", summaryDataProcessing)(
       remoteInput = statsDM.remoteOutput,

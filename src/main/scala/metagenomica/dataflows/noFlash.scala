@@ -94,9 +94,7 @@ trait AnyNoFlashDataflow extends AnyDataflow {
       ),
       remoteOutput = Map(
         data.lcaCSV -> S3Resource(params.outputS3Folder(sampleId, "assignment") / s"${sampleId}.lca.csv"),
-        data.bbhCSV -> S3Resource(params.outputS3Folder(sampleId, "assignment") / s"${sampleId}.bbh.csv"),
-        data.lcaNotAssigned -> S3Resource(params.outputS3Folder(sampleId, "assignment") / s"${sampleId}.lca.not-assigned"),
-        data.bbhNotAssigned -> S3Resource(params.outputS3Folder(sampleId, "assignment") / s"${sampleId}.bbh.not-assigned")
+        data.bbhCSV -> S3Resource(params.outputS3Folder(sampleId, "assignment") / s"${sampleId}.bbh.csv")
       )
     )
   }
