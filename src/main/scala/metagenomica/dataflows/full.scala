@@ -81,7 +81,9 @@ trait AnyFullDataflow extends AnyNoFlashDataflow {
   lazy val summaryDataMappings: List[AnyDataMapping] = statsDataMappings.map { statsDM =>
 
     DataMapping("summmary", summaryDataProcessing)(
-      remoteInput = statsDM.remoteOutput,
+      remoteInput = Map(
+        data.sampleStatsFolder -> S3Resource(params.outputS3Folder("summary", "stats"))
+      ),
       remoteOutput = Map(
         data.summaryStatsCSV -> S3Resource(params.outputS3Folder("summary", "stats") / s"summary.csv")
       )
