@@ -9,7 +9,7 @@ import ohnosequences.loquat._
 import ohnosequences.statika._
 import ohnosequences.cosas._, types._, klists._
 import ohnosequences.datasets._
-import ohnosequences.fastarious._, fasta._
+import ohnosequences.fastarious._, fasta._, fastq._
 
 import better.files._
 import com.github.tototoshi.csv._
@@ -22,39 +22,48 @@ case object statsDataProcessing extends DataProcessingBundle()(
   output = data.statsOutput
 ) {
 
-  def countReads(file: File): Integer = {
+  def countReads(
+    parser: Iterator[String] => Iterator[Any],
+    file: File
+  ): Integer = {
     val source = io.Source.fromFile( file.toJava )
-    val readsNumber = fasta.parseMap( source.getLines ).length
+    val readsNumber = parser( source.getLines ).length
     source.close()
     readsNumber
   }
-
-  def countLines(file: File): Integer = { file.lines.length }
 
 
   def instructions: ohnosequences.statika.AnyInstructions = say("Running stats loquat")
 
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
 
-    val statsCSV: File = context / "output" / "stats.csv"
+    val statsCSV: File = (context / "output" / "stats.csv").createIfNotExists()
     val sampleID: String = context.inputFile(data.sampleID).contentAsString
 
-    LazyTry {
-      // NOTE: careful, the order has to coincide:
-      val stats: Map[String, String] = csv.columnNames.statsHeader.zip(List(
-        sampleID,
-        countReads( context.inputFile(data.pairedReads1) ).toString,
-        countReads( context.inputFile(data.mergedReads) ).toString,
-        countReads( context.inputFile(data.pair1NotMerged) ).toString,
-        countReads( context.inputFile(data.blastNoHits) ).toString
-      )).toMap
+    val reads1gz: File = context.inputFile(data.pairedReads1)
+    val reads1fastq: File = File(reads1gz.path.toString.stripSuffix(".gz"))
 
+    cmd("gunzip")(reads1gz.path.toString) -&-
+    LazyTry {
       val csvWriter = csv.newWriter(statsCSV)
 
       // header:
-      csvWriter.writeRow(stats.keys.toSeq)
+      csvWriter.writeRow(csv.columnNames.statsHeader)
+
       // values:
-      csvWriter.writeRow(stats.values.toSeq)
+      // NOTE: careful, the order has to coincide with the header
+      // TODO: use csv.Row here
+      val stats: Seq[String] = Seq(
+        sampleID,
+
+        countReads( parseFastqDropErrors, reads1fastq ).toString,
+        countReads( parseFastqDropErrors, context.inputFile(data.mergedReads) ).toString,
+        countReads( parseFastqDropErrors, context.inputFile(data.pair1NotMerged) ).toString,
+
+        countReads( parseFastaDropErrors, context.inputFile(data.blastNoHits) ).toString
+      )
+
+      csvWriter.writeRow(stats)
 
       csvWriter.close()
     } -&-
