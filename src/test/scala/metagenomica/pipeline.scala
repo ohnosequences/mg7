@@ -28,7 +28,7 @@ case object test {
   ) {
 
     // an example of how you can add some conditions to the filter predicate
-    override val blastFilter: csv.Row[BlastOutRecKeys] => Boolean = { row =>
+    override def blastFilter(row: csv.Row[BlastOutRecKeys]): Boolean = {
       defaultBlastFilter(row) ||
       parseInt(row.select(outputFields.bitscore)).map{ _ > 42 }.getOrElse(false)
     }

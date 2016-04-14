@@ -21,7 +21,7 @@ case object titanTaxonomyTree {
   }
 
   /* Particular instance of AnyTaxonNode */
-  case class TitanTaxonNode(titanTaxon: TitanNCBITaxon) extends AnyVal with AnyTaxonNode {
+  case class TitanTaxonNode(titanTaxon: TitanNCBITaxon) extends AnyTaxonNode {
 
     def id: String = titanTaxon.id()
     // These methods may return null
@@ -32,12 +32,22 @@ case object titanTaxonomyTree {
       optional(titanTaxon.ncbiTaxonParent_inV) map TitanTaxonNode
   }
 
-  /* you can get one (or none) from a titan graph by id */
-  def titanTaxonNode(graph: TitanNCBITaxonomyGraph, id: String): Option[TitanTaxonNode] =
-    optional(graph.nCBITaxonIdIndex getVertex id) map TitanTaxonNode
 
-  /* of by several ids, here non-existring ids are just filtered out */
-  def titanTaxonNodes(graph: TitanNCBITaxonomyGraph, ids: List[String]): List[TitanTaxonNode] =
-    ids flatMap { titanTaxonNode(graph, _) }
+  implicit def titanNCBITaxonomyGraphOps(graph: TitanNCBITaxonomyGraph):
+    TitanNCBITaxonomyGraphOps =
+    TitanNCBITaxonomyGraphOps(graph)
 
+  case class TitanNCBITaxonomyGraphOps(graph: TitanNCBITaxonomyGraph) extends AnyVal {
+
+    /* you can get one (or none) from a titan graph by id */
+    def getNode(id: String): Option[TitanTaxonNode] =
+      optional(graph.nCBITaxonIdIndex.getVertex(id)).map(TitanTaxonNode)
+
+    /* of by several ids, here non-existring ids are just filtered out */
+    def getNodes(ids: Seq[String]): Seq[TitanTaxonNode] =
+      ids.flatMap(getNode)
+
+    // // NOTE: this is kind of unsafe, but we know that there is a root, otherwise nothing makes sense
+    // def root(): TitanTaxonNode = getNode("1").get
+  }
 }

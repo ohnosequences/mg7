@@ -42,27 +42,27 @@ dependencyOverrides ++= Set(
 
 
 
-// //// Uncomment for testing: ////
-// fatArtifactSettings
-//
-// // copied from bio4j-titan:
-// mergeStrategy in assembly ~= { old => {
-//     case "log4j.properties"                       => MergeStrategy.filterDistinctLines
-//     case PathList("org", "apache", "commons", _*) => MergeStrategy.first
-//     case x                                        => old(x)
-//   }
-// }
-//
-// enablePlugins(BuildInfoPlugin)
-// buildInfoPackage := "generated.metadata"
-// buildInfoObject  := name.value
-// buildInfoOptions := Seq(BuildInfoOption.Traits("ohnosequences.statika.AnyArtifactMetadata"))
-// buildInfoKeys    := Seq[BuildInfoKey](
-//   organization,
-//   version,
-//   "artifact" -> name.value.toLowerCase,
-//   "artifactUrl" -> fatArtifactUrl.value
-// )
-// 
+//// Uncomment for testing: ////
+fatArtifactSettings
+
+// copied from bio4j-titan:
+mergeStrategy in assembly ~= { old => {
+    case "log4j.properties"                       => MergeStrategy.filterDistinctLines
+    case PathList("org", "apache", "commons", _*) => MergeStrategy.first
+    case x                                        => old(x)
+  }
+}
+
+enablePlugins(BuildInfoPlugin)
+buildInfoPackage := "generated.metadata"
+buildInfoObject  := name.value
+buildInfoOptions := Seq(BuildInfoOption.Traits("ohnosequences.statika.AnyArtifactMetadata"))
+buildInfoKeys    := Seq[BuildInfoKey](
+  organization,
+  version,
+  "artifact" -> name.value.toLowerCase,
+  "artifactUrl" -> fatArtifactUrl.value
+)
+
 // // For including test code in the fat artifact:
 // unmanagedSourceDirectories in Compile += (scalaSource in Test).value / "metagenomica"

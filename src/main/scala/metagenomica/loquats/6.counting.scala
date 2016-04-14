@@ -54,8 +54,8 @@ case object countingDataProcessing extends DataProcessingBundle(
     counts.foldLeft(
       Map[TaxID, (Int, Int)]()
     ) { case (acc, (id, count)) =>
-      val node: Option[TitanTaxonNode] = titanTaxonNode(taxonomyGraph, id)
-      val ancestors: Seq[AnyTaxonNode] = node.map{ n => pathToTheRoot(n, Seq()) }.getOrElse(Seq())
+      val node: Option[TitanTaxonNode] = taxonomyGraph.getNode(id)
+      val ancestors: Seq[AnyTaxonNode] = node.map{ _.lineage }.getOrElse(Seq())
 
       ancestors.foldLeft(
         acc.updated(id, (count, 0))
@@ -106,7 +106,7 @@ case object countingDataProcessing extends DataProcessingBundle(
 
       counts foreach { case (taxID, (direct, accum)) =>
 
-        val node: Option[TitanTaxonNode] = titanTaxonNode(taxonomyGraph, taxID)
+        val node: Option[TitanTaxonNode] = taxonomyGraph.getNode(taxID)
         val name: String = node.map(_.name).getOrElse("")
         val rank: String = node.map(_.rank).getOrElse("")
 

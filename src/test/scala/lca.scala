@@ -31,88 +31,60 @@ class LCATest extends org.scalatest.FunSuite {
     case object r2 extends node(r1)
     case object r3 extends node(r2)
 
+    val common = Seq(root, c1, c2)
   }
   import defs._
 
   test("path to the root") {
 
-    assert{ pathToTheRoot(l2, Seq()) == Seq(root, c1, c2, l1, l2) }
-    assert{ pathToTheRoot(c1, Seq()) == Seq(root, c1) }
-    assert{ pathToTheRoot(root, Seq()) == Seq(root) }
-  }
-
-  test("intersection") {
-
-    val dPath = pathToTheRoot(l2, Seq())
-
-    assertResult( (List(root, c1, c2), List(r1, r2, r3)) ) {
-      intersect(dPath)(r3, Seq())
-    }
-
-    assertResult( (List(root, c1, c2, l1, l2), List()) ){
-      intersect(dPath)(l2, Seq())
-    }
-
-    assertResult( (List(root, c1, c2), List()) ){
-      intersect(dPath)(c2, Seq())
-    }
-
-    assertResult( (List(root), List()) ){
-      intersect(dPath)(root, Seq())
-    }
-
-    assertResult( (List(), List(root, c1, c2, r1)) ){
-      intersect(Seq())(r1, Seq())
-    }
-
-    assertResult( (List(root, c1, c2), List(r1, r2)) ) {
-      intersect(dPath)(r2, Seq())
-    }
+    assert{ l2.lineage == Seq(root, c1, c2, l1, l2) }
+    assert{ c1.lineage == Seq(root, c1) }
+    assert{ root.lineage == Seq(root) }
   }
 
   test("most specific node or lowest common ancestor") {
 
-    def ref(n: AnyTaxonNode): Either[Path, Path] = Left(pathToTheRoot(l1, Seq()))
+    // def ref(n: AnyTaxonNode): Either[Path, Path] = Left(pathToTheRoot(l1, Seq()))
 
-    assertResult( LCA(List(root, c1, c2)) ) {
-      solution(List(l1, r3))
+    assertResult( Some(c2) ) {
+      lowestCommonAncestor(Seq(l1, r3))
     }
 
-    assertResult( MSN(List(root, c1, c2, l1)) ) {
-      solution(List(l1, c1))
+    assertResult( Some(c1) ) {
+      lowestCommonAncestor(Seq(l1, c1))
     }
 
-    assertResult( MSN(List(root, c1, c2, l1, l2)) ) {
-      solution(List(l1, l2))
+    assertResult( Some(l1) ) {
+      lowestCommonAncestor(Seq(l1, l2))
     }
 
-    assertResult( MSN(List(root, c1, c2, r1, r2)) ) {
-      solution(List(c2, r2))
+    assertResult( Some(c2) ) {
+      lowestCommonAncestor(Seq(c2, r2))
     }
 
-    assertResult( LCA(List(root, c1, c2)) ) {
-      solution(List(l1, r1))
+    assertResult( Some(c2) ) {
+      lowestCommonAncestor(Seq(l1, r1))
     }
 
-    assertResult( MSN(List(root, c1, c2)) ) {
-      solution(List(c2, c2))
+    assertResult( Some(c2) ) {
+      lowestCommonAncestor(Seq(c2, c2))
     }
 
     // Multiple nodes:
 
-    // left, common, right -> LCA
-    assertResult( LCA(List(root, c1, c2)) ) {
-      solution(List(l1, c2, r2))
+    // left, common, right
+    assertResult( Some(c2) ) {
+      lowestCommonAncestor(Seq(l1, c2, r2))
     }
 
     // all on the same line
-    assertResult( MSN(List(root, c1, c2, l1, l2)) ) {
-      solution(List(c1, l2, l1, c2))
+    assertResult( Some(c1) ) {
+      lowestCommonAncestor(Seq(c1, l2, l1, c2))
     }
 
     // some from one branch and some from another
-    assertResult( LCA(List(root, c1, c2)) ) {
-      solution(List(c1, l2, r3, c2, r1))
+    assertResult( Some(c1) ) {
+      lowestCommonAncestor(Seq(c1, l2, r3, c2, r1))
     }
   }
 

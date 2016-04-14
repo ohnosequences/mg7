@@ -1,7 +1,7 @@
 package ohnosequences.mg7.loquats
 
 import ohnosequences.mg7._
-import ohnosequences.mg7.bio4j._, taxonomyTree.solution, titanTaxonomyTree._
+import ohnosequences.mg7.bio4j._, taxonomyTree._, titanTaxonomyTree._
 import ohnosequences.loquat._
 import ohnosequences.statika._
 import ohnosequences.cosas._, types._, klists._
@@ -50,16 +50,16 @@ extends DataProcessingBundle(
             parseInt(row.select(bitscore)).getOrElse(0)
           }
           referenceMap.get(maxRow.select(sseqid)).flatMap { taxId =>
-            titanTaxonNode(taxonomyGraph, taxId)
+            taxonomyGraph.getNode(taxId)
           }
         }
 
         // for each hit row we take the column with ID and lookup its TaxID
-        val taxIds: List[TaxID] = hits.toList.map{ _.select(sseqid) }.flatMap(referenceMap.get)
+        val taxIds: Seq[TaxID] = hits.toSeq.map{ _.select(sseqid) }.flatMap(referenceMap.get)
         // then we generate Titan taxon nodes
-        val nodes: List[TitanTaxonNode] = titanTaxonNodes(taxonomyGraph, taxIds)
+        val nodes: Seq[TitanTaxonNode] = taxonomyGraph.getNodes(taxIds)
         // and return the taxon node ID corresponding to the read
-        val lca: LCA = solution(nodes).node
+        val lca: LCA = lowestCommonAncestor(nodes)
 
         (readId, (lca, bbh))
       }
