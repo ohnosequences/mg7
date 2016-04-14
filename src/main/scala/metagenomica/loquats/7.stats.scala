@@ -44,21 +44,23 @@ case object statsDataProcessing extends DataProcessingBundle()(
 
     cmd("gunzip")(reads1gz.path.toString) -&-
     LazyTry {
-      // NOTE: careful, the order has to coincide:
-      val stats: Map[String, String] = csv.columnNames.statsHeader.zip(List(
+      val csvWriter = csv.newWriter(statsCSV)
+
+      // header:
+      csvWriter.writeRow(csv.columnNames.statsHeader)
+
+      // values:
+      // NOTE: careful, the order has to coincide with the header
+      // TODO: use csv.Row here
+      val stats: Seq[String] = Seq(
         sampleID,
         countReads( reads1fastq ).toString,
         countReads( context.inputFile(data.mergedReads) ).toString,
         countReads( context.inputFile(data.pair1NotMerged) ).toString,
         countReads( context.inputFile(data.blastNoHits) ).toString
-      )).toMap
+      )
 
-      val csvWriter = csv.newWriter(statsCSV)
-
-      // header:
-      csvWriter.writeRow(stats.keys.toSeq)
-      // values:
-      csvWriter.writeRow(stats.values.toSeq)
+      csvWriter.writeRow(stats)
 
       csvWriter.close()
     } -&-
