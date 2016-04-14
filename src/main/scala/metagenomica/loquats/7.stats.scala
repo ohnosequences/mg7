@@ -36,7 +36,7 @@ case object statsDataProcessing extends DataProcessingBundle()(
 
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
 
-    val statsCSV: File = context / "output" / "stats.csv"
+    val statsCSV: File = (context / "output" / "stats.csv").createIfNotExists()
     val sampleID: String = context.inputFile(data.sampleID).contentAsString
 
     val reads1gz: File = context.inputFile(data.pairedReads1)
