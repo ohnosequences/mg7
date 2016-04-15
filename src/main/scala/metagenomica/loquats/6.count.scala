@@ -16,15 +16,15 @@ import com.github.tototoshi.csv._
 import com.bio4j.titan.model.ncbiTaxonomy.TitanNCBITaxonomyGraph
 
 
-case object countingDataProcessing extends DataProcessingBundle(
+case object countDataProcessing extends DataProcessingBundle(
   bio4j.taxonomyBundle
-)(input = data.countingInput,
-  output = data.countingOutput
+)(input = data.countInput,
+  output = data.countOutput
 ) {
 
   lazy val taxonomyGraph: TitanNCBITaxonomyGraph = bio4j.taxonomyBundle.graph
 
-  def instructions: AnyInstructions = say("I'm counting you!")
+  def instructions: AnyInstructions = say("I'm count you!")
 
   // returns count of the given id and a filtered list (without that id)
   def count(id: ID, list: List[ID]): (Int, List[ID]) =
@@ -68,20 +68,21 @@ case object countingDataProcessing extends DataProcessingBundle(
 
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
 
+    // FIXME: this is not mergedReadsNumber
     val mergedReadsNumber: Int = parseInt(
       context.inputFile(data.lcaCSV).contentAsString
     ).getOrElse(1)
 
     // same thing that we do for lca and bbh
-    def processFile(assignmentsFile: File): (File, File, File, File) = {
+    def processFile(assignsFile: File): (File, File, File, File) = {
 
-      val assignmentsReader: CSVReader = csv.newReader(assignmentsFile)
-      val taxIDs: List[TaxID] = assignmentsReader.allWithHeaders.map { row => row(csv.columnNames.TaxID) }
-      assignmentsReader.close
+      val assignsReader: CSVReader = csv.newReader(assignsFile)
+      val taxIDs: List[TaxID] = assignsReader.allWithHeaders.map { row => row(csv.columnNames.TaxID) }
+      assignsReader.close
 
       val counts: Map[TaxID, (Int, Int)] = accumulatedCounts( directCounts(taxIDs) )
 
-      val filesPrefix: String = assignmentsFile.name.stripSuffix(".csv")
+      val filesPrefix: String = assignsFile.name.stripSuffix(".csv")
 
       val outDirectFile = context / s"${filesPrefix}.direct.counts"
       val outAccumFile  = context / s"${filesPrefix}.accum.counts"

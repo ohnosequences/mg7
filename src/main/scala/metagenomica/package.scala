@@ -23,6 +23,8 @@ package object mg7 {
   def parseInt(str: String): Option[Int] = util.Try(str.toInt).toOption
   def parseDouble(str: String): Option[Double] = util.Try(str.toDouble).toOption
 
+  def lookup[A, B](a: A, m: Map[A, B]): (A, B) = a -> m.apply(a)
+
 
   type BlastArgumentsVals =
     (db.type    := db.Raw)    ::

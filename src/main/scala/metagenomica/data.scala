@@ -38,42 +38,56 @@ case object data {
   // Blast input:
   case object fastaChunk extends FileData("reads")("fastq")
   // Blast output for each chunk:
-  case object blastChunkOut extends FileData("blast.chunk")("csv")
+  case object blastChunk extends FileData("blast.chunk")("csv")
   case object noHitsChunk extends Data("no-blast-hits.fa")
 
-  case object blastInput extends DataSet(fastaChunk :×: |[AnyData])
+  case object blastInput extends DataSet(
+    fastaChunk :×:
+    |[AnyData]
+  )
   case object blastOutput extends DataSet(
-    blastChunkOut :×:
+    blastChunk :×:
     noHitsChunk :×:
     |[AnyData]
   )
+
+  // Assignment output:
+  case object lcaChunk extends FileData("lca.chunk")("csv")
+  case object bbhChunk extends FileData("bbh.chunk")("csv")
+
+  case object assignInput extends DataSet(
+    blastChunk :×:
+    |[AnyData]
+  )
+  case object assignOutput extends DataSet(
+    lcaChunk :×:
+    bbhChunk :×:
+    |[AnyData]
+  )
+
 
 
   // all output chunks together:
   case object blastChunksFolder extends Data("blast-chunks")
   case object blastNoHitsFolder extends Data("blast-no-hits")
+  case object lcaChunksFolder   extends Data("lca-chunks")
+  case object bbhChunksFolder   extends Data("bbh-chunks")
   // after merging chunks:
   case object blastResult extends FileData("blast")("csv")
-  case object blastNoHits extends Data("blast.no-hits.fa")
+  case object blastNoHits extends Data("blast.no-hits.fasta")
+  case object lcaCSV      extends FileData("lca")("csv")
+  case object bbhCSV      extends FileData("bbh")("csv")
 
   case object mergeInput extends DataSet(
     blastChunksFolder :×:
     blastNoHitsFolder :×:
+    lcaChunksFolder :×:
+    bbhChunksFolder :×:
     |[AnyData]
   )
   case object mergeOutput extends DataSet(
     blastResult :×:
     blastNoHits :×:
-    |[AnyData]
-  )
-
-
-  // Assignment output:
-  case object lcaCSV extends FileData("lca")("csv")
-  case object bbhCSV extends FileData("bbh")("csv")
-
-  case object assignmentInput extends DataSet(blastResult :×: |[AnyData])
-  case object assignmentOutput extends DataSet(
     lcaCSV :×:
     bbhCSV :×:
     |[AnyData]
@@ -81,22 +95,22 @@ case object data {
 
 
   // Counting output:
-  case object lcaDirectCountsCSV extends FileData("lca.direct.counts")("csv")
-  case object lcaAccumCountsCSV extends FileData("lca.accum.counts")("csv")
+  case object lcaDirectCountsCSV     extends FileData("lca.direct.counts")("csv")
+  case object lcaAccumCountsCSV      extends FileData("lca.accum.counts")("csv")
   case object lcaDirectFreqCountsCSV extends FileData("lca.direct.frequency.counts")("csv")
-  case object lcaAccumFreqCountsCSV extends FileData("lca.accum.frequency.counts")("csv")
+  case object lcaAccumFreqCountsCSV  extends FileData("lca.accum.frequency.counts")("csv")
 
-  case object bbhDirectCountsCSV extends FileData("bbh.direct.counts")("csv")
-  case object bbhAccumCountsCSV extends FileData("bbh.accum.counts")("csv")
+  case object bbhDirectCountsCSV     extends FileData("bbh.direct.counts")("csv")
+  case object bbhAccumCountsCSV      extends FileData("bbh.accum.counts")("csv")
   case object bbhDirectFreqCountsCSV extends FileData("bbh.direct.frequency.counts")("csv")
-  case object bbhAccumFreqCountsCSV extends FileData("bbh.accum.frequency.counts")("csv")
+  case object bbhAccumFreqCountsCSV  extends FileData("bbh.accum.frequency.counts")("csv")
 
-  case object countingInput extends DataSet(
+  case object countInput extends DataSet(
     lcaCSV :×:
     bbhCSV :×:
     |[AnyData]
   )
-  case object countingOutput extends DataSet(
+  case object countOutput extends DataSet(
     lcaDirectCountsCSV :×:
     lcaAccumCountsCSV :×:
     lcaDirectFreqCountsCSV :×:

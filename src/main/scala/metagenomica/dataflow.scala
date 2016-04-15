@@ -19,27 +19,30 @@ trait AnyDataflow {
   val blastDataMappings: List[DataMapping[blastDataProcessing[Params]]]
 
   /* - Assignment */
-  val assignmentDataMappings: List[DataMapping[assignmentDataProcessing[Params]]]
+  val assignDataMappings: List[DataMapping[assignDataProcessing[Params]]]
+
+  /* - Merge */
+  val mergeDataMappings: List[DataMapping[mergeDataProcessing.type]]
 
   /* - Counting */
-  lazy val countingDataMappings: List[DataMapping[countingDataProcessing.type]] =
-    assignmentDataMappings.zip(splitDataMappings).map { case (assignmentDM, splitDM) =>
-      val sampleId = assignmentDM.label
+  lazy val countDataMappings: List[DataMapping[countDataProcessing.type]] =
+    mergeDataMappings.map { case mergeDM =>
+      val sampleId = mergeDM.label
 
-      DataMapping(sampleId, countingDataProcessing)(
+      DataMapping(sampleId, countDataProcessing)(
         remoteInput = Map(
-          data.lcaCSV -> assignmentDM.remoteOutput(data.lcaCSV),
-          data.bbhCSV -> assignmentDM.remoteOutput(data.bbhCSV)
+          lookup(data.lcaCSV, mergeDM.remoteOutput),
+          lookup(data.bbhCSV, mergeDM.remoteOutput)
         ),
         remoteOutput = Map(
-          data.lcaDirectCountsCSV -> S3Resource(params.outputS3Folder(sampleId, "counting") / s"${sampleId}.lca.direct.absolute.counts.csv"),
-          data.lcaAccumCountsCSV  -> S3Resource(params.outputS3Folder(sampleId, "counting") / s"${sampleId}.lca.accum.absolute.counts.csv"),
-          data.lcaDirectFreqCountsCSV -> S3Resource(params.outputS3Folder(sampleId, "counting") / s"${sampleId}.lca.direct.frequency.counts.csv"),
-          data.lcaAccumFreqCountsCSV  -> S3Resource(params.outputS3Folder(sampleId, "counting") / s"${sampleId}.lca.accum.frequency.counts.csv"),
-          data.bbhDirectCountsCSV -> S3Resource(params.outputS3Folder(sampleId, "counting") / s"${sampleId}.bbh.direct.absolute.counts.csv"),
-          data.bbhAccumCountsCSV  -> S3Resource(params.outputS3Folder(sampleId, "counting") / s"${sampleId}.bbh.accum.absolute.counts.csv"),
-          data.bbhDirectFreqCountsCSV -> S3Resource(params.outputS3Folder(sampleId, "counting") / s"${sampleId}.bbh.direct.frequency.counts.csv"),
-          data.bbhAccumFreqCountsCSV  -> S3Resource(params.outputS3Folder(sampleId, "counting") / s"${sampleId}.bbh.accum.frequency.counts.csv")
+          data.lcaDirectCountsCSV     -> S3Resource(params.outputS3Folder(sampleId, "count") / s"${sampleId}.lca.direct.absolute.counts.csv"),
+          data.lcaAccumCountsCSV      -> S3Resource(params.outputS3Folder(sampleId, "count") / s"${sampleId}.lca.accum.absolute.counts.csv"),
+          data.lcaDirectFreqCountsCSV -> S3Resource(params.outputS3Folder(sampleId, "count") / s"${sampleId}.lca.direct.frequency.counts.csv"),
+          data.lcaAccumFreqCountsCSV  -> S3Resource(params.outputS3Folder(sampleId, "count") / s"${sampleId}.lca.accum.frequency.counts.csv"),
+          data.bbhDirectCountsCSV     -> S3Resource(params.outputS3Folder(sampleId, "count") / s"${sampleId}.bbh.direct.absolute.counts.csv"),
+          data.bbhAccumCountsCSV      -> S3Resource(params.outputS3Folder(sampleId, "count") / s"${sampleId}.bbh.accum.absolute.counts.csv"),
+          data.bbhDirectFreqCountsCSV -> S3Resource(params.outputS3Folder(sampleId, "count") / s"${sampleId}.bbh.direct.frequency.counts.csv"),
+          data.bbhAccumFreqCountsCSV  -> S3Resource(params.outputS3Folder(sampleId, "count") / s"${sampleId}.bbh.accum.frequency.counts.csv")
         )
       )
     }
