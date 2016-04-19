@@ -75,7 +75,7 @@ extends DataProcessingBundle(
     } -&-
     success(
       "much blast, very success!",
-      data.blastChunkOut(totalOutput) ::
+      data.blastChunk(totalOutput) ::
       data.noHitsChunk(noHits) ::
       *[AnyDenotation { type Value <: FileResource }]
     )

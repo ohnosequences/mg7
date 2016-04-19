@@ -59,8 +59,6 @@ case object test {
     )
 
     val dataMappings: List[AnyDataMapping]
-
-    val checkInputObjects = true
   }
 
   abstract class TestLoquatConfig(
@@ -113,7 +111,7 @@ case object test {
   case object mergeConfig extends TestLoquatConfig("merge", dataflow.mergeDataMappings)
   case object mergeLoquat extends Loquat(mergeConfig, mergeDataProcessing)
 
-  case object assignmentConfig extends TestLoquatConfig("assignment", dataflow.assignmentDataMappings) {
+  case object assignConfig extends TestLoquatConfig("assign", dataflow.assignDataMappings) {
 
     override lazy val amiEnv = amznAMIEnv(ami, javaHeap = 3)
 
@@ -123,9 +121,9 @@ case object test {
       groupSize = AutoScalingGroupSize(0, 1, 10)
     )
   }
-  case object assignmentLoquat extends Loquat(assignmentConfig, assignmentDataProcessing(testParameters))
+  case object assignLoquat extends Loquat(assignConfig, assignDataProcessing(testParameters))
 
-  case object countingConfig extends TestLoquatConfig("counting", dataflow.countingDataMappings)
-  case object countingLoquat extends Loquat(countingConfig, countingDataProcessing)
+  case object countConfig extends TestLoquatConfig("count", dataflow.countDataMappings)
+  case object countLoquat extends Loquat(countConfig, countDataProcessing)
 
 }

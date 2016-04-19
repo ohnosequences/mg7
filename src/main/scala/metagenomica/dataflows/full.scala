@@ -24,8 +24,8 @@ import com.amazonaws.auth._, profile._
   2. split: splitting each dataset of reads on small chunks
   3. blast: processing each chunk of reads with blast
   4. merge: merging blast chunks into complete results per original reads datasets
-  5. assignment: assigning taxons (LCA and BBH)
-  6. counting: counting assignments
+  5. assign: assigning taxons (LCA and BBH)
+  6. count: count assigns
 */
 trait AnyFullDataflow extends AnyNoFlashDataflow {
 
@@ -56,7 +56,7 @@ trait AnyFullDataflow extends AnyNoFlashDataflow {
   lazy val statsDataMappings: List[AnyDataMapping] = List[List[AnyDataMapping]](
     flashDataMappings,
     mergeDataMappings,
-    assignmentDataMappings
+    assignDataMappings
   ).flatten
   .groupBy { _.label }
   .map { case (sampleID: String, dms: List[AnyDataMapping]) =>

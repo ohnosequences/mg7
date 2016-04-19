@@ -40,7 +40,7 @@ case object summaryDataProcessing extends DataProcessingBundle()(
 
     LazyTry {
       val csvWriter = csv.newWriter(summaryCSV)
-      csvWriter.writeRow(csv.columnNames.statsHeader)
+      csvWriter.writeRow(csv.statsHeader)
 
       // only one level in depth:
       context.inputFile(data.sampleStatsFolder).list foreach { sampleStats =>

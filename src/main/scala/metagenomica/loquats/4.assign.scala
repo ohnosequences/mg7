@@ -16,13 +16,13 @@ import scala.util.Try
 import com.github.tototoshi.csv._
 
 
-case class assignmentDataProcessing[MD <: AnyMG7Parameters](val md: MD)
+case class assignDataProcessing[MD <: AnyMG7Parameters](val md: MD)
 extends DataProcessingBundle(
   bio4j.taxonomyBundle,
   md.referenceDB
 )(
-  input = data.assignmentInput,
-  output = data.assignmentOutput
+  input = data.assignInput,
+  output = data.assignOutput
 ) {
   // For the output fields implicits
   import md._
@@ -37,9 +37,9 @@ extends DataProcessingBundle(
 
     val referenceMap: Map[ID, TaxID] = tsvReader.iterator.map{ row => row(0) -> row(1) }.toMap
 
-    val blastReader = csv.Reader(md.blastOutRec.keys, context.inputFile(data.blastResult))
+    val blastReader = csv.Reader(md.blastOutRec.keys, context.inputFile(data.blastChunk))
 
-    val assignments: Map[ReadID, (LCA, BBH)] = blastReader.rows
+    val assigns: Map[ReadID, (LCA, BBH)] = blastReader.rows
       // grouping rows by the read id
       .toStream.groupBy { _.select(qseqid) }
       .map { case (readId, hits) =>
@@ -55,11 +55,11 @@ extends DataProcessingBundle(
         }
 
         // for each hit row we take the column with ID and lookup its TaxID
-        val taxIds: Seq[TaxID] = hits.toSeq.map{ _.select(sseqid) }.flatMap(referenceMap.get)
+        val taxIds: Seq[TaxID] = hits.toSeq.map{ _.select(sseqid) }.flatMap(referenceMap.get).distinct
         // then we generate Titan taxon nodes
         val nodes: Seq[TitanTaxonNode] = taxonomyGraph.getNodes(taxIds)
         // and return the taxon node ID corresponding to the read
-        val lca: LCA = lowestCommonAncestor(nodes)
+        val lca: LCA = Some(taxonomyGraph.lowestCommonAncestor(nodes))
 
         (readId, (lca, bbh))
       }
@@ -74,17 +74,7 @@ extends DataProcessingBundle(
     val lcaWriter = csv.newWriter(lcaFile)
     val bbhWriter = csv.newWriter(bbhFile)
 
-    // writing headers first:
-    val header = List(
-      csv.columnNames.ReadID,
-      csv.columnNames.TaxID,
-      csv.columnNames.TaxName,
-      csv.columnNames.TaxRank
-    )
-    lcaWriter.writeRow(header)
-    bbhWriter.writeRow(header)
-
-    assignments foreach { case (readId, (lca, bbh)) =>
+    assigns foreach { case (readId, (lca, bbh)) =>
       lca.foreach{ node => lcaWriter.writeRow(List(readId, node.id, node.name, node.rank)) }
       bbh.foreach{ node => bbhWriter.writeRow(List(readId, node.id, node.name, node.rank)) }
     }
@@ -93,8 +83,8 @@ extends DataProcessingBundle(
     bbhWriter.close
 
     success(s"Results are ready",
-      data.lcaCSV(lcaFile) ::
-      data.bbhCSV(bbhFile) ::
+      data.lcaChunk(lcaFile) ::
+      data.bbhChunk(bbhFile) ::
       *[AnyDenotation { type Value <: FileResource }]
     )
   }
