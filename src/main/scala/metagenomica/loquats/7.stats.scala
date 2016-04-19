@@ -48,7 +48,7 @@ case object statsDataProcessing extends DataProcessingBundle()(
       val csvWriter = csv.newWriter(statsCSV)
 
       // header:
-      csvWriter.writeRow(csv.columnNames.statsHeader)
+      csvWriter.writeRow(csv.statsHeader)
 
       // values:
       // NOTE: careful, the order has to coincide with the header

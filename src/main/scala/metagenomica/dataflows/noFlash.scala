@@ -23,8 +23,8 @@ import com.amazonaws.auth._, profile._
   2. split: splitting each dataset of reads on small chunks
   3. blast: processing each chunk of reads with blast
   4. merge: merging blast chunks into complete results per original reads datasets
-  5. assignment: assigning taxons (LCA and BBH)
-  6. counting: counting assignments
+  5. assign: assigning taxons (LCA and BBH)
+  6. count: count assigns
 */
 trait AnyNoFlashDataflow extends AnyDataflow {
 
@@ -53,7 +53,6 @@ trait AnyNoFlashDataflow extends AnyDataflow {
     )
 
     lazy val chunksS3Folder: AnyS3Address = splitDM.remoteOutput(data.fastaChunks).resource
-
     lazy val chunks: List[S3Object] = s3.listObjects(chunksS3Folder.bucket, chunksS3Folder.key)
 
     chunks.zipWithIndex.map { case (chunkS3Obj, n) =>
@@ -63,38 +62,53 @@ trait AnyNoFlashDataflow extends AnyDataflow {
           data.fastaChunk -> S3Resource(chunkS3Obj)
         ),
         remoteOutput = Map(
-          data.blastChunkOut -> S3Resource(params.outputS3Folder(sampleId, "blast") / "chunks" / s"blast.${n}.csv"),
+          data.blastChunk -> S3Resource(params.outputS3Folder(sampleId, "blast") / "chunks" / s"blast.${n}.csv"),
           data.noHitsChunk -> S3Resource(params.outputS3Folder(sampleId, "blast") / "no-hits" / s"no-hits.${n}.fa")
         )
       )
     }
   }
 
-  lazy val mergeDataMappings = splitDataMappings.map { splitDM =>
-    val sampleId = splitDM.label
+  lazy val assignDataMappings = splitInputs.keys.toList.flatMap { case sampleId =>
+
+    lazy val s3 = S3.create(
+      new AWSCredentialsProviderChain(
+        new InstanceProfileCredentialsProvider(),
+        new ProfileCredentialsProvider()
+      )
+    )
+
+    lazy val chunksS3Folder: AnyS3Address = params.outputS3Folder(sampleId, "blast") / "chunks" /
+    lazy val chunks: List[S3Object] = s3.listObjects(chunksS3Folder.bucket, chunksS3Folder.key)
+
+    chunks.zipWithIndex.map { case (chunkS3Obj, n) =>
+
+      DataMapping(sampleId, assignDataProcessing(params))(
+        remoteInput = Map(
+          data.blastChunk -> S3Resource(chunkS3Obj)
+        ),
+        remoteOutput = Map(
+          data.lcaChunk -> S3Resource(params.outputS3Folder(sampleId, "assign") / "lca" / s"${sampleId}.lca.${n}.csv"),
+          data.bbhChunk -> S3Resource(params.outputS3Folder(sampleId, "assign") / "bbh" / s"${sampleId}.bbh.${n}.csv")
+        )
+      )
+    }
+  }
+
+  lazy val mergeDataMappings = splitInputs.keys.toList.map { case sampleId =>
 
     DataMapping(sampleId, mergeDataProcessing)(
       remoteInput = Map(
         data.blastChunksFolder -> S3Resource(params.outputS3Folder(sampleId, "blast") / "chunks" /),
-        data.blastNoHitsFolder -> S3Resource(params.outputS3Folder(sampleId, "blast") / "no-hits" /)
+        data.blastNoHitsFolder -> S3Resource(params.outputS3Folder(sampleId, "blast") / "no-hits" /),
+        data.lcaChunksFolder   -> S3Resource(params.outputS3Folder(sampleId, "assign") / "lca" /),
+        data.bbhChunksFolder   -> S3Resource(params.outputS3Folder(sampleId, "assign") / "bbh" /)
       ),
       remoteOutput = Map(
         data.blastResult -> S3Resource(params.outputS3Folder(sampleId, "merge") / s"${sampleId}.blast.csv"),
-        data.blastNoHits -> S3Resource(params.outputS3Folder(sampleId, "merge") / s"${sampleId}.no-hits.fa")
-      )
-    )
-  }
-
-  lazy val assignmentDataMappings = mergeDataMappings.map { mergeDM =>
-    val sampleId = mergeDM.label
-
-    DataMapping(sampleId, assignmentDataProcessing(params))(
-      remoteInput = Map(
-        data.blastResult -> mergeDM.remoteOutput(data.blastResult)
-      ),
-      remoteOutput = Map(
-        data.lcaCSV -> S3Resource(params.outputS3Folder(sampleId, "assignment") / s"${sampleId}.lca.csv"),
-        data.bbhCSV -> S3Resource(params.outputS3Folder(sampleId, "assignment") / s"${sampleId}.bbh.csv")
+        data.blastNoHits -> S3Resource(params.outputS3Folder(sampleId, "merge") / s"${sampleId}.no-hits.fa"),
+        data.lcaCSV      -> S3Resource(params.outputS3Folder(sampleId, "merge") / s"${sampleId}.lca.csv"),
+        data.bbhCSV      -> S3Resource(params.outputS3Folder(sampleId, "merge") / s"${sampleId}.bbh.csv")
       )
     )
   }

@@ -31,15 +31,22 @@ case object csv {
     val TaxName = "Tax-name"
     val TaxRank = "Tax-rank"
     val Count   = "Count"
-
-    val statsHeader: List[String] = List(
-      "Sample-ID",
-      "Input-pairs",
-      "Merged",
-      "Not-merged",
-      "No-Blast-hits"
-    )
   }
+
+  val statsHeader = List[String](
+    "Sample-ID",
+    "Input-pairs",
+    "Merged",
+    "Not-merged",
+    "No-Blast-hits"
+  )
+
+  val assignHeader = List[String](
+    columnNames.ReadID,
+    columnNames.TaxID,
+    columnNames.TaxName,
+    columnNames.TaxRank
+  )
 
   case class Row[Hs <: AnyProductType](
     val header: Hs,

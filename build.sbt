@@ -21,7 +21,7 @@ libraryDependencies ++= Seq(
   // generic tools:
   "ohnosequences" %% "cosas"        % "0.8.0",
   "ohnosequences" %% "datasets"     % "0.3.0",
-  "ohnosequences" %% "loquat"       % "2.0.0-M8-SNAPSHOT",
+  "ohnosequences" %% "loquat"       % "2.0.0-M8",
   "ohnosequences" %% "statika"      % "2.0.0-M5",
   "era7bio"       %% "rnacentraldb" % "0.2.1",
   // bundles:
@@ -29,15 +29,13 @@ libraryDependencies ++= Seq(
   "ohnosequences-bundles" %% "blast"      % "0.3.0",
   "ohnosequences-bundles" %% "bio4j-dist" % "0.2.0",
   // testing:
-  "era7bio"       %% "db-rna16s" % "0.2.0" % Test,
+  "era7bio"       %% "db-rna16s" % "0.3.0-SNAPSHOT" % Test,
   "org.scalatest" %% "scalatest" % "2.2.6" % Test
 )
 
 dependencyOverrides ++= Set(
-  "commons-logging"            % "commons-logging"     % "1.1.3",
-  "commons-codec"              % "commons-codec"       % "1.7",
-  "org.apache.httpcomponents"  % "httpclient"          % "4.5.1",
-  "org.slf4j"                  % "slf4j-api"           % "1.7.7"
+  "org.apache.httpcomponents" % "httpclient" % "4.5.1",
+  "org.slf4j"                 % "slf4j-api"  % "1.7.7"
 )
 
 
@@ -63,6 +61,6 @@ dependencyOverrides ++= Set(
 //   "artifact" -> name.value.toLowerCase,
 //   "artifactUrl" -> fatArtifactUrl.value
 // )
-// 
+
 // // For including test code in the fat artifact:
 // unmanagedSourceDirectories in Compile += (scalaSource in Test).value / "metagenomica"

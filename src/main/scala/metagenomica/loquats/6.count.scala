@@ -16,15 +16,15 @@ import com.github.tototoshi.csv._
 import com.bio4j.titan.model.ncbiTaxonomy.TitanNCBITaxonomyGraph
 
 
-case object countingDataProcessing extends DataProcessingBundle(
+case object countDataProcessing extends DataProcessingBundle(
   bio4j.taxonomyBundle
-)(input = data.countingInput,
-  output = data.countingOutput
+)(input = data.countInput,
+  output = data.countOutput
 ) {
 
   lazy val taxonomyGraph: TitanNCBITaxonomyGraph = bio4j.taxonomyBundle.graph
 
-  def instructions: AnyInstructions = say("I'm counting you!")
+  def instructions: AnyInstructions = say("I'm count you!")
 
   // returns count of the given id and a filtered list (without that id)
   def count(id: ID, list: List[ID]): (Int, List[ID]) =
@@ -54,8 +54,7 @@ case object countingDataProcessing extends DataProcessingBundle(
     counts.foldLeft(
       Map[TaxID, (Int, Int)]()
     ) { case (acc, (id, count)) =>
-      val node: Option[TitanTaxonNode] = titanTaxonNode(taxonomyGraph, id)
-      val ancestors: Seq[AnyTaxonNode] = node.map{ n => pathToTheRoot(n, Seq()) }.getOrElse(Seq())
+      val ancestors: Seq[AnyTaxonNode] = taxonomyGraph.getNode(id).map{ _.lineage }.getOrElse(Seq())
 
       ancestors.foldLeft(
         acc.updated(id, (count, 0))
@@ -68,20 +67,20 @@ case object countingDataProcessing extends DataProcessingBundle(
 
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
 
-    val mergedReadsNumber: Int = parseInt(
-      context.inputFile(data.lcaCSV).contentAsString
-    ).getOrElse(1)
-
     // same thing that we do for lca and bbh
-    def processFile(assignmentsFile: File): (File, File, File, File) = {
+    def processFile(assignsFile: File): (File, File, File, File) = {
 
-      val assignmentsReader: CSVReader = csv.newReader(assignmentsFile)
-      val taxIDs: List[TaxID] = assignmentsReader.allWithHeaders.map { row => row(csv.columnNames.TaxID) }
-      assignmentsReader.close
+      val assignsReader: CSVReader = csv.newReader(assignsFile)
+      val taxIDs: List[TaxID] = assignsReader.allWithHeaders.map { row => row(csv.columnNames.TaxID) }
+      assignsReader.close
+
+      // there as many assigned reads as there are tax IDs in the table
+      val assignedReadsNumber: Double = taxIDs.length
+      def frequency(absolute: Int): String = f"${absolute / assignedReadsNumber}%.10f"
 
       val counts: Map[TaxID, (Int, Int)] = accumulatedCounts( directCounts(taxIDs) )
 
-      val filesPrefix: String = assignmentsFile.name.stripSuffix(".csv")
+      val filesPrefix: String = assignsFile.name.stripSuffix(".csv")
 
       val outDirectFile = context / s"${filesPrefix}.direct.counts"
       val outAccumFile  = context / s"${filesPrefix}.accum.counts"
@@ -106,18 +105,20 @@ case object countingDataProcessing extends DataProcessingBundle(
 
       counts foreach { case (taxID, (direct, accum)) =>
 
-        val node: Option[TitanTaxonNode] = titanTaxonNode(taxonomyGraph, taxID)
+        val node: Option[TitanTaxonNode] = taxonomyGraph.getNode(taxID)
         val name: String = node.map(_.name).getOrElse("")
         val rank: String = node.map(_.rank).getOrElse("")
 
         // We write only non-zero direct counts
         if (direct > 0) {
           csvDirectWriter.writeRow( List(taxID, rank, name, direct) )
-          csvDirectFreqWriter.writeRow( List(taxID, rank, name, direct / mergedReadsNumber) )
+          csvDirectFreqWriter.writeRow( List(taxID, rank, name, frequency(direct)) )
         }
         // Accumulated counts shouldn't be ever a zero
-        csvAccumWriter.writeRow( List(taxID, rank, name, accum) )
-        csvAccumFreqWriter.writeRow( List(taxID, rank, name, accum / mergedReadsNumber) )
+        if (accum > 0) {
+          csvAccumWriter.writeRow( List(taxID, rank, name, accum) )
+          csvAccumFreqWriter.writeRow( List(taxID, rank, name, frequency(accum)) )
+        }
       }
 
       csvDirectWriter.close
