@@ -76,6 +76,7 @@ case object countDataProcessing extends DataProcessingBundle(
 
       // there as many assigned reads as there are tax IDs in the table
       val assignedReadsNumber: Double = taxIDs.length
+      def frequency(absolute: Int): String = f"${absolute / assignedReadsNumber}%.10f"
 
       val counts: Map[TaxID, (Int, Int)] = accumulatedCounts( directCounts(taxIDs) )
 
@@ -111,11 +112,13 @@ case object countDataProcessing extends DataProcessingBundle(
         // We write only non-zero direct counts
         if (direct > 0) {
           csvDirectWriter.writeRow( List(taxID, rank, name, direct) )
-          csvDirectFreqWriter.writeRow( List(taxID, rank, name, direct / assignedReadsNumber) )
+          csvDirectFreqWriter.writeRow( List(taxID, rank, name, frequency(direct)) )
         }
         // Accumulated counts shouldn't be ever a zero
-        csvAccumWriter.writeRow( List(taxID, rank, name, accum) )
-        csvAccumFreqWriter.writeRow( List(taxID, rank, name, accum / assignedReadsNumber) )
+        if (accum > 0) {
+          csvAccumWriter.writeRow( List(taxID, rank, name, accum) )
+          csvAccumFreqWriter.writeRow( List(taxID, rank, name, frequency(accum)) )
+        }
       }
 
       csvDirectWriter.close
