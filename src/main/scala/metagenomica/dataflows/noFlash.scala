@@ -95,8 +95,7 @@ trait AnyNoFlashDataflow extends AnyDataflow {
     }
   }
 
-  lazy val mergeDataMappings = assignDataMappings.map { assignDM =>
-    val sampleId = assignDM.label
+  lazy val mergeDataMappings = splitInputs.keys.toList.map { case sampleId =>
 
     DataMapping(sampleId, mergeDataProcessing)(
       remoteInput = Map(

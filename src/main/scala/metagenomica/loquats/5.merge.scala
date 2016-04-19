@@ -22,7 +22,8 @@ case object mergeDataProcessing extends DataProcessingBundle()(
 
 
   // TODO: use streams, file-writers, etc. stuff
-  def mergeChunks(dir: File, out: File): Unit = {
+  def mergeChunks(dir: File, out: File, header: Option[String] = None): Unit = {
+    header.foreach { out.appendLine }
     // only one level in depth:
     dir.list foreach { chunkFile =>
       out.append( chunkFile.contentAsString )
@@ -38,12 +39,11 @@ case object mergeDataProcessing extends DataProcessingBundle()(
     val lcaMerged    = (context / "lca.csv").createIfNotExists()
     val bbhMerged    = (context / "bbh.csv").createIfNotExists()
 
-    // TODO: write headers of the CSV files
-
+    // TODO: write header for Blast output
     LazyTry { mergeChunks( context.inputFile(data.blastChunksFolder), blastMerged)  } -&-
     LazyTry { mergeChunks( context.inputFile(data.blastNoHitsFolder), noHitsMerged) } -&-
-    LazyTry { mergeChunks( context.inputFile(data.lcaChunksFolder),   lcaMerged)    } -&-
-    LazyTry { mergeChunks( context.inputFile(data.bbhChunksFolder),   bbhMerged)    } -&-
+    LazyTry { mergeChunks( context.inputFile(data.lcaChunksFolder), lcaMerged, Some(csv.assignHeader.mkString(",")) ) } -&-
+    LazyTry { mergeChunks( context.inputFile(data.bbhChunksFolder), bbhMerged, Some(csv.assignHeader.mkString(",")) ) } -&-
     success(s"Everything is merged",
       data.blastResult(blastMerged) ::
       data.blastNoHits(noHitsMerged) ::

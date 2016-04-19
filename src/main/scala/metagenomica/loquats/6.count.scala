@@ -67,17 +67,15 @@ case object countDataProcessing extends DataProcessingBundle(
 
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
 
-    // FIXME: this is not mergedReadsNumber
-    val mergedReadsNumber: Int = parseInt(
-      context.inputFile(data.lcaCSV).contentAsString
-    ).getOrElse(1)
-
     // same thing that we do for lca and bbh
     def processFile(assignsFile: File): (File, File, File, File) = {
 
       val assignsReader: CSVReader = csv.newReader(assignsFile)
       val taxIDs: List[TaxID] = assignsReader.allWithHeaders.map { row => row(csv.columnNames.TaxID) }
       assignsReader.close
+
+      // there as many assigned reads as there are tax IDs in the table
+      val assignedReadsNumber: Double = taxIDs.length
 
       val counts: Map[TaxID, (Int, Int)] = accumulatedCounts( directCounts(taxIDs) )
 
@@ -113,11 +111,11 @@ case object countDataProcessing extends DataProcessingBundle(
         // We write only non-zero direct counts
         if (direct > 0) {
           csvDirectWriter.writeRow( List(taxID, rank, name, direct) )
-          csvDirectFreqWriter.writeRow( List(taxID, rank, name, direct / mergedReadsNumber) )
+          csvDirectFreqWriter.writeRow( List(taxID, rank, name, direct / assignedReadsNumber) )
         }
         // Accumulated counts shouldn't be ever a zero
         csvAccumWriter.writeRow( List(taxID, rank, name, accum) )
-        csvAccumFreqWriter.writeRow( List(taxID, rank, name, accum / mergedReadsNumber) )
+        csvAccumFreqWriter.writeRow( List(taxID, rank, name, accum / assignedReadsNumber) )
       }
 
       csvDirectWriter.close

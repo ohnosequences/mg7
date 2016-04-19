@@ -74,16 +74,6 @@ extends DataProcessingBundle(
     val lcaWriter = csv.newWriter(lcaFile)
     val bbhWriter = csv.newWriter(bbhFile)
 
-    // writing headers first:
-    val header = List(
-      csv.columnNames.ReadID,
-      csv.columnNames.TaxID,
-      csv.columnNames.TaxName,
-      csv.columnNames.TaxRank
-    )
-    // lcaWriter.writeRow(header)
-    // bbhWriter.writeRow(header)
-
     assigns foreach { case (readId, (lca, bbh)) =>
       lca.foreach{ node => lcaWriter.writeRow(List(readId, node.id, node.name, node.rank)) }
       bbh.foreach{ node => bbhWriter.writeRow(List(readId, node.id, node.name, node.rank)) }
