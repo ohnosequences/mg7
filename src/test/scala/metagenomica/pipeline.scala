@@ -59,8 +59,6 @@ case object test {
     )
 
     val dataMappings: List[AnyDataMapping]
-
-    val checkInputObjects = true
   }
 
   abstract class TestLoquatConfig(

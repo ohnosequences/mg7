@@ -54,8 +54,7 @@ case object countDataProcessing extends DataProcessingBundle(
     counts.foldLeft(
       Map[TaxID, (Int, Int)]()
     ) { case (acc, (id, count)) =>
-      val node: Option[TitanTaxonNode] = taxonomyGraph.getNode(id)
-      val ancestors: Seq[AnyTaxonNode] = node.map{ _.lineage }.getOrElse(Seq())
+      val ancestors: Seq[AnyTaxonNode] = taxonomyGraph.getNode(id).map{ _.lineage }.getOrElse(Seq())
 
       ancestors.foldLeft(
         acc.updated(id, (count, 0))

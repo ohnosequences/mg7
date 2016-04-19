@@ -55,11 +55,11 @@ extends DataProcessingBundle(
         }
 
         // for each hit row we take the column with ID and lookup its TaxID
-        val taxIds: Seq[TaxID] = hits.toSeq.map{ _.select(sseqid) }.flatMap(referenceMap.get)
+        val taxIds: Seq[TaxID] = hits.toSeq.map{ _.select(sseqid) }.flatMap(referenceMap.get).distinct
         // then we generate Titan taxon nodes
         val nodes: Seq[TitanTaxonNode] = taxonomyGraph.getNodes(taxIds)
         // and return the taxon node ID corresponding to the read
-        val lca: LCA = lowestCommonAncestor(nodes)
+        val lca: LCA = Some(taxonomyGraph.lowestCommonAncestor(nodes))
 
         (readId, (lca, bbh))
       }

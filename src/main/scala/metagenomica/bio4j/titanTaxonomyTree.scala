@@ -47,7 +47,10 @@ case object titanTaxonomyTree {
     def getNodes(ids: Seq[String]): Seq[TitanTaxonNode] =
       ids.flatMap(getNode)
 
-    // // NOTE: this is kind of unsafe, but we know that there is a root, otherwise nothing makes sense
-    // def root(): TitanTaxonNode = getNode("1").get
+    // NOTE: this is kind of unsafe, but we know that there is a root, otherwise nothing makes sense
+    def root(): TitanTaxonNode = TitanTaxonNode(graph.nCBITaxonIdIndex.getVertex("1").get)
+
+    def lowestCommonAncestor(nodes: Seq[AnyTaxonNode]): AnyTaxonNode =
+      taxonomyTree.lowestCommonAncestor(root, nodes)
   }
 }

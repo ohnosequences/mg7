@@ -69,8 +69,7 @@ trait AnyNoFlashDataflow extends AnyDataflow {
     }
   }
 
-  lazy val assignDataMappings = blastDataMappings.flatMap { blastDM =>
-    val sampleId = blastDM.label
+  lazy val assignDataMappings = splitInputs.keys.toList.flatMap { case sampleId =>
 
     lazy val s3 = S3.create(
       new AWSCredentialsProviderChain(
@@ -79,7 +78,7 @@ trait AnyNoFlashDataflow extends AnyDataflow {
       )
     )
 
-    lazy val chunksS3Folder: AnyS3Address = blastDM.remoteOutput(data.blastChunk).resource
+    lazy val chunksS3Folder: AnyS3Address = params.outputS3Folder(sampleId, "blast") / "chunks" /
     lazy val chunks: List[S3Object] = s3.listObjects(chunksS3Folder.bucket, chunksS3Folder.key)
 
     chunks.zipWithIndex.map { case (chunkS3Obj, n) =>

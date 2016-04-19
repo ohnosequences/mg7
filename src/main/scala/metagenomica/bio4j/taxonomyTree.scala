@@ -29,23 +29,21 @@ case object taxonomyTree {
   /* Path in the tree stores a sequence of nodes from bottom to top */
   type Path = Seq[AnyTaxonNode]
 
-  private def longestCommonPrefix[T](seq1: Seq[T], seq2: Seq[T]): Seq[T] = {
-    (seq1 zip seq2)
-      .takeWhile { case (s1, s2) =>
-        s1 == s2
-      }.map {
-        _._1
-      }
-  }
-
   /* Find the "solution" of the algorithm for a set of nodes */
-  def lowestCommonAncestor(nodes: Seq[AnyTaxonNode]): Option[AnyTaxonNode] = {
-    if (nodes.isEmpty) None
-    else Some(
-      nodes.reduce { (node1, node2) =>
-        longestCommonPrefix(node1.lineage, node2.lineage).last
-      }
-    )
+  def lowestCommonAncestor(default: AnyTaxonNode, nodes: Seq[AnyTaxonNode]): AnyTaxonNode = {
+
+    def longestCommonPrefix(path1: Path, path2: Path): Path = {
+      (path1 zip path2)
+        .takeWhile { case (n1, n2) =>
+          n1.id == n2.id
+        }.map { _._1 }
+    }
+
+    nodes
+      .map(_.lineage)
+      .reduceOption(longestCommonPrefix)
+      .flatMap(_.lastOption)
+      .getOrElse(default)
   }
 
 }

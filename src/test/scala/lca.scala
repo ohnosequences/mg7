@@ -44,47 +44,57 @@ class LCATest extends org.scalatest.FunSuite {
 
   test("most specific node or lowest common ancestor") {
 
-    // def ref(n: AnyTaxonNode): Either[Path, Path] = Left(pathToTheRoot(l1, Seq()))
+    def lca(nodes: Seq[AnyTaxonNode]): AnyTaxonNode = lowestCommonAncestor(root, nodes)
 
-    assertResult( Some(c2) ) {
-      lowestCommonAncestor(Seq(l1, r3))
+    assertResult( root ) { lca(Seq()) }
+
+    assertResult( r3 ) {
+      lca(Seq(r3))
     }
 
-    assertResult( Some(c1) ) {
-      lowestCommonAncestor(Seq(l1, c1))
+    assertResult( root ) {
+      lca(Seq(root, l1))
     }
 
-    assertResult( Some(l1) ) {
-      lowestCommonAncestor(Seq(l1, l2))
+    assertResult( c2 ) {
+      lca(Seq(l1, r3))
     }
 
-    assertResult( Some(c2) ) {
-      lowestCommonAncestor(Seq(c2, r2))
+    assertResult( c1 ) {
+      lca(Seq(l1, c1))
     }
 
-    assertResult( Some(c2) ) {
-      lowestCommonAncestor(Seq(l1, r1))
+    assertResult( l1 ) {
+      lca(Seq(l1, l2))
     }
 
-    assertResult( Some(c2) ) {
-      lowestCommonAncestor(Seq(c2, c2))
+    assertResult( c2 ) {
+      lca(Seq(c2, r2))
+    }
+
+    assertResult( c2 ) {
+      lca(Seq(l1, r1))
+    }
+
+    assertResult( c2 ) {
+      lca(Seq(c2, c2))
     }
 
     // Multiple nodes:
 
     // left, common, right
-    assertResult( Some(c2) ) {
-      lowestCommonAncestor(Seq(l1, c2, r2))
+    assertResult( c2 ) {
+      lca(Seq(l1, c2, r2))
     }
 
     // all on the same line
-    assertResult( Some(c1) ) {
-      lowestCommonAncestor(Seq(c1, l2, l1, c2))
+    assertResult( c1 ) {
+      lca(Seq(c1, l2, l1, c2))
     }
 
     // some from one branch and some from another
-    assertResult( Some(c1) ) {
-      lowestCommonAncestor(Seq(c1, l2, r3, c2, r1))
+    assertResult( c1 ) {
+      lca(Seq(c1, l2, r3, c2, r1))
     }
   }
 
