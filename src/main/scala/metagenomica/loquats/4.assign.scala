@@ -29,20 +29,33 @@ extends DataProcessingBundle(
 
   lazy val taxonomyGraph: TitanNCBITaxonomyGraph = bio4j.taxonomyBundle.graph
 
+  type BlastRow = csv.Row[md.blastOutRec.Keys]
+
   def instructions: AnyInstructions = say("Let's see who is who!")
 
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
 
     val tsvReader = CSVReader.open( md.referenceDB.id2taxa.toJava )(csv.UnixTSVFormat)
-
     val referenceMap: Map[ID, TaxID] = tsvReader.iterator.map{ row => row(0) -> row(1) }.toMap
 
     val blastReader = csv.Reader(md.blastOutRec.keys, context.inputFile(data.blastChunk))
 
-    val assigns: Map[ReadID, (LCA, BBH)] = blastReader.rows
+    // Outs:
+    val lcaFile = (context / "output" / "lca.csv").createIfNotExists()
+    val bbhFile = (context / "output" / "bbh.csv").createIfNotExists()
+    val lcaWriter = csv.newWriter(lcaFile)
+    val bbhWriter = csv.newWriter(bbhFile)
+
+    val lostInMappingFile = (context / "output" / "lost.in-mapping").createIfNotExists()
+    val lostInBio4jFile   = (context / "output" / "lost.in-bio4j").createIfNotExists()
+
+
+    // val assigns: Map[ReadID, (LCA, BBH)] =
+    blastReader.rows
       // grouping rows by the read id
       .toStream.groupBy { _.select(qseqid) }
-      .map { case (readId, hits) =>
+      // for each read evaluate LCA and BBH and write the output files
+      .foreach { case (readId: ID, hits: Stream[BlastRow]) =>
 
         val bbh: BBH = {
           // best blast score is just a maximum in the `bitscore` column
@@ -55,29 +68,38 @@ extends DataProcessingBundle(
         }
 
         // for each hit row we take the column with ID and lookup its TaxID
-        val taxIds: Seq[TaxID] = hits.toSeq.map{ _.select(sseqid) }.flatMap(referenceMap.get).distinct
-        // then we generate Titan taxon nodes
-        val nodes: Seq[TitanTaxonNode] = taxonomyGraph.getNodes(taxIds)
+        val (lostInMappingRows, taxIDs): (Seq[BlastRow], Seq[TaxID]) = hits.toSeq
+          .foldLeft(Seq[BlastRow](), Seq[TaxID]()) {
+            case ((rows, taxIDs), row) =>
+              referenceMap.get(row.select(sseqid)) match {
+                case None        => (row +: rows, taxIDs)
+                case Some(taxID) => (rows, taxID +: taxIDs)
+              }
+          }
+
+        // then we try to retreive Titan taxon nodes
+        val (lostInBio4jTaxIDs, nodes): (Seq[TaxID], Seq[TitanTaxonNode]) =
+          taxIDs.distinct.foldLeft(Seq[TaxID](), Seq[TitanTaxonNode]()) {
+            case ((lostTaxIDs, nodes), taxID) =>
+              taxonomyGraph.getNode(taxID) match {
+                case None       => (taxID +: lostTaxIDs, nodes)
+                case Some(node) => (lostTaxIDs, node +: nodes)
+              }
+          }
+
         // and return the taxon node ID corresponding to the read
         val lca: LCA = Some(taxonomyGraph.lowestCommonAncestor(nodes))
 
-        (readId, (lca, bbh))
+        // writing results
+        lca.foreach { node => lcaWriter.writeRow(List(readId, node.id, node.name, node.rank)) }
+        bbh.foreach { node => bbhWriter.writeRow(List(readId, node.id, node.name, node.rank)) }
+
+        lostInMappingRows.foreach { row => lostInMappingFile.appendLine(row.values.mkString(",")) }
+        lostInBio4jTaxIDs.foreach { taxID => lostInBio4jFile.appendLine(taxID) }
       }
 
     tsvReader.close
     blastReader.close
-
-    // Now we will write these two types of result to two separate files
-    val lcaFile = (context / "output" / "lca.csv").createIfNotExists()
-    val bbhFile = (context / "output" / "bbh.csv").createIfNotExists()
-
-    val lcaWriter = csv.newWriter(lcaFile)
-    val bbhWriter = csv.newWriter(bbhFile)
-
-    assigns foreach { case (readId, (lca, bbh)) =>
-      lca.foreach{ node => lcaWriter.writeRow(List(readId, node.id, node.name, node.rank)) }
-      bbh.foreach{ node => bbhWriter.writeRow(List(readId, node.id, node.name, node.rank)) }
-    }
 
     lcaWriter.close
     bbhWriter.close
@@ -85,6 +107,8 @@ extends DataProcessingBundle(
     success(s"Results are ready",
       data.lcaChunk(lcaFile) ::
       data.bbhChunk(bbhFile) ::
+      data.lost.inMapping(lostInMappingFile) ::
+      data.lost.inBio4j(lostInBio4jFile) ::
       *[AnyDenotation { type Value <: FileResource }]
     )
   }
