@@ -88,7 +88,10 @@ extends DataProcessingBundle(
           }
 
         // and return the taxon node ID corresponding to the read
-        val lca: LCA = Some(taxonomyGraph.lowestCommonAncestor(nodes))
+        val lca: LCA = lowestCommonAncestor(nodes)
+
+        // NOTE: this shouldn't ever happen, so we throw an error here
+        if (lca.isEmpty) sys.error("Failed to compute LCA; something is broken")
 
         // writing results
         lca.foreach { node => lcaWriter.writeRow(List(readId, node.id, node.name, node.rank)) }

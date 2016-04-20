@@ -30,7 +30,7 @@ case object taxonomyTree {
   type Path = Seq[AnyTaxonNode]
 
   /* Find the "solution" of the algorithm for a set of nodes */
-  def lowestCommonAncestor(default: AnyTaxonNode, nodes: Seq[AnyTaxonNode]): AnyTaxonNode = {
+  def lowestCommonAncestor(nodes: Seq[AnyTaxonNode]): Option[AnyTaxonNode] = {
 
     def longestCommonPrefix(path1: Path, path2: Path): Path = {
       (path1 zip path2)
@@ -43,7 +43,6 @@ case object taxonomyTree {
       .map(_.lineage)
       .reduceOption(longestCommonPrefix)
       .flatMap(_.lastOption)
-      .getOrElse(default)
   }
 
 }
