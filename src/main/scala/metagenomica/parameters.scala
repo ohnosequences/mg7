@@ -81,14 +81,15 @@ trait AnyMG7Parameters {
   implicit val has_bitscore: out.bitscore.type isOneOf BlastOutRecKeys#Types#AllTypes
   implicit val has_pident:   out.pident.type   isOneOf BlastOutRecKeys#Types#AllTypes
   implicit val has_qcovs:    out.qcovs.type    isOneOf BlastOutRecKeys#Types#AllTypes
+  implicit val has_gaps:     out.gaps.type     isOneOf BlastOutRecKeys#Types#AllTypes
 
   // NOTE: this is not exposed among other constructor arguments, but you can _override_ it
   def blastFilter(row: csv.Row[BlastOutRecKeys]): Boolean = defaultBlastFilter(row)
 
   // NOTE: this default is defined here to have has_qcovs implicit in the scope
-  def defaultBlastFilter(row: csv.Row[BlastOutRecKeys]): Boolean = {
-    val qcovs: String = row.select(outputFields.qcovs)(has_qcovs)
-    parseDouble(qcovs).map(_ > 98.0).getOrElse(false)
+  final def defaultBlastFilter(row: csv.Row[BlastOutRecKeys]): Boolean = {
+    row.select(outputFields.qcovs) == "100" &&
+    row.select(outputFields.gaps) == "0"
   }
 }
 
@@ -115,7 +116,8 @@ abstract class MG7Parameters[
   val has_sseqid:   out.sseqid.type   isOneOf BK#Types#AllTypes,
   val has_bitscore: out.bitscore.type isOneOf BK#Types#AllTypes,
   val has_pident:   out.pident.type   isOneOf BK#Types#AllTypes,
-  val has_qcovs:    out.qcovs.type    isOneOf BK#Types#AllTypes
+  val has_qcovs:    out.qcovs.type    isOneOf BK#Types#AllTypes,
+  val has_gaps:     out.gaps.type     isOneOf BK#Types#AllTypes
 ) extends AnyMG7Parameters {
 
   type BlastCommand = BC
