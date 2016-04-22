@@ -43,14 +43,14 @@ dependencyOverrides ++= Set(
 // //// Uncomment for testing: ////
 fatArtifactSettings
 //
-// // copied from bio4j-titan:
-// mergeStrategy in assembly ~= { old => {
-//     case "log4j.properties"                       => MergeStrategy.filterDistinctLines
-//     case PathList("org", "apache", "commons", _*) => MergeStrategy.first
-//     case x                                        => old(x)
-//   }
-// }
-//
+// copied from bio4j-titan:
+mergeStrategy in assembly ~= { old => {
+    case "log4j.properties"                       => MergeStrategy.filterDistinctLines
+    case PathList("org", "apache", "commons", _*) => MergeStrategy.first
+    case x                                        => old(x)
+  }
+}
+
 enablePlugins(BuildInfoPlugin)
 buildInfoPackage := "generated.metadata"
 buildInfoObject  := name.value
