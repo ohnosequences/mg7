@@ -1,1 +1,1 @@
-version in ThisBuild := "1.0.0-M3-fair-LCA-top-hits-SNAPSHOT"
+version in ThisBuild := "1.0.0-M3-fair-lca-top-hits"
