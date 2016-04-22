@@ -46,3 +46,5 @@
 - Various fixes in the LCA algorithm and assignment data-mappings #47
 - Changed default Blast filter to (qcovs == 100 && gaps == 0); made gaps a mandatory field #57
 - Keep only the top BLAST hits #58
+- clean test sources
+- rename src folders to match the package name
