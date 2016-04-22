@@ -29,7 +29,7 @@ libraryDependencies ++= Seq(
   "ohnosequences-bundles" %% "blast"      % "0.3.0",
   "ohnosequences-bundles" %% "bio4j-dist" % "0.2.0",
   // testing:
-  "era7bio"       %% "db-rna16s" % "0.3.0-SNAPSHOT" % Test,
+  "era7bio"       %% "db-rna16s" % "0.6.0" % Test,
   "org.scalatest" %% "scalatest" % "2.2.6" % Test
 )
 
@@ -41,7 +41,7 @@ dependencyOverrides ++= Set(
 
 
 // //// Uncomment for testing: ////
-// fatArtifactSettings
+fatArtifactSettings
 //
 // // copied from bio4j-titan:
 // mergeStrategy in assembly ~= { old => {
@@ -51,16 +51,16 @@ dependencyOverrides ++= Set(
 //   }
 // }
 //
-// enablePlugins(BuildInfoPlugin)
-// buildInfoPackage := "generated.metadata"
-// buildInfoObject  := name.value
-// buildInfoOptions := Seq(BuildInfoOption.Traits("ohnosequences.statika.AnyArtifactMetadata"))
-// buildInfoKeys    := Seq[BuildInfoKey](
-//   organization,
-//   version,
-//   "artifact" -> name.value.toLowerCase,
-//   "artifactUrl" -> fatArtifactUrl.value
-// )
+enablePlugins(BuildInfoPlugin)
+buildInfoPackage := "generated.metadata"
+buildInfoObject  := name.value
+buildInfoOptions := Seq(BuildInfoOption.Traits("ohnosequences.statika.AnyArtifactMetadata"))
+buildInfoKeys    := Seq[BuildInfoKey](
+  organization,
+  version,
+  "artifact" -> name.value.toLowerCase,
+  "artifactUrl" -> fatArtifactUrl.value
+)
 
 // // For including test code in the fat artifact:
 // unmanagedSourceDirectories in Compile += (scalaSource in Test).value / "metagenomica"
