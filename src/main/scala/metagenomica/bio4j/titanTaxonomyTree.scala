@@ -42,15 +42,5 @@ case object titanTaxonomyTree {
     /* you can get one (or none) from a titan graph by id */
     def getNode(id: String): Option[TitanTaxonNode] =
       optional(graph.nCBITaxonIdIndex.getVertex(id)).map(TitanTaxonNode)
-
-    /* of by several ids, here non-existring ids are just filtered out */
-    def getNodes(ids: Seq[String]): Seq[TitanTaxonNode] =
-      ids.flatMap(getNode)
-
-    // NOTE: this is kind of unsafe, but we know that there is a root, otherwise nothing makes sense
-    def root(): TitanTaxonNode = TitanTaxonNode(graph.nCBITaxonIdIndex.getVertex("1").get)
-
-    def lowestCommonAncestor(nodes: Seq[AnyTaxonNode]): AnyTaxonNode =
-      taxonomyTree.lowestCommonAncestor(root, nodes)
   }
 }
