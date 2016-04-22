@@ -1,0 +1,48 @@
+- Set the list of default BLAST output fields as suggested by @eparejatobes
+- Fixed Any[Blast]OutputField new name
+- Added totalReadsNumber output in the split loquat; and pass it as an input to the countint loquat
+- Added frequency table to the counting loquat
+- Renamed totalReadsNumber to mergedReadsNumber
+- Added BLAST no-hits output
+- Added merging for the no-hits chunks
+- Added flash not-merged outputs
+- Added a lot of crap to the MG7Parameters to make blast command configurable
+- Added blastn as a default command
+- Fixed blast for the case when the output is empty (create the empty output file)
+- Fixed merge datamappings
+- Removed merged reads count from the split step
+- Added outputs with LCA/BBH-not-assigned read IDs
+- Writing the whole no-hits read instead of just its header #44
+- Changed some data names; added .fa extension to the no-hits output
+- Added a loquat that counts stats per each sample #9, #20
+- Added a loquat that merges sample-stats into a summary table #9, #20
+- Added a refined CSVFormat with \n line-ending and a shortcut for CSVWriter instantiation #48
+- Fixed also the CSVReader format
+- Updated the loquat dep version #39
+- Moved some CSV-related things from the package object
+- Some more advanced CSV trickery
+- Added neccessary fields as implicits; it allows to make csv-select typesafe
+- Migrated assignment code to the typesafe CSV-utils
+- Made blast-filter predicate configurable; added default
+- Updated to blast-api 0.7.0
+- Set blastn defaults to what was discussed with @eparejatobes and @rtobes #51
+- * Moved defaultBlastOutRec out of the package object
+- Set up dependency on rnacentraldb; updated fastarious
+- Using BlastDBRelease[AnyBlastDB] instead of the old AnyReferenceDB; removed old reference-db code (including GIs stuff)
+- Removed bundles package; rearrenged related code
+- Updated to rnacentral-0.2.1
+- Fixed two bugs causing this mysterious null problem: + the `implicitly` val for the `argValsToSeq` in the abstract `AnyMG7Parameters` trait. Even though the type for this `implicitly[...]` was fixed, it turned out to be `null` + the default predicate in the abstract trait had to be a lazy val (or a def) #53
+- Fixed assignment data-mapping (it doesn't need no-hits results)
+- Removed not-assigned outputs, because they are always empty
+- Fixed stats data mappings inputs
+- Fixed input reads archive handling; it has to be uncompressed first
+- Creating output file before trying to write to it
+- Fixed summary step input
+- Fixed the order of stats headers/values (Map mixes up the order) #55
+- Fixed FASTQ parsing in the stats step #55
+- Fixed the summary tasks and table #55
+- Interchanged assign and merge steps, so that assign is done in parallel per chunk #56
+- Removed unnecessary dependency overrides, commented out fat-jar settings
+- Various fixes in the LCA algorithm and assignment data-mappings #47
+- Changed default Blast filter to (qcovs == 100 && gaps == 0); made gaps a mandatory field #57
+- Keep only the top BLAST hits #58
