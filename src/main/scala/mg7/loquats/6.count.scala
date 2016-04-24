@@ -24,7 +24,7 @@ case object countDataProcessing extends DataProcessingBundle(
 
   lazy val taxonomyGraph: TitanNCBITaxonomyGraph = bio4j.taxonomyBundle.graph
 
-  def instructions: AnyInstructions = say("I'm count you!")
+  def instructions: AnyInstructions = say("I'm counting you!")
 
   // returns count of the given id and a filtered list (without that id)
   def count(id: ID, list: List[ID]): (Int, List[ID]) =
@@ -48,19 +48,25 @@ case object countDataProcessing extends DataProcessingBundle(
     rec(taxIds, Map[TaxID, Int]())
   }
 
-  // TODO: figure out some more effective algorithm
-  // Caution: it uses bio4j bundle!
-  def accumulatedCounts(counts: Map[TaxID, Int]): Map[TaxID, (Int, Int)] = {
-    counts.foldLeft(
-      Map[TaxID, (Int, Int)]()
-    ) { case (acc, (id, count)) =>
-      val ancestors: Seq[AnyTaxonNode] = taxonomyGraph.getNode(id).map{ _.lineage }.getOrElse(Seq())
+  def accumulatedCounts(
+    directCounts: Map[TaxID, Int],
+    // NOTE: the lineage has to contain the node itself
+    getLineage: TaxID => Seq[TaxID]
+  ): Map[TaxID, Int] = {
+    directCounts.foldLeft(
+      Map[TaxID, Int]()
+    ) { case (accumCounts, (id, directCount)) =>
 
-      ancestors.foldLeft(
-        acc.updated(id, (count, 0))
-      ) { (acc, node) =>
-        val (direct, accumulated) = acc.get(node.id).getOrElse((0, 0))
-        acc.updated(node.id, (direct, accumulated + count))
+      getLineage(id).foldLeft(
+        accumCounts
+      ) { (newAccumCounts, ancestorID) =>
+
+        val accumulated = newAccumCounts.get(ancestorID).getOrElse(0)
+
+        newAccumCounts.updated(
+          ancestorID,
+          accumulated + directCount
+        )
       }
     }
   }
@@ -78,7 +84,13 @@ case object countDataProcessing extends DataProcessingBundle(
       val assignedReadsNumber: Double = taxIDs.length
       def frequency(absolute: Int): String = f"${absolute / assignedReadsNumber}%.10f"
 
-      val counts: Map[TaxID, (Int, Int)] = accumulatedCounts( directCounts(taxIDs) )
+      def getLineage(id: TaxID): Seq[TaxID] =
+        taxonomyGraph.getNode(id)
+          .map{ _.lineage }.getOrElse( Seq() )
+          .map{ _.id }
+
+      val direct:      Map[TaxID, Int] = directCounts(taxIDs)
+      val accumulated: Map[TaxID, Int] = accumulatedCounts(direct, getLineage)
 
       val filesPrefix: String = assignsFile.name.stripSuffix(".csv")
 
@@ -103,23 +115,22 @@ case object countDataProcessing extends DataProcessingBundle(
       csvDirectFreqWriter.writeRow(headerFor(outDirectFreqFile))
       csvAccumFreqWriter.writeRow(headerFor(outAccumFreqFile))
 
-      counts foreach { case (taxID, (direct, accum)) =>
+      def writeCounts(
+        counts: Map[TaxID, Int],
+        writerAbs: CSVWriter,
+        writerFrq: CSVWriter
+      ) = counts foreach { case (taxID, count) =>
 
         val node: Option[TitanTaxonNode] = taxonomyGraph.getNode(taxID)
         val name: String = node.map(_.name).getOrElse("")
         val rank: String = node.map(_.rank).getOrElse("")
 
-        // We write only non-zero direct counts
-        if (direct > 0) {
-          csvDirectWriter.writeRow( List(taxID, rank, name, direct) )
-          csvDirectFreqWriter.writeRow( List(taxID, rank, name, frequency(direct)) )
-        }
-        // Accumulated counts shouldn't be ever a zero
-        if (accum > 0) {
-          csvAccumWriter.writeRow( List(taxID, rank, name, accum) )
-          csvAccumFreqWriter.writeRow( List(taxID, rank, name, frequency(accum)) )
-        }
+        writerAbs.writeRow( Seq(taxID, rank, name, count) )
+        writerFrq.writeRow( Seq(taxID, rank, name, frequency(count)) )
       }
+
+      writeCounts(direct, csvDirectWriter, csvDirectFreqWriter)
+      writeCounts(accumulated, csvAccumWriter, csvAccumFreqWriter)
 
       csvDirectWriter.close
       csvAccumWriter.close
