@@ -26,45 +26,48 @@ case object countDataProcessing extends DataProcessingBundle(
 
   def instructions: AnyInstructions = say("I'm counting you!")
 
-  // returns count of the given id and a filtered list (without that id)
-  def count(id: ID, list: List[ID]): (Int, List[ID]) =
-    list.foldLeft( (0, List[ID]()) ) { case ((count, rest), next) =>
-      if (next == id) (count + 1, rest)
+  // returns count of the given element and a filtered list (without that element)
+  def count[X](x: X, list: List[X]): (Int, List[X]) =
+    list.foldLeft( (0, List[X]()) ) { case ((count, rest), next) =>
+      if (next == x) (count + 1, rest)
       else (count, next :: rest)
     }
 
-  def directCounts(taxIds: List[TaxID]): Map[TaxID, Int] = {
+  def directCounts(
+    nodes: List[AnyTaxonNode]
+  ): Map[AnyTaxonNode, Int] = {
 
     @scala.annotation.tailrec
-    def rec(list: List[TaxID], acc: Map[TaxID, Int]): Map[TaxID, Int] =
-      list match{
-        case Nil => acc
-        case h :: t => {
-          val (n, rest) = count(h, t)
-          rec(rest, acc.updated(h, n + 1))
-        }
+    def rec(
+      list: List[AnyTaxonNode],
+      acc: Map[AnyTaxonNode, Int]
+    ): Map[AnyTaxonNode, Int] = list match {
+      case Nil => acc
+      case h :: t => {
+        val (n, rest) = count(h, t)
+        rec(rest, acc.updated(h, n + 1))
       }
+    }
 
-    rec(taxIds, Map[TaxID, Int]())
+    rec(nodes, Map[AnyTaxonNode, Int]())
   }
 
   def accumulatedCounts(
-    directCounts: Map[TaxID, Int],
-    // NOTE: the lineage has to contain the node itself
-    getLineage: TaxID => Seq[TaxID]
-  ): Map[TaxID, Int] = {
+    directCounts: Map[AnyTaxonNode, Int]
+  ): Map[AnyTaxonNode, Int] = {
+
     directCounts.foldLeft(
-      Map[TaxID, Int]()
-    ) { case (accumCounts, (id, directCount)) =>
+      Map[AnyTaxonNode, Int]()
+    ) { case (accumCounts, (node, directCount)) =>
 
-      getLineage(id).foldLeft(
+      node.lineage.foldLeft(
         accumCounts
-      ) { (newAccumCounts, ancestorID) =>
+      ) { (newAccumCounts, ancestor) =>
 
-        val accumulated = newAccumCounts.get(ancestorID).getOrElse(0)
+        val accumulated = newAccumCounts.get(ancestor).getOrElse(0)
 
         newAccumCounts.updated(
-          ancestorID,
+          ancestor,
           accumulated + directCount
         )
       }
@@ -84,13 +87,10 @@ case object countDataProcessing extends DataProcessingBundle(
       val assignedReadsNumber: Double = taxIDs.length
       def frequency(absolute: Int): String = f"${absolute / assignedReadsNumber}%.10f"
 
-      def getLineage(id: TaxID): Seq[TaxID] =
-        taxonomyGraph.getNode(id)
-          .map{ _.lineage }.getOrElse( Seq() )
-          .map{ _.id }
+      def nodes: List[AnyTaxonNode] = taxIDs.flatMap(taxonomyGraph.getNode(_))
 
-      val direct:      Map[TaxID, Int] = directCounts(taxIDs)
-      val accumulated: Map[TaxID, Int] = accumulatedCounts(direct, getLineage)
+      val direct:      Map[AnyTaxonNode, Int] = directCounts(nodes)
+      val accumulated: Map[AnyTaxonNode, Int] = accumulatedCounts(direct)
 
       val filesPrefix: String = assignsFile.name.stripSuffix(".csv")
 
@@ -116,21 +116,25 @@ case object countDataProcessing extends DataProcessingBundle(
       csvAccumFreqWriter.writeRow(headerFor(outAccumFreqFile))
 
       def writeCounts(
-        counts: Map[TaxID, Int],
+        counts: Map[AnyTaxonNode, Int],
         writerAbs: CSVWriter,
         writerFrq: CSVWriter
-      ) = counts foreach { case (taxID, count) =>
+      ) = counts foreach { case (node, count) =>
 
-        val node: Option[TitanTaxonNode] = taxonomyGraph.getNode(taxID)
-        val name: String = node.map(_.name).getOrElse("")
-        val rank: String = node.map(_.rank).getOrElse("")
+        def row(count: String) = Seq[String](
+          node.id,
+          node.rank,
+          node.name,
+          count,
+          node.lineage.map(_.id).mkString("; ")
+        )
 
-        writerAbs.writeRow( Seq(taxID, rank, name, count) )
-        writerFrq.writeRow( Seq(taxID, rank, name, frequency(count)) )
+        writerAbs.writeRow( row(count.toString) )
+        writerFrq.writeRow( row(frequency(count)) )
       }
 
-      writeCounts(direct, csvDirectWriter, csvDirectFreqWriter)
-      writeCounts(accumulated, csvAccumWriter, csvAccumFreqWriter)
+      writeCounts(direct,      csvDirectWriter, csvDirectFreqWriter)
+      writeCounts(accumulated, csvAccumWriter,  csvAccumFreqWriter)
 
       csvDirectWriter.close
       csvAccumWriter.close
