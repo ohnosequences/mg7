@@ -21,7 +21,7 @@ case object titanTaxonomyTree {
   }
 
   /* Particular instance of AnyTaxonNode */
-  case class TitanTaxonNode(titanTaxon: TitanNCBITaxon) extends AnyTaxonNode {
+  case class TitanTaxonNode(titanTaxon: TitanNCBITaxon) extends AnyVal with AnyTaxonNode {
 
     def id: String = titanTaxon.id()
     // These methods may return null

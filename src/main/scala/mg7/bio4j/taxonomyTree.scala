@@ -5,7 +5,7 @@ package ohnosequences.mg7.bio4j
 case object taxonomyTree {
 
   /* This is just an abstract representation of the taxonomy tree nodes */
-  trait AnyTaxonNode {
+  trait AnyTaxonNode extends Any {
 
     def id: String
     def name: String
@@ -15,7 +15,7 @@ case object taxonomyTree {
     def parent: Option[AnyTaxonNode]
 
     /* The sequence of ancestors from the root to this node (it is never empty) */
-    lazy val lineage: Path = {
+    def lineage: Path = {
       @scala.annotation.tailrec
       def ancestors_rec(n: AnyTaxonNode, acc: Path): Path = n.parent match {
         case None => n +: acc
