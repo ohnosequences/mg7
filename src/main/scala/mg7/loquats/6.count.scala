@@ -26,46 +26,53 @@ case object countDataProcessing extends DataProcessingBundle(
 
   def instructions: AnyInstructions = say("I'm counting you!")
 
-  // returns count of the given id and a filtered list (without that id)
-  def count(id: ID, list: List[ID]): (Int, List[ID]) =
-    list.foldLeft( (0, List[ID]()) ) { case ((count, rest), next) =>
-      if (next == id) (count + 1, rest)
+  // returns count of the given element and a filtered list (without that element)
+  def count[X](x: X, list: List[X]): (Int, List[X]) =
+    list.foldLeft( (0, List[X]()) ) { case ((count, rest), next) =>
+      if (next == x) (count + 1, rest)
       else (count, next :: rest)
     }
 
-  def directCounts(taxIds: List[TaxID]): Map[TaxID, Int] = {
+  def directCounts(
+    taxIDs: List[TaxID],
+    getLineage: TaxID => Seq[TaxID]
+  ): Map[TaxID, (Int, Seq[TaxID])] = {
 
     @scala.annotation.tailrec
-    def rec(list: List[TaxID], acc: Map[TaxID, Int]): Map[TaxID, Int] =
-      list match{
-        case Nil => acc
-        case h :: t => {
-          val (n, rest) = count(h, t)
-          rec(rest, acc.updated(h, n + 1))
-        }
+    def rec(
+      list: List[TaxID],
+      acc: Map[TaxID, (Int, Seq[TaxID])]
+    ): Map[TaxID, (Int, Seq[TaxID])] = list match {
+      case Nil => acc
+      case h :: t => {
+        val (n, rest) = count(h, t)
+        rec(rest, acc.updated(h, (n + 1, getLineage(h))))
       }
+    }
 
-    rec(taxIds, Map[TaxID, Int]())
+    rec(taxIDs, Map[TaxID, (Int, Seq[TaxID])]())
   }
 
   def accumulatedCounts(
-    directCounts: Map[TaxID, Int],
-    // NOTE: the lineage has to contain the node itself
+    directCounts: Map[TaxID, (Int, Seq[TaxID])],
     getLineage: TaxID => Seq[TaxID]
-  ): Map[TaxID, Int] = {
-    directCounts.foldLeft(
-      Map[TaxID, Int]()
-    ) { case (accumCounts, (id, directCount)) =>
+  ): Map[TaxID, (Int, Seq[TaxID])] = {
 
-      getLineage(id).foldLeft(
+    directCounts.foldLeft(
+      Map[TaxID, (Int, Seq[TaxID])]()
+    ) { case (accumCounts, (taxID, (directCount, lineage))) =>
+
+      lineage.foldLeft(
         accumCounts
       ) { (newAccumCounts, ancestorID) =>
 
-        val accumulated = newAccumCounts.get(ancestorID).getOrElse(0)
+        val (accumulated, lineage) =
+          newAccumCounts.get(ancestorID)
+            .getOrElse( (0, getLineage(ancestorID)) )
 
         newAccumCounts.updated(
           ancestorID,
-          accumulated + directCount
+          (accumulated + directCount, lineage)
         )
       }
     }
@@ -82,20 +89,26 @@ case object countDataProcessing extends DataProcessingBundle(
 
       // there as many assigned reads as there are tax IDs in the table
       val assignedReadsNumber: Double = taxIDs.length
-      def frequency(absolute: Int): String = f"${absolute / assignedReadsNumber}%.10f"
+      def frequency(absolute: Int): Double = absolute / assignedReadsNumber
+
+      val lineageMap: scala.collection.mutable.Map[TaxID, Seq[TaxID]] = scala.collection.mutable.Map()
 
       def getLineage(id: TaxID): Seq[TaxID] =
-        taxonomyGraph.getNode(id)
-          .map{ _.lineage }.getOrElse( Seq() )
-          .map{ _.id }
+        lineageMap.get(id).getOrElse {
+          val lineage = taxonomyGraph.getNode(id)
+            .map{ _.lineage }.getOrElse( Seq() )
+            .map{ _.id }
+          lineageMap.update(id, lineage)
+          lineage
+        }
 
-      val direct:      Map[TaxID, Int] = directCounts(taxIDs)
-      val accumulated: Map[TaxID, Int] = accumulatedCounts(direct, getLineage)
+      val direct:      Map[TaxID, (Int, Seq[TaxID])] = directCounts(taxIDs, getLineage)
+      val accumulated: Map[TaxID, (Int, Seq[TaxID])] = accumulatedCounts(direct, getLineage)
 
       val filesPrefix: String = assignsFile.name.stripSuffix(".csv")
 
-      val outDirectFile = context / s"${filesPrefix}.direct.counts"
-      val outAccumFile  = context / s"${filesPrefix}.accum.counts"
+      val outDirectFile = context / s"${filesPrefix}.direct.absolute.counts"
+      val outAccumFile  = context / s"${filesPrefix}.accum.absolute.counts"
       val outDirectFreqFile = context / s"${filesPrefix}.direct.frequency.counts"
       val outAccumFreqFile  = context / s"${filesPrefix}.accum.frequency.counts"
 
@@ -108,7 +121,8 @@ case object countDataProcessing extends DataProcessingBundle(
         csv.columnNames.TaxID,
         csv.columnNames.TaxRank,
         csv.columnNames.TaxName,
-        file.name.replaceAll("\\.", "-")
+        file.name.replaceAll("\\.", "-"),
+        csv.columnNames.Lineage
       )
       csvDirectWriter.writeRow(headerFor(outDirectFile))
       csvAccumWriter.writeRow(headerFor(outAccumFile))
@@ -116,21 +130,27 @@ case object countDataProcessing extends DataProcessingBundle(
       csvAccumFreqWriter.writeRow(headerFor(outAccumFreqFile))
 
       def writeCounts(
-        counts: Map[TaxID, Int],
+        counts: Map[TaxID, (Int, Seq[TaxID])],
         writerAbs: CSVWriter,
         writerFrq: CSVWriter
-      ) = counts foreach { case (taxID, count) =>
+      ) = counts foreach { case (taxID, (absoluteCount, lineage)) =>
 
         val node: Option[TitanTaxonNode] = taxonomyGraph.getNode(taxID)
-        val name: String = node.map(_.name).getOrElse("")
-        val rank: String = node.map(_.rank).getOrElse("")
 
-        writerAbs.writeRow( Seq(taxID, rank, name, count) )
-        writerFrq.writeRow( Seq(taxID, rank, name, frequency(count)) )
+        def row(count: String) = Seq[String](
+          taxID,
+          node.map(_.rank).getOrElse(""),
+          node.map(_.name).getOrElse(""),
+          count,
+          lineage.mkString("; ")
+        )
+
+        writerAbs.writeRow(row( absoluteCount.toString ))
+        writerFrq.writeRow(row( f"${frequency(absoluteCount)}%.6f" ))
       }
 
-      writeCounts(direct, csvDirectWriter, csvDirectFreqWriter)
-      writeCounts(accumulated, csvAccumWriter, csvAccumFreqWriter)
+      writeCounts(direct,      csvDirectWriter, csvDirectFreqWriter)
+      writeCounts(accumulated, csvAccumWriter,  csvAccumFreqWriter)
 
       csvDirectWriter.close
       csvAccumWriter.close
