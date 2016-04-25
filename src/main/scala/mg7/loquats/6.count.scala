@@ -85,7 +85,7 @@ case object countDataProcessing extends DataProcessingBundle(
 
       // there as many assigned reads as there are tax IDs in the table
       val assignedReadsNumber: Double = taxIDs.length
-      def frequency(absolute: Int): String = f"${absolute / assignedReadsNumber}%.10f"
+      def frequency(absolute: Int): Double = absolute / assignedReadsNumber
 
       def nodes: List[AnyTaxonNode] = taxIDs.flatMap(taxonomyGraph.getNode(_))
 
@@ -119,7 +119,7 @@ case object countDataProcessing extends DataProcessingBundle(
         counts: Map[AnyTaxonNode, Int],
         writerAbs: CSVWriter,
         writerFrq: CSVWriter
-      ) = counts foreach { case (node, count) =>
+      ) = counts foreach { case (node, absoluteCount) =>
 
         def row(count: String) = Seq[String](
           node.id,
@@ -129,8 +129,8 @@ case object countDataProcessing extends DataProcessingBundle(
           node.lineage.map(_.id).mkString("; ")
         )
 
-        writerAbs.writeRow( row(count.toString) )
-        writerFrq.writeRow( row(frequency(count)) )
+        writerAbs.writeRow(row( absoluteCount.toString ))
+        writerFrq.writeRow(row( f"${frequency(absoluteCount)}%.6f" ))
       }
 
       writeCounts(direct,      csvDirectWriter, csvDirectFreqWriter)
