@@ -31,6 +31,7 @@ case object csv {
     val TaxName = "Tax-name"
     val TaxRank = "Tax-rank"
     val Count   = "Count"
+    val Lineage = "Lineage"
   }
 
   val statsHeader = List[String](
