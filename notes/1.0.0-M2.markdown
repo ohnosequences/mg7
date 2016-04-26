@@ -1,4 +1,4 @@
-This milestone release is huge. It contains a lot of improvements and some important fixes. Here are some higlights:
+This milestone release is huge. It contains a lot of improvements and some important fixes. Here are some highlights:
 
 * Features and improvements:
   - #4, #15: The BLAST reference database and IDs mapping is now configurable
