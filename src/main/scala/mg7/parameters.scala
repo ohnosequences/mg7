@@ -87,10 +87,8 @@ trait AnyMG7Parameters {
   def blastFilter(row: csv.Row[BlastOutRecKeys]): Boolean = defaultBlastFilter(row)
 
   // NOTE: this default is defined here to have has_qcovs implicit in the scope
-  final def defaultBlastFilter(row: csv.Row[BlastOutRecKeys]): Boolean = {
-    row.select(outputFields.qcovs) == "100" &&
-    row.select(outputFields.gaps) == "0"
-  }
+  final def defaultBlastFilter(row: csv.Row[BlastOutRecKeys]): Boolean =
+    row.select(outputFields.qcovs) == "100"
 }
 
 abstract class MG7Parameters[
