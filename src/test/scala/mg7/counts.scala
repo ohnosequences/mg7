@@ -21,41 +21,47 @@ case object countsCtx {
       List.fill(count)(node.id)
     }.toList
 
-  val direct = directCounts(ids)
+  def getLineage(id: TaxID): Seq[TaxID] = id2node(id).lineage.map(_.id)
 
-  val accumulated = accumulatedCounts(
-    direct,
-    id2node(_).lineage.map(_.id)
-  )
+  val direct: Map[TaxID, (Int, Seq[TaxID])] = directCounts(ids, getLineage)
+
+  val accumulated: Map[TaxID, (Int, Seq[TaxID])] = accumulatedCounts(direct, getLineage)
 }
 
 
 class CountsTest extends org.scalatest.FunSuite {
   import countsCtx._
 
+  def assertMapsDiff[A, B](m1: Map[A, B], m2: Map[A, B]): Unit = {
+    assertResult( List() ) {
+      m1.toList diff m2.toList
+    }
+  }
+
+
   test("direct counts") {
 
-    assertResult( direct ) {
-      realCounts.map { case (n, i) => n.id -> i }
-    }
+    assertMapsDiff(
+      realCounts.map { case (n, c) => n.id -> c },
+      direct.map { case (id, (c, _)) => id -> c }
+    )
   }
 
   test("accumulated counts") {
 
     // accumulated.foreach{ case (id, i) => info(s"${id}\t-> ${i}") }
 
-    assertResult( List() ) {
-      accumulated.toList.diff(
-        Map(
-            root.id -> 14,
-              c1.id -> 14,
-              c2.id -> 14,
-          l1.id -> 2, r1.id -> 8,
-          l2.id -> 2, r2.id -> 5,
-                      r3.id -> 5
-        ).toList
+    assertMapsDiff(
+      accumulated.map { case (id, (c, _)) => id -> c },
+      Map(
+          root.id -> 14,
+            c1.id -> 14,
+            c2.id -> 14,
+        l1.id -> 2, r1.id -> 8,
+        l2.id -> 2, r2.id -> 5,
+                    r3.id -> 5
       )
-    }
+    )
   }
 
 }
