@@ -3,74 +3,36 @@
 package ohnosequences.mg7.tests
 
 import ohnosequences.mg7.bio4j.taxonomyTree._
-import ohnosequences.mg7.tests.taxonomy._
 
-class LCATest extends org.scalatest.FunSuite {
 
-  test("lineage") {
+case object taxonomy {
 
-    assert{ l2.lineage == Seq(root, c1, c2, l1, l2) }
-    assert{ c1.lineage == Seq(root, c1) }
-    assert{ root.lineage == Seq(root) }
+  sealed abstract class AnyNode(val parent: Option[AnyNode]) extends AnyTaxonNode {
+
+    val id = this.toString
+    val name = id
+    val rank = ""
   }
 
-  test("lowest common ancestor") {
+  abstract class Node(p: AnyNode) extends AnyNode(Some(p))
 
-    // Just a shortcut:
-    def lca(nodes: Seq[AnyTaxonNode]): Option[AnyTaxonNode] = lowestCommonAncestor(nodes)
+  case object root extends AnyNode(None)
+  // common part
+  case object c1 extends Node(root)
+  case object c2 extends Node(c1)
+  // left branch
+  case object l1 extends Node(c2)
+  case object l2 extends Node(l1)
+  // right branch
+  case object r1 extends Node(c2)
+  case object r2 extends Node(r1)
+  case object r3 extends Node(r2)
 
-    assertResult( None ) { lca(Seq()) }
+  val common = Seq(root, c1, c2)
 
-    assertResult( Some(r3) ) {
-      lca(Seq(r3))
-    }
+  val allNodes: Set[AnyNode] = Set(root, c1, c2, l1, l2, r1, r2, r3)
 
-    assertResult( Some(root) ) {
-      lca(Seq(root, l1))
-    }
-
-    assertResult( Some(c2) ) {
-      lca(Seq(l1, r3))
-    }
-
-    assertResult( Some(c1) ) {
-      lca(Seq(l1, c1))
-    }
-
-    assertResult( Some(l1) ) {
-      lca(Seq(l1, l2))
-    }
-
-    assertResult( Some(c2) ) {
-      lca(Seq(c2, r2))
-    }
-
-    assertResult( Some(c2) ) {
-      lca(Seq(l1, r1))
-    }
-
-    assertResult( Some(c2) ) {
-      lca(Seq(c2, c2))
-    }
-
-    // Multiple nodes:
-
-    // left, common, right
-    assertResult( Some(c2) ) {
-      lca(Seq(l1, c2, r2))
-    }
-
-    // all on the same line
-    assertResult( Some(c1) ) {
-      lca(Seq(c1, l2, l1, c2))
-    }
-
-    // some from one branch and some from another
-    assertResult( Some(c1) ) {
-      lca(Seq(c1, l2, r3, c2, r1))
-    }
-  }
-
+  val id2node: Map[String, AnyNode] = allNodes.map{ n => (n.id -> n) }.toMap
 }
 
 ```

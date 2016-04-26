@@ -2,73 +2,68 @@
 ```scala
 package ohnosequences.mg7.tests
 
+import ohnosequences.mg7._
 import ohnosequences.mg7.bio4j.taxonomyTree._
+import ohnosequences.mg7.loquats.countDataProcessing._
+
 import ohnosequences.mg7.tests.taxonomy._
 
-class LCATest extends org.scalatest.FunSuite {
 
-  test("lineage") {
+case object countsCtx {
 
-    assert{ l2.lineage == Seq(root, c1, c2, l1, l2) }
-    assert{ c1.lineage == Seq(root, c1) }
-    assert{ root.lineage == Seq(root) }
+  val realCounts = Map[AnyNode, Int](
+    c2 -> 4,
+    l2 -> 2,
+    r1 -> 3,
+    r3 -> 5
+  )
+
+  val ids: List[TaxID] =
+    realCounts.flatMap { case (node, count) =>
+      List.fill(count)(node.id)
+    }.toList
+
+  def getLineage(id: TaxID): Seq[TaxID] = id2node(id).lineage.map(_.id)
+
+  val direct: Map[TaxID, (Int, Seq[TaxID])] = directCounts(ids, getLineage)
+
+  val accumulated: Map[TaxID, (Int, Seq[TaxID])] = accumulatedCounts(direct, getLineage)
+}
+
+
+class CountsTest extends org.scalatest.FunSuite {
+  import countsCtx._
+
+  def assertMapsDiff[A, B](m1: Map[A, B], m2: Map[A, B]): Unit = {
+    assertResult( List() ) {
+      m1.toList diff m2.toList
+    }
   }
 
-  test("lowest common ancestor") {
 
-    // Just a shortcut:
-    def lca(nodes: Seq[AnyTaxonNode]): Option[AnyTaxonNode] = lowestCommonAncestor(nodes)
+  test("direct counts") {
 
-    assertResult( None ) { lca(Seq()) }
+    assertMapsDiff(
+      realCounts.map { case (n, c) => n.id -> c },
+      direct.map { case (id, (c, _)) => id -> c }
+    )
+  }
 
-    assertResult( Some(r3) ) {
-      lca(Seq(r3))
-    }
+  test("accumulated counts") {
 
-    assertResult( Some(root) ) {
-      lca(Seq(root, l1))
-    }
+    // accumulated.foreach{ case (id, i) => info(s"${id}\t-> ${i}") }
 
-    assertResult( Some(c2) ) {
-      lca(Seq(l1, r3))
-    }
-
-    assertResult( Some(c1) ) {
-      lca(Seq(l1, c1))
-    }
-
-    assertResult( Some(l1) ) {
-      lca(Seq(l1, l2))
-    }
-
-    assertResult( Some(c2) ) {
-      lca(Seq(c2, r2))
-    }
-
-    assertResult( Some(c2) ) {
-      lca(Seq(l1, r1))
-    }
-
-    assertResult( Some(c2) ) {
-      lca(Seq(c2, c2))
-    }
-
-    // Multiple nodes:
-
-    // left, common, right
-    assertResult( Some(c2) ) {
-      lca(Seq(l1, c2, r2))
-    }
-
-    // all on the same line
-    assertResult( Some(c1) ) {
-      lca(Seq(c1, l2, l1, c2))
-    }
-
-    // some from one branch and some from another
-    assertResult( Some(c1) ) {
-      lca(Seq(c1, l2, r3, c2, r1))
-    }
+    assertMapsDiff(
+      accumulated.map { case (id, (c, _)) => id -> c },
+      Map(
+          root.id -> 14,
+            c1.id -> 14,
+            c2.id -> 14,
+        l1.id -> 2, r1.id -> 8,
+        l2.id -> 2, r2.id -> 5,
+                    r3.id -> 5
+      )
+    )
   }
 
 }

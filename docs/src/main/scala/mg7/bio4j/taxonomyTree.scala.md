@@ -12,7 +12,7 @@ case object taxonomyTree {
 This is just an abstract representation of the taxonomy tree nodes
 
 ```scala
-  trait AnyTaxonNode {
+  trait AnyTaxonNode extends Any {
 
     def id: String
     def name: String
@@ -25,7 +25,7 @@ This is just an abstract representation of the taxonomy tree nodes
 The sequence of ancestors from the root to this node (it is never empty)
 
 ```scala
-    lazy val lineage: Path = {
+    def lineage: Path = {
       @scala.annotation.tailrec
       def ancestors_rec(n: AnyTaxonNode, acc: Path): Path = n.parent match {
         case None => n +: acc
@@ -46,7 +46,7 @@ Path in the tree stores a sequence of nodes from bottom to top
 Find the "solution" of the algorithm for a set of nodes
 
 ```scala
-  def lowestCommonAncestor(default: AnyTaxonNode, nodes: Seq[AnyTaxonNode]): AnyTaxonNode = {
+  def lowestCommonAncestor(nodes: Seq[AnyTaxonNode]): Option[AnyTaxonNode] = {
 
     def longestCommonPrefix(path1: Path, path2: Path): Path = {
       (path1 zip path2)
@@ -59,7 +59,6 @@ Find the "solution" of the algorithm for a set of nodes
       .map(_.lineage)
       .reduceOption(longestCommonPrefix)
       .flatMap(_.lastOption)
-      .getOrElse(default)
   }
 
 }
@@ -69,23 +68,25 @@ Find the "solution" of the algorithm for a set of nodes
 
 
 
-[test/scala/mg7/pipeline.scala]: ../../../../test/scala/mg7/pipeline.scala.md
-[test/scala/mg7/lca.scala]: ../../../../test/scala/mg7/lca.scala.md
-[main/scala/mg7/dataflows/noFlash.scala]: ../dataflows/noFlash.scala.md
-[main/scala/mg7/dataflows/full.scala]: ../dataflows/full.scala.md
-[main/scala/mg7/package.scala]: ../package.scala.md
-[main/scala/mg7/bio4j/titanTaxonomyTree.scala]: titanTaxonomyTree.scala.md
 [main/scala/mg7/bio4j/bundle.scala]: bundle.scala.md
 [main/scala/mg7/bio4j/taxonomyTree.scala]: taxonomyTree.scala.md
-[main/scala/mg7/dataflow.scala]: ../dataflow.scala.md
+[main/scala/mg7/bio4j/titanTaxonomyTree.scala]: titanTaxonomyTree.scala.md
 [main/scala/mg7/csv.scala]: ../csv.scala.md
-[main/scala/mg7/parameters.scala]: ../parameters.scala.md
 [main/scala/mg7/data.scala]: ../data.scala.md
+[main/scala/mg7/dataflow.scala]: ../dataflow.scala.md
+[main/scala/mg7/dataflows/full.scala]: ../dataflows/full.scala.md
+[main/scala/mg7/dataflows/noFlash.scala]: ../dataflows/noFlash.scala.md
+[main/scala/mg7/loquats/1.flash.scala]: ../loquats/1.flash.scala.md
+[main/scala/mg7/loquats/2.split.scala]: ../loquats/2.split.scala.md
+[main/scala/mg7/loquats/3.blast.scala]: ../loquats/3.blast.scala.md
+[main/scala/mg7/loquats/4.assign.scala]: ../loquats/4.assign.scala.md
+[main/scala/mg7/loquats/5.merge.scala]: ../loquats/5.merge.scala.md
+[main/scala/mg7/loquats/6.count.scala]: ../loquats/6.count.scala.md
 [main/scala/mg7/loquats/7.stats.scala]: ../loquats/7.stats.scala.md
 [main/scala/mg7/loquats/8.summary.scala]: ../loquats/8.summary.scala.md
-[main/scala/mg7/loquats/6.count.scala]: ../loquats/6.count.scala.md
-[main/scala/mg7/loquats/3.blast.scala]: ../loquats/3.blast.scala.md
-[main/scala/mg7/loquats/2.split.scala]: ../loquats/2.split.scala.md
-[main/scala/mg7/loquats/4.assign.scala]: ../loquats/4.assign.scala.md
-[main/scala/mg7/loquats/1.flash.scala]: ../loquats/1.flash.scala.md
-[main/scala/mg7/loquats/5.merge.scala]: ../loquats/5.merge.scala.md
+[main/scala/mg7/package.scala]: ../package.scala.md
+[main/scala/mg7/parameters.scala]: ../parameters.scala.md
+[test/scala/mg7/counts.scala]: ../../../../test/scala/mg7/counts.scala.md
+[test/scala/mg7/lca.scala]: ../../../../test/scala/mg7/lca.scala.md
+[test/scala/mg7/pipeline.scala]: ../../../../test/scala/mg7/pipeline.scala.md
+[test/scala/mg7/taxonomy.scala]: ../../../../test/scala/mg7/taxonomy.scala.md

@@ -94,7 +94,9 @@ trait AnyNoFlashDataflow extends AnyDataflow {
         ),
         remoteOutput = Map(
           data.lcaChunk -> S3Resource(params.outputS3Folder(sampleId, "assign") / "lca" / s"${sampleId}.lca.${n}.csv"),
-          data.bbhChunk -> S3Resource(params.outputS3Folder(sampleId, "assign") / "bbh" / s"${sampleId}.bbh.${n}.csv")
+          data.bbhChunk -> S3Resource(params.outputS3Folder(sampleId, "assign") / "bbh" / s"${sampleId}.bbh.${n}.csv"),
+          data.lost.inMapping -> S3Resource(params.outputS3Folder(sampleId, "assign") / "lost" / "in-mapping" / s"${sampleId}.lost.in-mapping.${n}.csv"),
+          data.lost.inBio4j   -> S3Resource(params.outputS3Folder(sampleId, "assign") / "lost" / "in-bio4j" / s"${sampleId}.lost.in-bio4j.${n}.taxids")
         )
       )
     }
@@ -132,23 +134,25 @@ case class NoFlashDataflow[P <: AnyMG7Parameters](val params: P)(
 
 
 
-[test/scala/mg7/pipeline.scala]: ../../../../test/scala/mg7/pipeline.scala.md
-[test/scala/mg7/lca.scala]: ../../../../test/scala/mg7/lca.scala.md
-[main/scala/mg7/dataflows/noFlash.scala]: noFlash.scala.md
-[main/scala/mg7/dataflows/full.scala]: full.scala.md
-[main/scala/mg7/package.scala]: ../package.scala.md
-[main/scala/mg7/bio4j/titanTaxonomyTree.scala]: ../bio4j/titanTaxonomyTree.scala.md
 [main/scala/mg7/bio4j/bundle.scala]: ../bio4j/bundle.scala.md
 [main/scala/mg7/bio4j/taxonomyTree.scala]: ../bio4j/taxonomyTree.scala.md
-[main/scala/mg7/dataflow.scala]: ../dataflow.scala.md
+[main/scala/mg7/bio4j/titanTaxonomyTree.scala]: ../bio4j/titanTaxonomyTree.scala.md
 [main/scala/mg7/csv.scala]: ../csv.scala.md
-[main/scala/mg7/parameters.scala]: ../parameters.scala.md
 [main/scala/mg7/data.scala]: ../data.scala.md
+[main/scala/mg7/dataflow.scala]: ../dataflow.scala.md
+[main/scala/mg7/dataflows/full.scala]: full.scala.md
+[main/scala/mg7/dataflows/noFlash.scala]: noFlash.scala.md
+[main/scala/mg7/loquats/1.flash.scala]: ../loquats/1.flash.scala.md
+[main/scala/mg7/loquats/2.split.scala]: ../loquats/2.split.scala.md
+[main/scala/mg7/loquats/3.blast.scala]: ../loquats/3.blast.scala.md
+[main/scala/mg7/loquats/4.assign.scala]: ../loquats/4.assign.scala.md
+[main/scala/mg7/loquats/5.merge.scala]: ../loquats/5.merge.scala.md
+[main/scala/mg7/loquats/6.count.scala]: ../loquats/6.count.scala.md
 [main/scala/mg7/loquats/7.stats.scala]: ../loquats/7.stats.scala.md
 [main/scala/mg7/loquats/8.summary.scala]: ../loquats/8.summary.scala.md
-[main/scala/mg7/loquats/6.count.scala]: ../loquats/6.count.scala.md
-[main/scala/mg7/loquats/3.blast.scala]: ../loquats/3.blast.scala.md
-[main/scala/mg7/loquats/2.split.scala]: ../loquats/2.split.scala.md
-[main/scala/mg7/loquats/4.assign.scala]: ../loquats/4.assign.scala.md
-[main/scala/mg7/loquats/1.flash.scala]: ../loquats/1.flash.scala.md
-[main/scala/mg7/loquats/5.merge.scala]: ../loquats/5.merge.scala.md
+[main/scala/mg7/package.scala]: ../package.scala.md
+[main/scala/mg7/parameters.scala]: ../parameters.scala.md
+[test/scala/mg7/counts.scala]: ../../../../test/scala/mg7/counts.scala.md
+[test/scala/mg7/lca.scala]: ../../../../test/scala/mg7/lca.scala.md
+[test/scala/mg7/pipeline.scala]: ../../../../test/scala/mg7/pipeline.scala.md
+[test/scala/mg7/taxonomy.scala]: ../../../../test/scala/mg7/taxonomy.scala.md
