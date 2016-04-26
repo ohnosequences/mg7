@@ -1,0 +1,30 @@
+This is the third milestone on the way to the v1.0 release. Main purpose of this release was to introduce some essential features and check consistency of the pipeline (primarily for Illumina data). Here are the main changes since the [v1.0-M2 release](https://github.com/ohnosequences/mg7/releases/tag/v1.0.0-M2):
+
+* New features:
+  - #9, #11: Added **general stats** for the standard pipeline (with Flash) (`stats` and `summary` steps)
+  - #20: Added **counts frequency** tables
+  - #35: Added **taxonomic lineage** in the results
+  - #47: Changed to the **fair lowest common ancestor** (LCA) algorithm without the most-specific node modification
+  - #56: Interchanged the order of the `assign` and `merge` steps to **parallelize assignment** (per BLAST chunk)
+  - BLAST related improvements:
+    - #46: Reads with no BLAST hits are accumulated per each sample and merged in FASTA files
+    - #44: BLAST command itself and its parameters are completely **configurable** (so you can use not only `blastn`)
+    - #50: Added a check for the set of minimal necessary BLAST output fields
+    - #36, #51, #61: Reviewed and refined default BLAST parameters (for Illumina) and output format
+    - #38, #49, #57, #58: Added **configurable filter** for the BLAST results (with default `qcovs` == 100%), plus an mandatory filter to keep only the **top BLAST hits**
+
+* Other improvements:
+  - #43, #53, ...: Upgraded to [fastarious 0.6.0](https://github.com/ohnosequences/fastarious/releases/tag/v0.6.0)
+  - #40, #41, ...: Upgraded to [blast-api 0.7.0](https://github.com/ohnosequences/blast-api/releases/tag/v0.7.0)
+  - #39: Upgraded to [Loquat v2.0-M8](https://github.com/ohnosequences/loquat/releases/tag/v2.0.0-M8)
+  - #53: Migrated to the [RNACentral library](https://github.com/era7bio/rnacentraldb) for the reference DB interface
+  - #11, #54, #59: Added outputs with possible losses in the assignment step (id2taxa mapping or Bio4j lookup)
+
+* Important fixes:
+  - #48: Configured CSV writer to use unix line-endings
+  - #62: Fixed inconsistency in the accumulated counting algorithm
+  - #52, #55: Fixes of the bugs introduced during M3 development
+
+----
+
+See the full list of pull requests merged in this release in the [v1.0-M3 milestone](https://github.com/ohnosequences/mg7/issues?q=milestone%3Av1.0-M3).
