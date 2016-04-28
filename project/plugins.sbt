@@ -2,3 +2,5 @@ resolvers += "Era7 maven releases" at "https://s3-eu-west-1.amazonaws.com/releas
 
 addSbtPlugin("ohnosequences" % "nice-sbt-settings" % "0.7.0")
 addSbtPlugin("com.eed3si9n"  % "sbt-buildinfo"     % "0.5.0")
+
+addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "0.8.5")
