@@ -24,7 +24,7 @@ case object test {
     // blastCommand = blastn,
     // blastOutRec  = defaultBlastOutRec,
     // blastOptions = defaultBlastnOptions.value
-    referenceDB  = era7bio.db.rna16s.release
+    referenceDBs = Set(era7bio.db.rna16s.release)
   ) {
 
     // an example of how you can add some conditions to the filter predicate

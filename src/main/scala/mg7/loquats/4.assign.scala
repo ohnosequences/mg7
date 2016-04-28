@@ -17,26 +17,36 @@ import com.github.tototoshi.csv._
 
 
 case class assignDataProcessing[MD <: AnyMG7Parameters](val md: MD)
-extends DataProcessingBundle(
-  bio4j.taxonomyBundle,
-  md.referenceDB
-)(
-  input = data.assignInput,
+extends DataProcessingBundle()(
+  input  = data.assignInput,
   output = data.assignOutput
 ) {
   // For the output fields implicits
   import md._
 
+  override val bundleDependencies: List[AnyBundle] =
+    bio4j.taxonomyBundle :: md.referenceDBs.toList
+
   lazy val taxonomyGraph: TitanNCBITaxonomyGraph = bio4j.taxonomyBundle.graph
 
   type BlastRow = csv.Row[md.blastOutRec.Keys]
 
+  // This iterates over reference DBs and merges their id2taxa tables in one Map
+  lazy val referenceMap: Map[ID, TaxID] = {
+    val refMap: scala.collection.mutable.Map[ID, TaxID] = scala.collection.mutable.Map()
+
+    md.referenceDBs.foreach { refDB =>
+      val tsvReader = CSVReader.open( refDB.id2taxa.toJava )(csv.UnixTSVFormat)
+      tsvReader.iterator.foreach { row => refMap.updated(row(0), row(1)) }
+      tsvReader.close
+    }
+
+    refMap.toMap
+  }
+
   def instructions: AnyInstructions = say("Let's see who is who!")
 
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
-
-    val tsvReader = CSVReader.open( md.referenceDB.id2taxa.toJava )(csv.UnixTSVFormat)
-    val referenceMap: Map[ID, TaxID] = tsvReader.iterator.map{ row => row(0) -> row(1) }.toMap
 
     val blastReader = csv.Reader(md.blastOutRec.keys, context.inputFile(data.blastChunk))
 
@@ -49,8 +59,6 @@ extends DataProcessingBundle(
     val lostInMappingFile = (context / "output" / "lost.in-mapping").createIfNotExists()
     val lostInBio4jFile   = (context / "output" / "lost.in-bio4j").createIfNotExists()
 
-
-    // val assigns: Map[ReadID, (LCA, BBH)] =
     blastReader.rows
       // grouping rows by the read id
       .toStream.groupBy { _.select(qseqid) }
@@ -101,7 +109,6 @@ extends DataProcessingBundle(
         lostInBio4jTaxIDs.foreach { taxID => lostInBio4jFile.appendLine(taxID) }
       }
 
-    tsvReader.close
     blastReader.close
 
     lcaWriter.close
