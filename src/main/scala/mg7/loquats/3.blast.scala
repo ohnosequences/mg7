@@ -15,12 +15,13 @@ import sys.process._
 case object blastBundle extends ohnosequencesBundles.statika.Blast("2.2.31")
 
 case class blastDataProcessing[MD <: AnyMG7Parameters](val md: MD)
-extends DataProcessingBundle(
-  blastBundle,
-  md.referenceDB
-)(input  = data.blastInput,
+extends DataProcessingBundle()(
+  input  = data.blastInput,
   output = data.blastOutput
 ) {
+
+  override val bundleDependencies: List[AnyBundle] =
+    blastBundle :: md.referenceDBs.toList
 
   def instructions: AnyInstructions = say("Let the blasting begin!")
 

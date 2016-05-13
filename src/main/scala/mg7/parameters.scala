@@ -54,7 +54,7 @@ trait AnyMG7Parameters {
 
   val blastOptions: BlastCommand#OptionsVals
 
-  val referenceDB: AnyBlastDBRelease
+  val referenceDBs: Set[AnyBlastDBRelease]
 
   // has to be provided implicitly
   implicit val argValsToSeq: BlastOptionsToSeq[BlastArgumentsVals]
@@ -66,7 +66,7 @@ trait AnyMG7Parameters {
     BlastExpression(blastCommand)(
       outputRecord = blastOutRec,
       argumentValues =
-        db(Set(referenceDB.dbName)) ::
+        db(referenceDBs.map(_.dbName)) ::
         query(inFile) ::
         ohnosequences.blast.api.out(outFile) ::
         *[AnyDenotation],
@@ -106,7 +106,7 @@ abstract class MG7Parameters[
   val blastCommand: BC = blastn,
   val blastOutRec: BlastOutputRecord[BK]  = defaultBlastOutRec,
   val blastOptions: BC#OptionsVals        = defaultBlastnOptions.value,
-  val referenceDB: AnyBlastDBRelease
+  val referenceDBs: Set[AnyBlastDBRelease]
 )(implicit
   val argValsToSeq: BlastOptionsToSeq[BC#ArgumentsVals],
   val optValsToSeq: BlastOptionsToSeq[BC#OptionsVals],
