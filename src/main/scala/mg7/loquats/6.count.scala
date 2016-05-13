@@ -138,11 +138,11 @@ case object countDataProcessing extends DataProcessingBundle(
         val node: Option[TitanTaxonNode] = taxonomyGraph.getNode(taxID)
 
         def row(count: String) = Seq[String](
+          lineage.mkString(";"),
           taxID,
           node.map(_.rank).getOrElse(""),
           node.map(_.name).getOrElse(""),
-          count,
-          lineage.mkString("; ")
+          count
         )
 
         writerAbs.writeRow(row( absoluteCount.toString ))
