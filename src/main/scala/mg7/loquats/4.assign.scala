@@ -32,12 +32,19 @@ extends DataProcessingBundle()(
   type BlastRow = csv.Row[md.blastOutRec.Keys]
 
   // This iterates over reference DBs and merges their id2taxa tables in one Map
-  lazy val referenceMap: Map[ID, TaxID] = {
-    val refMap: scala.collection.mutable.Map[ID, TaxID] = scala.collection.mutable.Map()
+  lazy val referenceMap: Map[ID, Seq[TaxID]] = {
+    val refMap: scala.collection.mutable.Map[ID, Seq[TaxID]] = scala.collection.mutable.Map()
 
     md.referenceDBs.foreach { refDB =>
       val tsvReader = CSVReader.open( refDB.id2taxa.toJava )(csv.UnixTSVFormat)
-      tsvReader.iterator.foreach { row => refMap.updated(row(0), row(1)) }
+      tsvReader.iterator.foreach { row =>
+        refMap.updated(
+          // first column is the ID
+          row(0),
+          // second column is a sequence of tax IDs separated with ';'
+          row(1).split(';').map(_.trim)
+        )
+      }
       tsvReader.close
     }
 
@@ -70,9 +77,9 @@ extends DataProcessingBundle()(
           val maxRow = hits.maxBy { row =>
             parseInt(row.select(bitscore)).getOrElse(0)
           }
-          referenceMap.get(maxRow.select(sseqid)).flatMap { taxId =>
-            taxonomyGraph.getNode(taxId)
-          }
+          referenceMap.get(maxRow.select(sseqid))
+            .flatMap { _.headOption }
+            .flatMap { taxId => taxonomyGraph.getNode(taxId) }
         }
 
         // for each hit row we take the column with ID and lookup its TaxID
@@ -81,7 +88,7 @@ extends DataProcessingBundle()(
             case ((rows, taxIDs), row) =>
               referenceMap.get(row.select(sseqid)) match {
                 case None        => (row +: rows, taxIDs)
-                case Some(taxID) => (rows, taxID +: taxIDs)
+                case Some(taxas) => (rows, taxas ++ taxIDs)
               }
           }
 
