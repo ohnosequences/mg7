@@ -111,8 +111,6 @@ extends DataProcessingBundle()(
     success(s"Results are ready",
       data.lcaChunk(lcaFile) ::
       data.bbhChunk(bbhFile) ::
-      // data.lost.inMapping(lostInMappingFile) ::
-      // data.lost.inBio4j(lostInBio4jFile) ::
       *[AnyDenotation { type Value <: FileResource }]
     )
   }
