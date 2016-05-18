@@ -89,9 +89,9 @@ trait AnyNoFlashDataflow extends AnyDataflow {
         ),
         remoteOutput = Map(
           data.lcaChunk -> S3Resource(params.outputS3Folder(sampleId, "assign") / "lca" / s"${sampleId}.lca.${n}.csv"),
-          data.bbhChunk -> S3Resource(params.outputS3Folder(sampleId, "assign") / "bbh" / s"${sampleId}.bbh.${n}.csv"),
-          data.lost.inMapping -> S3Resource(params.outputS3Folder(sampleId, "assign") / "lost" / "in-mapping" / s"${sampleId}.lost.in-mapping.${n}.csv"),
-          data.lost.inBio4j   -> S3Resource(params.outputS3Folder(sampleId, "assign") / "lost" / "in-bio4j" / s"${sampleId}.lost.in-bio4j.${n}.taxids")
+          data.bbhChunk -> S3Resource(params.outputS3Folder(sampleId, "assign") / "bbh" / s"${sampleId}.bbh.${n}.csv")
+          // data.lost.inMapping -> S3Resource(params.outputS3Folder(sampleId, "assign") / "lost" / "in-mapping" / s"${sampleId}.lost.in-mapping.${n}.csv"),
+          // data.lost.inBio4j   -> S3Resource(params.outputS3Folder(sampleId, "assign") / "lost" / "in-bio4j" / s"${sampleId}.lost.in-bio4j.${n}.taxids")
         )
       )
     }

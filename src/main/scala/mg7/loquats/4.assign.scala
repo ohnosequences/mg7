@@ -72,38 +72,28 @@ extends DataProcessingBundle()(
       // for each read evaluate LCA and BBH and write the output files
       .foreach { case (readId: ID, hits: Stream[BlastRow]) =>
 
+        // for each hit row we take the column with ID and lookup its TaxID
+        val nodesMap: Map[TitanTaxonNode, BlastRow] =
+          hits.foldLeft(Map[TitanTaxonNode, BlastRow]()) { (acc, row) =>
+
+            referenceMap.get(row.select(sseqid))
+              .toSeq.flatten
+              .flatMap(taxonomyGraph.getNode)
+              .foldLeft(acc) { (accNodes, node) =>
+                accNodes.updated(node, row)
+              }
+          }
+
         val bbh: BBH = {
           // best blast score is just a maximum in the `bitscore` column
-          val maxRow = hits.maxBy { row =>
+          val maximum = nodesMap.maxBy { case (node, row) =>
             parseInt(row.select(bitscore)).getOrElse(0)
           }
-          referenceMap.get(maxRow.select(sseqid))
-            .flatMap { _.headOption }
-            .flatMap { taxId => taxonomyGraph.getNode(taxId) }
+          Some(maximum._1)
         }
 
-        // for each hit row we take the column with ID and lookup its TaxID
-        val (lostInMappingRows, taxIDs): (Seq[BlastRow], Seq[TaxID]) = hits.toSeq
-          .foldLeft(Seq[BlastRow](), Seq[TaxID]()) {
-            case ((rows, taxIDs), row) =>
-              referenceMap.get(row.select(sseqid)) match {
-                case None        => (row +: rows, taxIDs)
-                case Some(taxas) => (rows, taxas ++ taxIDs)
-              }
-          }
-
-        // then we try to retreive Titan taxon nodes
-        val (lostInBio4jTaxIDs, nodes): (Seq[TaxID], Seq[TitanTaxonNode]) =
-          taxIDs.distinct.foldLeft(Seq[TaxID](), Seq[TitanTaxonNode]()) {
-            case ((lostTaxIDs, nodes), taxID) =>
-              taxonomyGraph.getNode(taxID) match {
-                case None       => (taxID +: lostTaxIDs, nodes)
-                case Some(node) => (lostTaxIDs, node +: nodes)
-              }
-          }
-
         // and return the taxon node ID corresponding to the read
-        val lca: LCA = lowestCommonAncestor(nodes)
+        val lca: LCA = lowestCommonAncestor(nodesMap.keys.toSeq)
 
         // NOTE: this shouldn't ever happen, so we throw an error here
         if (lca.isEmpty) sys.error("Failed to compute LCA; something is broken")
@@ -111,9 +101,6 @@ extends DataProcessingBundle()(
         // writing results
         lca.foreach { node => lcaWriter.writeRow(List(readId, node.id, node.name, node.rank)) }
         bbh.foreach { node => bbhWriter.writeRow(List(readId, node.id, node.name, node.rank)) }
-
-        lostInMappingRows.foreach { row => lostInMappingFile.appendLine(row.values.mkString(",")) }
-        lostInBio4jTaxIDs.foreach { taxID => lostInBio4jFile.appendLine(taxID) }
       }
 
     blastReader.close
@@ -124,8 +111,8 @@ extends DataProcessingBundle()(
     success(s"Results are ready",
       data.lcaChunk(lcaFile) ::
       data.bbhChunk(bbhFile) ::
-      data.lost.inMapping(lostInMappingFile) ::
-      data.lost.inBio4j(lostInBio4jFile) ::
+      // data.lost.inMapping(lostInMappingFile) ::
+      // data.lost.inBio4j(lostInBio4jFile) ::
       *[AnyDenotation { type Value <: FileResource }]
     )
   }

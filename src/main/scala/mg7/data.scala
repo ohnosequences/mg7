@@ -67,8 +67,8 @@ case object data {
   case object assignOutput extends DataSet(
     lcaChunk :×:
     bbhChunk :×:
-    lost.inMapping :×:
-    lost.inBio4j :×:
+    // lost.inMapping :×:
+    // lost.inBio4j :×:
     |[AnyData]
   )
 
