@@ -51,6 +51,9 @@ extends DataProcessingBundle()(
     refMap.toMap
   }
 
+  def taxIDsFor(id: ID): Seq[TaxID] = referenceMap.get(id).getOrElse(Seq())
+
+
   def instructions: AnyInstructions = say("Let's see who is who!")
 
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
@@ -72,35 +75,31 @@ extends DataProcessingBundle()(
       // for each read evaluate LCA and BBH and write the output files
       .foreach { case (readId: ID, hits: Stream[BlastRow]) =>
 
-        val bbh: BBH = {
-          // best blast score is just a maximum in the `bitscore` column
-          val maxRow = hits.maxBy { row =>
-            parseInt(row.select(bitscore)).getOrElse(0)
-          }
-          referenceMap.get(maxRow.select(sseqid))
-            .flatMap { _.headOption }
-            .flatMap { taxId => taxonomyGraph.getNode(taxId) }
-        }
+        // NOTE: currently we leave only hits with the same maximum pident,
+        // so calculating average doesn't change anything, but it can be changed
+        val pidents: Seq[Double] = hits.flatMap{ row => parseDouble(row.select(pident)) }
+
+        val averagePident: Double = pidents.sum / pidents.length
 
         // for each hit row we take the column with ID and lookup its TaxID
-        val (lostInMappingRows, taxIDs): (Seq[BlastRow], Seq[TaxID]) = hits.toSeq
-          .foldLeft(Seq[BlastRow](), Seq[TaxID]()) {
-            case ((rows, taxIDs), row) =>
-              referenceMap.get(row.select(sseqid)) match {
-                case None        => (row +: rows, taxIDs)
-                case Some(taxas) => (rows, taxas ++ taxIDs)
-              }
-          }
+        val taxasMap: Map[BlastRow, Seq[TaxID]] = hits.map { row =>
+          row -> taxIDsFor(row.select(sseqid))
+        }.toMap
 
-        // then we try to retreive Titan taxon nodes
-        val (lostInBio4jTaxIDs, nodes): (Seq[TaxID], Seq[TitanTaxonNode]) =
-          taxIDs.distinct.foldLeft(Seq[TaxID](), Seq[TitanTaxonNode]()) {
-            case ((lostTaxIDs, nodes), taxID) =>
-              taxonomyGraph.getNode(taxID) match {
-                case None       => (taxID +: lostTaxIDs, nodes)
-                case Some(node) => (lostTaxIDs, node +: nodes)
-              }
-          }
+        // Best Blast Hit is just a maximum in the `bitscore` column
+        val maxHit: (BlastRow, Seq[TaxID]) = taxasMap.maxBy { case (row, taxas) =>
+          parseInt(row.select(bitscore)).getOrElse(0)
+        }
+        // TODO: take the most specific among the nodes (here we take just the first one)
+        val bbh: BBH = maxHit._2.headOption.flatMap(taxonomyGraph.getNode)
+
+        // NOTE: this shouldn't ever happen, so we throw an error here
+        if (bbh.isEmpty) sys.error("Failed to compute BBH; something is broken")
+
+        val nodes: Seq[TitanTaxonNode] = taxasMap
+          .values.toSeq
+          .flatten.distinct // only distinct IDs
+          .flatMap(taxonomyGraph.getNode)
 
         // and return the taxon node ID corresponding to the read
         val lca: LCA = lowestCommonAncestor(nodes)
@@ -109,11 +108,8 @@ extends DataProcessingBundle()(
         if (lca.isEmpty) sys.error("Failed to compute LCA; something is broken")
 
         // writing results
-        lca.foreach { node => lcaWriter.writeRow(List(readId, node.id, node.name, node.rank)) }
-        bbh.foreach { node => bbhWriter.writeRow(List(readId, node.id, node.name, node.rank)) }
-
-        lostInMappingRows.foreach { row => lostInMappingFile.appendLine(row.values.mkString(",")) }
-        lostInBio4jTaxIDs.foreach { taxID => lostInBio4jFile.appendLine(taxID) }
+        lca.foreach { node => lcaWriter.writeRow(List(readId, node.id, node.name, node.rank, averagePident)) }
+        bbh.foreach { node => bbhWriter.writeRow(List(readId, node.id, node.name, node.rank, maxHit._1.select(pident))) }
       }
 
     blastReader.close
@@ -124,8 +120,6 @@ extends DataProcessingBundle()(
     success(s"Results are ready",
       data.lcaChunk(lcaFile) ::
       data.bbhChunk(bbhFile) ::
-      data.lost.inMapping(lostInMappingFile) ::
-      data.lost.inBio4j(lostInBio4jFile) ::
       *[AnyDenotation { type Value <: FileResource }]
     )
   }

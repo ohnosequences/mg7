@@ -55,11 +55,6 @@ case object data {
   case object lcaChunk extends FileData("lca.chunk")("csv")
   case object bbhChunk extends FileData("bbh.chunk")("csv")
 
-  case object lost {
-    case object inMapping extends Data("lost.in-mapping.csv")
-    case object inBio4j extends Data("lost.in-bio4j.taxids")
-  }
-
   case object assignInput extends DataSet(
     blastChunk :×:
     |[AnyData]
@@ -67,8 +62,6 @@ case object data {
   case object assignOutput extends DataSet(
     lcaChunk :×:
     bbhChunk :×:
-    lost.inMapping :×:
-    lost.inBio4j :×:
     |[AnyData]
   )
 
