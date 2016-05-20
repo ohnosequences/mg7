@@ -118,11 +118,11 @@ case object countDataProcessing extends DataProcessingBundle(
       val csvAccumFreqWriter  = csv.newWriter(outAccumFreqFile)
 
       def headerFor(file: File) = List(
+        csv.columnNames.Lineage,
         csv.columnNames.TaxID,
         csv.columnNames.TaxRank,
         csv.columnNames.TaxName,
-        file.name.replaceAll("\\.", "-"),
-        csv.columnNames.Lineage
+        file.name.replaceAll("\\.", "-")
       )
       csvDirectWriter.writeRow(headerFor(outDirectFile))
       csvAccumWriter.writeRow(headerFor(outAccumFile))
