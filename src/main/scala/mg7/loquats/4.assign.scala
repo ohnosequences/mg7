@@ -51,6 +51,9 @@ extends DataProcessingBundle()(
     refMap.toMap
   }
 
+  def taxIDsFor(id: ID): Seq[TaxID] = referenceMap.get(id).getOrElse(Seq())
+
+
   def instructions: AnyInstructions = say("Let's see who is who!")
 
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
@@ -72,35 +75,43 @@ extends DataProcessingBundle()(
       // for each read evaluate LCA and BBH and write the output files
       .foreach { case (readId: ID, hits: Stream[BlastRow]) =>
 
+        // NOTE: currently we leave only hits with the same maximum pident,
+        // so calculating average doesn't change anything, but it can be changed
+        val pidents: Seq[Int] = hits
+          .map{ row => parseInt(row.select(pident)) }
+          .collect{ case Some(i) => i }
+
+        val averagePident: Int = pidents.sum / pidents.length
+
         // for each hit row we take the column with ID and lookup its TaxID
-        val nodesMap: Map[TitanTaxonNode, BlastRow] =
-          hits.foldLeft(Map[TitanTaxonNode, BlastRow]()) { (acc, row) =>
+        val taxasMap: Map[BlastRow, Seq[TaxID]] = hits.map { row =>
+          row -> taxIDsFor(row.select(sseqid))
+        }.toMap
 
-            referenceMap.get(row.select(sseqid))
-              .toSeq.flatten
-              .flatMap(taxonomyGraph.getNode)
-              .foldLeft(acc) { (accNodes, node) =>
-                accNodes.updated(node, row)
-              }
-          }
-
-        val bbh: BBH = {
-          // best blast score is just a maximum in the `bitscore` column
-          val maximum = nodesMap.maxBy { case (node, row) =>
-            parseInt(row.select(bitscore)).getOrElse(0)
-          }
-          Some(maximum._1)
+        // Best Blast Hit is just a maximum in the `bitscore` column
+        val maxHit: (BlastRow, Seq[TaxID]) = taxasMap.maxBy { case (row, taxas) =>
+          parseInt(row.select(bitscore)).getOrElse(0)
         }
+        // TODO: take the most specific among the nodes (here we take just the first one)
+        val bbh: BBH = maxHit._2.headOption.flatMap(taxonomyGraph.getNode)
+
+        // NOTE: this shouldn't ever happen, so we throw an error here
+        if (bbh.isEmpty) sys.error("Failed to compute BBH; something is broken")
+
+        val nodes: Seq[TitanTaxonNode] = taxasMap
+          .values.toSeq
+          .flatten.distinct // only distinct IDs
+          .flatMap(taxonomyGraph.getNode)
 
         // and return the taxon node ID corresponding to the read
-        val lca: LCA = lowestCommonAncestor(nodesMap.keys.toSeq)
+        val lca: LCA = lowestCommonAncestor(nodes)
 
         // NOTE: this shouldn't ever happen, so we throw an error here
         if (lca.isEmpty) sys.error("Failed to compute LCA; something is broken")
 
         // writing results
-        lca.foreach { node => lcaWriter.writeRow(List(readId, node.id, node.name, node.rank)) }
-        bbh.foreach { node => bbhWriter.writeRow(List(readId, node.id, node.name, node.rank)) }
+        lca.foreach { node => lcaWriter.writeRow(List(readId, node.id, node.name, node.rank, averagePident)) }
+        bbh.foreach { node => bbhWriter.writeRow(List(readId, node.id, node.name, node.rank, maxHit._1.select(pident))) }
       }
 
     blastReader.close
