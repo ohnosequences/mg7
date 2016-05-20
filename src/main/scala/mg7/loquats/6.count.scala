@@ -84,8 +84,22 @@ case object countDataProcessing extends DataProcessingBundle(
     def processFile(assignsFile: File): (File, File, File, File) = {
 
       val assignsReader: CSVReader = csv.newReader(assignsFile)
-      val taxIDs: List[TaxID] = assignsReader.allWithHeaders.map { row => row(csv.columnNames.TaxID) }
+      val assigns: List[(TaxID, String)] = assignsReader.allWithHeaders.map { row =>
+        (row(csv.columnNames.TaxID), row(csv.columnNames.Pident))
+      }
       assignsReader.close
+
+      val taxIDs: List[TaxID] = assigns.map(_._1)
+
+      val averagePidents: Map[TaxID, String] = assigns
+        .toStream.groupBy { _._1 } // group by taxIDs
+        .map { case (taxID, pairs) =>
+
+          val pidents: Stream[Double] =
+            pairs.flatMap { case (_, pident) => parseDouble(pident) }
+
+          taxID -> (pidents.sum / pidents.length).toString
+        }
 
       // there as many assigned reads as there are tax IDs in the table
       val assignedReadsNumber: Double = taxIDs.length
@@ -122,7 +136,8 @@ case object countDataProcessing extends DataProcessingBundle(
         csv.columnNames.TaxID,
         csv.columnNames.TaxRank,
         csv.columnNames.TaxName,
-        file.name.replaceAll("\\.", "-")
+        file.name.replaceAll("\\.", "-"),
+        "AveragePident"
       )
       csvDirectWriter.writeRow(headerFor(outDirectFile))
       csvAccumWriter.writeRow(headerFor(outAccumFile))
@@ -142,7 +157,8 @@ case object countDataProcessing extends DataProcessingBundle(
           taxID,
           node.map(_.rank).getOrElse(""),
           node.map(_.name).getOrElse(""),
-          count
+          count,
+          averagePidents.get(taxID).getOrElse("-")
         )
 
         writerAbs.writeRow(row( absoluteCount.toString ))

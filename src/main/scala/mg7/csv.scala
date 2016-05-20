@@ -26,12 +26,13 @@ case object csv {
   // TODO: rewrite this with product types:
   case object columnNames {
 
+    val Lineage = "Lineage"
     val ReadID  = "Read-ID"
     val TaxID   = "Tax-ID"
     val TaxName = "Tax-name"
     val TaxRank = "Tax-rank"
     val Count   = "Count"
-    val Lineage = "Lineage"
+    val Pident  = "pident"
   }
 
   val statsHeader = List[String](
@@ -46,7 +47,8 @@ case object csv {
     columnNames.ReadID,
     columnNames.TaxID,
     columnNames.TaxName,
-    columnNames.TaxRank
+    columnNames.TaxRank,
+    columnNames.Pident
   )
 
   case class Row[Hs <: AnyProductType](

@@ -77,11 +77,9 @@ extends DataProcessingBundle()(
 
         // NOTE: currently we leave only hits with the same maximum pident,
         // so calculating average doesn't change anything, but it can be changed
-        val pidents: Seq[Int] = hits
-          .map{ row => parseInt(row.select(pident)) }
-          .collect{ case Some(i) => i }
+        val pidents: Seq[Double] = hits.flatMap{ row => parseDouble(row.select(pident)) }
 
-        val averagePident: Int = pidents.sum / pidents.length
+        val averagePident: Double = pidents.sum / pidents.length
 
         // for each hit row we take the column with ID and lookup its TaxID
         val taxasMap: Map[BlastRow, Seq[TaxID]] = hits.map { row =>
