@@ -90,26 +90,25 @@ extends DataProcessingBundle()(
         val maxHit: (BlastRow, Seq[TaxID]) = taxasMap.maxBy { case (row, taxas) =>
           parseInt(row.select(bitscore)).getOrElse(0)
         }
-        // TODO: take the most specific among the nodes (here we take just the first one)
-        val bbh: BBH = maxHit._2.headOption.flatMap(taxonomyGraph.getNode)
 
-        // NOTE: this shouldn't ever happen, so we throw an error here
-        if (bbh.isEmpty) sys.error("Failed to compute BBH; something is broken")
+        val bbh: BBH = maxHit._2
+          .flatMap(taxonomyGraph.getNode)
+          .maxBy(_.rankNumber)
+
 
         val nodes: Seq[TitanTaxonNode] = taxasMap
           .values.toSeq
           .flatten.distinct // only distinct IDs
           .flatMap(taxonomyGraph.getNode)
 
-        // and return the taxon node ID corresponding to the read
-        val lca: LCA = lowestCommonAncestor(nodes)
-
-        // NOTE: this shouldn't ever happen, so we throw an error here
-        if (lca.isEmpty) sys.error("Failed to compute LCA; something is broken")
+        val lca: LCA = lowestCommonAncestor(nodes).getOrElse(
+          // NOTE: this shouldn't ever happen, so we throw an error here
+          sys.error("Failed to compute LCA; something is broken")
+        )
 
         // writing results
-        lca.foreach { node => lcaWriter.writeRow(List(readId, node.id, node.name, node.rank, averagePident)) }
-        bbh.foreach { node => bbhWriter.writeRow(List(readId, node.id, node.name, node.rank, maxHit._1.select(pident))) }
+        lcaWriter.writeRow(List(readId, lca.id, lca.name, lca.rank, averagePident))
+        bbhWriter.writeRow(List(readId, bbh.id, bbh.name, bbh.rank, maxHit._1.select(pident)))
       }
 
     blastReader.close
