@@ -32,17 +32,27 @@ extends DataProcessingBundle()(
   type BlastRow = csv.Row[md.blastOutRec.Keys]
 
   // This iterates over reference DBs and merges their id2taxa tables in one Map
-  lazy val referenceMap: Map[ID, TaxID] = {
-    val refMap: scala.collection.mutable.Map[ID, TaxID] = scala.collection.mutable.Map()
+  lazy val referenceMap: Map[ID, Seq[TaxID]] = {
+    val refMap: scala.collection.mutable.Map[ID, Seq[TaxID]] = scala.collection.mutable.Map()
 
     md.referenceDBs.foreach { refDB =>
       val tsvReader = CSVReader.open( refDB.id2taxa.toJava )(csv.UnixTSVFormat)
-      tsvReader.iterator.foreach { row => refMap.updated(row(0), row(1)) }
+      tsvReader.iterator.foreach { row =>
+        refMap.updated(
+          // first column is the ID
+          row(0),
+          // second column is a sequence of tax IDs separated with ';'
+          row(1).split(';').map(_.trim)
+        )
+      }
       tsvReader.close
     }
 
     refMap.toMap
   }
+
+  def taxIDsFor(id: ID): Seq[TaxID] = referenceMap.get(id).getOrElse(Seq())
+
 
   def instructions: AnyInstructions = say("Let's see who is who!")
 
@@ -65,48 +75,40 @@ extends DataProcessingBundle()(
       // for each read evaluate LCA and BBH and write the output files
       .foreach { case (readId: ID, hits: Stream[BlastRow]) =>
 
-        val bbh: BBH = {
-          // best blast score is just a maximum in the `bitscore` column
-          val maxRow = hits.maxBy { row =>
-            parseInt(row.select(bitscore)).getOrElse(0)
-          }
-          referenceMap.get(maxRow.select(sseqid)).flatMap { taxId =>
-            taxonomyGraph.getNode(taxId)
-          }
-        }
+        // NOTE: currently we leave only hits with the same maximum pident,
+        // so calculating average doesn't change anything, but it can be changed
+        val pidents: Seq[Double] = hits.flatMap{ row => parseDouble(row.select(pident)) }
+
+        val averagePident: Double = pidents.sum / pidents.length
 
         // for each hit row we take the column with ID and lookup its TaxID
-        val (lostInMappingRows, taxIDs): (Seq[BlastRow], Seq[TaxID]) = hits.toSeq
-          .foldLeft(Seq[BlastRow](), Seq[TaxID]()) {
-            case ((rows, taxIDs), row) =>
-              referenceMap.get(row.select(sseqid)) match {
-                case None        => (row +: rows, taxIDs)
-                case Some(taxID) => (rows, taxID +: taxIDs)
-              }
-          }
+        val taxasMap: Map[BlastRow, Seq[TaxID]] = hits.map { row =>
+          row -> taxIDsFor(row.select(sseqid))
+        }.toMap
 
-        // then we try to retreive Titan taxon nodes
-        val (lostInBio4jTaxIDs, nodes): (Seq[TaxID], Seq[TitanTaxonNode]) =
-          taxIDs.distinct.foldLeft(Seq[TaxID](), Seq[TitanTaxonNode]()) {
-            case ((lostTaxIDs, nodes), taxID) =>
-              taxonomyGraph.getNode(taxID) match {
-                case None       => (taxID +: lostTaxIDs, nodes)
-                case Some(node) => (lostTaxIDs, node +: nodes)
-              }
-          }
+        // Best Blast Hit is just a maximum in the `bitscore` column
+        val maxHit: (BlastRow, Seq[TaxID]) = taxasMap.maxBy { case (row, taxas) =>
+          parseInt(row.select(bitscore)).getOrElse(0)
+        }
 
-        // and return the taxon node ID corresponding to the read
-        val lca: LCA = lowestCommonAncestor(nodes)
+        val bbh: BBH = maxHit._2
+          .flatMap(taxonomyGraph.getNode)
+          .maxBy(_.rankNumber)
 
-        // NOTE: this shouldn't ever happen, so we throw an error here
-        if (lca.isEmpty) sys.error("Failed to compute LCA; something is broken")
+
+        val nodes: Seq[TitanTaxonNode] = taxasMap
+          .values.toSeq
+          .flatten.distinct // only distinct IDs
+          .flatMap(taxonomyGraph.getNode)
+
+        val lca: LCA = lowestCommonAncestor(nodes).getOrElse(
+          // NOTE: this shouldn't ever happen, so we throw an error here
+          sys.error("Failed to compute LCA; something is broken")
+        )
 
         // writing results
-        lca.foreach { node => lcaWriter.writeRow(List(readId, node.id, node.name, node.rank)) }
-        bbh.foreach { node => bbhWriter.writeRow(List(readId, node.id, node.name, node.rank)) }
-
-        lostInMappingRows.foreach { row => lostInMappingFile.appendLine(row.values.mkString(",")) }
-        lostInBio4jTaxIDs.foreach { taxID => lostInBio4jFile.appendLine(taxID) }
+        lcaWriter.writeRow(List(readId, lca.id, lca.name, lca.rank, averagePident))
+        bbhWriter.writeRow(List(readId, bbh.id, bbh.name, bbh.rank, maxHit._1.select(pident)))
       }
 
     blastReader.close
@@ -117,8 +119,6 @@ extends DataProcessingBundle()(
     success(s"Results are ready",
       data.lcaChunk(lcaFile) ::
       data.bbhChunk(bbhFile) ::
-      data.lost.inMapping(lostInMappingFile) ::
-      data.lost.inBio4j(lostInBio4jFile) ::
       *[AnyDenotation { type Value <: FileResource }]
     )
   }

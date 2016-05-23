@@ -24,6 +24,30 @@ case object taxonomyTree {
 
       ancestors_rec(this, Seq())
     }
+
+    def rankNumber: Int = this.rank.trim.toLowerCase match {
+      case "superkingdom"     => 1
+      case "kingdom"          => 2
+      case "superphylum"      => 3
+      case "phylum"           => 4
+      case "subphylum"        => 5
+      case "class"            => 6
+      case "subclass"         => 7
+      case "order"            => 8
+      case "suborder"         => 9
+      case "family"           => 10
+      case "subfamily"        => 11
+      case "tribe"            => 12
+      case "subtribe"         => 13
+      case "genus"            => 14
+      case "subgenus"         => 15
+      case "species group"    => 16
+      case "species subgroup" => 17
+      case "species"          => 18
+      case "subspecies"       => 19
+      // "no rank"
+      case _ => this.parent.map(_.rankNumber).getOrElse(0) + 1
+    }
   }
 
   /* Path in the tree stores a sequence of nodes from bottom to top */
@@ -44,5 +68,31 @@ case object taxonomyTree {
       .reduceOption(longestCommonPrefix)
       .flatMap(_.lastOption)
   }
+
+  // // TODO: move it all to the Bio4j taxonomy dist
+  // sealed trait AnyTaxonomicRank
+  //
+  // case object NoRank extends AnyTaxonomicRank
+  // sealed class TaxonomicRank(toInt: Int)
+  //
+  // case object Superkingdom    extends TaxonomicRank(1)
+  // case object Kingdom         extends TaxonomicRank(2)
+  // case object Superphylum     extends TaxonomicRank(3)
+  // case object Phylum          extends TaxonomicRank(4)
+  // case object Subphylum       extends TaxonomicRank(5)
+  // case object Class           extends TaxonomicRank(6)
+  // case object Subclass        extends TaxonomicRank(7)
+  // case object Order           extends TaxonomicRank(8)
+  // case object Suborder        extends TaxonomicRank(9)
+  // case object Family          extends TaxonomicRank(10)
+  // case object Subfamily       extends TaxonomicRank(11)
+  // case object Tribe           extends TaxonomicRank(12)
+  // case object Subtribe        extends TaxonomicRank(13)
+  // case object Genus           extends TaxonomicRank(14)
+  // case object Subgenus        extends TaxonomicRank(15)
+  // case object SpeciesGroup    extends TaxonomicRank(16)
+  // case object SpeciesSubgroup extends TaxonomicRank(17)
+  // case object Species         extends TaxonomicRank(18)
+  // case object Subspecies      extends TaxonomicRank(19)
 
 }

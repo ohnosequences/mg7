@@ -14,8 +14,8 @@ package object mg7 {
   type ReadID = ID
   type NodeID = ID
 
-  type LCA = Option[AnyTaxonNode]
-  type BBH = Option[AnyTaxonNode]
+  type LCA = AnyTaxonNode
+  type BBH = AnyTaxonNode
 
   type SampleID = ID
   type StepName = String
