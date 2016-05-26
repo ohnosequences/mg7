@@ -27,12 +27,12 @@ extends DataProcessingBundle()(
   override val bundleDependencies: List[AnyBundle] =
     bio4j.taxonomyBundle :: md.referenceDBs.toList
 
-  lazy val taxonomyGraph: TitanNCBITaxonomyGraph = bio4j.taxonomyBundle.graph
+  private lazy val taxonomyGraph: TitanNCBITaxonomyGraph = bio4j.taxonomyBundle.graph
 
   type BlastRow = csv.Row[md.blastOutRec.Keys]
 
   // This iterates over reference DBs and merges their id2taxa tables in one Map
-  lazy val referenceMap: Map[ID, Seq[TaxID]] = {
+  private lazy val referenceMap: Map[ID, Seq[TaxID]] = {
     val refMap: scala.collection.mutable.Map[ID, Seq[TaxID]] = scala.collection.mutable.Map()
 
     md.referenceDBs.foreach { refDB =>
@@ -51,7 +51,18 @@ extends DataProcessingBundle()(
     refMap.toMap
   }
 
-  def taxIDsFor(id: ID): Seq[TaxID] = referenceMap.get(id).getOrElse(Seq())
+  private def taxIDsFor(id: ID): Seq[TaxID] = referenceMap.get(id).getOrElse(Seq())
+
+  private def maximums[T, X](s: Iterable[T])(f: T => X)
+    (implicit cmp: Ordering[X]): List[T] =
+      s.foldLeft(List[T]()) {
+        case (a :: acc, t) if (    cmp.lt(f(t), f(a)) ) => a :: acc
+        case (a :: acc, t) if ( cmp.equiv(f(t), f(a)) ) => t :: a :: acc
+        // either acc is empty or t is the new maximum
+        case (_, t) => List(t)
+      }
+
+  private def averageOf(vals: Seq[Double]): Double = vals.sum / vals.length
 
 
   def instructions: AnyInstructions = say("Let's see who is who!")
@@ -75,40 +86,55 @@ extends DataProcessingBundle()(
       // for each read evaluate LCA and BBH and write the output files
       .foreach { case (readId: ID, hits: Stream[BlastRow]) =>
 
-        // NOTE: currently we leave only hits with the same maximum pident,
-        // so calculating average doesn't change anything, but it can be changed
-        val pidents: Seq[Double] = hits.flatMap{ row => parseDouble(row.select(pident)) }
-
-        val averagePident: Double = pidents.sum / pidents.length
-
-        // for each hit row we take the column with ID and lookup its TaxID
-        val taxasMap: Map[BlastRow, Seq[TaxID]] = hits.map { row =>
+        // for each hit row we take the column with ID and lookup corresponding TaxIDs
+        val assignments: List[(BlastRow, Seq[TaxID])] = hits.toList.map { row =>
           row -> taxIDsFor(row.select(sseqid))
-        }.toMap
-
-        // Best Blast Hit is just a maximum in the `bitscore` column
-        val maxHit: (BlastRow, Seq[TaxID]) = taxasMap.maxBy { case (row, taxas) =>
-          parseInt(row.select(bitscore)).getOrElse(0)
         }
 
-        val bbh: BBH = maxHit._2
+        //// Best Blast Hit ////
+
+        // best hits are those that have maximum in the `bitscore` column
+        val bbhHits: List[(BlastRow, Seq[TaxID])] = maximums(assignments) { case (row, _) =>
+          parseLong(row.select(bitscore)).getOrElse(0L)
+        }
+
+        // `pident` values of those hits that have maximum `bitscore`
+        val bbhPidents: Seq[Double] = bbhHits.flatMap{ case (row, _) => parseDouble(row.select(pident)) }
+
+        // nodes corresponding to the max-bitscore hits
+        val bbhNodes: Seq[TitanTaxonNode] = bbhHits
+          .flatMap(_._2).distinct // only distinct Tax IDs
           .flatMap(taxonomyGraph.getNode)
-          .maxBy(_.rankNumber)
+
+        // BBH node is the lowest common ancestor of the most rank-specific nodes
+        val bbhNode: BBH = lowestCommonAncestor(
+          maximums(bbhNodes) { _.rankNumber }
+        ).getOrElse(
+          // NOTE: this shouldn't ever happen, so we throw an error here
+          sys.error("Failed to compute BBH; something is broken")
+        )
 
 
-        val nodes: Seq[TitanTaxonNode] = taxasMap
-          .values.toSeq
-          .flatten.distinct // only distinct IDs
+        //// Lowest Common Ancestor ////
+
+        // NOTE: currently we leave only hits with the same maximum pident,
+        // so calculating average doesn't change anything, but it can be changed
+        val allPidents: Seq[Double] = hits.flatMap{ row => parseDouble(row.select(pident)) }
+
+        // nodes corresponding to all hits
+        val allNodes: Seq[TitanTaxonNode] = assignments
+          .flatMap(_._2).distinct // only distinct Tax IDs
           .flatMap(taxonomyGraph.getNode)
 
-        val lca: LCA = lowestCommonAncestor(nodes).getOrElse(
+        val lcaNode: LCA = lowestCommonAncestor(allNodes).getOrElse(
           // NOTE: this shouldn't ever happen, so we throw an error here
           sys.error("Failed to compute LCA; something is broken")
         )
 
+
         // writing results
-        lcaWriter.writeRow(List(readId, lca.id, lca.name, lca.rank, averagePident))
-        bbhWriter.writeRow(List(readId, bbh.id, bbh.name, bbh.rank, maxHit._1.select(pident)))
+        bbhWriter.writeRow(List(readId, bbhNode.id, bbhNode.name, bbhNode.rank, averageOf(bbhPidents)))
+        lcaWriter.writeRow(List(readId, lcaNode.id, lcaNode.name, lcaNode.rank, averageOf(allPidents)))
       }
 
     blastReader.close

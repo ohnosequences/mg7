@@ -21,6 +21,7 @@ package object mg7 {
   type StepName = String
 
   def parseInt(str: String): Option[Int] = util.Try(str.toInt).toOption
+  def parseLong(str: String): Option[Long] = util.Try(str.toLong).toOption
   def parseDouble(str: String): Option[Double] = util.Try(str.toDouble).toOption
 
   def lookup[A, B](a: A, m: Map[A, B]): (A, B) = a -> m.apply(a)
