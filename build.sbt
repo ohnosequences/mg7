@@ -23,13 +23,12 @@ libraryDependencies ++= Seq(
   "ohnosequences" %% "datasets"     % "0.3.0",
   "ohnosequences" %% "loquat"       % "2.0.0-M8",
   "ohnosequences" %% "statika"      % "2.0.0-M5",
-  "era7bio"       %% "rnacentraldb" % "0.2.1",
   // bundles:
   "ohnosequences-bundles" %% "flash"      % "0.2.0",
   "ohnosequences-bundles" %% "blast"      % "0.3.0",
   "ohnosequences-bundles" %% "bio4j-dist" % "0.2.0",
   // testing:
-  "era7bio"       %% "db-rna16s" % "0.6.0" % Test,
+  "era7bio"       %% "db-rna16s" % "0.6.5" % Test,
   "org.scalatest" %% "scalatest" % "2.2.6" % Test
 )
 

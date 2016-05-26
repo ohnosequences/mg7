@@ -8,8 +8,6 @@ import ohnosequences.flash.api._
 import ohnosequences.blast.api._
 import ohnosequences.blast.api.{ outputFields => out }
 
-import era7bio.db._
-
 import better.files._
 
 
@@ -54,7 +52,7 @@ trait AnyMG7Parameters {
 
   val blastOptions: BlastCommand#OptionsVals
 
-  val referenceDBs: Set[AnyBlastDBRelease]
+  val referenceDBs: Set[AnyReferenceDB]
 
   // has to be provided implicitly
   implicit val argValsToSeq: BlastOptionsToSeq[BlastArgumentsVals]
@@ -66,7 +64,7 @@ trait AnyMG7Parameters {
     BlastExpression(blastCommand)(
       outputRecord = blastOutRec,
       argumentValues =
-        db(referenceDBs.map(_.dbName)) ::
+        db(referenceDBs.map(_.blastDBName)) ::
         query(inFile) ::
         ohnosequences.blast.api.out(outFile) ::
         *[AnyDenotation],
@@ -106,7 +104,7 @@ abstract class MG7Parameters[
   val blastCommand: BC = blastn,
   val blastOutRec: BlastOutputRecord[BK]  = defaultBlastOutRec,
   val blastOptions: BC#OptionsVals        = defaultBlastnOptions.value,
-  val referenceDBs: Set[AnyBlastDBRelease]
+  val referenceDBs: Set[AnyReferenceDB]
 )(implicit
   val argValsToSeq: BlastOptionsToSeq[BC#ArgumentsVals],
   val optValsToSeq: BlastOptionsToSeq[BC#OptionsVals],
