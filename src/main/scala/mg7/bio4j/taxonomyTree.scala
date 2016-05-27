@@ -9,7 +9,7 @@ case object taxonomyTree {
 
     def id: String
     def name: String
-    def rank: String
+    def rankName: String
 
     // root doesn't have parent
     def parent: Option[AnyTaxonNode]
@@ -25,7 +25,7 @@ case object taxonomyTree {
       ancestors_rec(this, Seq())
     }
 
-    def rankNumber: Int = this.rank.trim.toLowerCase match {
+    def rankNumber: Int = this.rankName.trim.toLowerCase match {
       case "superkingdom"     => 1
       case "kingdom"          => 2
       case "superphylum"      => 3
@@ -48,6 +48,8 @@ case object taxonomyTree {
       // "no rank"
       case _ => this.parent.map(_.rankNumber).getOrElse(0) + 1
     }
+
+    def rank: String = s"${this.rankNumber}: ${this.rankName}"
   }
 
   /* Path in the tree stores a sequence of nodes from bottom to top */

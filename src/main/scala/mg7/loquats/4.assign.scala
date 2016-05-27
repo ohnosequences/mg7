@@ -122,8 +122,8 @@ extends DataProcessingBundle()(
 
 
         // writing results
-        bbhWriter.writeRow(List(readId, bbhNode.id, bbhNode.name, bbhNode.rank, averageOf(bbhPidents)))
-        lcaWriter.writeRow(List(readId, lcaNode.id, lcaNode.name, lcaNode.rank, averageOf(allPidents)))
+        bbhWriter.writeRow(List(readId, bbhNode.id, bbhNode.name, bbhNode.rank, f"${averageOf(bbhPidents)}%.2f"))
+        lcaWriter.writeRow(List(readId, lcaNode.id, lcaNode.name, lcaNode.rank, f"${averageOf(allPidents)}%.2f"))
       }
 
     blastReader.close
