@@ -38,7 +38,7 @@ extends DataProcessingBundle()(
     md.referenceDBs.foreach { refDB =>
       val tsvReader = CSVReader.open( refDB.id2taxas.toJava )(csv.UnixTSVFormat)
       tsvReader.iterator.foreach { row =>
-        refMap.updated(
+        refMap.update(
           // first column is the ID
           row(0),
           // second column is a sequence of tax IDs separated with ';'
@@ -52,17 +52,6 @@ extends DataProcessingBundle()(
   }
 
   private def taxIDsFor(id: ID): Seq[TaxID] = referenceMap.get(id).getOrElse(Seq())
-
-  private def maximums[T, X](s: Iterable[T])(f: T => X)
-    (implicit cmp: Ordering[X]): List[T] =
-      s.foldLeft(List[T]()) {
-        case (a :: acc, t) if (    cmp.lt(f(t), f(a)) ) => a :: acc
-        case (a :: acc, t) if ( cmp.equiv(f(t), f(a)) ) => t :: a :: acc
-        // either acc is empty or t is the new maximum
-        case (_, t) => List(t)
-      }
-
-  private def averageOf(vals: Seq[Double]): Double = vals.sum / vals.length
 
 
   def instructions: AnyInstructions = say("Let's see who is who!")

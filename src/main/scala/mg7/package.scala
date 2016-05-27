@@ -4,7 +4,6 @@ import ohnosequences.mg7.bio4j.taxonomyTree._
 import ohnosequences.cosas._, types._, klists._, typeUnions._
 import ohnosequences.blast.api._
 
-// import com.github.tototoshi.csv._
 import better.files._
 
 package object mg7 {
@@ -25,6 +24,17 @@ package object mg7 {
   def parseDouble(str: String): Option[Double] = util.Try(str.toDouble).toOption
 
   def lookup[A, B](a: A, m: Map[A, B]): (A, B) = a -> m.apply(a)
+
+  def maximums[T, X](s: Iterable[T])(f: T => X)
+    (implicit cmp: Ordering[X]): List[T] =
+      s.foldLeft(List[T]()) {
+        case (a :: acc, t) if (    cmp.lt(f(t), f(a)) ) => a :: acc
+        case (a :: acc, t) if ( cmp.equiv(f(t), f(a)) ) => t :: a :: acc
+        // either acc is empty or t is the new maximum
+        case (_, t) => List(t)
+      }
+
+  def averageOf(vals: Seq[Double]): Double = vals.sum / vals.length
 
 
   type BlastArgumentsVals =
