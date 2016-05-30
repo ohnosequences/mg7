@@ -162,7 +162,7 @@ case object countDataProcessing extends DataProcessingBundle(
         )
 
         writerAbs.writeRow(row( absoluteCount.toString ))
-        writerFrq.writeRow(row( f"${frequency(absoluteCount) * 100}%.2f" ))
+        writerFrq.writeRow(row( f"${frequency(absoluteCount) * 100}%.4f" ))
       }
 
       writeCounts(direct,      csvDirectWriter, csvDirectFreqWriter)
