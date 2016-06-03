@@ -9,7 +9,7 @@ case object taxonomy {
 
     val id = this.toString
     val name = id
-    val rank = ""
+    val rankName = ""
   }
 
   abstract class Node(p: AnyNode) extends AnyNode(Some(p))
