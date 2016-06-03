@@ -1,0 +1,17 @@
+This milestone adds some important features and improves the output data presentation. Here are the main changes since the [v1.0-M3 release](https://github.com/ohnosequences/mg7/releases/tag/v1.0.0-M3):
+
+* New features:
+  - #65: Added average `pident` (**percentage of identity**) column to the assignment and counts tables
+  - #66: Combining **multiple reference DBs**
+  - #68: Assignment now can handle **multiple taxas** per reference sequence
+  - #72: BBH is now evaluated as the _lowest common ancestor_ of the **most rank-specific nodes** of the max-`bitscore` hits
+  - #70: Replaced db.rnacentral library dependency with the `ReferenceDB` class
+
+* Various output tables improvements:
+  - #69: Moved lineage column to the 1st position
+  - #74: Added rank number for ordering rows by rank
+  - #75, #76: Changed frequency counts to percentage (i.e. 100-based)
+
+----
+
+See the full list of pull requests merged in this release in the [v1.0-M4 milestone](https://github.com/ohnosequences/mg7/issues?q=milestone%3Av1.0-M4).
