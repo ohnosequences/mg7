@@ -32,7 +32,7 @@ case object csv {
     val TaxName = "Tax-name"
     val TaxRank = "Tax-rank"
     val Count   = "Count"
-    val Pident  = "pident"
+    val Pident  = "Pident"
   }
 
   val statsHeader = List[String](

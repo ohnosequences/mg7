@@ -123,8 +123,8 @@ case object countDataProcessing extends DataProcessingBundle(
 
       val outDirectFile = context / s"${filesPrefix}.direct.absolute.counts"
       val outAccumFile  = context / s"${filesPrefix}.accum.absolute.counts"
-      val outDirectFreqFile = context / s"${filesPrefix}.direct.frequency.counts"
-      val outAccumFreqFile  = context / s"${filesPrefix}.accum.frequency.counts"
+      val outDirectFreqFile = context / s"${filesPrefix}.direct.frequency.percentage"
+      val outAccumFreqFile  = context / s"${filesPrefix}.accum.frequency.percentage"
 
       val csvDirectWriter = csv.newWriter(outDirectFile)
       val csvAccumWriter  = csv.newWriter(outAccumFile)
@@ -137,7 +137,7 @@ case object countDataProcessing extends DataProcessingBundle(
         csv.columnNames.TaxRank,
         csv.columnNames.TaxName,
         file.name.replaceAll("\\.", "-"),
-        "AveragePident"
+        "Average-Pident"
       )
       csvDirectWriter.writeRow(headerFor(outDirectFile))
       csvAccumWriter.writeRow(headerFor(outAccumFile))
