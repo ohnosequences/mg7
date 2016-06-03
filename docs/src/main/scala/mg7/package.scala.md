@@ -6,7 +6,6 @@ import ohnosequences.mg7.bio4j.taxonomyTree._
 import ohnosequences.cosas._, types._, klists._, typeUnions._
 import ohnosequences.blast.api._
 
-// import com.github.tototoshi.csv._
 import better.files._
 
 package object mg7 {
@@ -16,16 +15,28 @@ package object mg7 {
   type ReadID = ID
   type NodeID = ID
 
-  type LCA = Option[AnyTaxonNode]
-  type BBH = Option[AnyTaxonNode]
+  type LCA = AnyTaxonNode
+  type BBH = AnyTaxonNode
 
   type SampleID = ID
   type StepName = String
 
   def parseInt(str: String): Option[Int] = util.Try(str.toInt).toOption
+  def parseLong(str: String): Option[Long] = util.Try(str.toLong).toOption
   def parseDouble(str: String): Option[Double] = util.Try(str.toDouble).toOption
 
   def lookup[A, B](a: A, m: Map[A, B]): (A, B) = a -> m.apply(a)
+
+  def maximums[T, X](s: Iterable[T])(f: T => X)
+    (implicit cmp: Ordering[X]): List[T] =
+      s.foldLeft(List[T]()) {
+        case (a :: acc, t) if (    cmp.lt(f(t), f(a)) ) => a :: acc
+        case (a :: acc, t) if ( cmp.equiv(f(t), f(a)) ) => t :: a :: acc
+        // either acc is empty or t is the new maximum
+        case (_, t) => List(t)
+      }
+
+  def averageOf(vals: Seq[Double]): Double = vals.sum / vals.length
 
 
   type BlastArgumentsVals =
@@ -91,6 +102,7 @@ We're going to use all hits to do global sample-coherent assignment. But not now
 [main/scala/mg7/loquats/8.summary.scala]: loquats/8.summary.scala.md
 [main/scala/mg7/package.scala]: package.scala.md
 [main/scala/mg7/parameters.scala]: parameters.scala.md
+[main/scala/mg7/referenceDB.scala]: referenceDB.scala.md
 [test/scala/mg7/counts.scala]: ../../../test/scala/mg7/counts.scala.md
 [test/scala/mg7/lca.scala]: ../../../test/scala/mg7/lca.scala.md
 [test/scala/mg7/pipeline.scala]: ../../../test/scala/mg7/pipeline.scala.md

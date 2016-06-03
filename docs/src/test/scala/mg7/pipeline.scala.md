@@ -20,13 +20,19 @@ import com.amazonaws.auth._, profile._
 
 case object test {
 
+  case object rna16sRefDB extends ReferenceDB(
+    name = "era7bio.db.rna16s",
+    blastDBS3 = era7bio.db.rna16s.s3location / "blastdb" /,
+    id2taxasS3 = era7bio.db.rna16s.s3location / "data" / "id2taxa.tsv"
+  )
+
   case object testParameters extends MG7Parameters(
     outputS3Folder = testOutS3Folder,
     readsLength = bp300,
     // blastCommand = blastn,
     // blastOutRec  = defaultBlastOutRec,
     // blastOptions = defaultBlastnOptions.value
-    referenceDB  = era7bio.db.rna16s.release
+    referenceDBs = Set(rna16sRefDB)
   ) {
 
     // an example of how you can add some conditions to the filter predicate
@@ -153,6 +159,7 @@ case object test {
 [main/scala/mg7/loquats/8.summary.scala]: ../../../main/scala/mg7/loquats/8.summary.scala.md
 [main/scala/mg7/package.scala]: ../../../main/scala/mg7/package.scala.md
 [main/scala/mg7/parameters.scala]: ../../../main/scala/mg7/parameters.scala.md
+[main/scala/mg7/referenceDB.scala]: ../../../main/scala/mg7/referenceDB.scala.md
 [test/scala/mg7/counts.scala]: counts.scala.md
 [test/scala/mg7/lca.scala]: lca.scala.md
 [test/scala/mg7/pipeline.scala]: pipeline.scala.md

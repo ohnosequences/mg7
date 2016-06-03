@@ -10,8 +10,6 @@ import ohnosequences.flash.api._
 import ohnosequences.blast.api._
 import ohnosequences.blast.api.{ outputFields => out }
 
-import era7bio.db._
-
 import better.files._
 
 
@@ -64,7 +62,7 @@ BLAST parameters
 
   val blastOptions: BlastCommand#OptionsVals
 
-  val referenceDB: AnyBlastDBRelease
+  val referenceDBs: Set[AnyReferenceDB]
 
   // has to be provided implicitly
   implicit val argValsToSeq: BlastOptionsToSeq[BlastArgumentsVals]
@@ -76,7 +74,7 @@ BLAST parameters
     BlastExpression(blastCommand)(
       outputRecord = blastOutRec,
       argumentValues =
-        db(Set(referenceDB.dbName)) ::
+        db(referenceDBs.map(_.blastDBName)) ::
         query(inFile) ::
         ohnosequences.blast.api.out(outFile) ::
         *[AnyDenotation],
@@ -116,7 +114,7 @@ abstract class MG7Parameters[
   val blastCommand: BC = blastn,
   val blastOutRec: BlastOutputRecord[BK]  = defaultBlastOutRec,
   val blastOptions: BC#OptionsVals        = defaultBlastnOptions.value,
-  val referenceDB: AnyBlastDBRelease
+  val referenceDBs: Set[AnyReferenceDB]
 )(implicit
   val argValsToSeq: BlastOptionsToSeq[BC#ArgumentsVals],
   val optValsToSeq: BlastOptionsToSeq[BC#OptionsVals],
@@ -180,6 +178,7 @@ case object defaultBlastOutRec extends BlastOutputRecord(
 [main/scala/mg7/loquats/8.summary.scala]: loquats/8.summary.scala.md
 [main/scala/mg7/package.scala]: package.scala.md
 [main/scala/mg7/parameters.scala]: parameters.scala.md
+[main/scala/mg7/referenceDB.scala]: referenceDB.scala.md
 [test/scala/mg7/counts.scala]: ../../../test/scala/mg7/counts.scala.md
 [test/scala/mg7/lca.scala]: ../../../test/scala/mg7/lca.scala.md
 [test/scala/mg7/pipeline.scala]: ../../../test/scala/mg7/pipeline.scala.md

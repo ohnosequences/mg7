@@ -28,12 +28,13 @@ case object csv {
   // TODO: rewrite this with product types:
   case object columnNames {
 
+    val Lineage = "Lineage"
     val ReadID  = "Read-ID"
     val TaxID   = "Tax-ID"
     val TaxName = "Tax-name"
     val TaxRank = "Tax-rank"
     val Count   = "Count"
-    val Lineage = "Lineage"
+    val Pident  = "Pident"
   }
 
   val statsHeader = List[String](
@@ -48,7 +49,8 @@ case object csv {
     columnNames.ReadID,
     columnNames.TaxID,
     columnNames.TaxName,
-    columnNames.TaxRank
+    columnNames.TaxRank,
+    columnNames.Pident
   )
 
   case class Row[Hs <: AnyProductType](
@@ -102,6 +104,7 @@ case object csv {
 [main/scala/mg7/loquats/8.summary.scala]: loquats/8.summary.scala.md
 [main/scala/mg7/package.scala]: package.scala.md
 [main/scala/mg7/parameters.scala]: parameters.scala.md
+[main/scala/mg7/referenceDB.scala]: referenceDB.scala.md
 [test/scala/mg7/counts.scala]: ../../../test/scala/mg7/counts.scala.md
 [test/scala/mg7/lca.scala]: ../../../test/scala/mg7/lca.scala.md
 [test/scala/mg7/pipeline.scala]: ../../../test/scala/mg7/pipeline.scala.md

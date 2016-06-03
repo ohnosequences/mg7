@@ -11,7 +11,7 @@ case object taxonomy {
 
     val id = this.toString
     val name = id
-    val rank = ""
+    val rankName = ""
   }
 
   abstract class Node(p: AnyNode) extends AnyNode(Some(p))
@@ -58,6 +58,7 @@ case object taxonomy {
 [main/scala/mg7/loquats/8.summary.scala]: ../../../main/scala/mg7/loquats/8.summary.scala.md
 [main/scala/mg7/package.scala]: ../../../main/scala/mg7/package.scala.md
 [main/scala/mg7/parameters.scala]: ../../../main/scala/mg7/parameters.scala.md
+[main/scala/mg7/referenceDB.scala]: ../../../main/scala/mg7/referenceDB.scala.md
 [test/scala/mg7/counts.scala]: counts.scala.md
 [test/scala/mg7/lca.scala]: lca.scala.md
 [test/scala/mg7/pipeline.scala]: pipeline.scala.md

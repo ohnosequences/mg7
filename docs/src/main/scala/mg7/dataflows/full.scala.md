@@ -126,6 +126,7 @@ case class FullDataflow[P <: AnyMG7Parameters](val params: P)(
 [main/scala/mg7/loquats/8.summary.scala]: ../loquats/8.summary.scala.md
 [main/scala/mg7/package.scala]: ../package.scala.md
 [main/scala/mg7/parameters.scala]: ../parameters.scala.md
+[main/scala/mg7/referenceDB.scala]: ../referenceDB.scala.md
 [test/scala/mg7/counts.scala]: ../../../../test/scala/mg7/counts.scala.md
 [test/scala/mg7/lca.scala]: ../../../../test/scala/mg7/lca.scala.md
 [test/scala/mg7/pipeline.scala]: ../../../../test/scala/mg7/pipeline.scala.md
