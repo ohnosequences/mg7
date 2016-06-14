@@ -13,6 +13,10 @@ resolvers := Seq(
   "Era7 public maven snapshots" at s3("snapshots.era7.com").toHttps(s3region.value.toString)
 ) ++ resolvers.value
 
+resolvers in Test := Seq(
+  "Era7 private maven releases"  at s3("private.releases.era7.com").toHttps(s3region.value.toString)
+) ++ resolvers.value
+
 libraryDependencies ++= Seq(
   // APIs:
   "ohnosequences" %% "flash"      % "0.3.0",
@@ -27,8 +31,10 @@ libraryDependencies ++= Seq(
   "ohnosequences-bundles" %% "flash"      % "0.2.0",
   "ohnosequences-bundles" %% "blast"      % "0.3.0",
   "ohnosequences-bundles" %% "bio4j-dist" % "0.2.0",
+  // defaults:
+  "era7bio"       %% "defaults"  % "0.2.0" % Test,
   // testing:
-  "era7bio"       %% "db-rna16s" % "0.6.5" % Test,
+  "era7bio"       %% "db-rna16s" % "0.8.0" % Test,
   "org.scalatest" %% "scalatest" % "2.2.6" % Test
 )
 
