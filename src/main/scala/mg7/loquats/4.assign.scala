@@ -36,8 +36,8 @@ extends DataProcessingBundle()(
     val refMap: scala.collection.mutable.Map[ID, Seq[TaxID]] = scala.collection.mutable.Map()
 
     md.referenceDBs.foreach { refDB =>
-      val tsvReader = CSVReader.open( refDB.id2taxas.toJava )(csv.UnixTSVFormat)
-      tsvReader.iterator.foreach { row =>
+      val reader = newReader(refDB.id2taxas)
+      reader.iterator.foreach { row =>
         refMap.update(
           // first column is the ID
           row(0),
@@ -45,7 +45,7 @@ extends DataProcessingBundle()(
           row(1).split(';').map(_.trim)
         )
       }
-      tsvReader.close
+      reader.close
     }
 
     refMap.toMap
