@@ -9,10 +9,6 @@ import better.files._
 
 case object csv {
 
-  case object UnixTSVFormat extends TSVFormat {
-    override val lineTerminator: String = "\n"
-  }
-
   case object UnixCSVFormat extends DefaultCSVFormat {
     override val lineTerminator: String = "\n"
   }
