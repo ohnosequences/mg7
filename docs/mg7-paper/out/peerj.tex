@@ -1,0 +1,66 @@
+\documentclass[fleqn,10pt,lineno]{wlpeerj}
+
+\definecolor{OldCyan}{RGB}{62,127,137}
+% hyperref
+\usepackage[breaklinks=true]{hyperref}
+\hypersetup{
+  % setpagesize=false, % page size defined by xetex
+  % unicode=true, % unicode breaks when used with xetex
+  pdfnewwindow,
+  colorlinks,%
+  citecolor=OldCyan,%
+  filecolor=OldCyan,%
+  linkcolor=OldCyan,%
+  urlcolor=OldCyan,
+  urlbordercolor=OldCyan
+}
+\let\OldHref\href
+\renewcommand{\href}[2]{\OldHref[pdfnewwindow]{#1}{{#2}}}
+
+% ugly fix for latest pandoc
+\providecommand{\tightlist}{%
+\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+\title{$title$}
+
+$for(authors)$
+\author[$authors.position$]{$authors.name$} \affil[$authors.position$]{$authors.affiliation$}
+$endfor$
+
+\keywords{$for(keywords)$ $keywords$$sep$,$endfor$}
+
+% PeerJ doesn't like numbered sections
+\setcounter{secnumdepth}{0}
+
+% \renewcommand\refname{$biblio-title$}
+
+$if(abstract)$
+\begin{abstract}
+$abstract$
+\end{abstract}
+$endif$
+
+\begin{document}
+
+\flushbottom
+\maketitle
+\thispagestyle{empty}
+
+
+$body$
+
+$if(natbib)$
+  $if(biblio-files)$
+    $if(biblio-title)$
+      $if(book-class)$
+% \renewcommand\bibname{$biblio-title$}
+      $else$
+% \renewcommand\refname{$biblio-title$}
+      $endif$
+    $endif$
+  $endif$
+$endif$
+
+\bibliography{$bibliography$}
+
+\end{document}
