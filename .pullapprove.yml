@@ -11,6 +11,7 @@ reviewers:
         required: 1
         members:
             - laughedelic
+            - eparejatobes
         conditions:
             branches:
                 - master
