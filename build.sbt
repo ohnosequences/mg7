@@ -2,7 +2,7 @@ Nice.scalaProject
 
 name          := "mg7"
 organization  := "ohnosequences"
-description   := "metagenomica project"
+description   := "Configurable, scalable 16S metagenomics data analysis"
 
 bucketSuffix  := "era7.com"
 
