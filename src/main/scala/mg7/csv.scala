@@ -24,6 +24,7 @@ case object csv {
 
     val Lineage = "Lineage"
     val ReadID  = "Read-ID"
+    // TODO better Taxa/Taxon
     val TaxID   = "Tax-ID"
     val TaxName = "Tax-name"
     val TaxRank = "Tax-rank"
