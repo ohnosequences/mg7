@@ -16,31 +16,32 @@ import ohnosequences.awstools.autoscaling._
 import ohnosequences.awstools.regions.Region._
 import com.amazonaws.auth._, profile._
 
+// TODO this description is outdated right? assignment is done per chunk IIRC
 /* ## No-flash Dataflow
 
-  No-flash dataflow consists of the following steps of the MG7 pipeline:
+  No-flash dataflow does the same as the full one *but* the first flash-based merging step:
 
-  2. split: splitting each dataset of reads on small chunks
-  3. blast: processing each chunk of reads with blast
-  4. merge: merging blast chunks into complete results per original reads datasets
-  5. assign: assigning taxons (LCA and BBH)
-  6. count: count assigns
+  1. **split** split each reads dataset into smaller chunks
+  2. **blast** blast each chunk of reads against the reference database
+  3. **merge** merge blast results for each reads dataset
+  4. **assign** assign reads to taxa (LCA and BBH)
+  5. **count** count assignments
 */
 trait AnyNoFlashDataflow extends AnyDataflow {
 
   val splitInputs: Map[SampleID, S3Resource]
 
-  lazy val splitDataMappings = splitInputs.toList.map { case (sampleId, readsS3Resource) =>
-
-    DataMapping(sampleId, splitDataProcessing(params))(
-      remoteInput = Map(
-        data.mergedReads -> readsS3Resource
-      ),
-      remoteOutput = Map(
-        data.fastaChunks -> S3Resource(params.outputS3Folder(sampleId, "split"))
+  lazy val splitDataMappings =
+    splitInputs.toList.map { case (sampleId, readsS3Resource) =>
+      DataMapping(sampleId, splitDataProcessing(params))(
+        remoteInput = Map(
+          data.mergedReads -> readsS3Resource
+        ),
+        remoteOutput = Map(
+          data.fastaChunks -> S3Resource(params.outputS3Folder(sampleId, "split"))
+        )
       )
-    )
-  }
+    }
 
   lazy val blastDataMappings = splitDataMappings.flatMap { splitDM =>
     val sampleId = splitDM.label
