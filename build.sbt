@@ -38,10 +38,7 @@ dependencyOverrides ++= Set(
 )
 
 
-
-// //// Uncomment for testing: ////
 fatArtifactSettings
-//
 // copied from bio4j-titan:
 mergeStrategy in assembly ~= { old => {
     case "log4j.properties"                       => MergeStrategy.filterDistinctLines
@@ -57,9 +54,6 @@ buildInfoOptions := Seq(BuildInfoOption.Traits("ohnosequences.statika.AnyArtifac
 buildInfoKeys    := Seq[BuildInfoKey](
   organization,
   version,
-  "artifact" -> name.value.toLowerCase,
+  "artifact"    -> name.value.toLowerCase,
   "artifactUrl" -> fatArtifactUrl.value
 )
-
-// // For including test code in the fat artifact:
-// unmanagedSourceDirectories in Compile += (scalaSource in Test).value / "metagenomica"
