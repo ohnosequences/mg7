@@ -1,29 +1,27 @@
 package ohnosequences.mg7.loquats
 
-import ohnosequences.mg7._
-import ohnosequences.mg7.bio4j._, taxonomyTree._, titanTaxonomyTree._
+import ohnosequences.mg7._, bio4j._, taxonomyTree._, titanTaxonomyTree._
 import ohnosequences.loquat._
 import ohnosequences.statika._
 import ohnosequences.cosas._, types._, klists._
 import ohnosequences.datasets._
 import ohnosequences.blast.api._, outputFields._
-
 import com.bio4j.titan.model.ncbiTaxonomy.TitanNCBITaxonomyGraph
-
 import java.io.{ BufferedWriter, FileWriter, File }
 import scala.util.Try
-
 import com.github.tototoshi.csv._
 
 
-case class assignDataProcessing[MD <: AnyMG7Parameters](val md: MD)
-extends DataProcessingBundle()(
+case class assignDataProcessing[MD <: AnyMG7Parameters](val md: MD) extends DataProcessingBundle()(
   input  = data.assignInput,
   output = data.assignOutput
-) {
+)
+{
+
   // For the output fields implicits
   import md._
 
+  // TODO why override val here? why this is not a param?
   override val bundleDependencies: List[AnyBundle] =
     bio4j.taxonomyBundle :: md.referenceDBs.toList
 
@@ -33,6 +31,7 @@ extends DataProcessingBundle()(
 
   // This iterates over reference DBs and merges their id2taxa tables in one Map
   private lazy val referenceMap: Map[ID, Seq[TaxID]] = {
+
     val refMap: scala.collection.mutable.Map[ID, Seq[TaxID]] = scala.collection.mutable.Map()
 
     md.referenceDBs.foreach { refDB =>
@@ -51,11 +50,12 @@ extends DataProcessingBundle()(
     refMap.toMap
   }
 
-  private def taxIDsFor(id: ID): Seq[TaxID] = referenceMap.get(id).getOrElse(Seq())
-
+  private def taxIDsFor(id: ID): Seq[TaxID] =
+    referenceMap.get(id).getOrElse(Seq())
 
   def instructions: AnyInstructions = say("Let's see who is who!")
 
+  // TODO this is too big. Factor BBH and LCA into methods
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
 
     val blastReader = csv.Reader(md.blastOutRec.keys, context.inputFile(data.blastChunk))
