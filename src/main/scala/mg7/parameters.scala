@@ -10,7 +10,6 @@ import ohnosequences.blast.api.{ outputFields => out }
 
 import better.files._
 
-
 sealed trait SplitInputFormat
 case object FastaInput extends SplitInputFormat
 case object FastQInput extends SplitInputFormat
@@ -58,9 +57,7 @@ trait AnyMG7Parameters {
   implicit val argValsToSeq: BlastOptionsToSeq[BlastArgumentsVals]
   implicit val optValsToSeq: BlastOptionsToSeq[BlastCommand#OptionsVals]
 
-  def blastExpr(inFile: File, outFile: File):
-    BlastExpression[BlastCommand, BlastOutputRecord[BlastOutRecKeys]] = {
-
+  def blastExpr(inFile: File, outFile: File): BlastExpression[BlastCommand, BlastOutputRecord[BlastOutRecKeys]] =
     BlastExpression(blastCommand)(
       outputRecord = blastOutRec,
       argumentValues =
@@ -70,7 +67,6 @@ trait AnyMG7Parameters {
         *[AnyDenotation],
       optionValues = blastOptions
     )(argValsToSeq, optValsToSeq)
-  }
 
 
   // The minimal set of the output fields neccessary for the MG7 generic code
@@ -102,8 +98,8 @@ abstract class MG7Parameters[
   val splitInputFormat: SplitInputFormat = FastQInput,
   val splitChunkSize: Int = 10,
   val blastCommand: BC = blastn,
-  val blastOutRec: BlastOutputRecord[BK]  = defaultBlastOutRec,
-  val blastOptions: BC#OptionsVals        = defaultBlastnOptions.value,
+  val blastOutRec: BlastOutputRecord[BK]  = defaults.blastnOutputRecord,
+  val blastOptions: BC#OptionsVals        = defaults.blastnOptions.value,
   val referenceDBs: Set[AnyReferenceDB]
 )(implicit
   val argValsToSeq: BlastOptionsToSeq[BC#ArgumentsVals],
@@ -120,27 +116,49 @@ abstract class MG7Parameters[
   type BlastOutRecKeys = BK
 }
 
+case object defaults {
 
-case object defaultBlastOutRec extends BlastOutputRecord(
-  // query
-  out.qseqid      :×:
-  out.qstart      :×:
-  out.qend        :×:
-  out.qlen        :×:
-  // reference
-  out.sseqid      :×:
-  out.sstart      :×:
-  out.send        :×:
-  out.slen        :×:
-  // alignment
-  out.evalue      :×:
-  out.score       :×:
-  out.bitscore    :×:
-  out.length      :×:
-  out.pident      :×:
-  out.mismatch    :×:
-  out.gaps        :×:
-  out.gapopen     :×:
-  out.qcovs       :×:
-  |[AnyOutputField]
-)
+  // We set here all options explicitly
+  val blastnOptions: blastn.Options := blastn.OptionsVals =
+    blastn.options(
+      /* This actually depends on the workers instance type */
+      num_threads(4)              ::
+      blastn.task(blastn.blastn)  ::
+      evalue(BigDecimal(1E-100))  ::
+      /* We're going to use all hits to do global sample-coherent assignment. But not now, so no reason for this to be huge */
+      max_target_seqs(150)        ::
+      strand(Strands.both)        ::
+      word_size(46)               ::
+      show_gis(false)             ::
+      ungapped(false)             ::
+      penalty(-2)                 ::
+      reward(1)                   ::
+      /* 95% is a reasonable minimum. If it does not work, be more stringent with read preprocessing */
+      perc_identity(95.0) ::
+      *[AnyDenotation]
+    )
+
+  case object blastnOutputRecord extends BlastOutputRecord(
+    // query
+    out.qseqid      :×:
+    out.qstart      :×:
+    out.qend        :×:
+    out.qlen        :×:
+    // reference
+    out.sseqid      :×:
+    out.sstart      :×:
+    out.send        :×:
+    out.slen        :×:
+    // alignment
+    out.evalue      :×:
+    out.score       :×:
+    out.bitscore    :×:
+    out.length      :×:
+    out.pident      :×:
+    out.mismatch    :×:
+    out.gaps        :×:
+    out.gapopen     :×:
+    out.qcovs       :×:
+    |[AnyOutputField]
+  )
+}
