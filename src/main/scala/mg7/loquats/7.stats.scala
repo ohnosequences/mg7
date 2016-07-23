@@ -1,37 +1,32 @@
 package ohnosequences.mg7.loquats
 
 import ohnosequences.mg7._
-
 import ohnosequences.mg7.bio4j._, taxonomyTree._, titanTaxonomyTree._
-
 import ohnosequences.loquat._
-
 import ohnosequences.statika._
 import ohnosequences.cosas._, types._, klists._
 import ohnosequences.datasets._
 import ohnosequences.fastarious._, fasta._, fastq._
-
 import better.files._
 import com.github.tototoshi.csv._
-
 import com.bio4j.titan.model.ncbiTaxonomy.TitanNCBITaxonomyGraph
 
-
 case object statsDataProcessing extends DataProcessingBundle()(
-  input = data.statsInput,
-  output = data.statsOutput
-) {
+  input   = data.statsInput,
+  output  = data.statsOutput
+)
+{
 
   def countReads(
     parser: Iterator[String] => Iterator[Any],
     file: File
   ): Integer = {
+    // TODO why io.Source here??
     val source = io.Source.fromFile( file.toJava )
     val readsNumber = parser( source.getLines ).length
     source.close()
     readsNumber
   }
-
 
   def instructions: ohnosequences.statika.AnyInstructions = say("Running stats loquat")
 
@@ -47,6 +42,7 @@ case object statsDataProcessing extends DataProcessingBundle()(
     LazyTry {
       val csvWriter = csv.newWriter(statsCSV)
 
+      // TODO the whole method is a bit primitive
       // header:
       csvWriter.writeRow(csv.statsHeader)
 
