@@ -1,26 +1,22 @@
 package ohnosequences.mg7.loquats
 
 import ohnosequences.mg7._
-
 import ohnosequences.mg7.bio4j._, taxonomyTree._, titanTaxonomyTree._
-
 import ohnosequences.loquat._
-
 import ohnosequences.statika._
 import ohnosequences.cosas._, types._, klists._
 import ohnosequences.datasets._
-
 import better.files._
 import com.github.tototoshi.csv._
-
 import com.bio4j.titan.model.ncbiTaxonomy.TitanNCBITaxonomyGraph
-
 
 case object countDataProcessing extends DataProcessingBundle(
   bio4j.taxonomyBundle
-)(input = data.countInput,
-  output = data.countOutput
-) {
+)(
+  input   = data.countInput,
+  output  = data.countOutput
+)
+{
 
   lazy val taxonomyGraph: TitanNCBITaxonomyGraph = bio4j.taxonomyBundle.graph
 
@@ -43,14 +39,14 @@ case object countDataProcessing extends DataProcessingBundle(
       list: List[TaxID],
       acc: Map[TaxID, (Int, Seq[TaxID])]
     ): Map[TaxID, (Int, Seq[TaxID])] = list match {
-      case Nil => acc
+      case Nil    => acc
       case h :: t => {
         val (n, rest) = count(h, t)
         rec(rest, acc.updated(h, (n + 1, getLineage(h))))
       }
     }
 
-    rec(taxIDs, Map[TaxID, (Int, Seq[TaxID])]())
+    rec(taxIDs, Map())
   }
 
   def accumulatedCounts(
@@ -81,6 +77,7 @@ case object countDataProcessing extends DataProcessingBundle(
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
 
     // same thing that we do for lca and bbh
+    // TODO create a local case class or record for the return type
     def processFile(assignsFile: File): (File, File, File, File) = {
 
       val assignsReader: CSVReader = csv.newReader(assignsFile)
@@ -105,6 +102,7 @@ case object countDataProcessing extends DataProcessingBundle(
       val assignedReadsNumber: Double = taxIDs.length
       def frequency(absolute: Int): Double = absolute / assignedReadsNumber
 
+      // TODO why mutable Map??
       val lineageMap: scala.collection.mutable.Map[TaxID, Seq[TaxID]] = scala.collection.mutable.Map()
 
       def getLineage(id: TaxID): Seq[TaxID] =
@@ -121,6 +119,7 @@ case object countDataProcessing extends DataProcessingBundle(
 
       val filesPrefix: String = assignsFile.name.stripSuffix(".csv")
 
+      // TODO all this file output format-related code should be part of global configuration
       val outDirectFile = context / s"${filesPrefix}.direct.absolute.counts"
       val outAccumFile  = context / s"${filesPrefix}.accum.absolute.counts"
       val outDirectFreqFile = context / s"${filesPrefix}.direct.frequency.percentage"
@@ -131,6 +130,7 @@ case object countDataProcessing extends DataProcessingBundle(
       val csvDirectFreqWriter = csv.newWriter(outDirectFreqFile)
       val csvAccumFreqWriter  = csv.newWriter(outAccumFreqFile)
 
+      // TODO all this file output format-related code should be part of global configuration
       def headerFor(file: File) = List(
         csv.columnNames.Lineage,
         csv.columnNames.TaxID,
@@ -181,21 +181,22 @@ case object countDataProcessing extends DataProcessingBundle(
       )
     }
 
+    // TODO use data records directly instead of this ugly tuple business
     val lcaCounts = processFile( context.inputFile(data.lcaCSV) )
     val bbhCounts = processFile( context.inputFile(data.bbhCSV) )
 
     success(
       s"Results are written to ...",
       // LCA
-      data.lcaDirectCountsCSV(lcaCounts._1) ::
-      data.lcaAccumCountsCSV(lcaCounts._2) ::
+      data.lcaDirectCountsCSV(lcaCounts._1)     ::
+      data.lcaAccumCountsCSV(lcaCounts._2)      ::
       data.lcaDirectFreqCountsCSV(lcaCounts._3) ::
-      data.lcaAccumFreqCountsCSV(lcaCounts._4) ::
+      data.lcaAccumFreqCountsCSV(lcaCounts._4)  ::
       // BBH
-      data.bbhDirectCountsCSV(bbhCounts._1) ::
-      data.bbhAccumCountsCSV(bbhCounts._2) ::
+      data.bbhDirectCountsCSV(bbhCounts._1)     ::
+      data.bbhAccumCountsCSV(bbhCounts._2)      ::
       data.bbhDirectFreqCountsCSV(bbhCounts._3) ::
-      data.bbhAccumFreqCountsCSV(bbhCounts._4) ::
+      data.bbhAccumFreqCountsCSV(bbhCounts._4)  ::
       *[AnyDenotation { type Value <: FileResource }]
     )
   }
