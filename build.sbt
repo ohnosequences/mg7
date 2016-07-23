@@ -2,15 +2,14 @@ Nice.scalaProject
 
 name          := "mg7"
 organization  := "ohnosequences"
-description   := "metagenomica project"
+description   := "Configurable, scalable 16S metagenomics data analysis"
 
 bucketSuffix  := "era7.com"
 
 scalaVersion := "2.11.8"
 
 resolvers := Seq(
-  "Era7 public maven releases"  at s3("releases.era7.com").toHttps(s3region.value.toString),
-  "Era7 public maven snapshots" at s3("snapshots.era7.com").toHttps(s3region.value.toString)
+  "Era7 public maven releases"  at s3("releases.era7.com").toHttps(s3region.value.toString)
 ) ++ resolvers.value
 
 libraryDependencies ++= Seq(
@@ -38,10 +37,7 @@ dependencyOverrides ++= Set(
 )
 
 
-
-// //// Uncomment for testing: ////
 fatArtifactSettings
-//
 // copied from bio4j-titan:
 mergeStrategy in assembly ~= { old => {
     case "log4j.properties"                       => MergeStrategy.filterDistinctLines
@@ -57,9 +53,6 @@ buildInfoOptions := Seq(BuildInfoOption.Traits("ohnosequences.statika.AnyArtifac
 buildInfoKeys    := Seq[BuildInfoKey](
   organization,
   version,
-  "artifact" -> name.value.toLowerCase,
+  "artifact"    -> name.value.toLowerCase,
   "artifactUrl" -> fatArtifactUrl.value
 )
-
-// // For including test code in the fat artifact:
-// unmanagedSourceDirectories in Compile += (scalaSource in Test).value / "metagenomica"
