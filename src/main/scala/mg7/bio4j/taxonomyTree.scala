@@ -45,6 +45,7 @@ case object taxonomyTree {
       case "species"          => 18
       case "subspecies"       => 19
       // "no rank"
+      // TODO why this?? +1??
       case _ => this.parent.map(_.rankNumber).getOrElse(0) + 1
     }
 
