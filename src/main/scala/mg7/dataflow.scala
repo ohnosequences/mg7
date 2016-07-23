@@ -7,33 +7,30 @@ import ohnosequences.awstools.s3._
 
 trait AnyDataflow {
 
-  // param-pam-pam
   type Params <: AnyMG7Parameters
   val  params: Params
 
   /* The essential steps of any MG7 dataflow are */
-
-  val splitDataMappings: List[DataMapping[splitDataProcessing]]
-
+  val splitDataMappings : List[DataMapping[splitDataProcessing]]
   /* - BLAST */
-  val blastDataMappings: List[DataMapping[blastDataProcessing[Params]]]
-
+  val blastDataMappings : List[DataMapping[blastDataProcessing[Params]]]
   /* - Assignment */
   val assignDataMappings: List[DataMapping[assignDataProcessing[Params]]]
-
   /* - Merge */
-  val mergeDataMappings: List[DataMapping[mergeDataProcessing.type]]
-
+  val mergeDataMappings : List[DataMapping[mergeDataProcessing.type]]
   /* - Counting */
   lazy val countDataMappings: List[DataMapping[countDataProcessing.type]] =
     mergeDataMappings.map { case mergeDM =>
+
       val sampleId = mergeDM.label
 
       DataMapping(sampleId, countDataProcessing)(
+
         remoteInput = Map(
           lookup(data.lcaCSV, mergeDM.remoteOutput),
           lookup(data.bbhCSV, mergeDM.remoteOutput)
         ),
+
         remoteOutput = Map(
           data.lcaDirectCountsCSV     -> S3Resource(params.outputS3Folder(sampleId, "count") / s"${sampleId}.lca.direct.absolute.counts.csv"),
           data.lcaAccumCountsCSV      -> S3Resource(params.outputS3Folder(sampleId, "count") / s"${sampleId}.lca.accum.absolute.counts.csv"),
@@ -46,5 +43,4 @@ trait AnyDataflow {
         )
       )
     }
-
 }
