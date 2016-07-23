@@ -98,6 +98,7 @@ abstract class MG7Parameters[
   val splitInputFormat: SplitInputFormat = FastQInput,
   val splitChunkSize: Int = 10,
   val blastCommand: BC = blastn,
+  // TODO why default values? not good
   val blastOutRec: BlastOutputRecord[BK]  = defaults.blastnOutputRecord,
   val blastOptions: BC#OptionsVals        = defaults.blastnOptions.value,
   val referenceDBs: Set[AnyReferenceDB]
