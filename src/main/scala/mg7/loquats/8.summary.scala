@@ -17,11 +17,7 @@ case object summaryDataProcessing extends DataProcessingBundle()(
 {
 
   def countReads(file: File): Integer = {
-    // TODO why io.Source??
-    val source = io.Source.fromFile( file.toJava )
-    val readsNumber = fasta.parseMap( source.getLines ).length
-    source.close()
-    readsNumber
+    fasta.parseMap( file.lines ).length
   }
 
   def countLines(file: File): Integer = { file.lines.length }

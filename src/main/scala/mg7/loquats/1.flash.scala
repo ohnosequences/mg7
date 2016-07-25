@@ -1,6 +1,5 @@
 package ohnosequences.mg7.loquats
 
-// TODO in general I prefer imports to occupy less space
 import ohnosequences.mg7._
 import ohnosequences.loquat._
 import ohnosequences.statika._
@@ -9,12 +8,10 @@ import ohnosequences.cosas._, types._, klists._
 import ohnosequences.datasets._
 import better.files._
 
-// TODO move all these "tool" bundles to a separate file
-case object flashBundle extends ohnosequencesBundles.statika.Flash("1.2.11")
 
 case class flashDataProcessing[MD <: AnyMG7Parameters](val md: MD)
 extends DataProcessingBundle(
-  flashBundle
+  bundles.flash
 )(
   input   = data.flashInput,
   output  = data.flashOutput

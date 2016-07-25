@@ -21,7 +21,7 @@ package object mg7 {
   def parseLong(str: String): Option[Long] = util.Try(str.toLong).toOption
   def parseDouble(str: String): Option[Double] = util.Try(str.toDouble).toOption
 
-  // TODO why this?
+  // Used in dataMappings to get value pairs from another maps
   def lookup[A, B](a: A, m: Map[A, B]): (A, B) = a -> m.apply(a)
 
   // TODO why not create an ordering from `f` and use std library?
@@ -32,7 +32,7 @@ package object mg7 {
       // either acc is empty or t is the new maximum
       case (_, t) => List(t)
     }
-  // TODO why not as ops?
+
   def averageOf(vals: Seq[Double]): Double = vals.sum / vals.length
 
   type BlastArgumentsVals =

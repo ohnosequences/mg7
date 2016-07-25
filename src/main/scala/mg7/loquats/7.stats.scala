@@ -21,11 +21,7 @@ case object statsDataProcessing extends DataProcessingBundle()(
     parser: Iterator[String] => Iterator[Any],
     file: File
   ): Integer = {
-    // TODO why io.Source here??
-    val source = io.Source.fromFile( file.toJava )
-    val readsNumber = parser( source.getLines ).length
-    source.close()
-    readsNumber
+    parser( file.lines ).length
   }
 
   def instructions: ohnosequences.statika.AnyInstructions = say("Running stats loquat")

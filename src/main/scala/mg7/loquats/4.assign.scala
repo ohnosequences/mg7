@@ -12,18 +12,14 @@ import scala.util.Try
 import com.github.tototoshi.csv._
 
 
-case class assignDataProcessing[MD <: AnyMG7Parameters](val md: MD) extends DataProcessingBundle()(
+case class assignDataProcessing[MD <: AnyMG7Parameters](val md: MD) extends DataProcessingBundle(
+  (bio4j.taxonomyBundle :: md.referenceDBs.toList): _*
+)(
   input  = data.assignInput,
   output = data.assignOutput
-)
-{
-
+) {
   // For the output fields implicits
   import md._
-
-  // TODO why override val here? why this is not a param?
-  override val bundleDependencies: List[AnyBundle] =
-    bio4j.taxonomyBundle :: md.referenceDBs.toList
 
   private lazy val taxonomyGraph: TitanNCBITaxonomyGraph = bio4j.taxonomyBundle.graph
 

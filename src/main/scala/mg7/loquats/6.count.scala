@@ -102,7 +102,6 @@ case object countDataProcessing extends DataProcessingBundle(
       val assignedReadsNumber: Double = taxIDs.length
       def frequency(absolute: Int): Double = absolute / assignedReadsNumber
 
-      // TODO why mutable Map??
       val lineageMap: scala.collection.mutable.Map[TaxID, Seq[TaxID]] = scala.collection.mutable.Map()
 
       def getLineage(id: TaxID): Seq[TaxID] =

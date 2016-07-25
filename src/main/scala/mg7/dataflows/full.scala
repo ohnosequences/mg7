@@ -16,7 +16,6 @@ import ohnosequences.awstools.autoscaling._
 import ohnosequences.awstools.regions.Region._
 import com.amazonaws.auth._, profile._
 
-// TODO this description is outdated right? assignment is done per chunk IIRC
 /* ## Standard Dataflow
 
   Standard dataflow, which will perform the following steps:
@@ -24,8 +23,8 @@ import com.amazonaws.auth._, profile._
   1. **flash** merge paired-end reads
   2. **split** split each reads dataset into smaller chunks
   3. **blast** blast each chunk of reads against the reference database
-  4. **merge** merge blast results for each reads dataset
-  5. **assign** assign reads to taxa (LCA and BBH)
+  4. **assign** assign reads from each chunk to taxa (LCA and BBH)
+  5. **merge** merge results for each reads dataset
   6. **count** count assignments
 */
 trait AnyFullDataflow extends AnyNoFlashDataflow {
@@ -92,7 +91,7 @@ trait AnyFullDataflow extends AnyNoFlashDataflow {
     )
 }
 
-case class FullDataflow[P <: AnyMG7Parameters](val params: P)(val flashInputs: Map[SampleID, (S3Resource, S3Resource)]) 
+case class FullDataflow[P <: AnyMG7Parameters](val params: P)(val flashInputs: Map[SampleID, (S3Resource, S3Resource)])
 extends AnyFullDataflow {
 
   type Params = P

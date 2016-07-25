@@ -44,8 +44,8 @@ case object taxonomyTree {
       case "species subgroup" => 17
       case "species"          => 18
       case "subspecies"       => 19
-      // "no rank"
-      // TODO why this?? +1??
+      // "no rank" case
+      // NOTE: if a node has no rank, we take the rank of its parent and add 1 as it should be more specific
       case _ => this.parent.map(_.rankNumber).getOrElse(0) + 1
     }
 

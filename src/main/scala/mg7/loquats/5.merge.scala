@@ -18,11 +18,9 @@ case object mergeDataProcessing extends DataProcessingBundle()(
   // TODO: use streams, file-writers, etc. stuff
   // TODO no default arguments please
   def mergeChunks(dir: File, out: File, header: Option[String] = None): Unit = {
-    // TODO foreach on option :|
     header.foreach { out.appendLine }
     // only one level in depth:
-    // TODO as in other places, use {} here
-    dir.list foreach { chunkFile =>
+    dir.list.foreach { chunkFile =>
       out.append( chunkFile.contentAsString )
       chunkFile.delete()
     }

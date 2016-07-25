@@ -97,10 +97,9 @@ abstract class MG7Parameters[
   val readsLength: illumina.Length,
   val splitInputFormat: SplitInputFormat = FastQInput,
   val splitChunkSize: Int = 10,
-  val blastCommand: BC = blastn,
-  // TODO why default values? not good
-  val blastOutRec: BlastOutputRecord[BK]  = defaults.blastnOutputRecord,
-  val blastOptions: BC#OptionsVals        = defaults.blastnOptions.value,
+  val blastCommand: BC,
+  val blastOutRec: BlastOutputRecord[BK],
+  val blastOptions: BC#OptionsVals,
   val referenceDBs: Set[AnyReferenceDB]
 )(implicit
   val argValsToSeq: BlastOptionsToSeq[BC#ArgumentsVals],
