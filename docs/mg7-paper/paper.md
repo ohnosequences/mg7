@@ -120,7 +120,7 @@ In the same spirit as for BLAST, we implemented a type-safe eDSL for FLASh expre
 
 ### Bio4j and Graph Databases
 
-Bio4j [@pareja2015bio4j] is a data platform integrating data from different resources such as UniProt or GO in a graph data paradigm. In the assignment phase we use a subgraph containing the NCBI Taxonomy, wrapping in Scala its Java API in a tree algebraic data type.
+Bio4j [@pareja2015bio4j] is a data platform integrating data from different resources such as UniProt, the NCBI taxonomy, or GO, in a graph data paradigm. In the assignment phase we use a subgraph containing the NCBI Taxonomy, wrapping in Scala its Java API in a tree algebraic data type.
 
 ### 16S-DB7 Reference Database Construction
 
