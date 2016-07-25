@@ -246,22 +246,23 @@ implicits one can retrieve the value corresponding to a singleton type.
 \subsubsection{\texorpdfstring{\emph{Statika}: machine configuration and
 behavior}{Statika: machine configuration and behavior}}\label{statika-machine-configuration-and-behavior}
 
-\protect\hyperlink{statika}{Statika} is a Scala library developed by the
-first and last authors which serves as a way of defining and composing
-machine behaviors statically. The main component are \textbf{bundles}.
-Each bundle declares a sequence of computations (its behavior) which
-will be executed in an \textbf{environment}. A bundle can \emph{depend}
-on other bundles, and when being executed by an environment, its DAG
-(Directed Acyclic Graph) of dependencies is linearized and run in
-sequence. In our use, bundles correspond to what an EC2 instance should
-do and an environment to an AMI (Amazon Machine Image) which prepares
-the basic configuration, downloads the Scala code and runs it.
+\protect\hyperlink{statika}{Statika} is a Scala library developed by
+\emph{AA} and \emph{EP-T} which serves as a way of defining and
+composing machine behaviors statically. The main component are
+\textbf{bundles}. Each bundle declares a sequence of computations (its
+behavior) which will be executed in an \textbf{environment}. A bundle
+can \emph{depend} on other bundles, and when being executed by an
+environment, its DAG (Directed Acyclic Graph) of dependencies is
+linearized and run in sequence. In our use, bundles correspond to what
+an EC2 instance should do and an environment to an AMI (Amazon Machine
+Image) which prepares the basic configuration, downloads the Scala code
+and runs it.
 
 \subsubsection{\texorpdfstring{\emph{Datasets}: a mini-language for
 data}{Datasets: a mini-language for data}}\label{datasets-a-mini-language-for-data}
 
 \protect\hyperlink{datasets}{Datasets} is a Scala library developed by
-the first and last authors with the goal of being a Scala-embedded
+\emph{AA} and \emph{EP-T} with the goal of being a Scala-embedded
 mini-language for datasets and their locations. \textbf{Data} is
 represented as type-indexed fields: keys are modeled as singleton types,
 and values correspond to what could be called a denotation of the key: a
@@ -296,8 +297,8 @@ the ``same'' merged reads is always present, as the data that those
 with
 AWS}{Loquat: Parallel data processing with AWS}}\label{loquat-parallel-data-processing-with-aws}
 
-\protect\hyperlink{loquat}{Loquat} is a library developed by the first,
-second and last authors designed for the execution of embarrassingly
+\protect\hyperlink{loquat}{Loquat} is a library developed by \emph{AA},
+\emph{EK} and \emph{EP-T} designed for the execution of embarrassingly
 parallel tasks using S3, SQS and EC2 Amazon services.
 
 A \emph{loquat} executes a process with explicit input and output
