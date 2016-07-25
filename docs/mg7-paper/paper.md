@@ -123,7 +123,7 @@ Bio4j [@pareja2015bio4j] is a data platform integrating data from different reso
 
 The starting point for our 16S reference database is RNA Central [@rnacentral2014rnacentral], [version 5][rnacentral v5]. RNACentral was chosen being the most up to date, comprehensive RNA sequence repository, including among others all RNA data from Silva, GreenGenes, RDP, ENA, and RefSeq<!-- TODO cite them -->. First we take those sequences which
 
-1. are annotated as being of `rRNA` type^[We are aware of the existence of a gene annotation corresponding to 16S, that we are **not using** due to a significant amount of 16S sequences lacking the corresponding annotation]
+1. are annotated as being of `rRNA` type^[We are aware of the existence of a gene annotation corresponding to 16S in RNACentra, that we are **not using** due to a significant amount of 16S sequences lacking it]
 2. their length is at least `1300`^[Note that 16S sequences are sometimes part of an entry corresponding to whole small subunits; that's why we do not set a maximum length threshold]
 3. have at least one taxonomic assignment to a descendant of *Bacteria* or *Archaea*
 4. their lineage does not contain a set of taxa deemed uninformative^[for example: "unclassified Bacteria (miscellaneous)" or "unclassified". Assigning a read to an "unclassified" taxon defeats the first and foremost goal of taxonomic profiling: *classification*.]
@@ -131,6 +131,13 @@ The starting point for our 16S reference database is RNA Central [@rnacentral201
 After this first step, we drop redundant assignments: if sequences $S_1 \subseteq S_2$ share an assignment $T$, it gets dropped from $S_1$; sequences which as a result end up having no assignments are removed.
 
 Once we have non-redundant set of RNA sequences containing all those corresponding to 16S, we can apply our procedure for checking internal consistency of taxonomic assignments.
+
+We run MG7 using this set of sequences as query, and with reference all but the one we are trying to assign. Explain
+
+1. which kind of misassignments can be detected
+2. how
+3. why it is OK for sequences assigned to strange taxa, with no close 16S seq (they will get no hits)
+4. we analyze every assignment independently
 
 <!-- Our 16S-DB7 Reference Database is a curated subset of sequences from the NCBI nucleotide database **nt**. The sequences included were selected by similarity with the bacterial and archaeal reference sequences downloaded from the **RDP database** [@cole2013ribosomal]. RDP unaligned sequences were used to capture new 16S RNA sequences from **nt** using BLAST similarity search strategies and then, performing additional curation steps to remove sequences with poor taxonomic assignments to taxonomic nodes close to the root of the taxonomy tree.
 

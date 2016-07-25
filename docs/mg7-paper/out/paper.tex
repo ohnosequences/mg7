@@ -390,9 +390,9 @@ GreenGenes, RDP, ENA, and RefSeq. First we take those sequences which
 \tightlist
 \item
   are annotated as being of \texttt{rRNA} type\footnote{We are aware of
-    the existence of a gene annotation corresponding to 16S, that we are
-    \textbf{not using} due to a significant amount of 16S sequences
-    lacking the corresponding annotation}
+    the existence of a gene annotation corresponding to 16S in
+    RNACentra, that we are \textbf{not using} due to a significant
+    amount of 16S sequences lacking it}
 \item
   their length is at least \texttt{1300}\footnote{Note that 16S
     sequences are sometimes part of an entry corresponding to whole
@@ -416,6 +416,23 @@ removed.
 Once we have non-redundant set of RNA sequences containing all those
 corresponding to 16S, we can apply our procedure for checking internal
 consistency of taxonomic assignments.
+
+We run MG7 using this set of sequences as query, and with reference all
+but the one we are trying to assign. Explain
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  which kind of misassignments can be detected
+\item
+  how
+\item
+  why it is OK for sequences assigned to strange taxa, with no close 16S
+  seq (they will get no hits)
+\item
+  we analyze every assignment independently
+\end{enumerate}
 
 \subsection{Workflow Description}\label{workflow-description}
 
