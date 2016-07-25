@@ -1,5 +1,5 @@
 ---
-title: "MG7: Configurable and scalable 16S metagenomics data analysis"
+title: "MG7: Configurable and scalable 16S data analysis"
 
 authors:
 - name: Alexey Alekhin
