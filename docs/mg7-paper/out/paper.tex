@@ -199,14 +199,16 @@ These are some of the more innovative MG7 features:
 \tightlist
 \item
   Static reproducible specification of dependencies and behavior of the
-  different components using \emph{Statika} and \emph{Datasets}
+  different components using \emph{\protect\hyperlink{statika}{Statika}}
+  and \emph{\protect\hyperlink{datasets}{Datasets}}
 \item
   Parallelization and distributed analysis based on AWS, with on-demand
   infrastructure as the basic paradigm
 \item
-  Definition of complex workflows using \emph{Loquat}, a composable
-  system for scaling/parallelizing stateless computations especially
-  designed for AWS
+  Definition of complex workflows using
+  \emph{\protect\hyperlink{loquat}{Loquat}}, a composable system for
+  scaling/parallelizing stateless computations especially designed for
+  AWS
 \item
   A new approach to data analysis specification, management and
   specification based on working with it in exactly the same way as for
@@ -230,52 +232,49 @@ These are some of the more innovative MG7 features:
 
 In this section we describe the resources and libraries developed by the
 authors on top of which MG7 is built. All MG7 code is written in
-\href{http://www.scala-lang.org/}{Scala}, a hybrid object-functional
-programming language. Scala was chosen based on the possibility of using
-certain advanced programming styles, and Java interoperability, which
-let us build on the vast number of existing Java libraries; we take
-advantage of this when using Bio4j as an API for the NCBI taxonomy. It
-has support for type-level programming, type-dependent types (through
-type members) and singleton types, which permits a restricted form of
-dependent types where types can depend essentially on values determined
-at compile time (through their corresponding singleton types).
-Conversely, through implicits one can retrieve the value corresponding
-to a singleton type.
+\protect\hyperlink{scala}{Scala}, a hybrid object-functional programming
+language. Scala was chosen based on the possibility of using certain
+advanced programming styles, and Java interoperability, which let us
+build on the vast number of existing Java libraries; we take advantage
+of this when using Bio4j as an API for the NCBI taxonomy. It has support
+for type-level programming, type-dependent types (through type members)
+and singleton types, which permits a restricted form of dependent types
+where types can depend essentially on values determined at compile time
+(through their corresponding singleton types). Conversely, through
+implicits one can retrieve the value corresponding to a singleton type.
 
 \subsubsection{\texorpdfstring{\emph{Statika}: machine configuration and
 behavior}{Statika: machine configuration and behavior}}\label{statika-machine-configuration-and-behavior}
 
-\href{https://github.com/ohnosequences/statika}{Statika} is a Scala
-library developed by the first and last authors which serves as a way of
-defining and composing machine behaviors statically. The main component
-are \textbf{bundles}. Each bundle declares a sequence of computations
-(its behavior) which will be executed in an \textbf{environment}. A
-bundle can \emph{depend} on other bundles, and when being executed by an
-environment, its DAG (Directed Acyclic Graph) of dependencies is
-linearized and run in sequence. In our use, bundles correspond to what
-an EC2 instance should do and an environment to an AMI (Amazon Machine
-Image) which prepares the basic configuration, downloads the Scala code
-and runs it.
+\protect\hyperlink{statika}{Statika} is a Scala library developed by the
+first and last authors which serves as a way of defining and composing
+machine behaviors statically. The main component are \textbf{bundles}.
+Each bundle declares a sequence of computations (its behavior) which
+will be executed in an \textbf{environment}. A bundle can \emph{depend}
+on other bundles, and when being executed by an environment, its DAG
+(Directed Acyclic Graph) of dependencies is linearized and run in
+sequence. In our use, bundles correspond to what an EC2 instance should
+do and an environment to an AMI (Amazon Machine Image) which prepares
+the basic configuration, downloads the Scala code and runs it.
 
 \subsubsection{\texorpdfstring{\emph{Datasets}: a mini-language for
 data}{Datasets: a mini-language for data}}\label{datasets-a-mini-language-for-data}
 
-\href{https://github.com/ohnosequences/datasets}{Datasets} is a Scala
-library developed by the first and last authors with the goal of being a
-Scala-embedded mini-language for datasets and their locations.
-\textbf{Data} is represented as type-indexed fields: keys are modeled as
-singleton types, and values correspond to what could be called a
-denotation of the key: a value of type \texttt{Location} tagged with the
-key type. Then a \textbf{Dataset} is essentially a collection of data,
-which are guaranteed statically to be different through type-level
-predicates, making use of the value--type correspondence which can be
-established through singleton types and implicits. A dataset location is
-then just a list of locations formed by locations of each dataset key.
-All this is based on what could be described as an embedding in Scala of
-an extensible record system with concatenation on disjoint labels, in
-the spirit of \citep{harper1990extensible} \citep{harper1991record}. For
-that \emph{Datasets} uses
-\href{https://github.com/ohnosequences/cosas/}{ohnosequences/cosas}
+\protect\hyperlink{datasets}{Datasets} is a Scala library developed by
+the first and last authors with the goal of being a Scala-embedded
+mini-language for datasets and their locations. \textbf{Data} is
+represented as type-indexed fields: keys are modeled as singleton types,
+and values correspond to what could be called a denotation of the key: a
+value of type \texttt{Location} tagged with the key type. Then a
+\textbf{Dataset} is essentially a collection of data, which are
+guaranteed statically to be different through type-level predicates,
+making use of the value--type correspondence which can be established
+through singleton types and implicits. A dataset location is then just a
+list of locations formed by locations of each dataset key. All this is
+based on what could be described as an embedding in Scala of an
+extensible record system with concatenation on disjoint labels, in the
+spirit of \citep{harper1990extensible} \citep{harper1991record}. For
+that \emph{Datasets} uses the {[}ohnosequences/cosas{]}{[}cosas{]}
 library.
 
 Data keys can further have a reference to a \textbf{data type}, which,
@@ -297,10 +296,9 @@ the ``same'' merged reads is always present, as the data that those
 with
 AWS}{Loquat: Parallel data processing with AWS}}\label{loquat-parallel-data-processing-with-aws}
 
-\href{https://github.com/ohnosequences/loquat}{Loquat} is a library
-developed by the first, second and last authors designed for the
-execution of embarrassingly parallel tasks using S3, SQS and EC2 Amazon
-services.
+\protect\hyperlink{loquat}{Loquat} is a library developed by the first,
+second and last authors designed for the execution of embarrassingly
+parallel tasks using S3, SQS and EC2 Amazon services.
 
 A \emph{loquat} executes a process with explicit input and output
 datasets (declared using the \emph{Datasets} library described above).
@@ -336,11 +334,9 @@ length, etc) to pass to a tool such as FLASh.
 FLASh}\label{type-safe-edsls-for-blast-and-flash}
 
 We developed our own Scala-based type-safe eDSLs (embedded Domain
-Specific Languages) for
-\href{https://github.com/ohnosequences/flash}{FLASh}
-\citep{magovc2011flash} and
-\href{https://github.com/ohnosequences/blast}{BLAST}
-\citep{camacho2009blast} expressions and their execution.
+Specific Languages) for {[}FLASh{]}{[}flash{]} \citep{magovc2011flash}
+and {[}BLAST{]}{[}blast{]} \citep{camacho2009blast} expressions and
+their execution.
 
 In the case of BLAST we use a model where we can guarantee for each
 BLAST command expression at compile time that
@@ -853,24 +849,24 @@ These services are used through a Scala wrapper of the official
 \href{https://github.com/ohnosequences/aws-scala-tools/releases/tag/v0.13.2}{ohnosequences/aws-scala-tools
 v0.13.2}.
 
-\subsection{Scala}\label{scala}
+\hypertarget{scala}{\subsection{Scala}\label{scala}}
 
 MG7 itself and all the libraries used are written in Scala v2.11.
 
-\subsection{Statika}\label{statika}
+\hypertarget{statika}{\subsection{Statika}\label{statika}}
 
 MG7 uses
 \href{https://github.com/statika/statika/releases/tag/v0.2.0}{ohnosequences/statika
 v2.0.0} for specifying the configuration and behavior of EC2 instances.
 
-\subsection{Datasets}\label{datasets}
+\hypertarget{datasets}{\subsection{Datasets}\label{datasets}}
 
 MG7 uses
 \href{https://github.com/ohnosequences/datasets/releases/tag/v0.2.0}{ohnosequences/datasets
 v0.2.0} for specifying input and output data, their type and their
 location.
 
-\subsection{Loquat}\label{loquat}
+\hypertarget{loquat}{\subsection{Loquat}\label{loquat}}
 
 MG7 uses
 \href{https://github.com/ohnosequences/loquat/releases/tag/v2.0.0}{ohnosequences/loquat
@@ -938,6 +934,17 @@ All authors have read and approved the final manuscript.
 
 \emph{Funding:} The two first authors are funded by INTERCROSSING (Grant
 289974).
+
+\protect\hyperlink{statika}{statika} :
+https://github.com/ohnosequences/statika
+\protect\hyperlink{datasets}{datasets} :
+https://github.com/ohnosequences/datasets
+\protect\hyperlink{loquat}{loquat} :
+https://github.com/ohnosequences/loquat {[}flash{]} :
+https://github.com/ohnosequences/flash-api {[}blast{]} :
+https://github.com/ohnosequences/blast-api {[}cosas{]} :
+https://github.com/ohnosequences/cosas/ \protect\hyperlink{scala}{scala}
+: http://www.scala-lang.org/
 
   
 \bibliography{out/../refs}

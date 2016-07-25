@@ -64,9 +64,9 @@ Considering the current new metagenomics scenario and to tackle the challenges p
 
 These are some of the more innovative MG7 features:
 
-- Static reproducible specification of dependencies and behavior of the different components using *Statika* and *Datasets*
+- Static reproducible specification of dependencies and behavior of the different components using *[Statika][statika]* and *[Datasets][datasets]*
 - Parallelization and distributed analysis based on AWS, with on-demand infrastructure as the basic paradigm
-- Definition of complex workflows using *Loquat*, a composable system for scaling/parallelizing stateless computations especially designed for AWS
+- Definition of complex workflows using *[Loquat][loquat]*, a composable system for scaling/parallelizing stateless computations especially designed for AWS
 - A new approach to data analysis specification, management and specification based on working with it in exactly the same way as for a software project, together with the extensive use of compile-time structures and checks
 - Modeling of the taxonomy tree using the new paradigm of graph databases (Bio4j). It facilitates the taxonomic assignment tasks and the calculation of the taxa abundance values considering the hierarchic structure of taxonomy tree (cumulative values)
 - Exhaustive per-read taxonomic assignment using two complementary assignment algorithms Lowest Common Ancestor and Best BLAST Hit
@@ -74,16 +74,16 @@ These are some of the more innovative MG7 features:
 
 ## Libraries and resources
 
-In this section we describe the resources and libraries developed by the authors on top of which MG7 is built. All MG7 code is written in [Scala](http://www.scala-lang.org/), a hybrid object-functional programming language.
+In this section we describe the resources and libraries developed by the authors on top of which MG7 is built. All MG7 code is written in [Scala][scala], a hybrid object-functional programming language.
 Scala was chosen based on the possibility of using certain advanced programming styles, and Java interoperability, which let us build on the vast number of existing Java libraries; we take advantage of this when using Bio4j as an API for the NCBI taxonomy. It has support for type-level programming, type-dependent types (through type members) and singleton types, which permits a restricted form of dependent types where types can depend essentially on values determined at compile time (through their corresponding singleton types). Conversely, through implicits one can retrieve the value corresponding to a singleton type.
 
 ### _Statika_: machine configuration and behavior
 
-[Statika](https://github.com/ohnosequences/statika) is a Scala library developed by the first and last authors which serves as a way of defining and composing machine behaviors statically. The main component are **bundles**. Each bundle declares a sequence of computations (its behavior) which will be executed in an **environment**. A bundle can *depend* on other bundles, and when being executed by an environment, its DAG (Directed Acyclic Graph) of dependencies is linearized and run in sequence. In our use, bundles correspond to what an EC2 instance should do and an environment to an AMI (Amazon Machine Image) which prepares the basic configuration, downloads the Scala code and runs it.
+[Statika][statika] is a Scala library developed by the first and last authors which serves as a way of defining and composing machine behaviors statically. The main component are **bundles**. Each bundle declares a sequence of computations (its behavior) which will be executed in an **environment**. A bundle can *depend* on other bundles, and when being executed by an environment, its DAG (Directed Acyclic Graph) of dependencies is linearized and run in sequence. In our use, bundles correspond to what an EC2 instance should do and an environment to an AMI (Amazon Machine Image) which prepares the basic configuration, downloads the Scala code and runs it.
 
 ### _Datasets_: a mini-language for data
 
-[Datasets](https://github.com/ohnosequences/datasets) is a Scala library developed by the first and last authors with the goal of being a Scala-embedded mini-language for datasets and their locations. **Data** is represented as type-indexed fields: keys are modeled as singleton types, and values correspond to what could be called a denotation of the key: a value of type `Location` tagged with the key type. Then a **Dataset** is essentially a collection of data, which are guaranteed statically to be different through type-level predicates, making use of the value--type correspondence which can be established through singleton types and implicits. A dataset location is then just a list of locations formed by locations of each dataset key. All this is based on what could be described as an embedding in Scala of an extensible record system with concatenation on disjoint labels, in the spirit of [@harper1990extensible] [@harper1991record]. For that *Datasets* uses [ohnosequences/cosas](https://github.com/ohnosequences/cosas/) library.
+[Datasets][datasets] is a Scala library developed by the first and last authors with the goal of being a Scala-embedded mini-language for datasets and their locations. **Data** is represented as type-indexed fields: keys are modeled as singleton types, and values correspond to what could be called a denotation of the key: a value of type `Location` tagged with the key type. Then a **Dataset** is essentially a collection of data, which are guaranteed statically to be different through type-level predicates, making use of the value--type correspondence which can be established through singleton types and implicits. A dataset location is then just a list of locations formed by locations of each dataset key. All this is based on what could be described as an embedding in Scala of an extensible record system with concatenation on disjoint labels, in the spirit of [@harper1990extensible] [@harper1991record]. For that *Datasets* uses the [ohnosequences/cosas][cosas] library.
 
 Data keys can further have a reference to a **data type**, which, as the name hints at, can help in providing information about the type of data we are working with. For example, when declaring Illumina reads as a data, a data type containing information about the read length, insert size or end type (single or paired) is used.
 
@@ -91,7 +91,7 @@ A **location** can be, for example, an S3 object or a local file; by leaving the
 
 ### _Loquat_: Parallel data processing with AWS
 
-[Loquat](https://github.com/ohnosequences/loquat) is a library developed by the first, second and last authors designed for the execution of embarrassingly parallel tasks using S3, SQS and EC2 Amazon services.
+[Loquat][loquat] is a library developed by the first, second and last authors designed for the execution of embarrassingly parallel tasks using S3, SQS and EC2 Amazon services.
 
 A *loquat* executes a process with explicit input and output datasets (declared using the *Datasets* library described above). Workers (EC2 instances) read from an SQS queue the S3 locations for both input and output data; then they download the input to local files, and pass these file locations to the process to be executed. The output is then put in the corresponding S3 locations.
 
@@ -105,7 +105,7 @@ The input and output (and their locations) being defined statically has several 
 
 ### Type-safe eDSLs for BLAST and FLASh
 
-We developed our own Scala-based type-safe eDSLs (embedded Domain Specific Languages) for [FLASh](https://github.com/ohnosequences/flash) [@magovc2011flash] and [BLAST](https://github.com/ohnosequences/blast) [@camacho2009blast] expressions and their execution.
+We developed our own Scala-based type-safe eDSLs (embedded Domain Specific Languages) for [FLASh][flash] [@magovc2011flash] and [BLAST][blast] [@camacho2009blast] expressions and their execution.
 
 In the case of BLAST we use a model where we can guarantee for each BLAST command expression at compile time that
 
@@ -305,3 +305,11 @@ All authors have read and approved the final manuscript.
 # Acknowledgements
 
 *Funding:* The two first authors are funded by INTERCROSSING (Grant 289974).
+
+[statika]   : https://github.com/ohnosequences/statika
+[datasets]  : https://github.com/ohnosequences/datasets
+[loquat]    : https://github.com/ohnosequences/loquat
+[flash]     : https://github.com/ohnosequences/flash-api
+[blast]     : https://github.com/ohnosequences/blast-api
+[cosas]     : https://github.com/ohnosequences/cosas/
+[scala]     : http://www.scala-lang.org/
