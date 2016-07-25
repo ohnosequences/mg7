@@ -289,6 +289,8 @@ MG7 uses [bio4j/bio4j v0.12.0-RC3](https://github.com/bio4j/bio4j/releases/tag/v
 
 All authors work at the _Oh no sequences!_ research group, part of Era7 Bioinformatics. Era7 offers metagenomics data analysis services based on MG7. MG7 is open source, available under the OSI-approved AGPLv3 license.
 
+Partially funded by ITN INTERCROSSING (Grant 289974) and  Cardiobiome project ITC-20151148.
+
 # Author Contributions
 
 <!-- Initials: AA, EK, MM, PPT, EP, RT, EPT -->
@@ -301,10 +303,6 @@ All authors work at the _Oh no sequences!_ research group, part of Era7 Bioinfor
 - **EPT** developed *MG7*, *Statika*, *Datasets*, *FLASh/BLAST eDSLs*; data analysis approach and design; wrote the paper.
 
 All authors have read and approved the final manuscript.
-
-# Acknowledgements
-
-*Funding:* The two first authors are funded by INTERCROSSING (Grant 289974).
 
 [statika]   : https://github.com/ohnosequences/statika
 [datasets]  : https://github.com/ohnosequences/datasets
