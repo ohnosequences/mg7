@@ -23,8 +23,12 @@
 
 \title{$title$}
 
+% modified for this paper
 $for(authors)$
-\author[$authors.position$]{$authors.name$} \affil[$authors.position$]{$authors.affiliation$}
+\author[$authors.affiliation$]{$authors.name$}
+$endfor$
+$for(affiliations)$
+\affil[$affiliations.number$]{$affiliations.name$}
 $endfor$
 
 \keywords{$for(keywords)$ $keywords$$sep$,$endfor$}

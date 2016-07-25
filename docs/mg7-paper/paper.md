@@ -3,33 +3,30 @@ title: "MG7: Configurable and scalable 16S data analysis"
 
 authors:
 - name: Alexey Alekhin
-  affiliation: "_[oh no sequences!](http://ohnosequences.com)_ research group, [Era7 bioinformatics](http://www.era7bioinformatics.com)"
   email: "aalekhin@ohnosequences.com"
-  position: 1
+  affiliation: 1
 - name: Evdokim Kovach
-  affiliation: "_[oh no sequences!](http://ohnosequences.com)_ research group, [Era7 bioinformatics](http://www.era7bioinformatics.com)"
   email: "ekovach@ohnosequences.com"
-  position: 2
+  affiliation: 1
 - name: Marina Manrique
-  affiliation: "_[oh no sequences!](http://ohnosequences.com)_ research group, [Era7 bioinformatics](http://www.era7bioinformatics.com)"
   email: "mmanrique@era7.com"
-  position: 3
+  affiliation: 1
 - name: Pablo Pareja-Tobes
-  affiliation: "_[oh no sequences!](http://ohnosequences.com)_ research group, [Era7 bioinformatics](http://www.era7bioinformatics.com)"
   email: "ppareja@ohnosequences.com"
-  position: 4
+  affiliation: 1
 - name: Eduardo Pareja
-  affiliation: "_[oh no sequences!](http://ohnosequences.com)_ research group, [Era7 bioinformatics](http://www.era7bioinformatics.com)"
   email: "epareja@era7.com"
-  position: 5
+  affiliation: 1
 - name: Raquel Tobes
-  affiliation: "_[oh no sequences!](http://ohnosequences.com)_ research group, [Era7 bioinformatics](http://www.era7bioinformatics.com)"
   email: "rtobes@era7.com"
-  position: 6
+  affiliation: 1
 - name: Eduardo Pareja-Tobes
-  affiliation: "_[oh no sequences!](http://ohnosequences.com)_ research group, [Era7 bioinformatics](http://www.era7bioinformatics.com)"
   email: "eparejatobes@ohnosequences.com"
-  position: 7
+  affiliation: 1
+
+affiliations:
+  - number: 1
+    name: "*[oh no sequences!](http://ohnosequences.com)* research group, [Era7 bioinformatics](http://www.era7bioinformatics.com)"
 
 abstract: |
   As part of the Cambrian explosion of omics data, metagenomics brings to the table a specific, defining trait: its social essence. The *meta* prefix exerts its influence, with multitudes manifesting themselves everywhere; from samples to data analysis, from actors involved to (present and future) applications. Of these dimensions, data analysis is where needs lay further from what current tools provide. Key features are, among others, scalability, reproducibility, data provenance and distribution, process identity and versioning. These are the goals guiding our work in MG7, a 16S metagenomics data analysis system. The basic principle is a new approach to data analysis, where configuration, processes, or data locations are static, type-checked and subject to the standard evolution of a well-maintained software project. Cloud computing, in its Amazon Web Services incarnation, when coupled with these ideas, produces a robust, safely configurable, scalable tool. Processes, data, machine behaviors and their dependencies are expressed using a set of libraries which bring as much as possible checking and validation to the type level, without sacrificing expressiveness. Together they form a toolkit for defining scalable cloud-based workflows composed of stateless computations, with a static reproducible specification of dependencies, behavior and wiring of all steps. The modeling of taxonomy data is done using Bio4j, where the new paradigm of graph databases allows for both a simple expression of taxonomic assignment tasks and the calculation of taxa abundance values considering the hierarchic structure of the taxonomy tree. MG7 includes a new 16S reference database, *16S-DB7*, built with a flexible and sustainable update system, and the possibility of project-driven personalization.
