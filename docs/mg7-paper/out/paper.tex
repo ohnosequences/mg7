@@ -21,25 +21,21 @@
 \providecommand{\tightlist}{%
 \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 
-\title{MG7: Configurable and scalable 16S metagenomics data analysis}
+\title{MG7: Configurable and scalable 16S data analysis}
 
-\author[1]{Alexey Alekhin\(^\dagger\)} \affil[1]{\emph{\href{http://ohnosequences.com}{oh no sequences!}} research group,
-\href{http://www.era7bioinformatics.com}{Era7 bioinformatics}}
-\author[2]{Evdokim Kovach\(^\dagger\)} \affil[2]{\emph{\href{http://ohnosequences.com}{oh no sequences!}} research group,
-\href{http://www.era7bioinformatics.com}{Era7 bioinformatics}}
-\author[3]{Marina Manrique} \affil[3]{\emph{\href{http://ohnosequences.com}{oh no sequences!}} research group,
-\href{http://www.era7bioinformatics.com}{Era7 bioinformatics}}
-\author[4]{Pablo Pareja-Tobes} \affil[4]{\emph{\href{http://ohnosequences.com}{oh no sequences!}} research group,
-\href{http://www.era7bioinformatics.com}{Era7 bioinformatics}}
-\author[5]{Eduardo Pareja} \affil[5]{\emph{\href{http://ohnosequences.com}{oh no sequences!}} research group,
-\href{http://www.era7bioinformatics.com}{Era7 bioinformatics}}
-\author[6]{Raquel Tobes} \affil[6]{\emph{\href{http://ohnosequences.com}{oh no sequences!}} research group,
-\href{http://www.era7bioinformatics.com}{Era7 bioinformatics}}
-\author[7]{Eduardo Pareja-Tobes} \affil[7]{\emph{\href{http://ohnosequences.com}{oh no sequences!}} research group,
+% modified for this paper
+\author[1]{Alexey Alekhin}
+\author[1]{Evdokim Kovach}
+\author[1]{Marina Manrique}
+\author[1]{Pablo Pareja-Tobes}
+\author[1]{Eduardo Pareja}
+\author[1]{Raquel Tobes}
+\author[1]{Eduardo Pareja-Tobes}
+\affil[1]{\emph{\href{http://ohnosequences.com}{oh no sequences!}} research group,
 \href{http://www.era7bioinformatics.com}{Era7 bioinformatics}}
 
-\keywords{ Metagenomics, 16S, Bacterial diversity profile, Bio4j, Graph databases,
- Cloud computing, NGS, Genomic big data, Microbiome, Environmental, 16S
+\keywords{ Metagenomics, 16S, taxonomic profiling, Bio4j, Graph databases, Cloud
+ computing, NGS, Genomics, big data, Microbiome, Environmental, 16S
  Database}
 
 % PeerJ doesn't like numbered sections
@@ -74,8 +70,7 @@ assignment tasks and the calculation of taxa abundance values
 considering the hierarchic structure of the taxonomy tree. MG7 includes
 a new 16S reference database, \emph{16S-DB7}, built with a flexible and
 sustainable update system, and the possibility of project-driven
-personalization. \(^\dagger\) The first and second authors contributed
-equally to this work.
+personalization.
 \end{abstract}
 
 \begin{document}
@@ -97,13 +92,14 @@ health (diagnostics, treatments, drug response or prevention)
 the microbiome explosion: all kind of microbiomes (gut, mouth, skin,
 urinary tract, airway, milk, bladder) are now routinely sequenced in
 different conditions of health and disease, or after different
-treatments. The impact of Metagenomics is also being felt in
+treatments. The impact of microbiome analysis is also being felt in
 environmental sciences \citep{ufarte2015discovery}, crop sciences, the
-agrifood sector \citep{coughlan2015biotechnological} and biotechnology
-in general \citep{cowan2015metagenomics} \citep{kodzius2015marine}.
-These new possibilities for exploring the diversity of micro-organisms
-in the most varied environments are opening new research areas, and
-drastically changing the existing ones.
+agrifood sector \citep{coughlan2015biotechnological}, bioenergy
+\citep{yang2016discovery}, and biotechnology in general
+\citep{cowan2015metagenomics} \citep{kodzius2015marine}. These new
+possibilities for exploring the diversity of micro-organisms in the most
+varied environments are opening new research areas, and drastically
+changing the existing ones.
 
 As a consequence, the challenge is thus moving (as in other fields) from
 data acquisition to data analysis: the amount of data is expected to be
@@ -199,14 +195,16 @@ These are some of the more innovative MG7 features:
 \tightlist
 \item
   Static reproducible specification of dependencies and behavior of the
-  different components using \emph{Statika} and \emph{Datasets}
+  different components using \emph{\protect\hyperlink{statika}{Statika}}
+  and \emph{\protect\hyperlink{datasets}{Datasets}}
 \item
   Parallelization and distributed analysis based on AWS, with on-demand
   infrastructure as the basic paradigm
 \item
-  Definition of complex workflows using \emph{Loquat}, a composable
-  system for scaling/parallelizing stateless computations especially
-  designed for AWS
+  Definition of complex workflows using
+  \emph{\protect\hyperlink{loquat}{Loquat}}, a composable system for
+  scaling/parallelizing stateless computations especially designed for
+  AWS
 \item
   A new approach to data analysis specification, management and
   specification based on working with it in exactly the same way as for
@@ -214,9 +212,9 @@ These are some of the more innovative MG7 features:
   structures and checks
 \item
   Modeling of the taxonomy tree using the new paradigm of graph
-  databases (Bio4j). It facilitates the taxonomic assignment tasks and
-  the calculation of the taxa abundance values considering the
-  hierarchic structure of taxonomy tree (cumulative values)
+  databases (Bio4j, \citep{pareja2015bio4j}). It facilitates the
+  taxonomic assignment tasks and the calculation of the taxa abundance
+  values considering the hierarchic structure of taxonomy tree
 \item
   Exhaustive per-read taxonomic assignment using two complementary
   assignment algorithms Lowest Common Ancestor and Best BLAST Hit
@@ -230,52 +228,49 @@ These are some of the more innovative MG7 features:
 
 In this section we describe the resources and libraries developed by the
 authors on top of which MG7 is built. All MG7 code is written in
-\href{http://www.scala-lang.org/}{Scala}, a hybrid object-functional
-programming language. Scala was chosen based on the possibility of using
-certain advanced programming styles, and Java interoperability, which
-let us build on the vast number of existing Java libraries; we take
-advantage of this when using Bio4j as an API for the NCBI taxonomy. It
-has support for type-level programming, type-dependent types (through
-type members) and singleton types, which permits a restricted form of
-dependent types where types can depend essentially on values determined
-at compile time (through their corresponding singleton types).
-Conversely, through implicits one can retrieve the value corresponding
-to a singleton type.
+\protect\hyperlink{scala}{Scala}, a hybrid object-functional programming
+language. Scala was chosen based on the possibility of using certain
+advanced programming styles, and Java interoperability, which let us
+build on the vast number of existing Java libraries; we take advantage
+of this when using Bio4j as an API for the NCBI taxonomy. It has support
+for type-level programming, type-dependent types (through type members)
+and singleton types, which permits a restricted form of dependent types
+where types can depend essentially on values determined at compile time
+(through their corresponding singleton types). Conversely, through
+implicits one can retrieve the value corresponding to a singleton type.
 
 \subsubsection{\texorpdfstring{\emph{Statika}: machine configuration and
 behavior}{Statika: machine configuration and behavior}}\label{statika-machine-configuration-and-behavior}
 
-\href{https://github.com/ohnosequences/statika}{Statika} is a Scala
-library developed by the first and last authors which serves as a way of
-defining and composing machine behaviors statically. The main component
-are \textbf{bundles}. Each bundle declares a sequence of computations
-(its behavior) which will be executed in an \textbf{environment}. A
-bundle can \emph{depend} on other bundles, and when being executed by an
-environment, its DAG (Directed Acyclic Graph) of dependencies is
-linearized and run in sequence. In our use, bundles correspond to what
-an EC2 instance should do and an environment to an AMI (Amazon Machine
-Image) which prepares the basic configuration, downloads the Scala code
-and runs it.
+\protect\hyperlink{statika}{Statika} is a Scala library developed by
+\emph{AA} and \emph{EPT} which serves as a way of defining and composing
+machine behaviors statically. The main component are \textbf{bundles}.
+Each bundle declares a sequence of computations (its behavior) which
+will be executed in an \textbf{environment}. A bundle can \emph{depend}
+on other bundles, and when being executed by an environment, its DAG
+(Directed Acyclic Graph) of dependencies is linearized and run in
+sequence. In our use, bundles correspond to what an EC2 instance should
+do and an environment to an AMI (Amazon Machine Image) which prepares
+the basic configuration, downloads the Scala code and runs it.
 
 \subsubsection{\texorpdfstring{\emph{Datasets}: a mini-language for
 data}{Datasets: a mini-language for data}}\label{datasets-a-mini-language-for-data}
 
-\href{https://github.com/ohnosequences/datasets}{Datasets} is a Scala
-library developed by the first and last authors with the goal of being a
-Scala-embedded mini-language for datasets and their locations.
-\textbf{Data} is represented as type-indexed fields: keys are modeled as
-singleton types, and values correspond to what could be called a
-denotation of the key: a value of type \texttt{Location} tagged with the
-key type. Then a \textbf{Dataset} is essentially a collection of data,
-which are guaranteed statically to be different through type-level
-predicates, making use of the value--type correspondence which can be
-established through singleton types and implicits. A dataset location is
-then just a list of locations formed by locations of each dataset key.
-All this is based on what could be described as an embedding in Scala of
-an extensible record system with concatenation on disjoint labels, in
-the spirit of \citep{harper1990extensible} \citep{harper1991record}. For
-that \emph{Datasets} uses
-\href{https://github.com/ohnosequences/cosas/}{ohnosequences/cosas}
+\protect\hyperlink{datasets}{Datasets} is a Scala library developed by
+\emph{AA} and \emph{EPT} with the goal of being a Scala-embedded
+mini-language for datasets and their locations. \textbf{Data} is
+represented as type-indexed fields: keys are modeled as singleton types,
+and values correspond to what could be called a denotation of the key: a
+value of type \texttt{Location} tagged with the key type. Then a
+\textbf{Dataset} is essentially a collection of data, which are
+guaranteed statically to be different through type-level predicates,
+making use of the value--type correspondence which can be established
+through singleton types and implicits. A dataset location is then just a
+list of locations formed by locations of each dataset key. All this is
+based on what could be described as an embedding in Scala of an
+extensible record system with concatenation on disjoint labels, in the
+spirit of \citep{harper1990extensible} \citep{harper1991record}. For
+that \emph{Datasets} uses the {[}ohnosequences/cosas{]}{[}cosas{]}
 library.
 
 Data keys can further have a reference to a \textbf{data type}, which,
@@ -297,10 +292,9 @@ the ``same'' merged reads is always present, as the data that those
 with
 AWS}{Loquat: Parallel data processing with AWS}}\label{loquat-parallel-data-processing-with-aws}
 
-\href{https://github.com/ohnosequences/loquat}{Loquat} is a library
-developed by the first, second and last authors designed for the
-execution of embarrassingly parallel tasks using S3, SQS and EC2 Amazon
-services.
+\protect\hyperlink{loquat}{Loquat} is a library developed by \emph{AA},
+\emph{EK} and \emph{EPT} designed for the execution of embarrassingly
+parallel tasks using S3, SQS and EC2 Amazon services.
 
 A \emph{loquat} executes a process with explicit input and output
 datasets (declared using the \emph{Datasets} library described above).
@@ -336,11 +330,9 @@ length, etc) to pass to a tool such as FLASh.
 FLASh}\label{type-safe-edsls-for-blast-and-flash}
 
 We developed our own Scala-based type-safe eDSLs (embedded Domain
-Specific Languages) for
-\href{https://github.com/ohnosequences/flash}{FLASh}
-\citep{magovc2011flash} and
-\href{https://github.com/ohnosequences/blast}{BLAST}
-\citep{camacho2009blast} expressions and their execution.
+Specific Languages) for {[}FLASh{]}{[}flash{]} \citep{magovc2011flash}
+and {[}BLAST{]}{[}blast{]} \citep{camacho2009blast} expressions and
+their execution.
 
 In the case of BLAST we use a model where we can guarantee for each
 BLAST command expression at compile time that
@@ -371,9 +363,10 @@ those outlined for the BLAST eDSL.
 Databases}\label{bio4j-and-graph-databases}
 
 Bio4j \citep{pareja2015bio4j} is a data platform integrating data from
-different resources such as UniProt or GO in a graph data paradigm. In
-the assignment phase we use a subgraph containing the NCBI Taxonomy,
-wrapping in Scala its Java API in a tree algebraic data type.
+different resources such as UniProt, the NCBI taxonomy, or GO, in a
+graph data paradigm. In the assignment phase we use a subgraph
+containing the NCBI Taxonomy, wrapping in Scala its Java API in a tree
+algebraic data type.
 
 \subsubsection{16S-DB7 Reference Database
 Construction}\label{s-db7-reference-database-construction}
@@ -784,11 +777,12 @@ integration of semantically rich biological data using typed graph
 models. It integrates most publicly available data linked with sequences
 into a set of interdependent graphs to be used for bioinformatics
 analysis and especially for biological data. MG7 works based on the
-Bio4j taxonomy module. It opens the possibility to connect the taxonomic
-profiling data obtained with MG7 to all the biological knowledge
-associated to each taxon. Using the information available in Bio4j for
-all the proteins assigned to each taxon we are connected to all the
-functional data available in Uniprot related with it.
+Bio4j taxonomy module, which contains all the NCBI taxonomy data. It
+opens the possibility to connect the taxonomic profiling data obtained
+with MG7 to all the biological knowledge associated to each taxon. Using
+the information available in Bio4j for all the proteins assigned to each
+taxon we are connected to all the functional data available in Uniprot
+related with it.
 
 \subsection{Future developments}\label{future-developments}
 
@@ -853,24 +847,24 @@ These services are used through a Scala wrapper of the official
 \href{https://github.com/ohnosequences/aws-scala-tools/releases/tag/v0.13.2}{ohnosequences/aws-scala-tools
 v0.13.2}.
 
-\subsection{Scala}\label{scala}
+\hypertarget{scala}{\subsection{Scala}\label{scala}}
 
 MG7 itself and all the libraries used are written in Scala v2.11.
 
-\subsection{Statika}\label{statika}
+\hypertarget{statika}{\subsection{Statika}\label{statika}}
 
 MG7 uses
 \href{https://github.com/statika/statika/releases/tag/v0.2.0}{ohnosequences/statika
 v2.0.0} for specifying the configuration and behavior of EC2 instances.
 
-\subsection{Datasets}\label{datasets}
+\hypertarget{datasets}{\subsection{Datasets}\label{datasets}}
 
 MG7 uses
 \href{https://github.com/ohnosequences/datasets/releases/tag/v0.2.0}{ohnosequences/datasets
 v0.2.0} for specifying input and output data, their type and their
 location.
 
-\subsection{Loquat}\label{loquat}
+\hypertarget{loquat}{\subsection{Loquat}\label{loquat}}
 
 MG7 uses
 \href{https://github.com/ohnosequences/loquat/releases/tag/v2.0.0}{ohnosequences/loquat
@@ -905,13 +899,16 @@ Era7 Bioinformatics. Era7 offers metagenomics data analysis services
 based on MG7. MG7 is open source, available under the OSI-approved
 AGPLv3 license.
 
+Partially funded by ITN INTERCROSSING (Grant 289974) and Cardiobiome
+project ITC-20151148.
+
 \section{Author Contributions}\label{author-contributions}
 
 \begin{itemize}
 \tightlist
 \item
-  \textbf{AA} developed \emph{MG7}, \emph{Statika}, \emph{Datasets}, and
-  \emph{aws-scala-tools}; wrote the paper;
+  \textbf{AA} developed \emph{MG7}, \emph{Loquat}, \emph{Statika},
+  \emph{Datasets}, and \emph{aws-scala-tools}; wrote the paper;
 \item
   \textbf{EK} developed \emph{nispero} (a prototype for \emph{Loquat}
   \citep{kovach2014nispero}) and \emph{aws-scala-tools}.
@@ -919,8 +916,7 @@ AGPLv3 license.
   \textbf{MM} \emph{MG7} workflow design; curation and design of the
   \emph{16S-DB7} reference database; wrote the paper.
 \item
-  \textbf{PPT} curation, design, data extraction code of the
-  \emph{16S-DB7} reference database.
+  \textbf{PPT} design and development of the first \emph{MG7} prototype
 \item
   \textbf{EP} \emph{MG7} workflow design; wrote the paper.
 \item
@@ -928,16 +924,22 @@ AGPLv3 license.
   and design of the \emph{16S-DB7} reference database; wrote the paper.
 \item
   \textbf{EPT} developed \emph{MG7}, \emph{Statika}, \emph{Datasets},
-  \emph{FLASh/BLAST eDSLs}; data analysis approach and design; wrote the
-  paper.
+  \emph{FLASh/BLAST eDSLs}; data analysis approach and design; reference
+  database automated curation and filtering; wrote the paper.
 \end{itemize}
 
 All authors have read and approved the final manuscript.
 
-\section{Acknowledgements}\label{acknowledgements}
-
-\emph{Funding:} The two first authors are funded by INTERCROSSING (Grant
-289974).
+\protect\hyperlink{statika}{statika} :
+https://github.com/ohnosequences/statika
+\protect\hyperlink{datasets}{datasets} :
+https://github.com/ohnosequences/datasets
+\protect\hyperlink{loquat}{loquat} :
+https://github.com/ohnosequences/loquat {[}flash{]} :
+https://github.com/ohnosequences/flash-api {[}blast{]} :
+https://github.com/ohnosequences/blast-api {[}cosas{]} :
+https://github.com/ohnosequences/cosas/ \protect\hyperlink{scala}{scala}
+: http://www.scala-lang.org/
 
   
 \bibliography{out/../refs}

@@ -1,46 +1,42 @@
 ---
-title: "MG7: Configurable and scalable 16S metagenomics data analysis"
+title: "MG7: Configurable and scalable 16S data analysis"
 
 authors:
-- name: Alexey Alekhin$^\dagger$
-  affiliation: "_[oh no sequences!](http://ohnosequences.com)_ research group, [Era7 bioinformatics](http://www.era7bioinformatics.com)"
+- name: Alexey Alekhin
   email: "aalekhin@ohnosequences.com"
-  position: 1
-- name: Evdokim Kovach$^\dagger$
-  affiliation: "_[oh no sequences!](http://ohnosequences.com)_ research group, [Era7 bioinformatics](http://www.era7bioinformatics.com)"
+  affiliation: 1
+- name: Evdokim Kovach
   email: "ekovach@ohnosequences.com"
-  position: 2
+  affiliation: 1
 - name: Marina Manrique
-  affiliation: "_[oh no sequences!](http://ohnosequences.com)_ research group, [Era7 bioinformatics](http://www.era7bioinformatics.com)"
   email: "mmanrique@era7.com"
-  position: 3
+  affiliation: 1
 - name: Pablo Pareja-Tobes
-  affiliation: "_[oh no sequences!](http://ohnosequences.com)_ research group, [Era7 bioinformatics](http://www.era7bioinformatics.com)"
   email: "ppareja@ohnosequences.com"
-  position: 4
+  affiliation: 1
 - name: Eduardo Pareja
-  affiliation: "_[oh no sequences!](http://ohnosequences.com)_ research group, [Era7 bioinformatics](http://www.era7bioinformatics.com)"
   email: "epareja@era7.com"
-  position: 5
+  affiliation: 1
 - name: Raquel Tobes
-  affiliation: "_[oh no sequences!](http://ohnosequences.com)_ research group, [Era7 bioinformatics](http://www.era7bioinformatics.com)"
   email: "rtobes@era7.com"
-  position: 6
+  affiliation: 1
 - name: Eduardo Pareja-Tobes
-  affiliation: "_[oh no sequences!](http://ohnosequences.com)_ research group, [Era7 bioinformatics](http://www.era7bioinformatics.com)"
   email: "eparejatobes@ohnosequences.com"
-  position: 7
+  affiliation: 1
+
+affiliations:
+  - number: 1
+    name: "*[oh no sequences!](http://ohnosequences.com)* research group, [Era7 bioinformatics](http://www.era7bioinformatics.com)"
 
 abstract: |
   As part of the Cambrian explosion of omics data, metagenomics brings to the table a specific, defining trait: its social essence. The *meta* prefix exerts its influence, with multitudes manifesting themselves everywhere; from samples to data analysis, from actors involved to (present and future) applications. Of these dimensions, data analysis is where needs lay further from what current tools provide. Key features are, among others, scalability, reproducibility, data provenance and distribution, process identity and versioning. These are the goals guiding our work in MG7, a 16S metagenomics data analysis system. The basic principle is a new approach to data analysis, where configuration, processes, or data locations are static, type-checked and subject to the standard evolution of a well-maintained software project. Cloud computing, in its Amazon Web Services incarnation, when coupled with these ideas, produces a robust, safely configurable, scalable tool. Processes, data, machine behaviors and their dependencies are expressed using a set of libraries which bring as much as possible checking and validation to the type level, without sacrificing expressiveness. Together they form a toolkit for defining scalable cloud-based workflows composed of stateless computations, with a static reproducible specification of dependencies, behavior and wiring of all steps. The modeling of taxonomy data is done using Bio4j, where the new paradigm of graph databases allows for both a simple expression of taxonomic assignment tasks and the calculation of taxa abundance values considering the hierarchic structure of the taxonomy tree. MG7 includes a new 16S reference database, *16S-DB7*, built with a flexible and sustainable update system, and the possibility of project-driven personalization.
-  $^\dagger$ The first and second authors contributed equally to this work.
 
-keywords: "Metagenomics, 16S, Bacterial diversity profile, Bio4j, Graph databases, Cloud computing, NGS, Genomic big data, Microbiome, Environmental, 16S Database"
+keywords: "Metagenomics, 16S, taxonomic profiling, Bio4j, Graph databases, Cloud computing, NGS, Genomics, big data, Microbiome, Environmental, 16S Database"
 ---
 
 # Introduction
 
-During the past decade, metagenomics data analysis is growing exponentially. Some of the reasons behind this are the increasing throughput of massively parallel sequencing technologies (with the derived decrease in sequencing costs), and the wide impact of metagenomics studies [@oulas2015metagenomics], especially in human health  (diagnostics, treatments, drug response or prevention) [@bikel2015combining]. We should also mention what could be called the microbiome explosion: all kind of microbiomes (gut, mouth, skin, urinary tract, airway, milk, bladder) are now routinely sequenced in different conditions of health and disease, or after different treatments. The impact of Metagenomics is also being felt in environmental sciences [@ufarte2015discovery], crop sciences, the agrifood sector [@coughlan2015biotechnological] and biotechnology in general [@cowan2015metagenomics] [@kodzius2015marine]. These new possibilities for exploring the diversity of micro-organisms in the most varied environments are opening new research areas, and drastically changing the existing ones.
+During the past decade, metagenomics data analysis is growing exponentially. Some of the reasons behind this are the increasing throughput of massively parallel sequencing technologies (with the derived decrease in sequencing costs), and the wide impact of metagenomics studies [@oulas2015metagenomics], especially in human health  (diagnostics, treatments, drug response or prevention) [@bikel2015combining]. We should also mention what could be called the microbiome explosion: all kind of microbiomes (gut, mouth, skin, urinary tract, airway, milk, bladder) are now routinely sequenced in different conditions of health and disease, or after different treatments. The impact of microbiome analysis is also being felt in environmental sciences [@ufarte2015discovery], crop sciences, the agrifood sector [@coughlan2015biotechnological], bioenergy [@yang2016discovery], and biotechnology in general [@cowan2015metagenomics] [@kodzius2015marine]. These new possibilities for exploring the diversity of micro-organisms in the most varied environments are opening new research areas, and drastically changing the existing ones.
 
 As a consequence, the challenge is thus moving (as in other fields) from data acquisition to data analysis: the amount of data is expected to be overwhelming in a very short time [@stephens2015big].
 
@@ -65,26 +61,26 @@ Considering the current new metagenomics scenario and to tackle the challenges p
 
 These are some of the more innovative MG7 features:
 
-- Static reproducible specification of dependencies and behavior of the different components using *Statika* and *Datasets*
+- Static reproducible specification of dependencies and behavior of the different components using *[Statika][statika]* and *[Datasets][datasets]*
 - Parallelization and distributed analysis based on AWS, with on-demand infrastructure as the basic paradigm
-- Definition of complex workflows using *Loquat*, a composable system for scaling/parallelizing stateless computations especially designed for AWS
+- Definition of complex workflows using *[Loquat][loquat]*, a composable system for scaling/parallelizing stateless computations especially designed for AWS
 - A new approach to data analysis specification, management and specification based on working with it in exactly the same way as for a software project, together with the extensive use of compile-time structures and checks
-- Modeling of the taxonomy tree using the new paradigm of graph databases (Bio4j). It facilitates the taxonomic assignment tasks and the calculation of the taxa abundance values considering the hierarchic structure of taxonomy tree (cumulative values)
+- Modeling of the taxonomy tree using the new paradigm of graph databases (Bio4j, [@pareja2015bio4j]). It facilitates the taxonomic assignment tasks and the calculation of the taxa abundance values considering the hierarchic structure of taxonomy tree
 - Exhaustive per-read taxonomic assignment using two complementary assignment algorithms Lowest Common Ancestor and Best BLAST Hit
 - Using a new 16S database of reference sequences (16S-DB7) with a flexible and sustainable system of updating and project-driven customization
 
 ## Libraries and resources
 
-In this section we describe the resources and libraries developed by the authors on top of which MG7 is built. All MG7 code is written in [Scala](http://www.scala-lang.org/), a hybrid object-functional programming language.
+In this section we describe the resources and libraries developed by the authors on top of which MG7 is built. All MG7 code is written in [Scala][scala], a hybrid object-functional programming language.
 Scala was chosen based on the possibility of using certain advanced programming styles, and Java interoperability, which let us build on the vast number of existing Java libraries; we take advantage of this when using Bio4j as an API for the NCBI taxonomy. It has support for type-level programming, type-dependent types (through type members) and singleton types, which permits a restricted form of dependent types where types can depend essentially on values determined at compile time (through their corresponding singleton types). Conversely, through implicits one can retrieve the value corresponding to a singleton type.
 
 ### _Statika_: machine configuration and behavior
 
-[Statika](https://github.com/ohnosequences/statika) is a Scala library developed by the first and last authors which serves as a way of defining and composing machine behaviors statically. The main component are **bundles**. Each bundle declares a sequence of computations (its behavior) which will be executed in an **environment**. A bundle can *depend* on other bundles, and when being executed by an environment, its DAG (Directed Acyclic Graph) of dependencies is linearized and run in sequence. In our use, bundles correspond to what an EC2 instance should do and an environment to an AMI (Amazon Machine Image) which prepares the basic configuration, downloads the Scala code and runs it.
+[Statika][statika] is a Scala library developed by *AA* and *EPT* which serves as a way of defining and composing machine behaviors statically. The main component are **bundles**. Each bundle declares a sequence of computations (its behavior) which will be executed in an **environment**. A bundle can *depend* on other bundles, and when being executed by an environment, its DAG (Directed Acyclic Graph) of dependencies is linearized and run in sequence. In our use, bundles correspond to what an EC2 instance should do and an environment to an AMI (Amazon Machine Image) which prepares the basic configuration, downloads the Scala code and runs it.
 
 ### _Datasets_: a mini-language for data
 
-[Datasets](https://github.com/ohnosequences/datasets) is a Scala library developed by the first and last authors with the goal of being a Scala-embedded mini-language for datasets and their locations. **Data** is represented as type-indexed fields: keys are modeled as singleton types, and values correspond to what could be called a denotation of the key: a value of type `Location` tagged with the key type. Then a **Dataset** is essentially a collection of data, which are guaranteed statically to be different through type-level predicates, making use of the value--type correspondence which can be established through singleton types and implicits. A dataset location is then just a list of locations formed by locations of each dataset key. All this is based on what could be described as an embedding in Scala of an extensible record system with concatenation on disjoint labels, in the spirit of [@harper1990extensible] [@harper1991record]. For that *Datasets* uses [ohnosequences/cosas](https://github.com/ohnosequences/cosas/) library.
+[Datasets][datasets] is a Scala library developed by *AA* and *EPT* with the goal of being a Scala-embedded mini-language for datasets and their locations. **Data** is represented as type-indexed fields: keys are modeled as singleton types, and values correspond to what could be called a denotation of the key: a value of type `Location` tagged with the key type. Then a **Dataset** is essentially a collection of data, which are guaranteed statically to be different through type-level predicates, making use of the value--type correspondence which can be established through singleton types and implicits. A dataset location is then just a list of locations formed by locations of each dataset key. All this is based on what could be described as an embedding in Scala of an extensible record system with concatenation on disjoint labels, in the spirit of [@harper1990extensible] [@harper1991record]. For that *Datasets* uses the [ohnosequences/cosas][cosas] library.
 
 Data keys can further have a reference to a **data type**, which, as the name hints at, can help in providing information about the type of data we are working with. For example, when declaring Illumina reads as a data, a data type containing information about the read length, insert size or end type (single or paired) is used.
 
@@ -92,7 +88,7 @@ A **location** can be, for example, an S3 object or a local file; by leaving the
 
 ### _Loquat_: Parallel data processing with AWS
 
-[Loquat](https://github.com/ohnosequences/loquat) is a library developed by the first, second and last authors designed for the execution of embarrassingly parallel tasks using S3, SQS and EC2 Amazon services.
+[Loquat][loquat] is a library developed by *AA*, *EK* and *EPT* designed for the execution of embarrassingly parallel tasks using S3, SQS and EC2 Amazon services.
 
 A *loquat* executes a process with explicit input and output datasets (declared using the *Datasets* library described above). Workers (EC2 instances) read from an SQS queue the S3 locations for both input and output data; then they download the input to local files, and pass these file locations to the process to be executed. The output is then put in the corresponding S3 locations.
 
@@ -106,7 +102,7 @@ The input and output (and their locations) being defined statically has several 
 
 ### Type-safe eDSLs for BLAST and FLASh
 
-We developed our own Scala-based type-safe eDSLs (embedded Domain Specific Languages) for [FLASh](https://github.com/ohnosequences/flash) [@magovc2011flash] and [BLAST](https://github.com/ohnosequences/blast) [@camacho2009blast] expressions and their execution.
+We developed our own Scala-based type-safe eDSLs (embedded Domain Specific Languages) for [FLASh][flash] [@magovc2011flash] and [BLAST][blast] [@camacho2009blast] expressions and their execution.
 
 In the case of BLAST we use a model where we can guarantee for each BLAST command expression at compile time that
 
@@ -121,7 +117,7 @@ In the same spirit as for BLAST, we implemented a type-safe eDSL for FLASh expre
 
 ### Bio4j and Graph Databases
 
-Bio4j [@pareja2015bio4j] is a data platform integrating data from different resources such as UniProt or GO in a graph data paradigm. In the assignment phase we use a subgraph containing the NCBI Taxonomy, wrapping in Scala its Java API in a tree algebraic data type.
+Bio4j [@pareja2015bio4j] is a data platform integrating data from different resources such as UniProt, the NCBI taxonomy, or GO, in a graph data paradigm. In the assignment phase we use a subgraph containing the NCBI Taxonomy, wrapping in Scala its Java API in a tree algebraic data type.
 
 ### 16S-DB7 Reference Database Construction
 
@@ -228,7 +224,7 @@ The MG7 workflow consists of certain steps, each of which performs some work in 
 
 ## Taxonomy and Bio4j
 
-The hierarchic structure of the taxonomy of the living organisms is a tree, and, hence, is also a graph in which each node, with the exception of the root node, has a unique parent node. It led us to model the taxonomy tree as a graph using the graph database paradigm. Previously we developed Bio4j [@pareja2015bio4j], a platform for the integration of semantically rich biological data using typed graph models. It integrates most publicly available data linked with sequences into a set of interdependent graphs to be used for bioinformatics analysis and especially for biological data. MG7 works based on the Bio4j taxonomy module. It opens the possibility to connect the taxonomic profiling data obtained with MG7 to all the biological knowledge associated to each taxon. Using the information available in Bio4j for all the proteins assigned to each taxon we are connected to all the functional data available in Uniprot related with it.
+The hierarchic structure of the taxonomy of the living organisms is a tree, and, hence, is also a graph in which each node, with the exception of the root node, has a unique parent node. It led us to model the taxonomy tree as a graph using the graph database paradigm. Previously we developed Bio4j [@pareja2015bio4j], a platform for the integration of semantically rich biological data using typed graph models. It integrates most publicly available data linked with sequences into a set of interdependent graphs to be used for bioinformatics analysis and especially for biological data. MG7 works based on the Bio4j taxonomy module, which contains all the NCBI taxonomy data. It opens the possibility to connect the taxonomic profiling data obtained with MG7 to all the biological knowledge associated to each taxon. Using the information available in Bio4j for all the proteins assigned to each taxon we are connected to all the functional data available in Uniprot related with it.
 
 
 ## Future developments
@@ -290,19 +286,25 @@ MG7 uses [bio4j/bio4j v0.12.0-RC3](https://github.com/bio4j/bio4j/releases/tag/v
 
 All authors work at the _Oh no sequences!_ research group, part of Era7 Bioinformatics. Era7 offers metagenomics data analysis services based on MG7. MG7 is open source, available under the OSI-approved AGPLv3 license.
 
+Partially funded by ITN INTERCROSSING (Grant 289974) and  Cardiobiome project ITC-20151148.
+
 # Author Contributions
 
 <!-- Initials: AA, EK, MM, PPT, EP, RT, EPT -->
-- **AA** developed *MG7*, *Statika*, *Datasets*, and *aws-scala-tools*; wrote the paper;
+- **AA** developed *MG7*, *Loquat*, *Statika*, *Datasets*, and *aws-scala-tools*; wrote the paper;
 - **EK** developed *nispero* (a prototype for *Loquat* [@kovach2014nispero]) and *aws-scala-tools*.
 - **MM** *MG7* workflow design; curation and design of the *16S-DB7* reference database; wrote the paper.
-- **PPT** curation, design, data extraction code of the *16S-DB7* reference database.
+- **PPT** design and development of the first *MG7* prototype
 - **EP** *MG7* workflow design; wrote the paper.
 - **RT** *MG7* workflow design, assignment strategy; curation and design of the *16S-DB7* reference database; wrote the paper.
-- **EPT** developed *MG7*, *Statika*, *Datasets*, *FLASh/BLAST eDSLs*; data analysis approach and design; wrote the paper.
+- **EPT** developed *MG7*, *Statika*, *Datasets*, *FLASh/BLAST eDSLs*; data analysis approach and design; reference database automated curation and filtering; wrote the paper.
 
 All authors have read and approved the final manuscript.
 
-# Acknowledgements
-
-*Funding:* The two first authors are funded by INTERCROSSING (Grant 289974).
+[statika]   : https://github.com/ohnosequences/statika
+[datasets]  : https://github.com/ohnosequences/datasets
+[loquat]    : https://github.com/ohnosequences/loquat
+[flash]     : https://github.com/ohnosequences/flash-api
+[blast]     : https://github.com/ohnosequences/blast-api
+[cosas]     : https://github.com/ohnosequences/cosas/
+[scala]     : http://www.scala-lang.org/
