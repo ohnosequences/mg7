@@ -121,10 +121,34 @@ Bio4j [@pareja2015bio4j] is a data platform integrating data from different reso
 
 ### 16S-DB7 Reference Database Construction
 
-Our 16S-DB7 Reference Database is a curated subset of sequences from the NCBI nucleotide database **nt**. The sequences included were selected by similarity with the bacterial and archaeal reference sequences downloaded from the **RDP database** [@cole2013ribosomal]. RDP unaligned sequences were used to capture new 16S RNA sequences from **nt** using BLAST similarity search strategies and then, performing additional curation steps to remove sequences with poor taxonomic assignments to taxonomic nodes close to the root of the taxonomy tree.
-All the nucleotide sequences included in **nt** database has a taxonomic assignment provided by the **Genbank** sequence submitter. NCBI provides a table (available at ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/) to do the mapping of any Genbank Identifier (GI) to its Taxonomy Identifier (TaxID). Thus, we are based on a crowdsourced submitter-maintained taxonomic annotation system for reference sequences. It supposes a sustainable system able to face the expected number of reference sequences that will populate the public global nucleotide databases in the near future. Another advantageous point is that we are based on NCBI taxonomy, the *de-facto* standard taxonomic classification for biomolecular data [@cochrane20102010]. NCBI taxonomy is, undoubtedly, the most used taxonomy all over the world and the most similar to the official taxonomies of each specific field. This is a crucial point because all the type-culture and tissue databanks follow this official taxonomical classification and, in addition, all the knowledge accumulated during last decades is referred to this taxonomy. In addition NCBI provides a direct connection between taxonomical formal names and the physical specimens that serve as exemplars for the species [@federhen2014type].
+The starting point for our 16S reference database is RNA Central [@rnacentral2014rnacentral], [version 5][rnacentral v5].
 
-Certainly, if metagenomics results are easily integrated with the theoretical and experimental knowledge of each specific area, the impact of metagenomics will be higher than if it progresses as a disconnected research branch. Considering that metagenomics data interoperability, which is especially critical in clinical environments, requires a stable taxonomy to be used as reference, we decided to rely on the most widely used taxonomy: the NCBI taxonomy. In addition, the biggest global sequence database GenBank follows this taxonomy to register the origin of all their submitted sequences.
+
+<!-- The
+The starting point for We have built our reference database DB7 based on the complete RNAcentral release 5
+
+RNAcentral is a general database for all the types of non coding RNA maintained by RNAcentral Consortium. It  is formed by 38 Expert Databases, 22 of which have already been imported into RNAcentral:
+
+We downloaded RNAcentral release 5 on April 2016 from here:
+
+ftp://ftp.ebi.ac.uk/pub/databases/RNAcentral/releases/4.0/sequences/rnacentral_active.fasta.gz
+
+Our database includes the most important databases for metagenomics data analysis
+
+- Silva
+- GreenGenes
+- RDP
+- ENA (all non coding RNA included at ENA)
+- RefSeq (all non coding RNA included at RefSeq)
+
+The most important databases with rRNA sequences imported to RNAcentral are listed in ANNEX 1.
+We have curated the database manually and have designed systematic curation  approaches allowing us to do a rapid curation of the next RNAcentral releases. -->
+
+> Our 16S-DB7 Reference Database is a curated subset of sequences from the NCBI nucleotide database **nt**. The sequences included were selected by similarity with the bacterial and archaeal reference sequences downloaded from the **RDP database** [@cole2013ribosomal]. RDP unaligned sequences were used to capture new 16S RNA sequences from **nt** using BLAST similarity search strategies and then, performing additional curation steps to remove sequences with poor taxonomic assignments to taxonomic nodes close to the root of the taxonomy tree.
+>
+> All the nucleotide sequences included in **nt** database has a taxonomic assignment provided by the **Genbank** sequence submitter. NCBI provides a table (available at ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/) to do the mapping of any Genbank Identifier (GI) to its Taxonomy Identifier (TaxID). Thus, we are based on a crowdsourced submitter-maintained taxonomic annotation system for reference sequences. It supposes a sustainable system able to face the expected number of reference sequences that will populate the public global nucleotide databases in the near future. Another advantageous point is that we are based on NCBI taxonomy, the *de-facto* standard taxonomic classification for biomolecular data [@cochrane20102010]. NCBI taxonomy is, undoubtedly, the most used taxonomy all over the world and the most similar to the official taxonomies of each specific field. This is a crucial point because all the type-culture and tissue databanks follow this official taxonomical classification and, in addition, all the knowledge accumulated during last decades is referred to this taxonomy. In addition NCBI provides a direct connection between taxonomical formal names and the physical specimens that serve as exemplars for the species [@federhen2014type].
+>
+> Certainly, if metagenomics results are easily integrated with the theoretical and experimental knowledge of each specific area, the impact of metagenomics will be higher than if it progresses as a disconnected research branch. Considering that metagenomics data interoperability, which is especially critical in clinical environments, requires a stable taxonomy to be used as reference, we decided to rely on the most widely used taxonomy: the NCBI taxonomy. In addition, the biggest global sequence database GenBank follows this taxonomy to register the origin of all their submitted sequences.
 Our 16S database building strategy allows the substitution of the 16S database by any other subset of **nt**, even by the complete **nt** database if it would be needed, for example, for analyzing shotgun metagenomics data. This possibility of changing the reference database provides flexibility to the system enabling it for easy updating and project-driven personalization.
 
 ## Workflow Description
@@ -301,10 +325,11 @@ Partially funded by ITN INTERCROSSING (Grant 289974) and  Cardiobiome project IT
 
 All authors have read and approved the final manuscript.
 
-[statika]   : https://github.com/ohnosequences/statika
-[datasets]  : https://github.com/ohnosequences/datasets
-[loquat]    : https://github.com/ohnosequences/loquat
-[flash]     : https://github.com/ohnosequences/flash-api
-[blast]     : https://github.com/ohnosequences/blast-api
-[cosas]     : https://github.com/ohnosequences/cosas/
-[scala]     : http://www.scala-lang.org/
+[statika]: https://github.com/ohnosequences/statika
+[datasets]: https://github.com/ohnosequences/datasets
+[loquat]: https://github.com/ohnosequences/loquat
+[flash]: https://github.com/ohnosequences/flash-api
+[blast]: https://github.com/ohnosequences/blast-api
+[cosas]: https://github.com/ohnosequences/cosas/
+[scala]: http://www.scala-lang.org/
+[rnacentral v5]: http://blog.rnacentral.org/2016/03/rnacentral-release-5.html
