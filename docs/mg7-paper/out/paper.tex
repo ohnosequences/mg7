@@ -247,22 +247,21 @@ implicits one can retrieve the value corresponding to a singleton type.
 behavior}{Statika: machine configuration and behavior}}\label{statika-machine-configuration-and-behavior}
 
 \protect\hyperlink{statika}{Statika} is a Scala library developed by
-\emph{AA} and \emph{EP-T} which serves as a way of defining and
-composing machine behaviors statically. The main component are
-\textbf{bundles}. Each bundle declares a sequence of computations (its
-behavior) which will be executed in an \textbf{environment}. A bundle
-can \emph{depend} on other bundles, and when being executed by an
-environment, its DAG (Directed Acyclic Graph) of dependencies is
-linearized and run in sequence. In our use, bundles correspond to what
-an EC2 instance should do and an environment to an AMI (Amazon Machine
-Image) which prepares the basic configuration, downloads the Scala code
-and runs it.
+\emph{AA} and \emph{EPT} which serves as a way of defining and composing
+machine behaviors statically. The main component are \textbf{bundles}.
+Each bundle declares a sequence of computations (its behavior) which
+will be executed in an \textbf{environment}. A bundle can \emph{depend}
+on other bundles, and when being executed by an environment, its DAG
+(Directed Acyclic Graph) of dependencies is linearized and run in
+sequence. In our use, bundles correspond to what an EC2 instance should
+do and an environment to an AMI (Amazon Machine Image) which prepares
+the basic configuration, downloads the Scala code and runs it.
 
 \subsubsection{\texorpdfstring{\emph{Datasets}: a mini-language for
 data}{Datasets: a mini-language for data}}\label{datasets-a-mini-language-for-data}
 
 \protect\hyperlink{datasets}{Datasets} is a Scala library developed by
-\emph{AA} and \emph{EP-T} with the goal of being a Scala-embedded
+\emph{AA} and \emph{EPT} with the goal of being a Scala-embedded
 mini-language for datasets and their locations. \textbf{Data} is
 represented as type-indexed fields: keys are modeled as singleton types,
 and values correspond to what could be called a denotation of the key: a
@@ -298,7 +297,7 @@ with
 AWS}{Loquat: Parallel data processing with AWS}}\label{loquat-parallel-data-processing-with-aws}
 
 \protect\hyperlink{loquat}{Loquat} is a library developed by \emph{AA},
-\emph{EK} and \emph{EP-T} designed for the execution of embarrassingly
+\emph{EK} and \emph{EPT} designed for the execution of embarrassingly
 parallel tasks using S3, SQS and EC2 Amazon services.
 
 A \emph{loquat} executes a process with explicit input and output
@@ -912,8 +911,8 @@ project ITC-20151148.
 \begin{itemize}
 \tightlist
 \item
-  \textbf{AA} developed \emph{MG7}, \emph{Statika}, \emph{Datasets}, and
-  \emph{aws-scala-tools}; wrote the paper;
+  \textbf{AA} developed \emph{MG7}, \emph{Loquat}, \emph{Statika},
+  \emph{Datasets}, and \emph{aws-scala-tools}; wrote the paper;
 \item
   \textbf{EK} developed \emph{nispero} (a prototype for \emph{Loquat}
   \citep{kovach2014nispero}) and \emph{aws-scala-tools}.
@@ -921,8 +920,7 @@ project ITC-20151148.
   \textbf{MM} \emph{MG7} workflow design; curation and design of the
   \emph{16S-DB7} reference database; wrote the paper.
 \item
-  \textbf{PPT} curation, design, data extraction code of the
-  \emph{16S-DB7} reference database.
+  \textbf{PPT} design and development of the first \emph{MG7} prototype
 \item
   \textbf{EP} \emph{MG7} workflow design; wrote the paper.
 \item
@@ -930,8 +928,8 @@ project ITC-20151148.
   and design of the \emph{16S-DB7} reference database; wrote the paper.
 \item
   \textbf{EPT} developed \emph{MG7}, \emph{Statika}, \emph{Datasets},
-  \emph{FLASh/BLAST eDSLs}; data analysis approach and design; wrote the
-  paper.
+  \emph{FLASh/BLAST eDSLs}; data analysis approach and design; reference
+  database automated curation and filtering; wrote the paper.
 \end{itemize}
 
 All authors have read and approved the final manuscript.
