@@ -494,6 +494,16 @@ located in a line without bifurcations. In that case the taxon assigned
 is the most specific (the most distant from the root).}
 \end{figure}
 
+All the assignment procedures work by default with input the set of
+BLAST hits which have maximum bitscore among those covering the whole
+query sequence; we will call this the set of best hits of a query. Note
+that the criteria which determines this set of best hits is fully
+configurable, adjusted to conform to its meaning in each particular
+dataset: those hits which we should take into account as valid for
+assignment. This is of course experiment-dependent, and we can account
+for read quality or technology-specific error profiles through
+configuring these criteria for the set of best hits.
+
 \paragraph{LCA Assignment}\label{lca-assignment}
 
 For each read, first, we select the BEST BLAST HITs (by default 10 Hits)
