@@ -496,18 +496,18 @@ is the most specific (the most distant from the root).}
 
 All the assignment procedures work by default with input the set of
 BLAST hits which have maximum bitscore among those covering the whole
-query sequence; we will call this the set of best hits of a query. Note
-that the criteria which determines this set of best hits is fully
-configurable, adjusted to conform to its meaning in each particular
-dataset: those hits which we should take into account as valid for
-assignment. This is of course experiment-dependent, and we can account
-for read quality or technology-specific error profiles through
-configuring these criteria for the set of best hits.
+query sequence; we will call this the set of valid hits of a query. Note
+that the criteria which determines this set of valid hits is fully
+configurable, and should be adjusted to conform to its meaning in each
+particular dataset: those hits which we should take into account as
+valid for assignment. This is of course experiment-dependent, and the
+criteria for valid hits should account for read quality or
+technology-specific error profiles.
 
 \paragraph{LCA Assignment}\label{lca-assignment}
 
 The LCA assignment simply computes the lowest common ancestor of the set
-of best hits. Other metagenomics analysis approaches
+of valid hits. Other metagenomics analysis approaches
 \citep{huson2012microbial} have adopted LCA-based assignment algorithms,
 as it provides the most precise assignment for a set of taxa, with no
 further information available\footnote{the lowest common ancestor of a
@@ -515,7 +515,11 @@ further information available\footnote{the lowest common ancestor of a
   poset, with the ``parent of'' partial order}; as our reference
 database is already heavily preprocessed and checked for internal
 consistency, there is no need for altering the lowest common ancestor in
-any way, as is customarily done in other cases.
+any way, as is customarily done in other cases. MG7 operates under the
+assumption that hits which fulfill the user-defined criteria for being
+valid hits should be treated on an equal footing, and in that case
+taking their LCA is the coherent assignment choice with minimum
+information loss.
 
 \paragraph{Best BLAST hit taxonomic
 assignment}\label{best-blast-hit-taxonomic-assignment}
