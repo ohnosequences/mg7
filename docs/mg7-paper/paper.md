@@ -66,7 +66,7 @@ These are some of the more innovative MG7 features:
 - Definition of complex workflows using *[Loquat][loquat]*, a composable system for scaling/parallelizing stateless computations especially designed for AWS
 - A new approach to data analysis specification, management and specification based on working with it in exactly the same way as for a software project, together with the extensive use of compile-time structures and checks
 - Modeling of the taxonomy tree using the new paradigm of graph databases (Bio4j, [@pareja2015bio4j]). It facilitates the taxonomic assignment tasks and the calculation of the taxa abundance values considering the hierarchic structure of taxonomy tree
-- Exhaustive per-read taxonomic assignment using two complementary assignment algorithms Lowest Common Ancestor and Best BLAST Hit
+- Exhaustive per-read taxonomic assignment using two complementary assignment algorithms: Lowest Common Ancestor (LCA) and Best BLAST Hit
 - Using a new 16S database of reference sequences (16S-DB7) with a flexible and sustainable system of updating and project-driven customization
 
 ## Libraries and resources
