@@ -300,10 +300,10 @@ Partially funded by ITN INTERCROSSING (Grant 289974) and  Cardiobiome project IT
 
 All authors have read and approved the final manuscript.
 
-[statika]   : https://github.com/ohnosequences/statika
-[datasets]  : https://github.com/ohnosequences/datasets
-[loquat]    : https://github.com/ohnosequences/loquat
-[flash]     : https://github.com/ohnosequences/flash-api
-[blast]     : https://github.com/ohnosequences/blast-api
-[cosas]     : https://github.com/ohnosequences/cosas/
-[scala]     : http://www.scala-lang.org/
+[statika]: https://github.com/ohnosequences/statika
+[datasets]: https://github.com/ohnosequences/datasets
+[loquat]: https://github.com/ohnosequences/loquat
+[flash]: https://github.com/ohnosequences/flash-api
+[blast]: https://github.com/ohnosequences/blast-api
+[cosas]: https://github.com/ohnosequences/cosas/
+[scala]: http://www.scala-lang.org/
