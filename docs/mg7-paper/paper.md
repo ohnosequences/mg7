@@ -135,15 +135,11 @@ Once we have non-redundant set of RNA sequences containing all those correspondi
 1. be a taxon *close* to the original assignment, if there are sequences similar enough in the reference database
 2. be empty, due to this sequence having no similar sequences in the reference database
 
-In any other case, under our assumptions, this assignment should be discarded.
+In any other case, under our assumptions, this assignment should be discarded. What we consider as close is: the parent of the MG7 assignment should be contained in the lineage of the original assignment.
 
-<!--
-1. which kind of misassignments can be detected
-2. how
-3. why it is OK for sequences assigned to strange taxa, with no close 16S seq (they will get no hits)
-4. we analyze every assignment independently -->
+<!-- TODO I think there should be a figure here, explaining how wrong assignments would be detected and discarded, and why our definition of close is a good one. -->
 
-All these steps are automated, and integrated with every release of our reference database. The whole process can be repeated and adapted to other subsets of RNACentral; we do this for a 18S reference database.
+All these steps are automated, and integrated with every release of our reference database. The whole process can be repeated and adapted to other subsets of RNACentral; we do this for an 18S reference database.
 
 <!-- Our 16S-DB7 Reference Database is a curated subset of sequences from the NCBI nucleotide database **nt**. The sequences included were selected by similarity with the bacterial and archaeal reference sequences downloaded from the **RDP database** [@cole2013ribosomal]. RDP unaligned sequences were used to capture new 16S RNA sequences from **nt** using BLAST similarity search strategies and then, performing additional curation steps to remove sequences with poor taxonomic assignments to taxonomic nodes close to the root of the taxonomy tree.
 
