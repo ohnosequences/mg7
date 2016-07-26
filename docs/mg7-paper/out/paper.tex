@@ -410,29 +410,30 @@ GreenGenes, RDP, ENA, and RefSeq. First we take those sequences which
 
 After this first step, we drop redundant assignments: if sequences
 \(S_1 \subseteq S_2\) share an assignment \(T\), it gets dropped from
-\(S_1\); sequences which as a result end up having no assignments are
-removed.
+\(S_1\); sequences which as a result of this process end up having no
+assignments are removed.
 
 Once we have non-redundant set of RNA sequences containing all those
 corresponding to 16S, we can apply our procedure for checking internal
-consistency of taxonomic assignments.
-
-We run MG7 using this set of sequences as query, and with reference all
-but the one we are trying to assign. Explain
+consistency of taxonomic assignments. We run MG7 using this set of
+sequences as query, with reference all but the one we are trying to
+assign. Under the (reasonable) assumption of 16S sequence similarity
+being correlated with the taxonomy tree topology, the MG7 result should
+either
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  which kind of misassignments can be detected
+  be a taxon \emph{close} to the original assignment, if there are
+  sequences similar enough in the reference database
 \item
-  how
-\item
-  why it is OK for sequences assigned to strange taxa, with no close 16S
-  seq (they will get no hits)
-\item
-  we analyze every assignment independently
+  be empty, due to this sequence having no similar sequences in the
+  reference database
 \end{enumerate}
+
+In any other case, under our assumptions, this assignment should be
+discarded.
 
 All these steps are automated, and integrated with every release of our
 reference database. The whole process can be repeated and adapted to

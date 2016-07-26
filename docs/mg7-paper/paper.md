@@ -128,18 +128,22 @@ The starting point for our 16S reference database is RNA Central [@rnacentral201
 3. have at least one taxonomic assignment to a descendant of *Bacteria* or *Archaea*
 4. their lineage does not contain a set of taxa deemed uninformative^[for example: "unclassified Bacteria (miscellaneous)" or "unclassified". Assigning a read to an "unclassified" taxon defeats the first and foremost goal of taxonomic profiling: *classification*.]
 
-After this first step, we drop redundant assignments: if sequences $S_1 \subseteq S_2$ share an assignment $T$, it gets dropped from $S_1$; sequences which as a result end up having no assignments are removed.
+After this first step, we drop redundant assignments: if sequences $S_1 \subseteq S_2$ share an assignment $T$, it gets dropped from $S_1$; sequences which as a result of this process end up having no assignments are removed.
 
-Once we have non-redundant set of RNA sequences containing all those corresponding to 16S, we can apply our procedure for checking internal consistency of taxonomic assignments.
+Once we have non-redundant set of RNA sequences containing all those corresponding to 16S, we can apply our procedure for checking internal consistency of taxonomic assignments. We run MG7 using this set of sequences as query, with reference all but the one we are trying to assign. Under the (reasonable) assumption of 16S sequence similarity being correlated with the taxonomy tree topology, the MG7 result should either
 
-We run MG7 using this set of sequences as query, and with reference all but the one we are trying to assign. Explain
+1. be a taxon *close* to the original assignment, if there are sequences similar enough in the reference database
+2. be empty, due to this sequence having no similar sequences in the reference database
 
+In any other case, under our assumptions, this assignment should be discarded.
+
+<!--
 1. which kind of misassignments can be detected
 2. how
 3. why it is OK for sequences assigned to strange taxa, with no close 16S seq (they will get no hits)
-4. we analyze every assignment independently
+4. we analyze every assignment independently -->
 
-All these steps are automated, and integrated with every release of our reference database. The whole process can be repeated and adapted to other subsets of RNACentral; we do this for a 18S reference database. 
+All these steps are automated, and integrated with every release of our reference database. The whole process can be repeated and adapted to other subsets of RNACentral; we do this for a 18S reference database.
 
 <!-- Our 16S-DB7 Reference Database is a curated subset of sequences from the NCBI nucleotide database **nt**. The sequences included were selected by similarity with the bacterial and archaeal reference sequences downloaded from the **RDP database** [@cole2013ribosomal]. RDP unaligned sequences were used to capture new 16S RNA sequences from **nt** using BLAST similarity search strategies and then, performing additional curation steps to remove sequences with poor taxonomic assignments to taxonomic nodes close to the root of the taxonomy tree.
 
