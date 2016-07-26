@@ -139,7 +139,7 @@ In the first step the paired-end reads, designed with an insert size that yields
 
 ### Parallelized BLASTN of each read against the 16S-DB7
 
-The second step is to search for similar 16S sequences in our 16S-DB7 database. The taxonomic assignment for each read is based on BLASTN of each read against the 16S database.Assignment based on direct similarity of each read one by one compared against a sufficiently wide database is considered in different reviews of metagenomics analysis methodologies [@segata2013computational] [@morgan2012chapter] as a very exhaustive method for assignment. Some methods of assignment compare the sequences only against the 16S genes from available complete bacterial genomes or avoid computational cost clustering or binning the sequences first, and then doing the assignments only for the representative sequence of each cluster. MG7 carries out an exhaustive comparison of all the reads under analysis and it does not applies any binning strategy. Every read is specifically compared with all the sequences of the 16S database.
+The second step is to search for similar 16S sequences in our 16S-DB7 database. The taxonomic assignment for each read is based on BLASTN of each read against the 16S database. Assignment based on direct similarity of each read one by one compared against a sufficiently wide database is considered in different reviews of metagenomics analysis methodologies [@segata2013computational] [@morgan2012chapter] as a very exhaustive method for assignment. Some methods of assignment compare the sequences only against the 16S genes from available complete bacterial genomes or avoid computational cost clustering or binning the sequences first, and then doing the assignments only for the representative sequence of each cluster. MG7 carries out an exhaustive comparison of all the reads under analysis and it does not apply any binning strategy. Every read is specifically compared with all the sequences of the 16S database.
 
 ### Taxonomic Assignment Algorithms
 
@@ -149,11 +149,11 @@ All the reads are assigned under two different algorithms of assignment: i. Lowe
 
 All the assignment procedures work by default with input the set of BLAST hits which have maximum bitscore among those covering the whole query sequence; we will call this the set of valid hits of a query. Note that the criteria which determines this set of valid hits is fully configurable, and should be adjusted to conform to its meaning in each particular dataset: those hits which we should take into account as valid for assignment. This is of course experiment-dependent, and the criteria for valid hits should account for read quality or technology-specific error profiles.
 
-#### LCA Assignment
+#### LCA assignment
 
 The LCA assignment simply computes the lowest common ancestor of the set of valid hits. Other metagenomics analysis approaches [@huson2012microbial] have adopted LCA-based assignment algorithms, as it provides the most precise assignment for a set of taxa, with no further information available^[the lowest common ancestor of a set of nodes in a tree is just their product in the tree viewed as a poset, with the "parent of" partial order]; as our reference database is already heavily preprocessed and checked for internal consistency, there is no need for altering the lowest common ancestor in any way, as is customarily done in other cases<!-- TODO cite? -->. MG7 operates under the assumption that hits which fulfill the user-defined criteria for being valid hits should be treated on an equal footing, and in that case taking their LCA is the coherent assignment choice with minimum information loss.
 
-#### Best BLAST hit taxonomic assignment
+#### Best BLAST hit assignment
 
 We decided to maintain the simpler method of Best BLAST Hit (BBH) for taxonomic assignment because, in some cases, it can provide information about the sequences that adds information to that obtained using the LCA algorithm. With the LCA algorithm, when some reference sequences with BLAST alignments over the required thresholds map to a not sufficiently specific taxID, the read can be assigned to an unspecific taxon near to the root of the taxonomy tree. If the BBH reference sequence maps to more specific taxa, this method, in that case, gives us useful information.
 
