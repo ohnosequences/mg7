@@ -478,28 +478,23 @@ Algorithms}\label{taxonomic-assignment-algorithms}
 All the reads are assigned under two different algorithms of assignment:
 i. Lowest Common Ancestor based taxonomic assignment (LCA) and ii. Best
 BLAST Hit based taxonomic assignment (BBH). Figure 2 displays
-schematically the LCA algorithm applied sensu stricto (left panel) and
-the called `in line' exception (right panel) designed in order to gain
-specificity in the assignments in the cases in which the topology of the
-taxonomical nodes corresponding to the BLAST hits support sufficiently
-the assignment to the most specific taxon.
+schematically the LCA algorithm.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics{./Figure-2.jpg}
 \caption{\textbf{Lowest Common Ancestor algorithm for taxonomic
-assignment.} The Left panel displays an example of the application of
-LCA algorithm in a \emph{sensu stricto} mode. A, B, C and D represent
-taxonomy tree nodes with assigned reads. Right panel displays the
-\emph{in line} mode of assignment which is an exception for the
-\emph{sensu stricto} mode of application of LCA algorithm. The \emph{in
-line} mode is used when all the nodes are located in a line without
-bifurcations. In that case the taxon assigned is the most specific (the
-most distant from the root).}
+assignment.} \textbf{TODO UPDATE THIS FIGURE!} The Left panel displays
+an example of the application of LCA algorithm in a \emph{sensu stricto}
+mode. A, B, C and D represent taxonomy tree nodes with assigned reads.
+Right panel displays the \emph{in line} mode of assignment which is an
+exception for the \emph{sensu stricto} mode of application of LCA
+algorithm. The \emph{in line} mode is used when all the nodes are
+located in a line without bifurcations. In that case the taxon assigned
+is the most specific (the most distant from the root).}
 \end{figure}
 
-\paragraph{Lowest Common Ancestor based Taxonomic
-Assignment}\label{lowest-common-ancestor-based-taxonomic-assignment}
+\paragraph{LCA Assignment}\label{lca-assignment}
 
 For each read, first, we select the BEST BLAST HITs (by default 10 Hits)
 over a threshold of similarity. To evaluate similarity for this first
