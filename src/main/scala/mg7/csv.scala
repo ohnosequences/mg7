@@ -24,8 +24,7 @@ case object csv {
 
     val Lineage = "Lineage"
     val ReadID  = "Read-ID"
-    // TODO better Taxa/Taxon
-    val TaxID   = "Tax-ID"
+    val Taxa    = "Taxa"
     val TaxName = "Tax-name"
     val TaxRank = "Tax-rank"
     val Count   = "Count"
@@ -42,7 +41,7 @@ case object csv {
 
   val assignHeader = List[String](
     columnNames.ReadID,
-    columnNames.TaxID,
+    columnNames.Taxa,
     columnNames.TaxName,
     columnNames.TaxRank,
     columnNames.Pident

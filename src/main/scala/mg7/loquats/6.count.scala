@@ -30,16 +30,16 @@ case object countDataProcessing extends DataProcessingBundle(
     }
 
   def directCounts(
-    taxIDs: List[TaxID],
-    getLineage: TaxID => Seq[TaxID]
-  ): Map[TaxID, (Int, Seq[TaxID])] = {
+    taxIDs: List[Taxa],
+    getLineage: Taxa => Seq[Taxa]
+  ): Map[Taxa, (Int, Seq[Taxa])] = {
 
     @scala.annotation.tailrec
     def rec(
-      list: List[TaxID],
-      acc: Map[TaxID, (Int, Seq[TaxID])]
-    ): Map[TaxID, (Int, Seq[TaxID])] = list match {
-      case Nil    => acc
+      list: List[Taxa],
+      acc: Map[Taxa, (Int, Seq[Taxa])]
+    ): Map[Taxa, (Int, Seq[Taxa])] = list match {
+      case Nil => acc
       case h :: t => {
         val (n, rest) = count(h, t)
         rec(rest, acc.updated(h, (n + 1, getLineage(h))))
@@ -50,12 +50,12 @@ case object countDataProcessing extends DataProcessingBundle(
   }
 
   def accumulatedCounts(
-    directCounts: Map[TaxID, (Int, Seq[TaxID])],
-    getLineage: TaxID => Seq[TaxID]
-  ): Map[TaxID, (Int, Seq[TaxID])] = {
+    directCounts: Map[Taxa, (Int, Seq[Taxa])],
+    getLineage: Taxa => Seq[Taxa]
+  ): Map[Taxa, (Int, Seq[Taxa])] = {
 
     directCounts.foldLeft(
-      Map[TaxID, (Int, Seq[TaxID])]()
+      Map[Taxa, (Int, Seq[Taxa])]()
     ) { case (accumCounts, (taxID, (directCount, lineage))) =>
 
       lineage.foldLeft(
@@ -81,14 +81,14 @@ case object countDataProcessing extends DataProcessingBundle(
     def processFile(assignsFile: File): (File, File, File, File) = {
 
       val assignsReader: CSVReader = csv.newReader(assignsFile)
-      val assigns: List[(TaxID, String)] = assignsReader.allWithHeaders.map { row =>
-        (row(csv.columnNames.TaxID), row(csv.columnNames.Pident))
+      val assigns: List[(Taxa, String)] = assignsReader.allWithHeaders.map { row =>
+        (row(csv.columnNames.Taxa), row(csv.columnNames.Pident))
       }
       assignsReader.close
 
-      val taxIDs: List[TaxID] = assigns.map(_._1)
+      val taxIDs: List[Taxa] = assigns.map(_._1)
 
-      val averagePidents: Map[TaxID, String] = assigns
+      val averagePidents: Map[Taxa, String] = assigns
         .toStream.groupBy { _._1 } // group by taxIDs
         .map { case (taxID, pairs) =>
 
@@ -102,9 +102,9 @@ case object countDataProcessing extends DataProcessingBundle(
       val assignedReadsNumber: Double = taxIDs.length
       def frequency(absolute: Int): Double = absolute / assignedReadsNumber
 
-      val lineageMap: scala.collection.mutable.Map[TaxID, Seq[TaxID]] = scala.collection.mutable.Map()
+      val lineageMap: scala.collection.mutable.Map[Taxa, Seq[Taxa]] = scala.collection.mutable.Map()
 
-      def getLineage(id: TaxID): Seq[TaxID] =
+      def getLineage(id: Taxa): Seq[Taxa] =
         lineageMap.get(id).getOrElse {
           val lineage = taxonomyGraph.getNode(id)
             .map{ _.lineage }.getOrElse( Seq() )
@@ -113,8 +113,8 @@ case object countDataProcessing extends DataProcessingBundle(
           lineage
         }
 
-      val direct:      Map[TaxID, (Int, Seq[TaxID])] = directCounts(taxIDs, getLineage)
-      val accumulated: Map[TaxID, (Int, Seq[TaxID])] = accumulatedCounts(direct, getLineage)
+      val direct:      Map[Taxa, (Int, Seq[Taxa])] = directCounts(taxIDs, getLineage)
+      val accumulated: Map[Taxa, (Int, Seq[Taxa])] = accumulatedCounts(direct, getLineage)
 
       val filesPrefix: String = assignsFile.name.stripSuffix(".csv")
 
@@ -132,7 +132,7 @@ case object countDataProcessing extends DataProcessingBundle(
       // TODO all this file output format-related code should be part of global configuration
       def headerFor(file: File) = List(
         csv.columnNames.Lineage,
-        csv.columnNames.TaxID,
+        csv.columnNames.Taxa,
         csv.columnNames.TaxRank,
         csv.columnNames.TaxName,
         file.name.replaceAll("\\.", "-"),
@@ -144,7 +144,7 @@ case object countDataProcessing extends DataProcessingBundle(
       csvAccumFreqWriter.writeRow(headerFor(outAccumFreqFile))
 
       def writeCounts(
-        counts: Map[TaxID, (Int, Seq[TaxID])],
+        counts: Map[Taxa, (Int, Seq[Taxa])],
         writerAbs: CSVWriter,
         writerFrq: CSVWriter
       ) = counts foreach { case (taxID, (absoluteCount, lineage)) =>

@@ -6,8 +6,8 @@ import ohnosequences.blast.api._
 
 package object mg7 {
 
-  type ID     = String
-  type TaxID  = ID
+  type ID = String
+  type Taxa = ID
   type ReadID = ID
   type NodeID = ID
 

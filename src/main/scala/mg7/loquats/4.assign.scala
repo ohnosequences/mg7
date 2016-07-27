@@ -26,9 +26,8 @@ case class assignDataProcessing[MD <: AnyMG7Parameters](val md: MD) extends Data
   type BlastRow = csv.Row[md.blastOutRec.Keys]
 
   // This iterates over reference DBs and merges their id2taxa tables in one Map
-  private lazy val referenceMap: Map[ID, Seq[TaxID]] = {
-
-    val refMap: scala.collection.mutable.Map[ID, Seq[TaxID]] = scala.collection.mutable.Map()
+  private lazy val referenceMap: Map[ID, Seq[Taxa]] = {
+    val refMap: scala.collection.mutable.Map[ID, Seq[Taxa]] = scala.collection.mutable.Map()
 
     md.referenceDBs.foreach { refDB =>
       val reader = csv.newReader(refDB.id2taxas)
@@ -46,8 +45,8 @@ case class assignDataProcessing[MD <: AnyMG7Parameters](val md: MD) extends Data
     refMap.toMap
   }
 
-  private def taxIDsFor(id: ID): Seq[TaxID] =
-    referenceMap.get(id).getOrElse(Seq())
+  private def taxIDsFor(id: ID): Seq[Taxa] = referenceMap.get(id).getOrElse(Seq())
+
 
   def instructions: AnyInstructions = say("Let's see who is who!")
 
@@ -71,15 +70,15 @@ case class assignDataProcessing[MD <: AnyMG7Parameters](val md: MD) extends Data
       // for each read evaluate LCA and BBH and write the output files
       .foreach { case (readId: ID, hits: Stream[BlastRow]) =>
 
-        // for each hit row we take the column with ID and lookup corresponding TaxIDs
-        val assignments: List[(BlastRow, Seq[TaxID])] = hits.toList.map { row =>
+        // for each hit row we take the column with ID and lookup corresponding Taxas
+        val assignments: List[(BlastRow, Seq[Taxa])] = hits.toList.map { row =>
           row -> taxIDsFor(row.select(sseqid))
         }
 
         //// Best Blast Hit ////
 
         // best hits are those that have maximum in the `bitscore` column
-        val bbhHits: List[(BlastRow, Seq[TaxID])] = maximums(assignments) { case (row, _) =>
+        val bbhHits: List[(BlastRow, Seq[Taxa])] = maximums(assignments) { case (row, _) =>
           parseLong(row.select(bitscore)).getOrElse(0L)
         }
 

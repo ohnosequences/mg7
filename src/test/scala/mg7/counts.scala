@@ -16,16 +16,16 @@ case object countsCtx {
     r3 -> 5
   )
 
-  val ids: List[TaxID] =
+  val ids: List[Taxa] =
     realCounts.flatMap { case (node, count) =>
       List.fill(count)(node.id)
     }.toList
 
-  def getLineage(id: TaxID): Seq[TaxID] = id2node(id).lineage.map(_.id)
+  def getLineage(id: Taxa): Seq[Taxa] = id2node(id).lineage.map(_.id)
 
-  val direct: Map[TaxID, (Int, Seq[TaxID])] = directCounts(ids, getLineage)
+  val direct: Map[Taxa, (Int, Seq[Taxa])] = directCounts(ids, getLineage)
 
-  val accumulated: Map[TaxID, (Int, Seq[TaxID])] = accumulatedCounts(direct, getLineage)
+  val accumulated: Map[Taxa, (Int, Seq[Taxa])] = accumulatedCounts(direct, getLineage)
 }
 
 
