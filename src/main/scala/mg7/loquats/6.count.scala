@@ -82,7 +82,7 @@ case object countDataProcessing extends DataProcessingBundle(
 
       val assignsReader: CSVReader = csv.newReader(assignsFile)
       val assigns: List[(Taxa, String)] = assignsReader.allWithHeaders.map { row =>
-        (row(csv.columnNames.Taxa), row(csv.columnNames.Pident))
+        (row(csv.columns.Taxa.label), row(csv.columns.Pident.label))
       }
       assignsReader.close
 
@@ -131,10 +131,10 @@ case object countDataProcessing extends DataProcessingBundle(
 
       // TODO all this file output format-related code should be part of global configuration
       def headerFor(file: File) = List(
-        csv.columnNames.Lineage,
-        csv.columnNames.Taxa,
-        csv.columnNames.TaxRank,
-        csv.columnNames.TaxName,
+        csv.columns.Lineage.label,
+        csv.columns.Taxa.label,
+        csv.columns.TaxRank.label,
+        csv.columns.TaxName.label,
         file.name.replaceAll("\\.", "-"),
         "Average-Pident"
       )

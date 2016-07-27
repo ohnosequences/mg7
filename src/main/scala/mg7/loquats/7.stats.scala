@@ -1,6 +1,6 @@
 package ohnosequences.mg7.loquats
 
-import ohnosequences.mg7._
+import ohnosequences.mg7._, csv._
 import ohnosequences.mg7.bio4j._, taxonomyTree._, titanTaxonomyTree._
 import ohnosequences.loquat._
 import ohnosequences.statika._
@@ -8,7 +8,7 @@ import ohnosequences.cosas._, types._, klists._
 import ohnosequences.datasets._
 import ohnosequences.fastarious._, fasta._, fastq._
 import better.files._
-import com.github.tototoshi.csv._
+// import com.github.tototoshi.csv._
 import com.bio4j.titan.model.ncbiTaxonomy.TitanNCBITaxonomyGraph
 
 case object statsDataProcessing extends DataProcessingBundle()(
@@ -38,24 +38,18 @@ case object statsDataProcessing extends DataProcessingBundle()(
     LazyTry {
       val csvWriter = csv.newWriter(statsCSV)
 
-      // TODO the whole method is a bit primitive
-      // header:
-      csvWriter.writeRow(csv.statsHeader)
-
-      // values:
-      // NOTE: careful, the order has to coincide with the header
-      // TODO: use csv.Row here
-      val stats: Seq[String] = Seq(
+      val statsRow = Row(statsColumns)(
         sampleID,
-
         countReads( parseFastqDropErrors, reads1fastq ).toString,
         countReads( parseFastqDropErrors, context.inputFile(data.mergedReads) ).toString,
         countReads( parseFastqDropErrors, context.inputFile(data.pair1NotMerged) ).toString,
-
         countReads( parseFastaDropErrors, context.inputFile(data.blastNoHits) ).toString
       )
 
-      csvWriter.writeRow(stats)
+      // header:
+      csvWriter.writeRow(statsColumns.labels)
+      // values:
+      csvWriter.writeRow(statsRow.values)
 
       csvWriter.close()
     } -&-

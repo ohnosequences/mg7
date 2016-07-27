@@ -1,6 +1,6 @@
 package ohnosequences.mg7.loquats
 
-import ohnosequences.mg7._, bio4j._, taxonomyTree._, titanTaxonomyTree._
+import ohnosequences.mg7._, csv._, bio4j._, taxonomyTree._, titanTaxonomyTree._
 import ohnosequences.loquat._
 import ohnosequences.statika._
 import ohnosequences.cosas._, types._, klists._
@@ -30,7 +30,7 @@ case object summaryDataProcessing extends DataProcessingBundle()(
 
     LazyTry {
       val csvWriter = csv.newWriter(summaryCSV)
-      csvWriter.writeRow(csv.statsHeader)
+      csvWriter.writeRow(statsColumns.labels)
 
       // only one level in depth:
       context.inputFile(data.sampleStatsFolder).list foreach { sampleStats =>

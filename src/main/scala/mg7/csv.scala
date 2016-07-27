@@ -19,59 +19,77 @@ case object csv {
   def newReader(file: File): CSVReader =
     CSVReader.open(file.toJava)(UnixCSVFormat)
 
-  // TODO: rewrite this with product types:
-  case object columnNames {
 
-    val Lineage = "Lineage"
-    val ReadID  = "Read-ID"
-    val Taxa    = "Taxa"
-    val TaxName = "Tax-name"
-    val TaxRank = "Tax-rank"
-    val Count   = "Count"
-    val Pident  = "Pident"
+  abstract class Column(lbl: String) extends Type[String](lbl) { col: Singleton => }
+
+  case object columns {
+
+    case object Lineage extends Column("Lineage")
+    case object ReadID  extends Column("Read-ID")
+    case object Taxa    extends Column("Taxa")
+    case object TaxName extends Column("Tax-name")
+    case object TaxRank extends Column("Tax-rank")
+    case object Count   extends Column("Count")
+    case object Pident  extends Column("Pident")
+
+    case object SampleID    extends Column("Sample-ID")
+    case object InputPairs  extends Column("Input-pairs")
+    case object Merged      extends Column("Merged")
+    case object NotMerged   extends Column("Not-merged")
+    case object NoBlasthits extends Column("No-Blast-hits")
   }
 
-  val statsHeader = List[String](
-    "Sample-ID",
-    "Input-pairs",
-    "Merged",
-    "Not-merged",
-    "No-Blast-hits"
-  )
+  // TODO: make these values configurable (see #31)
+  val statsColumns =
+    columns.SampleID    :×:
+    columns.InputPairs  :×:
+    columns.Merged      :×:
+    columns.NotMerged   :×:
+    columns.NoBlasthits :×:
+    |[Column]
 
-  val assignHeader = List[String](
-    columnNames.ReadID,
-    columnNames.Taxa,
-    columnNames.TaxName,
-    columnNames.TaxRank,
-    columnNames.Pident
-  )
+  // TODO: make these values configurable (see #31)
+  val assignColumns =
+    columns.ReadID  :×:
+    columns.Taxa    :×:
+    columns.TaxName :×:
+    columns.TaxRank :×:
+    columns.Pident  :×:
+    |[Column]
 
-  case class Row[Hs <: AnyProductType](
-    val header: Hs,
-    val values: Seq[String]
-  )
-  {
 
-    def toMap: Map[AnyType, String] =
-      header.types.asList.zip(values).toMap
+  implicit class productTypeOps[P <: AnyProductType](val p: P) extends AnyVal {
 
-    def select[C <: AnyType](column: C)(implicit check: C isOneOf Hs#Types#AllTypes): String =
+    def labels: Seq[String] = p.types.asList.map { _.label }
+  }
+
+
+  case class Row[Cs <: AnyProductType](val columns: Cs)(val values: String*) {
+
+    def toMap: Map[AnyType, String] = columns.types.asList.zip(values).toMap
+
+    def select[C <: AnyType](column: C)(implicit
+      check: C isOneOf Cs#Types#AllTypes
+    ): String =
       this.toMap.apply(column)
   }
 
-  case class Reader[Hs <: AnyProductType](val header: Hs, val csvReader: CSVReader) {
+  case object Row {
 
-    def rows: Iterator[Row[Hs]] =
-      csvReader.iterator.map { Row(header, _) }
+    def apply[Cs <: AnyProductType](vs: AnyDenotation.Of[Cs]): Row[Cs] =
+      Row(vs.tpe)(vs.value.asList.map(_.value.toString): _*)
   }
 
-  implicit def toCSVReader[Hs <: AnyProductType](r: Reader[Hs]): CSVReader =
-    r.csvReader
+  case class Reader[Cs <: AnyProductType](val columns: Cs, val csvReader: CSVReader) {
+
+    def rows: Iterator[Row[Cs]] = csvReader.iterator.map { vs => Row(columns)(vs: _*) }
+  }
+
+  implicit def toCSVReader[Cs <: AnyProductType](r: Reader[Cs]): CSVReader = r.csvReader
 
   case object Reader {
 
-    def apply[Hs <: AnyProductType](header: Hs, file: File): Reader[Hs] =
-      Reader(header, CSVReader.open(file.toJava)(UnixCSVFormat))
+    def apply[Cs <: AnyProductType](columns: Cs, file: File): Reader[Cs] =
+      Reader(columns, CSVReader.open(file.toJava)(UnixCSVFormat))
   }
 }
