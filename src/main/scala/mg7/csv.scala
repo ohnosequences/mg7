@@ -7,20 +7,7 @@ import better.files._
 // Some minimal CSV utils, will be replaced by a specialized library based on cosas
 case object csv {
 
-  case object UnixCSVFormat extends DefaultCSVFormat {
-
-    override val lineTerminator: String =
-      "\n"
-  }
-
-  def newWriter(file: File, append: Boolean = true): CSVWriter =
-    CSVWriter.open(file.toJava, append)(UnixCSVFormat)
-
-  def newReader(file: File): CSVReader =
-    CSVReader.open(file.toJava)(UnixCSVFormat)
-
-
-  abstract class Column(lbl: String) extends Type[String](lbl) { col: Singleton => }
+  sealed class Column(lbl: String) extends Type[String](lbl)
 
   case object columns {
 
@@ -37,25 +24,86 @@ case object csv {
     case object Merged      extends Column("Merged")
     case object NotMerged   extends Column("Not-merged")
     case object NoBlasthits extends Column("No-Blast-hits")
+
+    case object AveragePident extends Column("Average-Pident")
   }
 
   // TODO: make these values configurable (see #31)
-  val statsColumns =
-    columns.SampleID    :×:
-    columns.InputPairs  :×:
-    columns.Merged      :×:
-    columns.NotMerged   :×:
-    columns.NoBlasthits :×:
-    |[Column]
+  case object refDB {
+    import csv.columns._
+
+    val columns =
+      ReadID :×:
+      Taxa   :×:
+      |[Column]
+  }
+
+
+  case object stats {
+    import csv.columns._
+
+    val columns =
+      SampleID    :×:
+      InputPairs  :×:
+      Merged      :×:
+      NotMerged   :×:
+      NoBlasthits :×:
+      |[Column]
+  }
 
   // TODO: make these values configurable (see #31)
-  val assignColumns =
-    columns.ReadID  :×:
-    columns.Taxa    :×:
-    columns.TaxName :×:
-    columns.TaxRank :×:
-    columns.Pident  :×:
-    |[Column]
+  case object assignment {
+    import csv.columns._
+
+    val columns =
+      ReadID  :×:
+      Taxa    :×:
+      TaxName :×:
+      TaxRank :×:
+      Pident  :×:
+      |[Column]
+  }
+
+  // TODO: this is all quite clumsy, but will be improved
+  case object counts {
+    import csv.columns._
+
+    val columns =
+      Lineage       :×:
+      Taxa          :×:
+      TaxRank       :×:
+      TaxName       :×:
+      Count         :×:
+      AveragePident :×:
+      |[Column]
+
+    type Columns = // columns.type
+      Lineage.type       :×:
+      Taxa.type          :×:
+      TaxRank.type       :×:
+      TaxName.type       :×:
+      Count.type         :×:
+      AveragePident.type :×:
+      |[Column]
+
+    def header(countsType: String): Columns#Raw =
+      Lineage(Lineage.label)             ::
+      Taxa(Taxa.label)                   ::
+      TaxRank(TaxRank.label)             ::
+      TaxName(TaxName.label)             ::
+      Count(countsType)                  ::
+      AveragePident(AveragePident.label) ::
+      *[AnyDenotation]
+
+    case object direct {
+      val absolute  = header("direct.absolute.counts")
+      val frequency = header("direct.frequency.counts")
+    }
+    case object accum {
+      val absolute  = header("accum.absolute.percentage")
+      val frequency = header("accum.frequency.percentage")
+    }
+  }
 
 
   implicit class productTypeOps[P <: AnyProductType](val p: P) extends AnyVal {
@@ -64,7 +112,7 @@ case object csv {
   }
 
 
-  case class Row[Cs <: AnyProductType](val columns: Cs)(val values: String*) {
+  case class Row[Cs <: AnyProductType](val columns: Cs, val values: Seq[String]) {
 
     def toMap: Map[AnyType, String] = columns.types.asList.zip(values).toMap
 
@@ -76,20 +124,33 @@ case object csv {
 
   case object Row {
 
-    def apply[Cs <: AnyProductType](vs: AnyDenotation.Of[Cs]): Row[Cs] =
-      Row(vs.tpe)(vs.value.asList.map(_.value.toString): _*)
+    def apply[Cs <: AnyProductType](cs: Cs)(vs: Cs#Raw): Row[Cs] =
+      Row(cs, vs.asList.map(_.value.toString))
   }
 
-  case class Reader[Cs <: AnyProductType](val columns: Cs, val csvReader: CSVReader) {
 
-    def rows: Iterator[Row[Cs]] = csvReader.iterator.map { vs => Row(columns)(vs: _*) }
+  case object UnixCSVFormat extends DefaultCSVFormat {
+    override val lineTerminator: String = "\n"
   }
 
-  implicit def toCSVReader[Cs <: AnyProductType](r: Reader[Cs]): CSVReader = r.csvReader
+  // NOTE: this is a simple wrapper for the tototoshi CSVReader to work with the Row type
+  case class Reader[Cs <: AnyProductType](val columns: Cs)(val file: File) {
 
-  case object Reader {
+    private lazy val csvReader = CSVReader.open(file.toJava)(UnixCSVFormat)
+    def close(): Unit = csvReader.close()
 
-    def apply[Cs <: AnyProductType](columns: Cs, file: File): Reader[Cs] =
-      Reader(columns, CSVReader.open(file.toJava)(UnixCSVFormat))
+    def rows: Iterator[Row[Cs]] = csvReader.iterator.map { vs => Row(columns, vs) }
+  }
+
+  // NOTE: this is a simple wrapper for the tototoshi CSVWriter to work with the Row type
+  case class Writer[Cs <: AnyProductType](val columns: Cs)(val file: File, val append: Boolean = true) {
+
+    private lazy val csvWriter = CSVWriter.open(file.toJava, append)(UnixCSVFormat)
+    def close(): Unit = csvWriter.close()
+
+    def addRow(row: Row[Cs]): Unit = csvWriter.writeRow(row.values)
+    def addVals(vs: Cs#Raw):  Unit = csvWriter.writeRow(Row(columns)(vs).values)
+
+    def writeHeader(): Unit = csvWriter.writeRow(columns.labels)
   }
 }

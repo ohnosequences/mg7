@@ -1,6 +1,6 @@
 package ohnosequences.mg7.loquats
 
-import ohnosequences.mg7._, bio4j._, taxonomyTree._, titanTaxonomyTree._
+import ohnosequences.mg7._, csv._, bio4j._, taxonomyTree._, titanTaxonomyTree._
 import ohnosequences.loquat._
 import ohnosequences.statika._
 import ohnosequences.cosas._, types._, klists._
@@ -9,7 +9,6 @@ import ohnosequences.blast.api._, outputFields._
 import com.bio4j.titan.model.ncbiTaxonomy.TitanNCBITaxonomyGraph
 import java.io.{ BufferedWriter, FileWriter, File }
 import scala.util.Try
-import com.github.tototoshi.csv._
 
 
 case class assignDataProcessing[MD <: AnyMG7Parameters](val md: MD) extends DataProcessingBundle(
@@ -30,16 +29,15 @@ case class assignDataProcessing[MD <: AnyMG7Parameters](val md: MD) extends Data
     val refMap: scala.collection.mutable.Map[ID, Seq[Taxa]] = scala.collection.mutable.Map()
 
     md.referenceDBs.foreach { refDB =>
-      val reader = csv.newReader(refDB.id2taxas)
-      reader.iterator.foreach { row =>
+      val reader = csv.Reader(csv.refDB.columns)(refDB.id2taxas)
+      reader.rows.foreach { row =>
         refMap.update(
-          // first column is the ID
-          row(0),
+          row.select(columns.ReadID),
           // second column is a sequence of tax IDs separated with ';'
-          row(1).split(';').map(_.trim)
+          row.select(columns.Taxa).split(';').map(_.trim)
         )
       }
-      reader.close
+      reader.close()
     }
 
     refMap.toMap
@@ -53,13 +51,13 @@ case class assignDataProcessing[MD <: AnyMG7Parameters](val md: MD) extends Data
   // TODO this is too big. Factor BBH and LCA into methods
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
 
-    val blastReader = csv.Reader(md.blastOutRec.keys, context.inputFile(data.blastChunk))
+    val blastReader = csv.Reader(md.blastOutRec.keys)(context.inputFile(data.blastChunk))
 
     // Outs:
     val lcaFile = (context / "output" / "lca.csv").createIfNotExists()
     val bbhFile = (context / "output" / "bbh.csv").createIfNotExists()
-    val lcaWriter = csv.newWriter(lcaFile)
-    val bbhWriter = csv.newWriter(bbhFile)
+    val lcaWriter = csv.Writer(csv.assignment.columns)(lcaFile)
+    val bbhWriter = csv.Writer(csv.assignment.columns)(bbhFile)
 
     val lostInMappingFile = (context / "output" / "lost.in-mapping").createIfNotExists()
     val lostInBio4jFile   = (context / "output" / "lost.in-bio4j").createIfNotExists()
@@ -115,16 +113,32 @@ case class assignDataProcessing[MD <: AnyMG7Parameters](val md: MD) extends Data
           sys.error("Failed to compute LCA; something is broken")
         )
 
+        import csv.columns._
 
         // writing results
-        bbhWriter.writeRow(List(readId, bbhNode.id, bbhNode.name, bbhNode.rank, f"${averageOf(bbhPidents)}%.2f"))
-        lcaWriter.writeRow(List(readId, lcaNode.id, lcaNode.name, lcaNode.rank, f"${averageOf(allPidents)}%.2f"))
+        bbhWriter.addVals(
+          ReadID(readId)        ::
+          Taxa(bbhNode.id)      ::
+          TaxName(bbhNode.name) ::
+          TaxRank(bbhNode.rank) ::
+          Pident(f"${averageOf(bbhPidents)}%.2f") ::
+          *[AnyDenotation]
+        )
+
+        lcaWriter.addVals(
+          ReadID(readId)        ::
+          Taxa(lcaNode.id)      ::
+          TaxName(lcaNode.name) ::
+          TaxRank(lcaNode.rank) ::
+          Pident(f"${averageOf(allPidents)}%.2f") ::
+          *[AnyDenotation]
+        )
       }
 
-    blastReader.close
+    blastReader.close()
 
-    lcaWriter.close
-    bbhWriter.close
+    lcaWriter.close()
+    bbhWriter.close()
 
     success(s"Results are ready",
       data.lcaChunk(lcaFile) ::

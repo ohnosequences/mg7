@@ -1,6 +1,6 @@
 package ohnosequences.mg7.loquats
 
-import ohnosequences.mg7._, csv._
+import ohnosequences.mg7._, csv._, columns._
 import ohnosequences.mg7.bio4j._, taxonomyTree._, titanTaxonomyTree._
 import ohnosequences.loquat._
 import ohnosequences.statika._
@@ -8,7 +8,6 @@ import ohnosequences.cosas._, types._, klists._
 import ohnosequences.datasets._
 import ohnosequences.fastarious._, fasta._, fastq._
 import better.files._
-// import com.github.tototoshi.csv._
 import com.bio4j.titan.model.ncbiTaxonomy.TitanNCBITaxonomyGraph
 
 case object statsDataProcessing extends DataProcessingBundle()(
@@ -36,22 +35,20 @@ case object statsDataProcessing extends DataProcessingBundle()(
 
     cmd("gunzip")(reads1gz.path.toString) -&-
     LazyTry {
-      val csvWriter = csv.newWriter(statsCSV)
+      val statsWriter = csv.Writer(stats.columns)(statsCSV)
 
-      val statsRow = Row(statsColumns)(
-        sampleID,
-        countReads( parseFastqDropErrors, reads1fastq ).toString,
-        countReads( parseFastqDropErrors, context.inputFile(data.mergedReads) ).toString,
-        countReads( parseFastqDropErrors, context.inputFile(data.pair1NotMerged) ).toString,
-        countReads( parseFastaDropErrors, context.inputFile(data.blastNoHits) ).toString
+      statsWriter.writeHeader()
+
+      statsWriter.addVals(
+        SampleID(sampleID) ::
+        InputPairs(  countReads( parseFastqDropErrors, reads1fastq ).toString) ::
+        Merged(      countReads( parseFastqDropErrors, context.inputFile(data.mergedReads) ).toString) ::
+        NotMerged(   countReads( parseFastqDropErrors, context.inputFile(data.pair1NotMerged) ).toString) ::
+        NoBlasthits( countReads( parseFastaDropErrors, context.inputFile(data.blastNoHits) ).toString) ::
+        *[AnyDenotation]
       )
 
-      // header:
-      csvWriter.writeRow(statsColumns.labels)
-      // values:
-      csvWriter.writeRow(statsRow.values)
-
-      csvWriter.close()
+      statsWriter.close()
     } -&-
     success(s"Stats for the [${sampleID}] are ready",
       data.sampleStatsCSV(statsCSV) ::

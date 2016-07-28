@@ -31,7 +31,7 @@ extends DataProcessingBundle(
     LazyTry {
       // NOTE: once we update to better-files 2.15.+, use `file.lineIterator` here (it's autoclosing):
       val source = io.Source.fromFile( context.inputFile(data.fastaChunk).toJava )
-      val totalOutputWriter = csv.newWriter(totalOutput, append = true)
+      val totalOutputWriter = csv.Writer(md.blastOutRec.keys)(totalOutput)
 
       fasta.parseFastaDropErrors(source.getLines) foreach { read =>
         println(s"\nRunning BLAST for the read ${read.getV(header).id}")
@@ -40,15 +40,11 @@ extends DataProcessingBundle(
         val outFile = (context / "blastRead.csv").clear()
 
         val expr = md.blastExpr(inFile, outFile)
-
         println(expr.toSeq.mkString(" "))
-
-        // BAM!!
         expr.toSeq.!!
 
-        val csvReader = csv.Reader(md.blastOutRec.keys, outFile)
-
-        val allHits: Seq[csv.Row[md.BlastOutRecKeys]] = csvReader.rows.toSeq
+        val blastReader = csv.Reader(md.blastOutRec.keys)(outFile)
+        val allHits: Seq[csv.Row[md.BlastOutRecKeys]] = blastReader.rows.toSeq
 
         println(s"- There are ${allHits.length} hits")
 
@@ -72,10 +68,10 @@ extends DataProcessingBundle(
           noHits.appendLine(read.asString)
         } else {
           println(s"- Appending filtered results to the total chunk output")
-          totalOutputWriter.writeAll(filteredHits.map{ _.values })
+          filteredHits.foreach { row => totalOutputWriter.addRow(row) }
         }
 
-        csvReader.close()
+        blastReader.close()
       }
 
       // it's important to close things in the end:

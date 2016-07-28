@@ -1,13 +1,12 @@
 package ohnosequences.mg7.loquats
 
-import ohnosequences.mg7._
+import ohnosequences.mg7._, csv._
 import ohnosequences.mg7.bio4j._, taxonomyTree._, titanTaxonomyTree._
 import ohnosequences.loquat._
 import ohnosequences.statika._
 import ohnosequences.cosas._, types._, klists._
 import ohnosequences.datasets._
 import better.files._
-import com.github.tototoshi.csv._
 import com.bio4j.titan.model.ncbiTaxonomy.TitanNCBITaxonomyGraph
 
 case object countDataProcessing extends DataProcessingBundle(
@@ -80,11 +79,16 @@ case object countDataProcessing extends DataProcessingBundle(
     // TODO create a local case class or record for the return type
     def processFile(assignsFile: File): (File, File, File, File) = {
 
-      val assignsReader: CSVReader = csv.newReader(assignsFile)
-      val assigns: List[(Taxa, String)] = assignsReader.allWithHeaders.map { row =>
-        (row(csv.columns.Taxa.label), row(csv.columns.Pident.label))
-      }
-      assignsReader.close
+      val assignsReader = csv.Reader(assignment.columns)(assignsFile)
+
+      val assigns: List[(Taxa, String)] = assignsReader.rows.map { row =>
+        (
+          row.select(columns.Taxa),
+          row.select(columns.Pident)
+        )
+      }.toList
+
+      assignsReader.close()
 
       val taxIDs: List[Taxa] = assigns.map(_._1)
 
@@ -124,53 +128,48 @@ case object countDataProcessing extends DataProcessingBundle(
       val outDirectFreqFile = context / s"${filesPrefix}.direct.frequency.percentage"
       val outAccumFreqFile  = context / s"${filesPrefix}.accum.frequency.percentage"
 
-      val csvDirectWriter = csv.newWriter(outDirectFile)
-      val csvAccumWriter  = csv.newWriter(outAccumFile)
-      val csvDirectFreqWriter = csv.newWriter(outDirectFreqFile)
-      val csvAccumFreqWriter  = csv.newWriter(outAccumFreqFile)
+      val csvDirectWriter     = csv.Writer(csv.counts.columns)(outDirectFile)
+      val csvAccumWriter      = csv.Writer(csv.counts.columns)(outAccumFile)
+      val csvDirectFreqWriter = csv.Writer(csv.counts.columns)(outDirectFreqFile)
+      val csvAccumFreqWriter  = csv.Writer(csv.counts.columns)(outAccumFreqFile)
 
-      // TODO all this file output format-related code should be part of global configuration
-      def headerFor(file: File) = List(
-        csv.columns.Lineage.label,
-        csv.columns.Taxa.label,
-        csv.columns.TaxRank.label,
-        csv.columns.TaxName.label,
-        file.name.replaceAll("\\.", "-"),
-        "Average-Pident"
-      )
-      csvDirectWriter.writeRow(headerFor(outDirectFile))
-      csvAccumWriter.writeRow(headerFor(outAccumFile))
-      csvDirectFreqWriter.writeRow(headerFor(outDirectFreqFile))
-      csvAccumFreqWriter.writeRow(headerFor(outAccumFreqFile))
+      // TODO all this file output format-related code should be part of global configuration (see #31)
+      def headerRow(file: File) = Row(csv.counts.columns)(csv.counts.header(file.name.replaceAll("\\.", "-")))
+
+      csvDirectWriter.addRow(headerRow(outDirectFile))
+      csvAccumWriter.addRow(headerRow(outAccumFile))
+      csvDirectFreqWriter.addRow(headerRow(outDirectFreqFile))
+      csvAccumFreqWriter.addRow(headerRow(outAccumFreqFile))
 
       def writeCounts(
-        counts: Map[Taxa, (Int, Seq[Taxa])],
-        writerAbs: CSVWriter,
-        writerFrq: CSVWriter
-      ) = counts foreach { case (taxID, (absoluteCount, lineage)) =>
+        countsMap: Map[Taxa, (Int, Seq[Taxa])],
+        writerAbs: csv.Writer[csv.counts.Columns],
+        writerFrq: csv.Writer[csv.counts.Columns]
+      ) = countsMap foreach { case (taxa, (absoluteCount, lineage)) =>
 
-        val node: Option[TitanTaxonNode] = taxonomyGraph.getNode(taxID)
+        val node: Option[TitanTaxonNode] = taxonomyGraph.getNode(taxa)
 
-        def row(count: String) = Seq[String](
-          lineage.mkString(";"),
-          taxID,
-          node.map(_.rank).getOrElse(""),
-          node.map(_.name).getOrElse(""),
-          count,
-          averagePidents.get(taxID).getOrElse("-")
+        def row(count: String) = Row(csv.counts.columns)(
+          columns.Lineage(lineage.mkString(";")) ::
+          columns.Taxa(taxa) ::
+          columns.TaxRank(node.map(_.rank).getOrElse("")) ::
+          columns.TaxName(node.map(_.name).getOrElse("")) ::
+          columns.Count(count) ::
+          columns.AveragePident(averagePidents.get(taxa).getOrElse("-")) ::
+          *[AnyDenotation]
         )
 
-        writerAbs.writeRow(row( absoluteCount.toString ))
-        writerFrq.writeRow(row( f"${frequency(absoluteCount) * 100}%.4f" ))
+        writerAbs.addRow(row( absoluteCount.toString ))
+        writerFrq.addRow(row( f"${frequency(absoluteCount) * 100}%.4f" ))
       }
 
       writeCounts(direct,      csvDirectWriter, csvDirectFreqWriter)
       writeCounts(accumulated, csvAccumWriter,  csvAccumFreqWriter)
 
-      csvDirectWriter.close
-      csvAccumWriter.close
-      csvDirectFreqWriter.close
-      csvAccumFreqWriter.close
+      csvDirectWriter.close()
+      csvAccumWriter.close()
+      csvDirectFreqWriter.close()
+      csvAccumFreqWriter.close()
 
       (
         outDirectFile,

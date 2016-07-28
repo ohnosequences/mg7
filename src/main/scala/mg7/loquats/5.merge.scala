@@ -36,8 +36,8 @@ case object mergeDataProcessing extends DataProcessingBundle()(
     // TODO: write header for Blast output
     LazyTry { mergeChunks( context.inputFile(data.blastChunksFolder), blastMerged)  } -&-
     LazyTry { mergeChunks( context.inputFile(data.blastNoHitsFolder), noHitsMerged) } -&-
-    LazyTry { mergeChunks( context.inputFile(data.lcaChunksFolder), lcaMerged, Some(csv.assignColumns.labels.mkString(",")) ) } -&-
-    LazyTry { mergeChunks( context.inputFile(data.bbhChunksFolder), bbhMerged, Some(csv.assignColumns.labels.mkString(",")) ) } -&-
+    LazyTry { mergeChunks( context.inputFile(data.lcaChunksFolder), lcaMerged, Some(csv.assignment.columns.labels.mkString(",")) ) } -&-
+    LazyTry { mergeChunks( context.inputFile(data.bbhChunksFolder), bbhMerged, Some(csv.assignment.columns.labels.mkString(",")) ) } -&-
     success(s"Everything is merged",
       data.blastResult(blastMerged)   ::
       data.blastNoHits(noHitsMerged)  ::
