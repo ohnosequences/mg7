@@ -1,7 +1,8 @@
 package ohnosequences.mg7.loquats
 
 import ohnosequences.mg7._
-import ohnosequences.mg7.bio4j._, taxonomyTree._, titanTaxonomyTree._
+// import ohnosequences.mg7.bio4j._, taxonomyTree._, titanTaxonomyTree._
+import ohnosequences.ncbitaxonomy._, api._, titan._
 import ohnosequences.loquat._
 import ohnosequences.statika._
 import ohnosequences.cosas._, types._, klists._
@@ -25,9 +26,10 @@ extends DataProcessingBundle()(
   import md._
 
   override val bundleDependencies: List[AnyBundle] =
-    bio4j.taxonomyBundle :: md.referenceDBs.toList
+    ohnosequences.ncbitaxonomy.ncbiTaxonomyBundle :: md.referenceDBs.toList
 
-  private lazy val taxonomyGraph: TitanNCBITaxonomyGraph = bio4j.taxonomyBundle.graph
+  private lazy val taxonomyGraph: TitanNCBITaxonomyGraph =
+    ohnosequences.ncbitaxonomy.ncbiTaxonomyBundle.graph
 
   type BlastRow = csv.Row[md.blastOutRec.Keys]
 
@@ -91,7 +93,7 @@ extends DataProcessingBundle()(
         val bbhPidents: Seq[Double] = bbhHits.flatMap{ case (row, _) => parseDouble(row.select(pident)) }
 
         // nodes corresponding to the max-bitscore hits
-        val bbhNodes: Seq[TitanTaxonNode] = bbhHits
+        val bbhNodes: Seq[TitanNode] = bbhHits
           .flatMap(_._2).distinct // only distinct Tax IDs
           .flatMap(taxonomyGraph.getNode)
 

@@ -1,6 +1,5 @@
 package ohnosequences
 
-import ohnosequences.mg7.bio4j.taxonomyTree._
 import ohnosequences.cosas._, types._, klists._, typeUnions._
 import ohnosequences.blast.api._
 
