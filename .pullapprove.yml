@@ -8,7 +8,7 @@ reset_on_reopened: true
 reviewers:
     - # maintainer has to approve everything that is _merged to master_
         name: maintainer
-        required: 1
+        required: -1
         members:
             - laughedelic
             - eparejatobes
