@@ -1,6 +1,5 @@
 package ohnosequences.mg7
 
-
 import ohnosequences.mg7._, loquats._, dataflows._
 import ohnosequences.datasets._, illumina._
 import ohnosequences.cosas._, types._, klists._
@@ -14,8 +13,6 @@ import ohnosequences.awstools.autoscaling._
 import ohnosequences.awstools.regions.Region._
 import com.amazonaws.auth._, profile._
 
-
-
 case object test {
 
   case object rna16sRefDB extends ReferenceDB(
@@ -27,9 +24,9 @@ case object test {
   case object testParameters extends MG7Parameters(
     outputS3Folder = testOutS3Folder,
     readsLength = bp300,
-    // blastCommand = blastn,
-    // blastOutRec  = defaultBlastOutRec,
-    // blastOptions = defaultBlastnOptions.value
+    blastCommand = blastn,
+    blastOutRec  = defaults.blastnOutputRecord,
+    blastOptions = defaults.blastnOptions.value,
     referenceDBs = Set(rna16sRefDB)
   ) {
 

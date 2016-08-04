@@ -1,37 +1,26 @@
 package ohnosequences.mg7.loquats
 
-import ohnosequences.mg7._
-
-import ohnosequences.mg7.bio4j._, taxonomyTree._, titanTaxonomyTree._
-
+import ohnosequences.mg7._, csv._, columns._
 import ohnosequences.loquat._
-
 import ohnosequences.statika._
 import ohnosequences.cosas._, types._, klists._
 import ohnosequences.datasets._
 import ohnosequences.fastarious._, fasta._, fastq._
-
 import better.files._
-import com.github.tototoshi.csv._
-
 import com.bio4j.titan.model.ncbiTaxonomy.TitanNCBITaxonomyGraph
 
-
 case object statsDataProcessing extends DataProcessingBundle()(
-  input = data.statsInput,
-  output = data.statsOutput
-) {
+  input   = data.statsInput,
+  output  = data.statsOutput
+)
+{
 
   def countReads(
     parser: Iterator[String] => Iterator[Any],
     file: File
   ): Integer = {
-    val source = io.Source.fromFile( file.toJava )
-    val readsNumber = parser( source.getLines ).length
-    source.close()
-    readsNumber
+    parser( file.lines ).length
   }
-
 
   def instructions: ohnosequences.statika.AnyInstructions = say("Running stats loquat")
 
@@ -45,27 +34,20 @@ case object statsDataProcessing extends DataProcessingBundle()(
 
     cmd("gunzip")(reads1gz.path.toString) -&-
     LazyTry {
-      val csvWriter = csv.newWriter(statsCSV)
+      val statsWriter = csv.Writer(stats.columns)(statsCSV)
 
-      // header:
-      csvWriter.writeRow(csv.statsHeader)
+      statsWriter.writeHeader()
 
-      // values:
-      // NOTE: careful, the order has to coincide with the header
-      // TODO: use csv.Row here
-      val stats: Seq[String] = Seq(
-        sampleID,
-
-        countReads( parseFastqDropErrors, reads1fastq ).toString,
-        countReads( parseFastqDropErrors, context.inputFile(data.mergedReads) ).toString,
-        countReads( parseFastqDropErrors, context.inputFile(data.pair1NotMerged) ).toString,
-
-        countReads( parseFastaDropErrors, context.inputFile(data.blastNoHits) ).toString
+      statsWriter.addVals(
+        SampleID(sampleID) ::
+        InputPairs(  countReads( parseFastqDropErrors, reads1fastq ).toString) ::
+        Merged(      countReads( parseFastqDropErrors, context.inputFile(data.mergedReads) ).toString) ::
+        NotMerged(   countReads( parseFastqDropErrors, context.inputFile(data.pair1NotMerged) ).toString) ::
+        NoBlasthits( countReads( parseFastaDropErrors, context.inputFile(data.blastNoHits) ).toString) ::
+        *[AnyDenotation]
       )
 
-      csvWriter.writeRow(stats)
-
-      csvWriter.close()
+      statsWriter.close()
     } -&-
     success(s"Stats for the [${sampleID}] are ready",
       data.sampleStatsCSV(statsCSV) ::
