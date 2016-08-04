@@ -1,9 +1,8 @@
 package ohnosequences.mg7.tests
 
 import ohnosequences.mg7._
-import ohnosequences.mg7.bio4j.taxonomyTree._
+import ohnosequences.ncbitaxonomy._, api.{ Taxa => TaxaOps, Taxon => _, _ }
 import ohnosequences.mg7.loquats.countDataProcessing._
-
 import ohnosequences.mg7.tests.taxonomy._
 
 
@@ -16,16 +15,16 @@ case object countsCtx {
     r3 -> 5
   )
 
-  val ids: List[Taxa] =
+  val ids: Taxa =
     realCounts.flatMap { case (node, count) =>
       List.fill(count)(node.id)
     }.toList
 
-  def getLineage(id: Taxa): Seq[Taxa] = id2node(id).lineage.map(_.id)
+  def getLineage(id: Taxon): Taxa = id2node(id).lineage.map(_.id)
 
-  val direct: Map[Taxa, (Int, Seq[Taxa])] = directCounts(ids, getLineage)
+  val direct: Map[Taxon, (Int, Taxa)] = directCounts(ids, getLineage)
 
-  val accumulated: Map[Taxa, (Int, Seq[Taxa])] = accumulatedCounts(direct, getLineage)
+  val accumulated: Map[Taxon, (Int, Taxa)] = accumulatedCounts(direct, getLineage)
 }
 
 

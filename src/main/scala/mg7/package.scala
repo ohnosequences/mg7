@@ -2,16 +2,20 @@ package ohnosequences
 
 import ohnosequences.cosas._, types._, klists._, typeUnions._
 import ohnosequences.blast.api._
+import ohnosequences.ncbitaxonomy.TitanNode
 
 package object mg7 {
 
   type ID = String
-  type Taxa = ID
+  type Taxon  = ID
+  type Taxa   = Seq[Taxon]
   type ReadID = ID
   type NodeID = ID
 
-  type LCA = AnyTaxonNode
-  type BBH = AnyTaxonNode
+  type TitanTaxon = TitanNode
+
+  type LCA = ncbitaxonomy.titan.ncbiTitanTaxon
+  type BBH = ncbitaxonomy.titan.ncbiTitanTaxon
 
   type SampleID = ID
   type StepName = String

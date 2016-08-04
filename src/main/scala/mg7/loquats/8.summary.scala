@@ -1,6 +1,6 @@
 package ohnosequences.mg7.loquats
 
-import ohnosequences.mg7._, csv._, bio4j._, taxonomyTree._, titanTaxonomyTree._
+import ohnosequences.mg7._, csv._
 import ohnosequences.loquat._
 import ohnosequences.statika._
 import ohnosequences.cosas._, types._, klists._

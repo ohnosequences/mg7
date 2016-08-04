@@ -1,7 +1,7 @@
 package ohnosequences.mg7.loquats
 
 import ohnosequences.mg7._
-import ohnosequences.ncbitaxonomy._, api._, titan._
+import ohnosequences.ncbitaxonomy._, api.{ Taxa => TaxaOps, Taxon => _, _ }, titan._
 import ohnosequences.mg7._, csv._
 import ohnosequences.loquat._
 import ohnosequences.statika._
@@ -27,8 +27,8 @@ case class assignDataProcessing[MD <: AnyMG7Parameters](val md: MD) extends Data
   type BlastRow = csv.Row[md.blastOutRec.Keys]
 
   // This iterates over reference DBs and merges their id2taxa tables in one Map
-  private lazy val referenceMap: Map[ID, Seq[Taxa]] = {
-    val refMap: scala.collection.mutable.Map[ID, Seq[Taxa]] = scala.collection.mutable.Map()
+  private lazy val referenceMap: Map[ID, Taxa] = {
+    val refMap: scala.collection.mutable.Map[ID, Taxa] = scala.collection.mutable.Map()
 
     md.referenceDBs.foreach { refDB =>
       val reader = csv.Reader(csv.refDB.columns)(refDB.id2taxas)
@@ -45,7 +45,7 @@ case class assignDataProcessing[MD <: AnyMG7Parameters](val md: MD) extends Data
     refMap.toMap
   }
 
-  private def taxIDsFor(id: ID): Seq[Taxa] = referenceMap.get(id).getOrElse(Seq())
+  private def taxIDsFor(id: ID): Taxa = referenceMap.get(id).getOrElse(Seq())
 
 
   def instructions: AnyInstructions = say("Let's see who is who!")
@@ -71,14 +71,14 @@ case class assignDataProcessing[MD <: AnyMG7Parameters](val md: MD) extends Data
       .foreach { case (readId: ID, hits: Stream[BlastRow]) =>
 
         // for each hit row we take the column with ID and lookup corresponding Taxas
-        val assignments: List[(BlastRow, Seq[Taxa])] = hits.toList.map { row =>
+        val assignments: List[(BlastRow, Taxa)] = hits.toList.map { row =>
           row -> taxIDsFor(row.select(sseqid))
         }
 
         //// Best Blast Hit ////
 
         // best hits are those that have maximum in the `bitscore` column
-        val bbhHits: List[(BlastRow, Seq[Taxa])] = maximums(assignments) { case (row, _) =>
+        val bbhHits: List[(BlastRow, Taxa)] = maximums(assignments) { case (row, _) =>
           parseLong(row.select(bitscore)).getOrElse(0L)
         }
 
@@ -86,18 +86,13 @@ case class assignDataProcessing[MD <: AnyMG7Parameters](val md: MD) extends Data
         val bbhPidents: Seq[Double] = bbhHits.flatMap{ case (row, _) => parseDouble(row.select(pident)) }
 
         // nodes corresponding to the max-bitscore hits
-        val bbhNodes: Seq[TitanNode] = bbhHits
+        val bbhNodes: Seq[TitanTaxon] = bbhHits
           .flatMap(_._2).distinct // only distinct Tax IDs
-          .flatMap(taxonomyGraph.getNode)
+          .flatMap(taxonomyGraph.getTaxon)
 
         // BBH node is the lowest common ancestor of the most rank-specific nodes
-        val bbhNode: BBH = lowestCommonAncestor(
-          maximums(bbhNodes) { _.rankNumber }
-        ).getOrElse(
-          // NOTE: this shouldn't ever happen, so we throw an error here
-          sys.error("Failed to compute BBH; something is broken")
-        )
-
+        val bbhNode: BBH =
+          ( maximums(bbhNodes) { _.rankNumber } ) lowestCommonAncestor taxonomyGraph
 
         //// Lowest Common Ancestor ////
 
@@ -106,14 +101,12 @@ case class assignDataProcessing[MD <: AnyMG7Parameters](val md: MD) extends Data
         val allPidents: Seq[Double] = hits.flatMap{ row => parseDouble(row.select(pident)) }
 
         // nodes corresponding to all hits
-        val allNodes: Seq[TitanTaxonNode] = assignments
+        val allNodes: Seq[TitanTaxon] = assignments
           .flatMap(_._2).distinct // only distinct Tax IDs
-          .flatMap(taxonomyGraph.getNode)
+          .flatMap(taxonomyGraph.getTaxon)
 
-        val lcaNode: LCA = lowestCommonAncestor(allNodes).getOrElse(
-          // NOTE: this shouldn't ever happen, so we throw an error here
-          sys.error("Failed to compute LCA; something is broken")
-        )
+        val lcaNode: LCA =
+          allNodes lowestCommonAncestor taxonomyGraph
 
         import csv.columns._
 

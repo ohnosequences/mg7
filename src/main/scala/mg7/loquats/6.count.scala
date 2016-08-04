@@ -1,7 +1,7 @@
 package ohnosequences.mg7.loquats
 
 import ohnosequences.mg7._, csv._
-import ohnosequences.mg7.bio4j._, taxonomyTree._, titanTaxonomyTree._
+import ohnosequences.ncbitaxonomy._, api.{ Taxa => TaxaOps, Taxon => _, _ }, titan._
 import ohnosequences.loquat._
 import ohnosequences.statika._
 import ohnosequences.cosas._, types._, klists._
@@ -29,15 +29,15 @@ case object countDataProcessing extends DataProcessingBundle(
     }
 
   def directCounts(
-    taxIDs: List[Taxa],
-    getLineage: Taxa => Seq[Taxa]
-  ): Map[Taxa, (Int, Seq[Taxa])] = {
+    taxIDs: Taxa,
+    getLineage: Taxon => Taxa
+  ): Map[Taxon, (Int, Taxa)] = {
 
     @scala.annotation.tailrec
     def rec(
-      list: List[Taxa],
-      acc: Map[Taxa, (Int, Seq[Taxa])]
-    ): Map[Taxa, (Int, Seq[Taxa])] = list match {
+      list: Taxa,
+      acc: Map[Taxon, (Int, Taxa)]
+    ): Map[Taxon, (Int, Taxa)] = list match {
       case Nil => acc
       case h :: t => {
         val (n, rest) = count(h, t)
@@ -49,12 +49,12 @@ case object countDataProcessing extends DataProcessingBundle(
   }
 
   def accumulatedCounts(
-    directCounts: Map[Taxa, (Int, Seq[Taxa])],
-    getLineage: Taxa => Seq[Taxa]
-  ): Map[Taxa, (Int, Seq[Taxa])] = {
+    directCounts: Map[Taxon, (Int, Taxa)],
+    getLineage: Taxon => Taxa
+  ): Map[Taxon, (Int, Taxa)] = {
 
     directCounts.foldLeft(
-      Map[Taxa, (Int, Seq[Taxa])]()
+      Map[Taxon, (Int, Taxa)]()
     ) { case (accumCounts, (taxID, (directCount, lineage))) =>
 
       lineage.foldLeft(
@@ -81,7 +81,7 @@ case object countDataProcessing extends DataProcessingBundle(
 
       val assignsReader = csv.Reader(assignment.columns)(assignsFile)
 
-      val assigns: List[(Taxa, String)] = assignsReader.rows.map { row =>
+      val assigns: List[(Taxon, String)] = assignsReader.rows.map { row =>
         (
           row.select(columns.Taxa),
           row.select(columns.Pident)
@@ -90,9 +90,9 @@ case object countDataProcessing extends DataProcessingBundle(
 
       assignsReader.close()
 
-      val taxIDs: List[Taxa] = assigns.map(_._1)
+      val taxIDs: Taxa = assigns.map(_._1)
 
-      val averagePidents: Map[Taxa, String] = assigns
+      val averagePidents: Map[Taxon, String] = assigns
         .toStream.groupBy { _._1 } // group by taxIDs
         .map { case (taxID, pairs) =>
 
@@ -106,19 +106,19 @@ case object countDataProcessing extends DataProcessingBundle(
       val assignedReadsNumber: Double = taxIDs.length
       def frequency(absolute: Int): Double = absolute / assignedReadsNumber
 
-      val lineageMap: scala.collection.mutable.Map[Taxa, Seq[Taxa]] = scala.collection.mutable.Map()
+      val lineageMap: scala.collection.mutable.Map[Taxon, Taxa] = scala.collection.mutable.Map()
 
-      def getLineage(id: Taxa): Seq[Taxa] =
+      def getLineage(id: Taxon): Taxa =
         lineageMap.get(id).getOrElse {
-          val lineage = taxonomyGraph.getNode(id)
-            .map{ _.lineage }.getOrElse( Seq() )
+          val lineage = taxonomyGraph.getTaxon(id)
+            .map{ _.ancestors }.getOrElse( Seq() )
             .map{ _.id }
           lineageMap.update(id, lineage)
           lineage
         }
 
-      val direct:      Map[Taxa, (Int, Seq[Taxa])] = directCounts(taxIDs, getLineage)
-      val accumulated: Map[Taxa, (Int, Seq[Taxa])] = accumulatedCounts(direct, getLineage)
+      val direct:      Map[Taxon, (Int, Taxa)] = directCounts(taxIDs, getLineage)
+      val accumulated: Map[Taxon, (Int, Taxa)] = accumulatedCounts(direct, getLineage)
 
       val filesPrefix: String = assignsFile.name.stripSuffix(".csv")
 
@@ -142,12 +142,12 @@ case object countDataProcessing extends DataProcessingBundle(
       csvAccumFreqWriter.addRow(headerRow(outAccumFreqFile))
 
       def writeCounts(
-        countsMap: Map[Taxa, (Int, Seq[Taxa])],
+        countsMap: Map[Taxon, (Int, Taxa)],
         writerAbs: csv.Writer[csv.counts.Columns],
         writerFrq: csv.Writer[csv.counts.Columns]
       ) = countsMap foreach { case (taxa, (absoluteCount, lineage)) =>
 
-        val node: Option[TitanTaxonNode] = taxonomyGraph.getNode(taxa)
+        val node: Option[TitanTaxon] = taxonomyGraph.getTaxon(taxa)
 
         def row(count: String) = Row(csv.counts.columns)(
           columns.Lineage(lineage.mkString(";")) ::
