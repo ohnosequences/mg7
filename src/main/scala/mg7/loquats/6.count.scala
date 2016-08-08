@@ -10,14 +10,15 @@ import better.files._
 import com.bio4j.titan.model.ncbiTaxonomy.TitanNCBITaxonomyGraph
 
 case object countDataProcessing extends DataProcessingBundle(
-  bio4j.taxonomyBundle
+  ncbiTaxonomyBundle
 )(
   input   = data.countInput,
   output  = data.countOutput
 )
 {
 
-  lazy val taxonomyGraph: TitanNCBITaxonomyGraph = bio4j.taxonomyBundle.graph
+  lazy val taxonomyGraph: TitanNCBITaxonomyGraph =
+    ncbiTaxonomyBundle.graph
 
   def instructions: AnyInstructions = say("I'm counting you!")
 

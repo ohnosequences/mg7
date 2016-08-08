@@ -13,7 +13,7 @@ import java.io.{ BufferedWriter, FileWriter, File }
 import scala.util.Try
 
 case class assignDataProcessing[MD <: AnyMG7Parameters](val md: MD) extends DataProcessingBundle(
-  (bio4j.taxonomyBundle :: md.referenceDBs.toList): _*
+  (ncbiTaxonomyBundle :: md.referenceDBs.toList): _*
 )(
   input  = data.assignInput,
   output = data.assignOutput
@@ -22,7 +22,7 @@ case class assignDataProcessing[MD <: AnyMG7Parameters](val md: MD) extends Data
   import md._
 
   private lazy val taxonomyGraph: TitanNCBITaxonomyGraph =
-    ohnosequences.ncbitaxonomy.ncbiTaxonomyBundle.graph
+    ncbiTaxonomyBundle.graph
 
   type BlastRow = csv.Row[md.blastOutRec.Keys]
 

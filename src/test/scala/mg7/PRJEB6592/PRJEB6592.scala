@@ -1,4 +1,4 @@
-package ohnosequences.mg7
+package ohnosequences.test.mg7
 
 import ohnosequences.mg7._, loquats._, dataflows._
 import ohnosequences.datasets._, illumina._
@@ -6,6 +6,7 @@ import ohnosequences.cosas._, types._, klists._
 import ohnosequences.loquat._
 import ohnosequences.statika._, aws._
 import ohnosequences.blast.api._
+import ohnosequences.db.rna16s
 
 import ohnosequences.awstools.ec2._, InstanceType._
 import ohnosequences.awstools.s3._
@@ -13,22 +14,17 @@ import ohnosequences.awstools.autoscaling._
 import ohnosequences.awstools.regions.Region._
 import com.amazonaws.auth._, profile._
 
-case object test {
-
-  case object rna16sRefDB extends ReferenceDB(
-    name        = "era7bio.db.rna16s",
-    blastDBS3   = ohnosequences.db.rna16s.release.fastaS3 /,
-    id2taxasS3  = ohnosequences.db.rna16s.release.id2taxasS3
-  )
+case object PRJEB6592 {
 
   case object testParameters extends MG7Parameters(
-    outputS3Folder = testOutS3Folder,
-    readsLength = bp300,
-    blastCommand = blastn,
-    blastOutRec  = defaults.blastnOutputRecord,
-    blastOptions = defaults.blastnOptions.value,
-    referenceDBs = Set(rna16sRefDB)
-  ) {
+    outputS3Folder  = testOutS3Folder,
+    readsLength     = bp300,
+    blastCommand    = blastn,
+    blastOutRec     = defaults.blastnOutputRecord,
+    blastOptions    = defaults.blastnOptions.value,
+    referenceDBs    = Set(rna16sRefDB)
+  )
+  {
 
     // an example of how you can add some conditions to the filter predicate
     override def blastFilter(row: csv.Row[BlastOutRecKeys]): Boolean = {
@@ -97,7 +93,6 @@ case object test {
 
   val dataflow = NoFlashDataflow(testParameters)(splitInputs)
 
-
   // case object flashConfig extends TestLoquatConfig("flash", dataflow.flashDataMappings)
   // case object flashLoquat extends Loquat(flashConfig, flashDataProcessing(testParameters))
 
@@ -128,5 +123,4 @@ case object test {
 
   case object countConfig extends TestLoquatConfig("count", dataflow.countDataMappings)
   case object countLoquat extends Loquat(countConfig, countDataProcessing)
-
 }
