@@ -52,9 +52,6 @@ case object PRJEB6592 {
 
   val dataflow = NoFlashDataflow(testParameters)(splitInputs)
 
-  // case object flashConfig extends TestLoquatConfig("flash", dataflow.flashDataMappings)
-  // case object flashLoquat extends Loquat(flashConfig, flashDataProcessing(testParameters))
-
   case object splitConfig extends TestLoquatConfig("split", dataflow.splitDataMappings)
   case object splitLoquat extends Loquat(splitConfig, splitDataProcessing(testParameters))
 
