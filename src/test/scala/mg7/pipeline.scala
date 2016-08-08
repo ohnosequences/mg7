@@ -16,9 +16,9 @@ import com.amazonaws.auth._, profile._
 case object test {
 
   case object rna16sRefDB extends ReferenceDB(
-    name = "era7bio.db.rna16s",
-    blastDBS3 = era7bio.db.rna16s.s3location / "blastdb" /,
-    id2taxasS3 = era7bio.db.rna16s.s3location / "data" / "id2taxa.tsv"
+    name        = "era7bio.db.rna16s",
+    blastDBS3   = ohnosequences.db.rna16s.release.fastaS3 /,
+    id2taxasS3  = ohnosequences.db.rna16s.release.id2taxasS3
   )
 
   case object testParameters extends MG7Parameters(

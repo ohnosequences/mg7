@@ -35,6 +35,7 @@ dependencyOverrides ++= Set(
 )
 
 // NOTE should be reestablished
+wartremoverErrors in (Test, compile) := Seq()
 wartremoverErrors in (Compile, compile) := Seq()
 
 addFatArtifactPublishing(Test)
