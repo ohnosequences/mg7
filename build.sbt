@@ -34,6 +34,9 @@ dependencyOverrides ++= Set(
   "org.slf4j"                 % "slf4j-api"  % "1.7.7"
 )
 
+// NOTE should be reestablished
+wartremoverErrors in (Compile, compile) := Seq()
+
 addFatArtifactPublishing(Test)
 
 mergeStrategy in assembly ~= { old => {
