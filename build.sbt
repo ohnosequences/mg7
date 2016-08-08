@@ -1,5 +1,3 @@
-Nice.scalaProject
-
 name          := "mg7"
 organization  := "ohnosequences"
 description   := "Configurable, scalable 16S metagenomics data analysis"
@@ -36,9 +34,11 @@ dependencyOverrides ++= Set(
   "org.slf4j"                 % "slf4j-api"  % "1.7.7"
 )
 
+// NOTE should be reestablished
+wartremoverErrors in (Compile, compile) := Seq()
 
-fatArtifactSettings
-// copied from bio4j-titan:
+addFatArtifactPublishing(Test)
+
 mergeStrategy in assembly ~= { old => {
     case "log4j.properties"                       => MergeStrategy.filterDistinctLines
     case PathList("org", "apache", "commons", _*) => MergeStrategy.first

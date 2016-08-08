@@ -6,7 +6,7 @@ reject_regex: '^(:-1:|Rejected)'
 reset_on_reopened: true
 # author_approval: ignored
 reviewers:
-    - # maintainer has to approve everything that is _merged to master_
+    - # One of the maintainers has to approve everything that is merged to master
         name: maintainer
         required: 1
         members:
