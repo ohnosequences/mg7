@@ -37,7 +37,7 @@ case object BeiMockPipeline {
     .toMap
 
   case object testParameters extends MG7Parameters(
-    outputS3Folder  = { (sampleId, step) => commonS3Prefix/"out"/"mock"/step/sampleId/ },
+    outputS3Folder  = { (sampleId, step) => testDefaults.outputS3Folder/sampleId/step/ },
     readsLength     = bp250,
     splitChunkSize  = 1000,
     blastCommand    = blastn,

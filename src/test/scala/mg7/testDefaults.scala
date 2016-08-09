@@ -15,6 +15,11 @@ import com.amazonaws.auth._, profile._
 
 case object testDefaults {
 
+  /* All input test data should go in here */
+  lazy val inputS3Folder  = S3Folder("resources.ohnosequences.com", "16s/public-datasets")
+  /* Output test data is scoped by version */
+  lazy val outputS3Folder = S3Folder("resources.ohnosequences.com", generated.metadata.mg7.artifact) / generated.metadata.mg7.version
+
   lazy val defaultAMI = AmazonLinuxAMI(Ireland, HVM, InstanceStore)
 
   trait AnyTestLoquatConfig extends AnyLoquatConfig { config =>
