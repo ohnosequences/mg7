@@ -20,6 +20,10 @@ case object testDefaults {
   /* Output test data is scoped by version */
   lazy val outputS3Folder = S3Folder("resources.ohnosequences.com", generated.metadata.mg7.artifact) / generated.metadata.mg7.version
 
+  val defaultOutput: (SampleID, StepName) => S3Folder =
+    (sampleID, step) => outputS3Folder/sampleID/step/
+
+  lazy val referenceDBs: Set[AnyReferenceDB] = Set(rna16sRefDB)
   /*
     ## Default Illumina parameters
 
