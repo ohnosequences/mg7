@@ -13,6 +13,7 @@ import ohnosequences.awstools.autoscaling._
 import ohnosequences.awstools.regions.Region._
 import com.amazonaws.auth._, profile._
 
+// TODO this is a gut sample after all, see what we are going to do with this
 case object PRJEB6592 {
 
   val commonS3Prefix = S3Folder("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592")
