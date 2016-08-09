@@ -42,17 +42,8 @@ case object BeiMockPipeline {
     splitChunkSize  = 1000,
     blastCommand    = blastn,
     blastOutRec     = defaults.blastnOutputRecord,
-    blastOptions    = defaults.blastnOptions.update(
-        num_threads(4)              ::
-        word_size(46)               ::
-        evalue(BigDecimal(1E-100))  ::
-        /* We're going to use all hits to do global sample-coherent assignment. But not now, so no reason for this to be huge */
-        max_target_seqs(150)        ::
-        /* 95% is a reasonable minimum. If it does not work, be more stringent with read preprocessing */
-        perc_identity(95.0)         ::
-        *[AnyDenotation]
-      ).value,
-    referenceDBs = Set(rna16sRefDB)
+    blastOptions    = testDefaults.Illumina.blastnOptions,
+    referenceDBs    = Set(rna16sRefDB)
   )
   {
 

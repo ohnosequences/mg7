@@ -20,6 +20,27 @@ case object testDefaults {
   /* Output test data is scoped by version */
   lazy val outputS3Folder = S3Folder("resources.ohnosequences.com", generated.metadata.mg7.artifact) / generated.metadata.mg7.version
 
+  /*
+    ## Default Illumina parameters
+
+  */
+  case object Illumina {
+
+    lazy val blastnOptions =
+      defaults.blastnOptions.update(
+        num_threads(4)              ::
+        word_size(46)               ::
+        evalue(BigDecimal(1E-100))  ::
+        /* We're going to use all hits to do global sample-coherent assignment. But not now, so no reason for this to be huge */
+        max_target_seqs(150)        ::
+        /* 95% is a reasonable minimum. If it does not work, be more stringent with read preprocessing */
+        perc_identity(95.0)         ::
+        *[AnyDenotation]
+      )
+      .value
+  }
+
+
   lazy val defaultAMI = AmazonLinuxAMI(Ireland, HVM, InstanceStore)
 
   trait AnyTestLoquatConfig extends AnyLoquatConfig { config =>
