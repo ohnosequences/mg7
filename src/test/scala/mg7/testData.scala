@@ -22,6 +22,8 @@ case object testData {
     ## Mock communities
 
     These are physical mock communities from BEI from which samples have been sequenced in our test data.
+
+    The difference between `HM-782D` and `HM-783D` is that `HM-782D` has **even** concentration of **RNA operon counts** per species, while `HM-783D` contains **staggered RNA operon counts**, with a difference of at most a `10^3` factor.  
   */
   val HM_782D =
     MockCommunity (
@@ -50,6 +52,34 @@ case object testData {
         170187  -> "Streptococcus pneumoniae TIGR4"
       )
     )
+
+  val HM_783D =
+    id          = "HM_783D",
+    description = "https://www.beiresources.org/ProductInformationSheet/tabid/784/Default.aspx?doc=39237.pdf",
+    composition = Map (
+      400667  -> "Acinetobacter baumannii ATCC 17978",
+      411466  -> "Actinomyces odontolyticus ATCC 17982",
+      222523  -> "Bacillus cereus ATCC 10987",
+      435590  -> "Bacteroides vulgatus ATCC 8482",
+      290402  -> "Clostridium beijerinckii NCIMB 8052",
+      243230  -> "Deinococcus radiodurans R1",
+      474186  -> "Enterococcus faecalis OG1RF",
+      511145  -> "Escherichia coli str. K-12 substr. MG1655",
+      85962   -> "Helicobacter pylori 26695",
+      324831  -> "Lactobacillus gasseri ATCC 33323 = JCM 1131",
+      169963  -> "Listeria monocytogenes EGD-e",
+      122586  -> "Neisseria meningitidis MC58",
+      267747  -> "Propionibacterium acnes KPA171202",
+      208964  -> "Pseudomonas aeruginosa PAO1",
+      272943  -> "Rhodobacter sphaeroides 2.4.1",
+      451516  -> "Staphylococcus aureus subsp. aureus USA300_TCH1516",
+      176280  -> "Staphylococcus epidermidis ATCC 12228",
+      208435  -> "Streptococcus agalactiae 2603V/R",
+      210007  -> "Streptococcus mutans UA159",
+      170187  -> "Streptococcus pneumoniae TIGR4"
+    )
+  )
+
 
   /*
     ## Illumina mock communities
