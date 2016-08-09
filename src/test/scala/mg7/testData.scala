@@ -30,26 +30,26 @@ case object testData {
       id          = "HM-782D",
       description = "https://www.beiresources.org/ProductInformationSheet/tabid/784/Default.aspx?doc=38933.pdf",
       composition = Map (
-        400667  -> "Acinetobacter baumannii ATCC 17978",
-        411466  -> "Actinomyces odontolyticus ATCC 17982",
-        222523  -> "Bacillus cereus ATCC 10987",
-        435590  -> "Bacteroides vulgatus ATCC 8482",
-        290402  -> "Clostridium beijerinckii NCIMB 8052",
-        243230  -> "Deinococcus radiodurans R1",
-        474186  -> "Enterococcus faecalis OG1RF",
-        511145  -> "Escherichia coli str. K-12 substr. MG1655",
-        85962   -> "Helicobacter pylori 26695",
-        324831  -> "Lactobacillus gasseri ATCC 33323 = JCM 1131",
-        169963  -> "Listeria monocytogenes EGD-e",
-        122586  -> "Neisseria meningitidis MC58",
-        267747  -> "Propionibacterium acnes KPA171202",
-        208964  -> "Pseudomonas aeruginosa PAO1",
-        272943  -> "Rhodobacter sphaeroides 2.4.1",
-        451516  -> "Staphylococcus aureus subsp. aureus USA300_TCH1516",
-        176280  -> "Staphylococcus epidermidis ATCC 12228",
-        208435  -> "Streptococcus agalactiae 2603V/R",
-        210007  -> "Streptococcus mutans UA159",
-        170187  -> "Streptococcus pneumoniae TIGR4"
+        400667  -> ("Acinetobacter baumannii ATCC 17978"   ->               1 ),
+        411466  -> ("Actinomyces odontolyticus ATCC 17982" ->               1 ),
+        222523  -> ("Bacillus cereus ATCC 10987" ->                         1 ),
+        435590  -> ("Bacteroides vulgatus ATCC 8482" ->                     1 ),
+        290402  -> ("Clostridium beijerinckii NCIMB 8052" ->                1 ),
+        243230  -> ("Deinococcus radiodurans R1" ->                         1 ),
+        474186  -> ("Enterococcus faecalis OG1RF" ->                        1 ),
+        511145  -> ("Escherichia coli str. K-12 substr. MG1655" ->          1 ),
+        85962   -> ("Helicobacter pylori 26695" ->                          1 ),
+        324831  -> ("Lactobacillus gasseri ATCC 33323 = JCM 1131" ->        1 ),
+        169963  -> ("Listeria monocytogenes EGD-e" ->                       1 ),
+        122586  -> ("Neisseria meningitidis MC58" ->                        1 ),
+        267747  -> ("Propionibacterium acnes KPA171202" ->                  1 ),
+        208964  -> ("Pseudomonas aeruginosa PAO1" ->                        1 ),
+        272943  -> ("Rhodobacter sphaeroides 2.4.1" ->                      1 ),
+        451516  -> ("Staphylococcus aureus subsp. aureus USA300_TCH1516" -> 1 ),
+        176280  -> ("Staphylococcus epidermidis ATCC 12228" ->              1 ),
+        208435  -> ("Streptococcus agalactiae 2603V/R" ->                   1 ),
+        210007  -> ("Streptococcus mutans UA159" ->                         1 ),
+        170187  -> ("Streptococcus pneumoniae TIGR4" ->                     1 )
       )
     )
 
@@ -58,26 +58,26 @@ case object testData {
       id          = "HM_783D",
       description = "https://www.beiresources.org/ProductInformationSheet/tabid/784/Default.aspx?doc=39237.pdf",
       composition = Map (
-        400667  -> "Acinetobacter baumannii ATCC 17978",
-        411466  -> "Actinomyces odontolyticus ATCC 17982",
-        222523  -> "Bacillus cereus ATCC 10987",
-        435590  -> "Bacteroides vulgatus ATCC 8482",
-        290402  -> "Clostridium beijerinckii NCIMB 8052",
-        243230  -> "Deinococcus radiodurans R1",
-        474186  -> "Enterococcus faecalis OG1RF",
-        511145  -> "Escherichia coli str. K-12 substr. MG1655",
-        85962   -> "Helicobacter pylori 26695",
-        324831  -> "Lactobacillus gasseri ATCC 33323 = JCM 1131",
-        169963  -> "Listeria monocytogenes EGD-e",
-        122586  -> "Neisseria meningitidis MC58",
-        267747  -> "Propionibacterium acnes KPA171202",
-        208964  -> "Pseudomonas aeruginosa PAO1",
-        272943  -> "Rhodobacter sphaeroides 2.4.1",
-        451516  -> "Staphylococcus aureus subsp. aureus USA300_TCH1516",
-        176280  -> "Staphylococcus epidermidis ATCC 12228",
-        208435  -> "Streptococcus agalactiae 2603V/R",
-        210007  -> "Streptococcus mutans UA159",
-        170187  -> "Streptococcus pneumoniae TIGR4"
+        400667  -> ("Acinetobacter baumannii ATCC 17978"   ->               10    ),
+        411466  -> ("Actinomyces odontolyticus ATCC 17982" ->               1     ),
+        222523  -> ("Bacillus cereus ATCC 10987" ->                         100   ),
+        435590  -> ("Bacteroides vulgatus ATCC 8482" ->                     1     ),
+        290402  -> ("Clostridium beijerinckii NCIMB 8052" ->                100   ),
+        243230  -> ("Deinococcus radiodurans R1" ->                         1     ),
+        474186  -> ("Enterococcus faecalis OG1RF" ->                        1     ),
+        511145  -> ("Escherichia coli str. K-12 substr. MG1655" ->          1000  ),
+        85962   -> ("Helicobacter pylori 26695" ->                          10    ),
+        324831  -> ("Lactobacillus gasseri ATCC 33323 = JCM 1131" ->        10    ),
+        169963  -> ("Listeria monocytogenes EGD-e" ->                       10    ),
+        122586  -> ("Neisseria meningitidis MC58" ->                        10    ),
+        267747  -> ("Propionibacterium acnes KPA171202" ->                  10    ),
+        208964  -> ("Pseudomonas aeruginosa PAO1" ->                        100   ),
+        272943  -> ("Rhodobacter sphaeroides 2.4.1" ->                      1000  ),
+        451516  -> ("Staphylococcus aureus subsp. aureus USA300_TCH1516" -> 100   ),
+        176280  -> ("Staphylococcus epidermidis ATCC 12228" ->              1000  ),
+        208435  -> ("Streptococcus agalactiae 2603V/R" ->                   100   ),
+        210007  -> ("Streptococcus mutans UA159" ->                         1000  ),
+        170187  -> ("Streptococcus pneumoniae TIGR4" ->                     1     )
       )
     )
 
@@ -92,6 +92,7 @@ case object testData {
       community = HM_782D
     )
 
-  case class MockCommunity(val id: String, val description: String, val composition: Map[Int,String])
+  /* In the composition map, the values are the taxon name and the relative count of RNA operon copies */
+  case class MockCommunity(val id: String, val description: String, val composition: Map[Int,(String,Int)])
   case class MockCommunitySample(val id: String, val community: MockCommunity)
 }
