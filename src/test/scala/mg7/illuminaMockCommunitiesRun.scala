@@ -17,6 +17,7 @@ case object BeiMockPipeline {
 
   val commonS3Prefix = S3Folder("era7p", "mg7-test/data")
 
+  // TODO move all this to the testData object
   /* For now we are only testing one sample */
   val sampleIDs: List[SampleID] = List(
     "ERR1049996"
@@ -36,23 +37,7 @@ case object BeiMockPipeline {
     }
     .toMap
 
-  case object testParameters extends MG7Parameters(
-    outputS3Folder  = testDefaults.defaultOutput,
-    readsLength     = bp250,
-    splitChunkSize  = 1000,
-    blastCommand    = blastn,
-    blastOutRec     = defaults.blastnOutputRecord,
-    blastOptions    = testDefaults.Illumina.blastnOptions,
-    referenceDBs    = testDefaults.referenceDBs
-  )
-  {
-
-    /* The only basic thing we require is at least 100% **query** coverage. If we miss sequences this way, this should be solved through trimming/quality filtering */
-    override def blastFilter(row: csv.Row[BlastOutRecKeys]): Boolean =
-      row.select(outputFields.qcovs).toDouble  >= 100
-  }
-
-  val dataflow = FullDataflow(testParameters)(inputSamples)
+  lazy val dataflow = FullDataflow(testDefaults.Illumina.parameters)(inputSamples)
 
   /*
     ### mg7 steps
@@ -65,49 +50,32 @@ case object BeiMockPipeline {
     era7bio.mg7test.BeiMockPipeline.xyzLoquat.deploy(era7.defaults.yourUser)
     ```
   */
-
   case object flashConfig extends TestLoquatConfig("flash", dataflow.flashDataMappings)
-  case object flashLoquat extends Loquat(flashConfig, flashDataProcessing(testParameters))
+  case object flashLoquat extends Loquat(flashConfig, flashDataProcessing(testDefaults.Illumina.parameters))
 
   case object splitConfig extends TestLoquatConfig("split", dataflow.splitDataMappings)
-  case object splitLoquat extends Loquat(splitConfig, splitDataProcessing(testParameters))
+  case object splitLoquat extends Loquat(splitConfig, splitDataProcessing(testDefaults.Illumina.parameters))
 
   case object blastConfig extends TestLoquatConfig("blast", dataflow.blastDataMappings) {
     // NOTE: we don't want to check input objects here because they are too many and
     //   checking them one by one will take too long and likely fail
     override val checkInputObjects = false
-
-    override lazy val workersConfig: AnyWorkersConfig = WorkersConfig(
-      instanceSpecs = InstanceSpecs(defaultAMI, c3.large),
-      purchaseModel = Spot(maxPrice = Some(0.025)),
-      groupSize = AutoScalingGroupSize(0, 100, 100)
-    )
+    override lazy val workersConfig = testDefaults.Illumina.blastWorkers
   }
-  case object blastLoquat extends Loquat(blastConfig, blastDataProcessing(testParameters))
-
+  case object blastLoquat extends Loquat(blastConfig, blastDataProcessing(testDefaults.Illumina.parameters))
 
   case object assignConfig extends TestLoquatConfig("assign", dataflow.assignDataMappings) {
+
     override val checkInputObjects = false
-
     override lazy val amiEnv = amznAMIEnv(ami, javaHeap = 10)
-
-    override lazy val workersConfig: AnyWorkersConfig = WorkersConfig(
-      instanceSpecs = InstanceSpecs(defaultAMI, m3.xlarge),
-      purchaseModel = Spot(maxPrice = Some(0.05)),
-      groupSize = AutoScalingGroupSize(0, 6, 6)
-    )
+    override lazy val workersConfig = testDefaults.Illumina.assignWorkers
   }
-  case object assignLoquat extends Loquat(assignConfig, assignDataProcessing(testParameters))
-
+  case object assignLoquat extends Loquat(assignConfig, assignDataProcessing(testDefaults.Illumina.parameters))
 
   case object mergeConfig extends TestLoquatConfig("merge", dataflow.mergeDataMappings) {
-    override val skipEmptyResults = false
 
-    override lazy val workersConfig: AnyWorkersConfig = WorkersConfig(
-      instanceSpecs = InstanceSpecs(defaultAMI, m3.xlarge),
-      purchaseModel = Spot(maxPrice = Some(0.05)),
-      groupSize = AutoScalingGroupSize(0, 1, 10)
-    )
+    override val skipEmptyResults = false
+    override lazy val workersConfig: AnyWorkersConfig = testDefaults.Illumina.mergeWorkers
   }
   case object mergeLoquat extends Loquat(mergeConfig, mergeDataProcessing)
 

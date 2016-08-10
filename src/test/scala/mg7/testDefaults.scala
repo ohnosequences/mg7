@@ -15,6 +15,7 @@ import ohnosequences.awstools.s3._
 import ohnosequences.awstools.autoscaling._
 import ohnosequences.awstools.regions.Region._
 import com.amazonaws.auth._, profile._
+import ohnosequences.datasets.illumina._
 
 case object testDefaults {
 
@@ -31,6 +32,7 @@ case object testDefaults {
   /*
     ## Default Illumina parameters
 
+    These parameters are a sensible default for Illumina reads.
   */
   case object Illumina {
 
@@ -44,6 +46,36 @@ case object testDefaults {
         *[AnyDenotation]
       )
       .value
+
+    lazy val readLength = illumina.bp250
+
+    case object parameters extends MG7Parameters(
+      outputS3Folder  = testDefaults.defaultOutput,
+      readsLength     = readLength,
+      splitChunkSize  = 1000,
+      blastCommand    = blastn,
+      blastOutRec     = defaults.blastnOutputRecord,
+      blastOptions    = blastnOptions,
+      referenceDBs    = testDefaults.referenceDBs
+    )
+
+    lazy val blastWorkers: AnyWorkersConfig = WorkersConfig(
+      instanceSpecs = InstanceSpecs(defaultAMI, c3.large),
+      purchaseModel = Spot(maxPrice = Some(0.025)),
+      groupSize = AutoScalingGroupSize(0, 100, 100)
+    )
+
+    lazy val assignWorkers: AnyWorkersConfig = WorkersConfig(
+      instanceSpecs = InstanceSpecs(defaultAMI, m3.xlarge),
+      purchaseModel = Spot(maxPrice = Some(0.05)),
+      groupSize = AutoScalingGroupSize(0, 6, 6)
+    )
+
+    lazy val mergeWorkers: AnyWorkersConfig = WorkersConfig(
+      instanceSpecs = InstanceSpecs(defaultAMI, m3.xlarge),
+      purchaseModel = Spot(maxPrice = Some(0.05)),
+      groupSize = AutoScalingGroupSize(0, 1, 10)
+    )
   }
 
 
