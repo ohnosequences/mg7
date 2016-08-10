@@ -90,6 +90,62 @@ case object testData {
       )
     )
 
+  val HM_278D =
+    MockCommunity(
+      id = "HM_278D",
+      description = new URL("https://www.beiresources.org/Catalog/ItemDetails/tabid/522/Default.aspx?BEINum=HM-278D&Template=otherProducts"),
+      composition = Map (
+        400667  -> ("Acinetobacter baumannii ATCC 17978"   ->               1 ),
+        411466  -> ("Actinomyces odontolyticus ATCC 17982" ->               1 ),
+        222523  -> ("Bacillus cereus ATCC 10987" ->                         1 ),
+        435590  -> ("Bacteroides vulgatus ATCC 8482" ->                     1 ),
+        290402  -> ("Clostridium beijerinckii NCIMB 8052" ->                1 ),
+        243230  -> ("Deinococcus radiodurans R1" ->                         1 ),
+        474186  -> ("Enterococcus faecalis OG1RF" ->                        1 ),
+        511145  -> ("Escherichia coli str. K-12 substr. MG1655" ->          1 ),
+        85962   -> ("Helicobacter pylori 26695" ->                          1 ),
+        324831  -> ("Lactobacillus gasseri ATCC 33323 = JCM 1131" ->        1 ),
+        169963  -> ("Listeria monocytogenes EGD-e" ->                       1 ),
+        122586  -> ("Neisseria meningitidis MC58" ->                        1 ),
+        267747  -> ("Propionibacterium acnes KPA171202" ->                  1 ),
+        208964  -> ("Pseudomonas aeruginosa PAO1" ->                        1 ),
+        272943  -> ("Rhodobacter sphaeroides 2.4.1" ->                      1 ),
+        450394  -> ("Staphylococcus aureus subsp. aureus USA300_TCH959" ->  1 ),
+        176280  -> ("Staphylococcus epidermidis ATCC 12228" ->              1 ),
+        208435  -> ("Streptococcus agalactiae 2603V/R" ->                   1 ),
+        210007  -> ("Streptococcus mutans UA159" ->                         1 ),
+        170187  -> ("Streptococcus pneumoniae TIGR4" ->                     1 )
+      )
+    )
+
+    val HM_279D =
+      MockCommunity(
+        id = "HM_279D",
+        description = new URL("https://www.beiresources.org/Catalog/ItemDetails/tabid/522/Default.aspx?BEINum=HM-279D&Template=otherProducts"),
+        composition = Map (
+          400667  -> ("Acinetobacter baumannii ATCC 17978"   ->               10 ),
+          411466  -> ("Actinomyces odontolyticus ATCC 17982" ->               1 ),
+          222523  -> ("Bacillus cereus ATCC 10987" ->                         100 ),
+          435590  -> ("Bacteroides vulgatus ATCC 8482" ->                     1 ),
+          290402  -> ("Clostridium beijerinckii NCIMB 8052" ->                100 ),
+          243230  -> ("Deinococcus radiodurans R1" ->                         1 ),
+          474186  -> ("Enterococcus faecalis OG1RF" ->                        1 ),
+          511145  -> ("Escherichia coli str. K-12 substr. MG1655" ->          1000 ),
+          85962   -> ("Helicobacter pylori 26695" ->                          10 ),
+          324831  -> ("Lactobacillus gasseri ATCC 33323 = JCM 1131" ->        10 ),
+          169963  -> ("Listeria monocytogenes EGD-e" ->                       10 ),
+          122586  -> ("Neisseria meningitidis MC58" ->                        10 ),
+          267747  -> ("Propionibacterium acnes KPA171202" ->                  10 ),
+          208964  -> ("Pseudomonas aeruginosa PAO1" ->                        100 ),
+          272943  -> ("Rhodobacter sphaeroides 2.4.1" ->                      1000 ),
+          450394  -> ("Staphylococcus aureus subsp. aureus USA300_TCH959" ->  100 ),
+          176280  -> ("Staphylococcus epidermidis ATCC 12228" ->              1000 ),
+          208435  -> ("Streptococcus agalactiae 2603V/R" ->                   100 ),
+          210007  -> ("Streptococcus mutans UA159" ->                         1000 ),
+          170187  -> ("Streptococcus pneumoniae TIGR4" ->                     1 )
+        )
+      )
+
   /*
     ## Illumina mock communities
 
