@@ -88,6 +88,7 @@ case object testData {
 
     These are several mock community samples sequenced with Illumina.
   */
+  // TODO check the IDs for Illumina even/staggered and add them here
   val ERR1049996 =
     MockCommunitySample (
       id        = "ERR1049996",
