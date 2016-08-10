@@ -78,6 +78,49 @@ case object testDefaults {
     )
   }
 
+  case object PacBio {
+
+    lazy val blastnOptions =
+      defaults.blastnOptions.update(
+        reward(1)                   ::
+        penalty(-2)                 ::
+        word_size(72)               ::
+        perc_identity(98.5)         ::
+        max_target_seqs(10000)      ::
+        evalue(BigDecimal(1e-100))  ::
+        *[AnyDenotation]
+      ).value
+
+    case object parameters extends MG7Parameters(
+      outputS3Folder    = testDefaults.defaultOutput,
+      readsLength       = illumina.bp250, // totally inoffensive
+      splitInputFormat  = FastQInput,
+      splitChunkSize    = 100,
+      blastCommand      = blastn,
+      blastOptions      = blastnOptions,
+      blastOutRec       = defaults.blastnOutputRecord,
+      referenceDBs      = testDefaults.referenceDBs
+    )
+
+    lazy val blastWorkers: AnyWorkersConfig = WorkersConfig(
+      instanceSpecs = InstanceSpecs(defaultAMI, c3.large),
+      purchaseModel = Spot(maxPrice = Some(0.025)),
+      groupSize = AutoScalingGroupSize(0, 100, 100)
+    )
+
+    lazy val assignWorkers: AnyWorkersConfig = WorkersConfig(
+      instanceSpecs = InstanceSpecs(defaultAMI, m3.xlarge),
+      purchaseModel = Spot(maxPrice = Some(0.05)),
+      groupSize = AutoScalingGroupSize(0, 6, 6)
+    )
+
+    lazy val mergeWorkers: AnyWorkersConfig = WorkersConfig(
+      instanceSpecs = InstanceSpecs(defaultAMI, m3.xlarge),
+      purchaseModel = Spot(maxPrice = Some(0.05)),
+      groupSize = AutoScalingGroupSize(0, 1, 10)
+    )
+  }
+
 
   lazy val defaultAMI = AmazonLinuxAMI(Ireland, HVM, InstanceStore)
 
