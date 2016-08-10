@@ -81,10 +81,4 @@ case object BeiMockPipeline {
 
   case object countConfig extends TestLoquatConfig("count", dataflow.countDataMappings)
   case object countLoquat extends Loquat(countConfig, countDataProcessing)
-
-  case object statsConfig extends TestLoquatConfig("stats", dataflow.statsDataMappings)
-  case object statsLoquat extends Loquat(statsConfig, statsDataProcessing)
-
-  case object summaryConfig extends TestLoquatConfig("summary", dataflow.summaryDataMappings)
-  case object summaryLoquat extends Loquat(summaryConfig, summaryDataProcessing)
 }
