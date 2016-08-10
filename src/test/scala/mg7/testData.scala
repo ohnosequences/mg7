@@ -5,6 +5,8 @@
 */
 package ohnosequences.test.mg7
 
+import java.net.URL
+
 case object testData {
 
   /*
@@ -28,7 +30,7 @@ case object testData {
   val HM_782D =
     MockCommunity (
       id          = "HM-782D",
-      description = "https://www.beiresources.org/ProductInformationSheet/tabid/784/Default.aspx?doc=38933.pdf",
+      description = new URL("https://www.beiresources.org/Catalog/otherProducts/HM-782D.aspx"),
       composition = Map (
         400667  -> ("Acinetobacter baumannii ATCC 17978"   ->               1 ),
         411466  -> ("Actinomyces odontolyticus ATCC 17982" ->               1 ),
@@ -56,7 +58,7 @@ case object testData {
   val HM_783D =
     MockCommunity (
       id          = "HM_783D",
-      description = "https://www.beiresources.org/ProductInformationSheet/tabid/784/Default.aspx?doc=39237.pdf",
+      description = new URL("https://www.beiresources.org/Catalog/otherProducts/HM-783D.aspx"),
       composition = Map (
         400667  -> ("Acinetobacter baumannii ATCC 17978"   ->               10    ),
         411466  -> ("Actinomyces odontolyticus ATCC 17982" ->               1     ),
@@ -93,6 +95,6 @@ case object testData {
     )
 
   /* In the composition map, the values are the taxon name and the relative count of RNA operon copies */
-  case class MockCommunity(val id: String, val description: String, val composition: Map[Int,(String,Int)])
+  case class MockCommunity(val id: String, val description: URL, val composition: Map[Int,(String,Int)])
   case class MockCommunitySample(val id: String, val community: MockCommunity)
 }
