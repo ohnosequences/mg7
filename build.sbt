@@ -25,8 +25,8 @@ libraryDependencies ++= Seq(
   "ohnosequences-bundles" %% "flash"      % "0.2.0",
   "ohnosequences-bundles" %% "blast"      % "0.3.0",
   // testing:
-  "era7bio"       %% "db-rna16s" % "0.6.5" % Test,
-  "org.scalatest" %% "scalatest" % "2.2.6" % Test
+  "ohnosequences" %% "db-rna16s" % "0.9.0-60-g5090204"  % Test,
+  "org.scalatest" %% "scalatest" % "2.2.6"              % Test
 )
 
 dependencyOverrides ++= Set(
@@ -35,6 +35,7 @@ dependencyOverrides ++= Set(
 )
 
 // NOTE should be reestablished
+wartremoverErrors in (Test, compile) := Seq()
 wartremoverErrors in (Compile, compile) := Seq()
 
 addFatArtifactPublishing(Test)
