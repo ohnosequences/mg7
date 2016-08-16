@@ -46,7 +46,7 @@ mergeStrategy in assembly ~= { old => {
 }
 
 
-generateStatikaMetadataIn(Compile)
+generateStatikaMetadataIn(Test)
 
 // This includes tests sources in the assembled fat-jar:
 fullClasspath in assembly := (fullClasspath in Test).value
