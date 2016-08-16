@@ -10,7 +10,7 @@ import ohnosequences.awstools.s3._
 
 case object testData {
 
-  lazy val mg7 = generated.metadata.mg7
+  lazy val mg7 = ohnosequences.generated.metadata.mg7
 
   /* All input test data should go in here; note that this is *not* scoped by mg7 version: it is supposed to be immutable, and we don't want to copy it to a new location for every release. */
   lazy val s3Folder =

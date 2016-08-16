@@ -19,7 +19,7 @@ import ohnosequences.datasets.illumina._
 
 case object testDefaults {
 
-  lazy val mg7 = generated.metadata.mg7
+  lazy val mg7 = ohnosequences.generated.metadata.mg7
 
   /* Output test data *is* scoped by version */
   lazy val outputS3Folder =
@@ -126,7 +126,7 @@ case object testDefaults {
 
   trait AnyTestLoquatConfig extends AnyLoquatConfig { config =>
 
-    lazy val metadata: AnyArtifactMetadata = generated.metadata.mg7
+    lazy val metadata: AnyArtifactMetadata = ohnosequences.generated.metadata.mg7
 
     val iamRoleName = "loquat.testing"
     val logsBucketName = "loquat.testing"
