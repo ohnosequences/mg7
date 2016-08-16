@@ -16,9 +16,7 @@ case object mergeDataProcessing extends DataProcessingBundle()(
   def instructions: AnyInstructions = say("Merging, joining, amalgamating!")
 
   // TODO: use streams, file-writers, etc. stuff
-  // TODO no default arguments please
-  def mergeChunks(dir: File, out: File, header: Option[String] = None): Unit = {
-    header.foreach { out.appendLine }
+  def mergeChunks(dir: File, out: File): Unit = {
     // only one level in depth:
     dir.list.foreach { chunkFile =>
       out.append( chunkFile.contentAsString )
@@ -36,8 +34,16 @@ case object mergeDataProcessing extends DataProcessingBundle()(
     // TODO: write header for Blast output
     LazyTry { mergeChunks( context.inputFile(data.blastChunksFolder), blastMerged)  } -&-
     LazyTry { mergeChunks( context.inputFile(data.blastNoHitsFolder), noHitsMerged) } -&-
-    LazyTry { mergeChunks( context.inputFile(data.lcaChunksFolder), lcaMerged, Some(csv.assignment.columns.labels.mkString(",")) ) } -&-
-    LazyTry { mergeChunks( context.inputFile(data.bbhChunksFolder), bbhMerged, Some(csv.assignment.columns.labels.mkString(",")) ) } -&-
+    LazyTry {
+      // header row:
+      lcaMerged.appendLine( csv.assignment.columns.labels.mkString(",") )
+      mergeChunks( context.inputFile(data.lcaChunksFolder), lcaMerged  )
+    } -&-
+    LazyTry {
+      // header row:
+      bbhMerged.appendLine( csv.assignment.columns.labels.mkString(",") )
+      mergeChunks( context.inputFile(data.bbhChunksFolder), bbhMerged )
+    } -&-
     success(s"Everything is merged",
       data.blastResult(blastMerged)   ::
       data.blastNoHits(noHitsMerged)  ::
