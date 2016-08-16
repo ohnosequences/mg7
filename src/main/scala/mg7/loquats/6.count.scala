@@ -100,7 +100,7 @@ case object countDataProcessing extends DataProcessingBundle(
           val pidents: Stream[Double] =
             pairs.flatMap { case (_, pident) => parseDouble(pident) }
 
-          taxID -> f"${averageOf(pidents)}%.2f"
+          taxID -> f"${pidents.average}%.2f"
         }
 
       // there as many assigned reads as there are tax IDs in the table

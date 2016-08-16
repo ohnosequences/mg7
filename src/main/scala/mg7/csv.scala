@@ -62,6 +62,14 @@ case object csv {
       TaxRank :×:
       Pident  :×:
       |[Column]
+
+    type Columns =
+      ReadID.type  :×:
+      Taxa.type    :×:
+      TaxName.type :×:
+      TaxRank.type :×:
+      Pident.type  :×:
+      |[Column]
   }
 
   // TODO: this is all quite clumsy, but will be improved

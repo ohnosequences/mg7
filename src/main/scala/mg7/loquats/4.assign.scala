@@ -48,6 +48,38 @@ case class assignDataProcessing[MD <: AnyMG7Parameters](val md: MD) extends Data
   private def taxIDsFor(id: ID): Taxa = referenceMap.get(id).getOrElse(Seq())
 
 
+  private def writeResult(
+    writer: csv.Writer[csv.assignment.Columns]
+  )(readId: ID,
+    assignments: List[(BlastRow, Taxa)],
+    nodesFilter: Seq[TitanTaxon] => Seq[TitanTaxon]
+  ): Unit = {
+
+    // `pident` values of those hits that have maximum `bitscore`
+    val pidents: Seq[Double] = assignments.flatMap{ case (row, _) => parseDouble(row.select(pident)) }
+    // NOTE: currently we leave only hits with the same maximum pident,
+    // so calculating average doesn't change anything, but it can be changed
+
+    val nodes: Seq[TitanTaxon] = nodesFilter(
+      assignments
+        .flatMap(_._2).distinct // only distinct Tax IDs
+        .flatMap(taxonomyGraph.getTaxon)
+    )
+
+    val lcaNode = nodes.lowestCommonAncestor(taxonomyGraph)
+
+    import csv.columns._
+    writer.addVals(
+      ReadID(readId)        ::
+      Taxa(lcaNode.id)      ::
+      TaxName(lcaNode.name) ::
+      TaxRank(lcaNode.rank) ::
+      Pident(f"${pidents.average}%.2f") ::
+      *[AnyDenotation]
+    )
+  }
+
+
   def instructions: AnyInstructions = say("Let's see who is who!")
 
   // TODO this is too big. Factor BBH and LCA into methods
@@ -61,9 +93,6 @@ case class assignDataProcessing[MD <: AnyMG7Parameters](val md: MD) extends Data
     val lcaWriter = csv.Writer(csv.assignment.columns)(lcaFile)
     val bbhWriter = csv.Writer(csv.assignment.columns)(bbhFile)
 
-    val lostInMappingFile = (context / "output" / "lost.in-mapping").createIfNotExists()
-    val lostInBio4jFile   = (context / "output" / "lost.in-bio4j").createIfNotExists()
-
     blastReader.rows
       // grouping rows by the read id
       .toStream.groupBy { _.select(qseqid) }
@@ -71,63 +100,19 @@ case class assignDataProcessing[MD <: AnyMG7Parameters](val md: MD) extends Data
       .foreach { case (readId: ID, hits: Stream[BlastRow]) =>
 
         // for each hit row we take the column with ID and lookup corresponding Taxas
-        val assignments: List[(BlastRow, Taxa)] = hits.toList.map { row =>
+        val allAssignments: List[(BlastRow, Taxa)] = hits.toList.map { row =>
           row -> taxIDsFor(row.select(sseqid))
         }
 
-        //// Best Blast Hit ////
+        // LCA of all
+        writeResult(lcaWriter)(readId, allAssignments, identity)
 
-        // best hits are those that have maximum in the `bitscore` column
-        val bbhHits: List[(BlastRow, Taxa)] = maximums(assignments) { case (row, _) =>
-          parseLong(row.select(bitscore)).getOrElse(0L)
-        }
-
-        // `pident` values of those hits that have maximum `bitscore`
-        val bbhPidents: Seq[Double] = bbhHits.flatMap{ case (row, _) => parseDouble(row.select(pident)) }
-
-        // nodes corresponding to the max-bitscore hits
-        val bbhNodes: Seq[TitanTaxon] = bbhHits
-          .flatMap(_._2).distinct // only distinct Tax IDs
-          .flatMap(taxonomyGraph.getTaxon)
-
-        // BBH node is the lowest common ancestor of the most rank-specific nodes
-        val bbhNode: BBH =
-          ( maximums(bbhNodes) { _.rankNumber } ) lowestCommonAncestor taxonomyGraph
-
-        //// Lowest Common Ancestor ////
-
-        // NOTE: currently we leave only hits with the same maximum pident,
-        // so calculating average doesn't change anything, but it can be changed
-        val allPidents: Seq[Double] = hits.flatMap{ row => parseDouble(row.select(pident)) }
-
-        // nodes corresponding to all hits
-        val allNodes: Seq[TitanTaxon] = assignments
-          .flatMap(_._2).distinct // only distinct Tax IDs
-          .flatMap(taxonomyGraph.getTaxon)
-
-        val lcaNode: LCA =
-          allNodes lowestCommonAncestor taxonomyGraph
-
-        import csv.columns._
-
-        // writing results
-        bbhWriter.addVals(
-          ReadID(readId)        ::
-          Taxa(bbhNode.id)      ::
-          TaxName(bbhNode.name) ::
-          TaxRank(bbhNode.rank) ::
-          Pident(f"${averageOf(bbhPidents)}%.2f") ::
-          *[AnyDenotation]
-        )
-
-        lcaWriter.addVals(
-          ReadID(readId)        ::
-          Taxa(lcaNode.id)      ::
-          TaxName(lcaNode.name) ::
-          TaxRank(lcaNode.rank) ::
-          Pident(f"${averageOf(allPidents)}%.2f") ::
-          *[AnyDenotation]
-        )
+        // BBH (LCA of best hits with best ranks)
+        writeResult(bbhWriter)(readId,
+          // best hits are those that have maximum in the `bitscore` column
+          allAssignments.maximumsBy { case (row, _) => parseLong(row.select(bitscore)).getOrElse(0L) },
+          // BBH node is the lowest common ancestor of the most rank-specific nodes
+          { nodes => nodes.maximumsBy(_.rankNumber) })
       }
 
     blastReader.close()
