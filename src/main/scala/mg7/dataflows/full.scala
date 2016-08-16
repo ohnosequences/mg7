@@ -51,44 +51,6 @@ trait AnyFullDataflow extends AnyNoFlashDataflow {
   val splitInputs: Map[SampleID, S3Resource] =
     flashDataMappings.map { flashDM => flashDM.label -> flashDM.remoteOutput(data.mergedReads) }.toMap
 
-  lazy val statsDataMappings: List[AnyDataMapping] =
-    List[List[AnyDataMapping]](
-      flashDataMappings,
-      mergeDataMappings,
-      assignDataMappings
-    ).flatten
-    .groupBy { _.label }
-    .map {
-      case (sampleID: String, dms: List[AnyDataMapping]) =>
-        val outputs: Map[AnyData, S3Resource] =
-          dms.map{ _.remoteOutput }.foldLeft(Map[AnyData, S3Resource]()){ _ ++ _ }
-
-        DataMapping(sampleID, statsDataProcessing)(
-          remoteInput = Map[AnyData, AnyRemoteResource](
-            data.sampleID       -> MessageResource(sampleID),
-            data.pairedReads1   -> flashInputs(sampleID)._1,
-            data.mergedReads    -> outputs(data.mergedReads),
-            data.pair1NotMerged -> outputs(data.pair1NotMerged),
-            data.blastNoHits    -> outputs(data.blastNoHits)
-          ),
-          remoteOutput = Map(
-            data.sampleStatsCSV -> S3Resource(params.outputS3Folder("samples", "stats") / s"${sampleID}.stats.csv")
-          )
-        )
-    }
-    .toList
-
-  lazy val summaryDataMappings: List[AnyDataMapping] =
-    List(
-      DataMapping("summmary", summaryDataProcessing)(
-        remoteInput = Map(
-          data.sampleStatsFolder -> S3Resource(params.outputS3Folder("samples", "stats"))
-        ),
-        remoteOutput = Map(
-          data.summaryStatsCSV -> S3Resource(params.outputS3Folder("summary", "stats") / s"summary.csv")
-        )
-      )
-    )
 }
 
 case class FullDataflow[P <: AnyMG7Parameters](val params: P)(val flashInputs: Map[SampleID, (S3Resource, S3Resource)])

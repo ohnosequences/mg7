@@ -38,8 +38,6 @@ dependencyOverrides ++= Set(
 wartremoverErrors in (Test, compile) := Seq()
 wartremoverErrors in (Compile, compile) := Seq()
 
-addFatArtifactPublishing(Test)
-
 mergeStrategy in assembly ~= { old => {
     case "log4j.properties"                       => MergeStrategy.filterDistinctLines
     case PathList("org", "apache", "commons", _*) => MergeStrategy.first
@@ -47,13 +45,11 @@ mergeStrategy in assembly ~= { old => {
   }
 }
 
-enablePlugins(BuildInfoPlugin)
-buildInfoPackage := "generated.metadata"
-buildInfoObject  := name.value
-buildInfoOptions := Seq(BuildInfoOption.Traits("ohnosequences.statika.AnyArtifactMetadata"))
-buildInfoKeys    := Seq[BuildInfoKey](
-  organization,
-  version,
-  "artifact"    -> name.value.toLowerCase,
-  "artifactUrl" -> fatArtifactUrl.value
-)
+
+generateStatikaMetadataIn(Compile)
+
+// This includes tests sources in the assembled fat-jar:
+fullClasspath in assembly := (fullClasspath in Test).value
+
+// This turns on fat-jar publishing during release process:
+publishFatArtifact in Release := true
