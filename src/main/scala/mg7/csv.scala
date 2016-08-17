@@ -103,14 +103,14 @@ case object csv {
       AveragePident(AveragePident.label) ::
       *[AnyDenotation]
 
-    case object direct {
-      val absolute  = header("direct.absolute.counts")
-      val frequency = header("direct.frequency.counts")
-    }
-    case object accum {
-      val absolute  = header("accum.absolute.percentage")
-      val frequency = header("accum.frequency.percentage")
-    }
+    // case object direct {
+    //   val absolute  = header("direct.absolute.counts")
+    //   val frequency = header("direct.frequency.counts")
+    // }
+    // case object accum {
+    //   val absolute  = header("accum.absolute.percentage")
+    //   val frequency = header("accum.frequency.percentage")
+    // }
   }
 
 
