@@ -9,9 +9,9 @@ import com.amazonaws.services.s3.transfer._
 
 import better.files._
 
-
 // TODO: the non-bundle part of the trait could be put in the blast-api lib
 trait AnyReferenceDB extends AnyBundle {
+
   val name: String
   val blastDBS3:  S3Folder
   val id2taxasS3: S3Object
@@ -37,4 +37,5 @@ abstract class ReferenceDB(
   val name: String,
   val blastDBS3:  S3Folder,
   val id2taxasS3: S3Object
-) extends Bundle() with AnyReferenceDB
+)
+extends Bundle() with AnyReferenceDB

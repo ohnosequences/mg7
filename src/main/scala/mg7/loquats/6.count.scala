@@ -1,28 +1,24 @@
 package ohnosequences.mg7.loquats
 
-import ohnosequences.mg7._
-
-import ohnosequences.mg7.bio4j._, taxonomyTree._, titanTaxonomyTree._
-
+import ohnosequences.mg7._, csv._
+import ohnosequences.ncbitaxonomy._, api.{ Taxa => TaxaOps, Taxon => _, _ }, titan._
 import ohnosequences.loquat._
-
 import ohnosequences.statika._
 import ohnosequences.cosas._, types._, klists._
 import ohnosequences.datasets._
-
 import better.files._
-import com.github.tototoshi.csv._
-
 import com.bio4j.titan.model.ncbiTaxonomy.TitanNCBITaxonomyGraph
 
-
 case object countDataProcessing extends DataProcessingBundle(
-  bio4j.taxonomyBundle
-)(input = data.countInput,
-  output = data.countOutput
-) {
+  ncbiTaxonomyBundle
+)(
+  input   = data.countInput,
+  output  = data.countOutput
+)
+{
 
-  lazy val taxonomyGraph: TitanNCBITaxonomyGraph = bio4j.taxonomyBundle.graph
+  lazy val taxonomyGraph: TitanNCBITaxonomyGraph =
+    ncbiTaxonomyBundle.graph
 
   def instructions: AnyInstructions = say("I'm counting you!")
 
@@ -34,15 +30,15 @@ case object countDataProcessing extends DataProcessingBundle(
     }
 
   def directCounts(
-    taxIDs: List[TaxID],
-    getLineage: TaxID => Seq[TaxID]
-  ): Map[TaxID, (Int, Seq[TaxID])] = {
+    taxIDs: Taxa,
+    getLineage: Taxon => Taxa
+  ): Map[Taxon, (Int, Taxa)] = {
 
     @scala.annotation.tailrec
     def rec(
-      list: List[TaxID],
-      acc: Map[TaxID, (Int, Seq[TaxID])]
-    ): Map[TaxID, (Int, Seq[TaxID])] = list match {
+      list: Taxa,
+      acc: Map[Taxon, (Int, Taxa)]
+    ): Map[Taxon, (Int, Taxa)] = list match {
       case Nil => acc
       case h :: t => {
         val (n, rest) = count(h, t)
@@ -50,16 +46,16 @@ case object countDataProcessing extends DataProcessingBundle(
       }
     }
 
-    rec(taxIDs, Map[TaxID, (Int, Seq[TaxID])]())
+    rec(taxIDs, Map())
   }
 
   def accumulatedCounts(
-    directCounts: Map[TaxID, (Int, Seq[TaxID])],
-    getLineage: TaxID => Seq[TaxID]
-  ): Map[TaxID, (Int, Seq[TaxID])] = {
+    directCounts: Map[Taxon, (Int, Taxa)],
+    getLineage: Taxon => Taxa
+  ): Map[Taxon, (Int, Taxa)] = {
 
     directCounts.foldLeft(
-      Map[TaxID, (Int, Seq[TaxID])]()
+      Map[Taxon, (Int, Taxa)]()
     ) { case (accumCounts, (taxID, (directCount, lineage))) =>
 
       lineage.foldLeft(
@@ -81,97 +77,100 @@ case object countDataProcessing extends DataProcessingBundle(
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
 
     // same thing that we do for lca and bbh
+    // TODO create a local case class or record for the return type
     def processFile(assignsFile: File): (File, File, File, File) = {
 
-      val assignsReader: CSVReader = csv.newReader(assignsFile)
-      val assigns: List[(TaxID, String)] = assignsReader.allWithHeaders.map { row =>
-        (row(csv.columnNames.TaxID), row(csv.columnNames.Pident))
-      }
-      assignsReader.close
+      val assignsReader = csv.Reader(assignment.columns)(assignsFile)
 
-      val taxIDs: List[TaxID] = assigns.map(_._1)
+      val assigns: List[(Taxon, String)] = assignsReader.rows.map { row =>
+        (
+          row.select(columns.Taxa),
+          row.select(columns.Pident)
+        )
+      }.toList
 
-      val averagePidents: Map[TaxID, String] = assigns
+      assignsReader.close()
+
+      val taxIDs: Taxa = assigns.map(_._1)
+
+      val averagePidents: Map[Taxon, String] = assigns
         .toStream.groupBy { _._1 } // group by taxIDs
         .map { case (taxID, pairs) =>
 
           val pidents: Stream[Double] =
             pairs.flatMap { case (_, pident) => parseDouble(pident) }
 
-          taxID -> f"${averageOf(pidents)}%.2f"
+          taxID -> f"${pidents.average}%.2f"
         }
 
       // there as many assigned reads as there are tax IDs in the table
       val assignedReadsNumber: Double = taxIDs.length
       def frequency(absolute: Int): Double = absolute / assignedReadsNumber
 
-      val lineageMap: scala.collection.mutable.Map[TaxID, Seq[TaxID]] = scala.collection.mutable.Map()
+      val lineageMap: scala.collection.mutable.Map[Taxon, Taxa] = scala.collection.mutable.Map()
 
-      def getLineage(id: TaxID): Seq[TaxID] =
+      def getLineage(id: Taxon): Taxa =
         lineageMap.get(id).getOrElse {
-          val lineage = taxonomyGraph.getNode(id)
-            .map{ _.lineage }.getOrElse( Seq() )
+          val lineage = taxonomyGraph.getTaxon(id)
+            .map{ _.ancestors }.getOrElse( Seq() )
             .map{ _.id }
           lineageMap.update(id, lineage)
           lineage
         }
 
-      val direct:      Map[TaxID, (Int, Seq[TaxID])] = directCounts(taxIDs, getLineage)
-      val accumulated: Map[TaxID, (Int, Seq[TaxID])] = accumulatedCounts(direct, getLineage)
+      val direct:      Map[Taxon, (Int, Taxa)] = directCounts(taxIDs, getLineage)
+      val accumulated: Map[Taxon, (Int, Taxa)] = accumulatedCounts(direct, getLineage)
 
       val filesPrefix: String = assignsFile.name.stripSuffix(".csv")
 
+      // TODO all this file output format-related code should be part of global configuration
       val outDirectFile = context / s"${filesPrefix}.direct.absolute.counts"
       val outAccumFile  = context / s"${filesPrefix}.accum.absolute.counts"
       val outDirectFreqFile = context / s"${filesPrefix}.direct.frequency.percentage"
       val outAccumFreqFile  = context / s"${filesPrefix}.accum.frequency.percentage"
 
-      val csvDirectWriter = csv.newWriter(outDirectFile)
-      val csvAccumWriter  = csv.newWriter(outAccumFile)
-      val csvDirectFreqWriter = csv.newWriter(outDirectFreqFile)
-      val csvAccumFreqWriter  = csv.newWriter(outAccumFreqFile)
+      val csvDirectWriter     = csv.Writer(csv.counts.columns)(outDirectFile)
+      val csvAccumWriter      = csv.Writer(csv.counts.columns)(outAccumFile)
+      val csvDirectFreqWriter = csv.Writer(csv.counts.columns)(outDirectFreqFile)
+      val csvAccumFreqWriter  = csv.Writer(csv.counts.columns)(outAccumFreqFile)
 
-      def headerFor(file: File) = List(
-        csv.columnNames.Lineage,
-        csv.columnNames.TaxID,
-        csv.columnNames.TaxRank,
-        csv.columnNames.TaxName,
-        file.name.replaceAll("\\.", "-"),
-        "Average-Pident"
-      )
-      csvDirectWriter.writeRow(headerFor(outDirectFile))
-      csvAccumWriter.writeRow(headerFor(outAccumFile))
-      csvDirectFreqWriter.writeRow(headerFor(outDirectFreqFile))
-      csvAccumFreqWriter.writeRow(headerFor(outAccumFreqFile))
+      // TODO all this file output format-related code should be part of global configuration (see #31)
+      def headerRow(file: File) = Row(csv.counts.columns)(csv.counts.header(file.name.replaceAll("\\.", "-")))
+
+      csvDirectWriter.addRow(headerRow(outDirectFile))
+      csvAccumWriter.addRow(headerRow(outAccumFile))
+      csvDirectFreqWriter.addRow(headerRow(outDirectFreqFile))
+      csvAccumFreqWriter.addRow(headerRow(outAccumFreqFile))
 
       def writeCounts(
-        counts: Map[TaxID, (Int, Seq[TaxID])],
-        writerAbs: CSVWriter,
-        writerFrq: CSVWriter
-      ) = counts foreach { case (taxID, (absoluteCount, lineage)) =>
+        countsMap: Map[Taxon, (Int, Taxa)],
+        writerAbs: csv.Writer[csv.counts.Columns],
+        writerFrq: csv.Writer[csv.counts.Columns]
+      ) = countsMap foreach { case (taxa, (absoluteCount, lineage)) =>
 
-        val node: Option[TitanTaxonNode] = taxonomyGraph.getNode(taxID)
+        val node: Option[TitanTaxon] = taxonomyGraph.getTaxon(taxa)
 
-        def row(count: String) = Seq[String](
-          lineage.mkString(";"),
-          taxID,
-          node.map(_.rank).getOrElse(""),
-          node.map(_.name).getOrElse(""),
-          count,
-          averagePidents.get(taxID).getOrElse("-")
+        def row(count: String) = Row(csv.counts.columns)(
+          columns.Lineage(lineage.mkString(";")) ::
+          columns.Taxa(taxa) ::
+          columns.TaxRank(node.map(_.rank).getOrElse("")) ::
+          columns.TaxName(node.map(_.name).getOrElse("")) ::
+          columns.Count(count) ::
+          columns.AveragePident(averagePidents.get(taxa).getOrElse("-")) ::
+          *[AnyDenotation]
         )
 
-        writerAbs.writeRow(row( absoluteCount.toString ))
-        writerFrq.writeRow(row( f"${frequency(absoluteCount) * 100}%.4f" ))
+        writerAbs.addRow(row( absoluteCount.toString ))
+        writerFrq.addRow(row( f"${frequency(absoluteCount) * 100}%.4f" ))
       }
 
       writeCounts(direct,      csvDirectWriter, csvDirectFreqWriter)
       writeCounts(accumulated, csvAccumWriter,  csvAccumFreqWriter)
 
-      csvDirectWriter.close
-      csvAccumWriter.close
-      csvDirectFreqWriter.close
-      csvAccumFreqWriter.close
+      csvDirectWriter.close()
+      csvAccumWriter.close()
+      csvDirectFreqWriter.close()
+      csvAccumFreqWriter.close()
 
       (
         outDirectFile,
@@ -181,21 +180,22 @@ case object countDataProcessing extends DataProcessingBundle(
       )
     }
 
+    // TODO use data records directly instead of this ugly tuple business
     val lcaCounts = processFile( context.inputFile(data.lcaCSV) )
     val bbhCounts = processFile( context.inputFile(data.bbhCSV) )
 
     success(
       s"Results are written to ...",
       // LCA
-      data.lcaDirectCountsCSV(lcaCounts._1) ::
-      data.lcaAccumCountsCSV(lcaCounts._2) ::
+      data.lcaDirectCountsCSV(lcaCounts._1)     ::
+      data.lcaAccumCountsCSV(lcaCounts._2)      ::
       data.lcaDirectFreqCountsCSV(lcaCounts._3) ::
-      data.lcaAccumFreqCountsCSV(lcaCounts._4) ::
+      data.lcaAccumFreqCountsCSV(lcaCounts._4)  ::
       // BBH
-      data.bbhDirectCountsCSV(bbhCounts._1) ::
-      data.bbhAccumCountsCSV(bbhCounts._2) ::
+      data.bbhDirectCountsCSV(bbhCounts._1)     ::
+      data.bbhAccumCountsCSV(bbhCounts._2)      ::
       data.bbhDirectFreqCountsCSV(bbhCounts._3) ::
-      data.bbhAccumFreqCountsCSV(bbhCounts._4) ::
+      data.bbhAccumFreqCountsCSV(bbhCounts._4)  ::
       *[AnyDenotation { type Value <: FileResource }]
     )
   }
