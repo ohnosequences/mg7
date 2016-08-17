@@ -24,6 +24,10 @@ trait AnyDataflow {
 
       val sampleId = mergeDM.label
 
+      def outputFor(d: FileData): (FileData, S3Resource) = {
+        d -> S3Resource(params.outputS3Folder(sampleId, "count") / s"${sampleId}.${d.baseName}.csv")
+      }
+
       DataMapping(sampleId, countDataProcessing)(
 
         remoteInput = Map(
@@ -32,14 +36,14 @@ trait AnyDataflow {
         ),
 
         remoteOutput = Map(
-          data.lcaDirectCountsCSV     -> S3Resource(params.outputS3Folder(sampleId, "count") / s"${sampleId}.lca.direct.absolute.counts.csv"),
-          data.lcaAccumCountsCSV      -> S3Resource(params.outputS3Folder(sampleId, "count") / s"${sampleId}.lca.accum.absolute.counts.csv"),
-          data.lcaDirectFreqCountsCSV -> S3Resource(params.outputS3Folder(sampleId, "count") / s"${sampleId}.lca.direct.frequency.counts.csv"),
-          data.lcaAccumFreqCountsCSV  -> S3Resource(params.outputS3Folder(sampleId, "count") / s"${sampleId}.lca.accum.frequency.counts.csv"),
-          data.bbhDirectCountsCSV     -> S3Resource(params.outputS3Folder(sampleId, "count") / s"${sampleId}.bbh.direct.absolute.counts.csv"),
-          data.bbhAccumCountsCSV      -> S3Resource(params.outputS3Folder(sampleId, "count") / s"${sampleId}.bbh.accum.absolute.counts.csv"),
-          data.bbhDirectFreqCountsCSV -> S3Resource(params.outputS3Folder(sampleId, "count") / s"${sampleId}.bbh.direct.frequency.counts.csv"),
-          data.bbhAccumFreqCountsCSV  -> S3Resource(params.outputS3Folder(sampleId, "count") / s"${sampleId}.bbh.accum.frequency.counts.csv")
+          outputFor(data.lca.direct.absolute),
+          outputFor(data.lca.accum.absolute),
+          outputFor(data.lca.direct.relative),
+          outputFor(data.lca.accum.relative),
+          outputFor(data.bbh.direct.absolute),
+          outputFor(data.bbh.accum.absolute),
+          outputFor(data.bbh.direct.relative),
+          outputFor(data.bbh.accum.relative)
         )
       )
     }
