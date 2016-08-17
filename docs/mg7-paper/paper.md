@@ -121,9 +121,9 @@ Bio4j [@pareja2015bio4j] is a data platform integrating data from different reso
 
 ### 16S-DB7 Reference Database Construction
 
-The starting point for our 16S reference database is RNA Central [@rnacentral2014rnacentral], [version 5][rnacentral v5]. RNACentral was chosen being the most up to date, comprehensive RNA sequence repository, including among others all RNA data from Silva, GreenGenes, RDP, ENA, and RefSeq<!-- TODO cite them -->. First we take those sequences which
+The starting point for our 16S reference database is RNA Central [@rnacentral2014rnacentral], [version 5][rnacentral v5]. RNAcentral was chosen being the most up to date, comprehensive RNA sequence repository, including among others all RNA data from Silva, GreenGenes, RDP, ENA, and RefSeq<!-- TODO cite them -->. First we take those sequences which
 
-1. are annotated as being of `rRNA` type^[We are aware of the existence of a gene annotation corresponding to 16S in RNACentra, that we are **not using** due to a significant amount of 16S sequences lacking it]
+1. are annotated as being of `rRNA` type^[We are aware of the existence of a gene annotation corresponding to 16S in RNAcentral, that we are **not using** due to a significant amount of 16S sequences lacking it]
 2. their length is at least `1300`^[Note that 16S sequences are sometimes part of an entry corresponding to whole small subunits; that's why we do not set a maximum length threshold]
 3. have at least one taxonomic assignment to a descendant of *Bacteria* or *Archaea*
 4. their lineage does not contain a set of taxa deemed uninformative^[for example: "unclassified Bacteria (miscellaneous)" or "unclassified". Assigning a read to an "unclassified" taxon defeats the first and foremost goal of taxonomic profiling: *classification*.]
@@ -139,7 +139,7 @@ In any other case, under our assumptions, this assignment should be discarded.
 
 <!-- TODO I think there should be a figure here, explaining how wrong assignments would be detected and discarded, and why our definition of close is a good one. -->
 
-All these steps are automated, and integrated with every release of our reference database. The whole process can be repeated and adapted to other subsets of RNACentral; we do this for an 18S reference database.
+All these steps are automated, and integrated with every release of our reference database. The whole process can be repeated and adapted to other subsets of RNAcentral; we do this for an 18S reference database.
 
 ## Workflow Description
 
