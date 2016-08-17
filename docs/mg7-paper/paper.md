@@ -130,12 +130,12 @@ The starting point for our 16S reference database is RNA Central [@rnacentral201
 
 After this first step, we drop redundant assignments: if sequences $S_1 \subseteq S_2$ share an assignment $T$, it gets dropped from $S_1$; sequences which as a result of this process end up having no assignments are removed.
 
-Once we have non-redundant set of RNA sequences containing all those corresponding to 16S, we can apply our procedure for checking internal consistency of taxonomic assignments. We run MG7 using this set of sequences as query, with reference all but the one we are trying to assign. Under the (reasonable) assumption of 16S sequence similarity being correlated with the taxonomy tree topology, the MG7 result should either
+Once we have a non-redundant set of ribosomal RNA sequences (containing all those corresponding to 16S), we can apply our procedure for checking internal consistency of taxonomic assignments. We run MG7 using this set of sequences as query, with reference all but the one we are trying to assign. Under the (reasonable) assumption of 16S sequence similarity being correlated with the taxonomy tree topology, the resulting MG7 taxonomic assignment should either
 
-1. be a taxon *close* to the original assignment, if there are sequences similar enough in the reference database
-2. be empty, due to this sequence having no similar sequences in the reference database
+1. be a taxon *close* to the original assignment, if there are sequences similar enough in the reference database; what we consider as close is: the parent of the MG7 assignment should be contained in the lineage of the original assignment.
+2. be empty, due to this sequence having no similar sequences in the reference database, thus making impossible to do any taxonomic assignment.
 
-In any other case, under our assumptions, this assignment should be discarded. What we consider as close is: the parent of the MG7 assignment should be contained in the lineage of the original assignment.
+In any other case, under our assumptions, this assignment should be discarded.
 
 <!-- TODO I think there should be a figure here, explaining how wrong assignments would be detected and discarded, and why our definition of close is a good one. -->
 
