@@ -1,5 +1,3 @@
-Nice.scalaProject
-
 name          := "mg7"
 organization  := "ohnosequences"
 description   := "Configurable, scalable 16S metagenomics data analysis"
@@ -14,9 +12,10 @@ resolvers := Seq(
 
 libraryDependencies ++= Seq(
   // APIs:
-  "ohnosequences" %% "flash"      % "0.3.0",
-  "ohnosequences" %% "fastarious" % "0.6.0",
-  "ohnosequences" %% "blast-api"  % "0.7.0",
+  "ohnosequences" %% "flash"        % "0.3.0",
+  "ohnosequences" %% "fastarious"   % "0.6.0",
+  "ohnosequences" %% "blast-api"    % "0.7.0",
+  "ohnosequences" %% "ncbitaxonomy" % "0.1.0",
   // generic tools:
   "ohnosequences" %% "cosas"        % "0.8.0",
   "ohnosequences" %% "datasets"     % "0.3.0",
@@ -25,10 +24,9 @@ libraryDependencies ++= Seq(
   // bundles:
   "ohnosequences-bundles" %% "flash"      % "0.2.0",
   "ohnosequences-bundles" %% "blast"      % "0.3.0",
-  "ohnosequences-bundles" %% "bio4j-dist" % "0.2.0",
   // testing:
-  "era7bio"       %% "db-rna16s" % "0.6.5" % Test,
-  "org.scalatest" %% "scalatest" % "2.2.6" % Test
+  "ohnosequences" %% "db-rna16s" % "0.9.0-60-g5090204"  % Test,
+  "org.scalatest" %% "scalatest" % "2.2.6"              % Test
 )
 
 dependencyOverrides ++= Set(
@@ -36,9 +34,10 @@ dependencyOverrides ++= Set(
   "org.slf4j"                 % "slf4j-api"  % "1.7.7"
 )
 
+// NOTE should be reestablished
+wartremoverErrors in (Test, compile) := Seq()
+wartremoverErrors in (Compile, compile) := Seq()
 
-fatArtifactSettings
-// copied from bio4j-titan:
 mergeStrategy in assembly ~= { old => {
     case "log4j.properties"                       => MergeStrategy.filterDistinctLines
     case PathList("org", "apache", "commons", _*) => MergeStrategy.first
@@ -46,13 +45,11 @@ mergeStrategy in assembly ~= { old => {
   }
 }
 
-enablePlugins(BuildInfoPlugin)
-buildInfoPackage := "generated.metadata"
-buildInfoObject  := name.value
-buildInfoOptions := Seq(BuildInfoOption.Traits("ohnosequences.statika.AnyArtifactMetadata"))
-buildInfoKeys    := Seq[BuildInfoKey](
-  organization,
-  version,
-  "artifact"    -> name.value.toLowerCase,
-  "artifactUrl" -> fatArtifactUrl.value
-)
+
+generateStatikaMetadataIn(Test)
+
+// This includes tests sources in the assembled fat-jar:
+fullClasspath in assembly := (fullClasspath in Test).value
+
+// This turns on fat-jar publishing during release process:
+publishFatArtifact in Release := true

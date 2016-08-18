@@ -6,15 +6,14 @@ import ohnosequences.statika._
 import ohnosequences.cosas._, types._, klists._
 import ohnosequences.datasets._
 import ohnosequences.fastarious._, fasta._
-
 import better.files._
 import collection.JavaConversions._
 
-
 case class splitDataProcessing(params: AnyMG7Parameters) extends DataProcessingBundle()(
-  input = data.splitInput,
-  output = data.splitOutput
-) {
+  input   = data.splitInput,
+  output  = data.splitOutput
+)
+{
 
   def instructions: AnyInstructions = say("Splitting, cutting, separating")
 
@@ -23,6 +22,7 @@ case class splitDataProcessing(params: AnyMG7Parameters) extends DataProcessingB
     val outputDir = context / "chunks"
 
     LazyTry {
+
       outputDir.createDirectories()
 
       val lines: Iterator[String] = context.inputFile(data.mergedReads).lines
@@ -44,10 +44,10 @@ case class splitDataProcessing(params: AnyMG7Parameters) extends DataProcessingB
             .overwrite(chunk.mkString("\n"))
         }
     } -&-
-    success("chunk-chunk-chunk!",
+    success(
+      "chunk-chunk-chunk!",
       data.fastaChunks(outputDir) ::
       *[AnyDenotation { type Value <: FileResource }]
     )
-
   }
 }
