@@ -5,7 +5,6 @@ import ohnosequences.cosas._, types._, klists._
 
 case object data {
 
-  // Flash:
   case object pairedReads1 extends FileData("reads1")("fastq.gz")
   case object pairedReads2 extends FileData("reads2")("fastq.gz")
 
@@ -27,13 +26,11 @@ case object data {
     |[AnyData]
   )
 
-
   // Reads after splitting (multiple files in a virtual S3 folder):
   case object fastaChunks extends Data("reads-chunks")
 
-  case object splitInput extends DataSet(mergedReads :×: |[AnyData])
+  case object splitInput  extends DataSet(mergedReads :×: |[AnyData])
   case object splitOutput extends DataSet(fastaChunks :×: |[AnyData])
-
 
   // Blast input:
   case object fastaChunk extends FileData("reads")("fastq")
@@ -65,8 +62,6 @@ case object data {
     |[AnyData]
   )
 
-
-
   // all output chunks together:
   case object blastChunksFolder extends Data("blast-chunks")
   case object blastNoHitsFolder extends Data("blast-no-hits")
@@ -81,29 +76,35 @@ case object data {
   case object mergeInput extends DataSet(
     blastChunksFolder :×:
     blastNoHitsFolder :×:
-    lcaChunksFolder :×:
-    bbhChunksFolder :×:
+    lcaChunksFolder   :×:
+    bbhChunksFolder   :×:
     |[AnyData]
   )
   case object mergeOutput extends DataSet(
     blastResult :×:
     blastNoHits :×:
-    lcaCSV :×:
-    bbhCSV :×:
+    lcaCSV      :×:
+    bbhCSV      :×:
     |[AnyData]
   )
 
-
   // Counting output:
-  case object lcaDirectCountsCSV     extends FileData("lca.direct.counts")("csv")
-  case object lcaAccumCountsCSV      extends FileData("lca.accum.counts")("csv")
-  case object lcaDirectFreqCountsCSV extends FileData("lca.direct.frequency.counts")("csv")
-  case object lcaAccumFreqCountsCSV  extends FileData("lca.accum.frequency.counts")("csv")
+  class DataCounts(prefix: String) {
 
-  case object bbhDirectCountsCSV     extends FileData("bbh.direct.counts")("csv")
-  case object bbhAccumCountsCSV      extends FileData("bbh.accum.counts")("csv")
-  case object bbhDirectFreqCountsCSV extends FileData("bbh.direct.frequency.counts")("csv")
-  case object bbhAccumFreqCountsCSV  extends FileData("bbh.accum.frequency.counts")("csv")
+    case object direct extends DirectAccum("direct")
+    case object accum  extends DirectAccum("accumulated")
+
+    class DirectAccum(directaccum: String) {
+
+      case object absolute extends AbsRel("absolute.counts")
+      case object relative extends AbsRel("frequency.percentage")
+
+      class AbsRel(absrel: String)
+        extends FileData(s"${prefix}.${directaccum}.${absrel}")("csv")
+    }
+  }
+  case object lca extends DataCounts("lca")
+  case object bbh extends DataCounts("bbh")
 
   case object countInput extends DataSet(
     lcaCSV :×:
@@ -111,17 +112,16 @@ case object data {
     |[AnyData]
   )
   case object countOutput extends DataSet(
-    lcaDirectCountsCSV :×:
-    lcaAccumCountsCSV :×:
-    lcaDirectFreqCountsCSV :×:
-    lcaAccumFreqCountsCSV :×:
-    bbhDirectCountsCSV :×:
-    bbhAccumCountsCSV :×:
-    bbhDirectFreqCountsCSV :×:
-    bbhAccumFreqCountsCSV :×:
+    lca.direct.absolute :×:
+    lca.accum.absolute  :×:
+    lca.direct.relative :×:
+    lca.accum.relative  :×:
+    bbh.direct.absolute :×:
+    bbh.accum.absolute  :×:
+    bbh.direct.relative :×:
+    bbh.accum.relative  :×:
     |[AnyData]
   )
-
 
   case object sampleID extends FileData("sample-id")("txt")
   case object sampleStatsCSV extends FileData("sample.stats")("csv")
@@ -139,7 +139,6 @@ case object data {
     |[AnyData]
   )
 
-
   case object sampleStatsFolder extends Data("stats")
   case object summaryStatsCSV extends FileData("summary.stats")("csv")
 
@@ -151,6 +150,4 @@ case object data {
     summaryStatsCSV :×:
     |[AnyData]
   )
-
-
 }
