@@ -121,11 +121,25 @@ Bio4j [@pareja2015bio4j] is a data platform integrating data from different reso
 
 ### 16S-DB7 Reference Database Construction
 
-Our 16S-DB7 Reference Database is a curated subset of sequences from the NCBI nucleotide database **nt**. The sequences included were selected by similarity with the bacterial and archaeal reference sequences downloaded from the **RDP database** [@cole2013ribosomal]. RDP unaligned sequences were used to capture new 16S RNA sequences from **nt** using BLAST similarity search strategies and then, performing additional curation steps to remove sequences with poor taxonomic assignments to taxonomic nodes close to the root of the taxonomy tree.
-All the nucleotide sequences included in **nt** database has a taxonomic assignment provided by the **Genbank** sequence submitter. NCBI provides a table (available at ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/) to do the mapping of any Genbank Identifier (GI) to its Taxonomy Identifier (TaxID). Thus, we are based on a crowdsourced submitter-maintained taxonomic annotation system for reference sequences. It supposes a sustainable system able to face the expected number of reference sequences that will populate the public global nucleotide databases in the near future. Another advantageous point is that we are based on NCBI taxonomy, the *de-facto* standard taxonomic classification for biomolecular data [@cochrane20102010]. NCBI taxonomy is, undoubtedly, the most used taxonomy all over the world and the most similar to the official taxonomies of each specific field. This is a crucial point because all the type-culture and tissue databanks follow this official taxonomical classification and, in addition, all the knowledge accumulated during last decades is referred to this taxonomy. In addition NCBI provides a direct connection between taxonomical formal names and the physical specimens that serve as exemplars for the species [@federhen2014type].
+The starting point for our 16S reference database is RNA Central [@rnacentral2014rnacentral], [version 5][rnacentral v5]. RNAcentral was chosen being the most up to date, comprehensive RNA sequence repository, including among others all RNA data from Silva, GreenGenes, RDP, ENA, and RefSeq<!-- TODO cite them -->. First we take those sequences which
 
-Certainly, if metagenomics results are easily integrated with the theoretical and experimental knowledge of each specific area, the impact of metagenomics will be higher than if it progresses as a disconnected research branch. Considering that metagenomics data interoperability, which is especially critical in clinical environments, requires a stable taxonomy to be used as reference, we decided to rely on the most widely used taxonomy: the NCBI taxonomy. In addition, the biggest global sequence database GenBank follows this taxonomy to register the origin of all their submitted sequences.
-Our 16S database building strategy allows the substitution of the 16S database by any other subset of **nt**, even by the complete **nt** database if it would be needed, for example, for analyzing shotgun metagenomics data. This possibility of changing the reference database provides flexibility to the system enabling it for easy updating and project-driven personalization.
+1. are annotated as being of `rRNA` type^[We are aware of the existence of a gene annotation corresponding to 16S in RNAcentral, that we are **not using** due to a significant amount of 16S sequences lacking it]
+2. their length is at least `1300`^[Note that 16S sequences are sometimes part of an entry corresponding to whole small subunits; that's why we do not set a maximum length threshold]
+3. have at least one taxonomic assignment to a descendant of *Bacteria* or *Archaea*
+4. their lineage does not contain a set of taxa deemed uninformative^[for example: "unclassified Bacteria (miscellaneous)" or "unclassified". Assigning a read to an "unclassified" taxon defeats the first and foremost goal of taxonomic profiling: *classification*.]
+
+After this first step, we drop redundant assignments: if sequences $S_1 \subseteq S_2$ share an assignment $T$, it gets dropped from $S_1$; sequences which as a result of this process end up having no assignments are removed.
+
+Once we have a non-redundant set of ribosomal RNA sequences (containing all those corresponding to 16S), we can apply our procedure for checking internal consistency of taxonomic assignments. We run MG7 using this set of sequences as query, with reference all but the one we are trying to assign. Under the (reasonable) assumption of 16S sequence similarity being correlated with the taxonomy tree topology, the resulting MG7 taxonomic assignment should either
+
+1. be a taxon *close* to the original assignment, if there are sequences similar enough in the reference database; what we consider as close is: the parent of the MG7 assignment should be contained in the lineage of the original assignment.
+2. be empty, due to this sequence having no similar sequences in the reference database, thus making impossible to do any taxonomic assignment.
+
+In any other case, under our assumptions, this assignment should be discarded.
+
+<!-- TODO I think there should be a figure here, explaining how wrong assignments would be detected and discarded, and why our definition of close is a good one. -->
+
+All these steps are automated, and integrated with every release of our reference database. The whole process can be repeated and adapted to other subsets of RNAcentral; we do this for an 18S reference database.
 
 ## Workflow Description
 
@@ -308,3 +322,4 @@ All authors have read and approved the final manuscript.
 [blast]: https://github.com/ohnosequences/blast-api
 [cosas]: https://github.com/ohnosequences/cosas/
 [scala]: http://www.scala-lang.org/
+[rnacentral v5]: http://blog.rnacentral.org/2016/03/rnacentral-release-5.html
