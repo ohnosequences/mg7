@@ -9,12 +9,10 @@ import ohnosequences.fastarious._, fasta._
 import better.files._
 import collection.JavaConversions._
 
-case class splitDataProcessing(params: AnyMG7Parameters) extends DataProcessingBundle()(
-  input   = data.splitInput,
-  output  = data.splitOutput
-)
-{
-
+case class splitDataProcessing(parameters: AnyMG7Parameters) extends DataProcessingBundle()(
+  input  = data.splitInput,
+  output = data.splitOutput
+) {
   def instructions: AnyInstructions = say("Splitting, cutting, separating")
 
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
@@ -27,7 +25,7 @@ case class splitDataProcessing(params: AnyMG7Parameters) extends DataProcessingB
 
       val lines: Iterator[String] = context.inputFile(data.mergedReads).lines
 
-      val fastasIterator: Iterator[String] = params.splitInputFormat match {
+      val fastasIterator: Iterator[String] = parameters.splitInputFormat match {
         // if input is FastQ, we parse it, convert it to FASTA and get String version
         case FastQInput => fastq.parseFastqDropErrors(lines).map(_.toFASTA.asString)
         // if it's Fasta, we parse it and get String version
@@ -36,7 +34,7 @@ case class splitDataProcessing(params: AnyMG7Parameters) extends DataProcessingB
 
       // group it
       fastasIterator
-        .grouped(params.splitChunkSize)
+        .grouped(parameters.splitChunkSize)
         .zipWithIndex
         .foreach { case (chunk, n) =>
 

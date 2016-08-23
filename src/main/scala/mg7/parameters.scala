@@ -16,18 +16,7 @@ case object FastQInput extends SplitInputFormat
 
 trait AnyMG7Parameters {
 
-  val outputS3Folder: (SampleID, StepName) => S3Folder
-
-  /* Flash parameters */
-  val readsLength: illumina.Length
-
-  // TODO: should it be configurable?
-  lazy val flashOptions = flash.defaults.update(
-    read_len(readsLength.toInt) ::
-    max_overlap(readsLength.toInt) ::
-    *[AnyDenotation]
-  )
-
+  // val outputS3Folder: (SampleID, StepName) => S3Folder
 
   /* Split parameters */
   /* This is the number of reads in each chunk after the `split` step */
@@ -93,8 +82,9 @@ abstract class MG7Parameters[
       type Union <: BC#ValidOutputFields#Types#Union
     }
   }
-](val outputS3Folder: (SampleID, StepName) => S3Folder,
-  val readsLength: illumina.Length,
+](
+  // val outputS3Folder: (SampleID, StepName) => S3Folder,
+  // val readsLength: illumina.Length,
   val splitInputFormat: SplitInputFormat = FastQInput,
   val splitChunkSize: Int = 10,
   val blastCommand: BC,
@@ -115,6 +105,20 @@ abstract class MG7Parameters[
   type BlastCommand = BC
   type BlastOutRecKeys = BK
 }
+
+trait AnyFlashParameters {
+
+  /* Flash parameters */
+  val readsLength: illumina.Length
+
+  // TODO: should it be configurable?
+  lazy val flashOptions = flash.defaults.update(
+    read_len(readsLength.toInt) ::
+    max_overlap(readsLength.toInt) ::
+    *[AnyDenotation]
+  )
+}
+
 
 case object defaults {
 

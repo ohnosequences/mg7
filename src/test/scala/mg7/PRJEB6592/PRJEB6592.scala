@@ -53,31 +53,31 @@ case object PRJEB6592 {
 
   val dataflow = NoFlashDataflow(testParameters)(splitInputs)
 
-  case object splitConfig extends TestLoquatConfig("split", dataflow.splitDataMappings)
-  case object splitLoquat extends Loquat(splitConfig, splitDataProcessing(testParameters))
-
-  case object blastConfig extends TestLoquatConfig("blast", dataflow.blastDataMappings) {
-    // NOTE: we don't want to check input objects here because they are too many and
-    //   checking them one by one will take too long and likely fail
-    override val checkInputObjects = false
-  }
-  case object blastLoquat extends Loquat(blastConfig, blastDataProcessing(testParameters))
-
-  case object mergeConfig extends TestLoquatConfig("merge", dataflow.mergeDataMappings)
-  case object mergeLoquat extends Loquat(mergeConfig, mergeDataProcessing)
-
-  case object assignConfig extends TestLoquatConfig("assign", dataflow.assignDataMappings) {
-
-    override lazy val amiEnv = amznAMIEnv(ami, javaHeap = 3)
-
-    override lazy val workersConfig: AnyWorkersConfig = WorkersConfig(
-      instanceSpecs = InstanceSpecs(defaultAMI, r3.large),
-      purchaseModel = Spot(maxPrice = Some(0.4)),
-      groupSize = AutoScalingGroupSize(0, 1, 10)
-    )
-  }
-  case object assignLoquat extends Loquat(assignConfig, assignDataProcessing(testParameters))
-
-  case object countConfig extends TestLoquatConfig("count", dataflow.countDataMappings)
-  case object countLoquat extends Loquat(countConfig, countDataProcessing)
+  // case object splitConfig extends TestLoquatConfig("split", dataflow.splitDataMappings)
+  // case object splitLoquat extends Loquat(splitConfig, splitDataProcessing(testParameters))
+  //
+  // case object blastConfig extends TestLoquatConfig("blast", dataflow.blastDataMappings) {
+  //   // NOTE: we don't want to check input objects here because they are too many and
+  //   //   checking them one by one will take too long and likely fail
+  //   override val checkInputObjects = false
+  // }
+  // case object blastLoquat extends Loquat(blastConfig, blastDataProcessing(testParameters))
+  //
+  // case object mergeConfig extends TestLoquatConfig("merge", dataflow.mergeDataMappings)
+  // case object mergeLoquat extends Loquat(mergeConfig, mergeDataProcessing)
+  //
+  // case object assignConfig extends TestLoquatConfig("assign", dataflow.assignDataMappings) {
+  //
+  //   override lazy val amiEnv = amznAMIEnv(ami, javaHeap = 3)
+  //
+  //   override lazy val workersConfig: AnyWorkersConfig = WorkersConfig(
+  //     instanceSpecs = InstanceSpecs(defaultAMI, r3.large),
+  //     purchaseModel = Spot(maxPrice = Some(0.4)),
+  //     groupSize = AutoScalingGroupSize(0, 1, 10)
+  //   )
+  // }
+  // case object assignLoquat extends Loquat(assignConfig, assignDataProcessing(testParameters))
+  //
+  // case object countConfig extends TestLoquatConfig("count", dataflow.countDataMappings)
+  // case object countLoquat extends Loquat(countConfig, countDataProcessing)
 }

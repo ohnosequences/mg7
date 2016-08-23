@@ -37,7 +37,7 @@ case object BeiMockPipeline {
     }
     .toMap
 
-  lazy val dataflow = FullDataflow(testDefaults.Illumina.parameters)(inputSamples)
+  // lazy val dataflow = FullDataflow(testDefaults.Illumina.parameters)(inputSamples)
 
   /*
     ### mg7 steps
@@ -50,35 +50,35 @@ case object BeiMockPipeline {
     era7bio.mg7test.BeiMockPipeline.xyzLoquat.deploy(era7.defaults.yourUser)
     ```
   */
-  case object flashConfig extends TestLoquatConfig("flash", dataflow.flashDataMappings)
-  case object flashLoquat extends Loquat(flashConfig, flashDataProcessing(testDefaults.Illumina.parameters))
-
-  case object splitConfig extends TestLoquatConfig("split", dataflow.splitDataMappings)
-  case object splitLoquat extends Loquat(splitConfig, splitDataProcessing(testDefaults.Illumina.parameters))
-
-  case object blastConfig extends TestLoquatConfig("blast", dataflow.blastDataMappings) {
-    // NOTE: we don't want to check input objects here because they are too many and
-    //   checking them one by one will take too long and likely fail
-    override val checkInputObjects = false
-    override lazy val workersConfig = testDefaults.Illumina.blastWorkers
-  }
-  case object blastLoquat extends Loquat(blastConfig, blastDataProcessing(testDefaults.Illumina.parameters))
-
-  case object assignConfig extends TestLoquatConfig("assign", dataflow.assignDataMappings) {
-
-    override val checkInputObjects = false
-    override lazy val amiEnv = amznAMIEnv(ami, javaHeap = 10)
-    override lazy val workersConfig = testDefaults.Illumina.assignWorkers
-  }
-  case object assignLoquat extends Loquat(assignConfig, assignDataProcessing(testDefaults.Illumina.parameters))
-
-  case object mergeConfig extends TestLoquatConfig("merge", dataflow.mergeDataMappings) {
-
-    override val skipEmptyResults = false
-    override lazy val workersConfig: AnyWorkersConfig = testDefaults.Illumina.mergeWorkers
-  }
-  case object mergeLoquat extends Loquat(mergeConfig, mergeDataProcessing)
-
-  case object countConfig extends TestLoquatConfig("count", dataflow.countDataMappings)
-  case object countLoquat extends Loquat(countConfig, countDataProcessing)
+  // case object flashConfig extends TestLoquatConfig("flash", dataflow.flashDataMappings)
+  // case object flashLoquat extends Loquat(flashConfig, flashDataProcessing(testDefaults.Illumina.parameters))
+  //
+  // case object splitConfig extends TestLoquatConfig("split", dataflow.splitDataMappings)
+  // case object splitLoquat extends Loquat(splitConfig, splitDataProcessing(testDefaults.Illumina.parameters))
+  //
+  // case object blastConfig extends TestLoquatConfig("blast", dataflow.blastDataMappings) {
+  //   // NOTE: we don't want to check input objects here because they are too many and
+  //   //   checking them one by one will take too long and likely fail
+  //   override val checkInputObjects = false
+  //   override lazy val workersConfig = testDefaults.Illumina.blastWorkers
+  // }
+  // case object blastLoquat extends Loquat(blastConfig, blastDataProcessing(testDefaults.Illumina.parameters))
+  //
+  // case object assignConfig extends TestLoquatConfig("assign", dataflow.assignDataMappings) {
+  //
+  //   override val checkInputObjects = false
+  //   override lazy val amiEnv = amznAMIEnv(ami, javaHeap = 10)
+  //   override lazy val workersConfig = testDefaults.Illumina.assignWorkers
+  // }
+  // case object assignLoquat extends Loquat(assignConfig, assignDataProcessing(testDefaults.Illumina.parameters))
+  //
+  // case object mergeConfig extends TestLoquatConfig("merge", dataflow.mergeDataMappings) {
+  //
+  //   override val skipEmptyResults = false
+  //   override lazy val workersConfig: AnyWorkersConfig = testDefaults.Illumina.mergeWorkers
+  // }
+  // case object mergeLoquat extends Loquat(mergeConfig, mergeDataProcessing)
+  //
+  // case object countConfig extends TestLoquatConfig("count", dataflow.countDataMappings)
+  // case object countLoquat extends Loquat(countConfig, countDataProcessing)
 }
