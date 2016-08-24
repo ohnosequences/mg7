@@ -2,25 +2,44 @@ package ohnosequences.mg7
 
 import ohnosequences.mg7.loquats._
 import ohnosequences.loquat._
+import ohnosequences.statika._, aws._
 import ohnosequences.datasets._
 import ohnosequences.awstools.s3._
 import com.amazonaws.auth._, profile._
 
 
-trait AnyMG7Pipeline {
-
-  val inputSamples: Map[SampleID, S3Resource]
-  val outputS3Folder: (SampleID, StepName) => S3Folder
+trait AnyMG7Pipeline { pipeline =>
 
   type Parameters <: AnyMG7Parameters
   val  parameters: Parameters
 
-  val splitConfig:  AnySplitConfig
-  val blastConfig:  AnyBlastConfig
-  val assignConfig: AnyAssignConfig
-  val mergeConfig:  AnyMergeConfig
-  val countConfig:  AnyCountConfig
+  val inputSamples: Map[SampleID, S3Resource]
+  val outputS3Folder: (SampleID, StepName) => S3Folder
 
+  val metadata: AnyArtifactMetadata
+  val iamRoleName: String
+  val logsBucketName: String
+
+  /* This trait helps to set these common values */
+  trait CommonConfigDefaults {
+
+    val metadata: AnyArtifactMetadata = pipeline.metadata
+    val iamRoleName: String           = pipeline.iamRoleName
+    val logsBucketName: String        = pipeline.logsBucketName
+  }
+
+  case class  SplitConfig(val size: Int) extends AnySplitConfig  with CommonConfigDefaults
+  case class  BlastConfig(val size: Int) extends AnyBlastConfig  with CommonConfigDefaults
+  case class AssignConfig(val size: Int) extends AnyAssignConfig with CommonConfigDefaults
+  case class  MergeConfig(val size: Int) extends AnyMergeConfig  with CommonConfigDefaults
+  case class  CountConfig(val size: Int) extends AnyCountConfig  with CommonConfigDefaults
+
+  /* You can override these values to customize configuration for each step */
+  val splitConfig:  AnySplitConfig  = SplitConfig(inputSamples.size)
+  val blastConfig:  AnyBlastConfig  = BlastConfig(inputSamples.size)
+  val assignConfig: AnyAssignConfig = AssignConfig(inputSamples.size)
+  val mergeConfig:  AnyMergeConfig  = MergeConfig(inputSamples.size)
+  val countConfig:  AnyCountConfig  = CountConfig(inputSamples.size)
 
   // Boilerplate definitions that are derived from the ones above:
 
@@ -159,10 +178,13 @@ abstract class MG7Pipeline[P <: AnyMG7Parameters](
 /* This kind of pipeline adds the Flash data preprocessing step */
 trait AnyFlashMG7Pipeline extends AnyMG7Pipeline {
 
+  val flashParameters: AnyFlashParameters
   val pairedInputs: Map[SampleID, (S3Resource, S3Resource)]
 
-  val flashParameters: AnyFlashParameters
-  val flashConfig: AnyFlashConfig
+  case class FlashConfig(val size: Int) extends AnyFlashConfig  with CommonConfigDefaults
+
+  val flashConfig: AnyFlashConfig = FlashConfig(pairedInputs.size)
+
 
   lazy val flashDataMappings = pairedInputs.toList.map { case (sampleId, (reads1S3Resource, reads2S3Resource)) =>
 
