@@ -4,8 +4,7 @@ import ohnosequences.cosas._, types._, klists._, typeUnions._
 import ohnosequences.awstools.s3._
 import ohnosequences.datasets._
 import ohnosequences.flash.api._
-import ohnosequences.blast.api._
-import ohnosequences.blast.api.{ outputFields => out }
+import ohnosequences.blast.api.{ outputFields => out, _ }
 
 
 case object defaults {
