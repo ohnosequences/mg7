@@ -15,7 +15,7 @@ import com.amazonaws.auth._, profile._
 
 case object Pacbio {
 
-  case object pipeline extends MG7Pipeline(testDefaults.PacBio.parameters) with MG7PipelineDefaults {
+  case object pipeline extends MG7Pipeline(testDefaults.PacBioParameters) with MG7PipelineDefaults {
 
     // TODO: update this to the current conventions
     val commonS3Prefix = S3Folder("era7p", "pacbio/data/")

@@ -15,7 +15,7 @@ import com.amazonaws.auth._, profile._
 
 case object BeiMock {
 
-  case object pipeline extends FlashMG7Pipeline(testDefaults.Illumina.parameters) with MG7PipelineDefaults {
+  case object pipeline extends FlashMG7Pipeline(testDefaults.IlluminaParameters) with MG7PipelineDefaults {
 
     // val commonS3Prefix = S3Folder("era7p", "mg7-test/data")
 

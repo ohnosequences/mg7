@@ -16,12 +16,12 @@ import com.amazonaws.auth._, profile._
 case object PRJEB6592 {
 
   case object parameters extends MG7Parameters(
-    // outputS3Folder  = testOutS3Folder,
-    // readsLength     = bp300,
-    blastCommand    = blastn,
-    blastOutRec     = defaults.blastnOutputRecord,
-    blastOptions    = defaults.blastnOptions.value,
-    referenceDBs    = Set(rna16sRefDB)
+    splitInputFormat = FastQInput,
+    splitChunkSize   = 10,
+    blastCommand     = blastn,
+    blastOutRec      = defaults.blastnOutputRecord,
+    blastOptions     = defaults.blastnOptions.value,
+    referenceDBs     = Set(rna16sRefDB)
   ) {
 
     // an example of how you can add some conditions to the filter predicate

@@ -31,55 +31,6 @@ case object testDefaults {
     commonS3Prefix / pipeline / sampleID / step /
   }
 
-  /*
-    ## Default Illumina parameters
-
-    These parameters are a sensible default for Illumina reads.
-  */
-  case object Illumina {
-
-    lazy val blastnOptions =
-      defaults.blastnOptions.update(
-        num_threads(4)              ::
-        word_size(46)               ::
-        evalue(BigDecimal(1E-100))  ::
-        max_target_seqs(10000)      ::
-        perc_identity(98.0)         ::
-        *[AnyDenotation]
-      ).value
-
-    case object parameters extends MG7Parameters(
-      splitChunkSize  = 1000,
-      blastCommand    = blastn,
-      blastOutRec     = defaults.blastnOutputRecord,
-      blastOptions    = blastnOptions,
-      referenceDBs    = Set(rna16sRefDB)
-    )
-  }
-
-  case object PacBio {
-
-    lazy val blastnOptions =
-      defaults.blastnOptions.update(
-        reward(1)                   ::
-        penalty(-2)                 ::
-        word_size(72)               ::
-        perc_identity(98.5)         ::
-        max_target_seqs(10000)      ::
-        evalue(BigDecimal(1e-100))  ::
-        *[AnyDenotation]
-      ).value
-
-    case object parameters extends MG7Parameters(
-      splitInputFormat  = FastQInput,
-      splitChunkSize    = 100,
-      blastCommand      = blastn,
-      blastOptions      = blastnOptions,
-      blastOutRec       = defaults.blastnOutputRecord,
-      referenceDBs      = Set(rna16sRefDB)
-    )
-  }
-
 
   trait MG7PipelineDefaults extends AnyMG7Pipeline {
 
@@ -99,4 +50,7 @@ case object testDefaults {
     localCredentials = new ProfileCredentialsProvider("default"),
     keypairName = "aalekhin"
   )
+
+  val IlluminaParameters = defaults.Illumina.parameters(rna16sRefDB)
+  val PacBioParameters = defaults.PacBio.parameters(rna16sRefDB)
 }
