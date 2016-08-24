@@ -158,35 +158,26 @@ trait AnyMG7Pipeline { pipeline =>
     }
   }
 
-  case object splitLoquat  extends Loquat(splitConfig,  splitDataProcessing(parameters))(dataMappings.split)
-  case object blastLoquat  extends Loquat(blastConfig,  blastDataProcessing(parameters))(dataMappings.blast)
-  case object assignLoquat extends Loquat(assignConfig, assignDataProcessing(parameters))(dataMappings.assign)
-  case object mergeLoquat  extends Loquat(mergeConfig,  mergeDataProcessing)(dataMappings.merge)
-  case object countLoquat  extends Loquat(countConfig,  countDataProcessing)(dataMappings.count)
+  case object split  extends Loquat(splitConfig,  splitDataProcessing(parameters))(dataMappings.split)
+  case object blast  extends Loquat(blastConfig,  blastDataProcessing(parameters))(dataMappings.blast)
+  case object assign extends Loquat(assignConfig, assignDataProcessing(parameters))(dataMappings.assign)
+  case object merge  extends Loquat(mergeConfig,  mergeDataProcessing)(dataMappings.merge)
+  case object count  extends Loquat(countConfig,  countDataProcessing)(dataMappings.count)
 }
 
-
-/* With the constructor it is just easier to bind the Parameters type member */
-abstract class MG7Pipeline[P <: AnyMG7Parameters](
-  val parameters: P
-) extends AnyMG7Pipeline {
-  type Parameters = P
-
-  /* The rest of the members can be defined inside */
-}
 
 /* This kind of pipeline adds the Flash data preprocessing step */
 trait AnyFlashMG7Pipeline extends AnyMG7Pipeline {
 
   val flashParameters: AnyFlashParameters
-  val pairedInputs: Map[SampleID, (S3Resource, S3Resource)]
+  val inputPairedReads: Map[SampleID, (S3Resource, S3Resource)]
 
   case class FlashConfig(val size: Int) extends AnyFlashConfig  with CommonConfigDefaults
 
-  val flashConfig: AnyFlashConfig = FlashConfig(pairedInputs.size)
+  val flashConfig: AnyFlashConfig = FlashConfig(inputPairedReads.size)
 
 
-  lazy val flashDataMappings = pairedInputs.toList.map { case (sampleId, (reads1S3Resource, reads2S3Resource)) =>
+  lazy val flashDataMappings = inputPairedReads.toList.map { case (sampleId, (reads1S3Resource, reads2S3Resource)) =>
 
     DataMapping(sampleId, flashDataProcessing(flashParameters))(
       remoteInput = Map(
@@ -203,9 +194,16 @@ trait AnyFlashMG7Pipeline extends AnyMG7Pipeline {
   }
 
   /* This is the input of the base pipeline derived from the output of Flash */
-  final lazy val sampleInputs: Map[SampleID, S3Resource] = flashDataMappings.map { flashDM =>
+  final lazy val inputSamples: Map[SampleID, S3Resource] = flashDataMappings.map { flashDM =>
     flashDM.label -> flashDM.remoteOutput(data.mergedReads)
   }.toMap
 
-  case object flashLoquat extends Loquat(flashConfig, flashDataProcessing(flashParameters))(flashDataMappings)
+  case object flash extends Loquat(flashConfig, flashDataProcessing(flashParameters))(flashDataMappings)
 }
+
+/* With the constructor it is just easier to bind the Parameters type member. The rest of the members can be set inside */
+abstract class MG7Pipeline[P <: AnyMG7Parameters](val parameters: P)
+  extends AnyMG7Pipeline { type Parameters = P }
+
+abstract class FlashMG7Pipeline[P <: AnyMG7Parameters](val parameters: P)
+  extends AnyFlashMG7Pipeline { type Parameters = P }

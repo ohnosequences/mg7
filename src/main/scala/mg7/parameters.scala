@@ -119,6 +119,8 @@ trait AnyFlashParameters {
   )
 }
 
+case class FlashParameters(val readsLength: illumina.Length) extends AnyFlashParameters
+
 
 case object defaults {
 

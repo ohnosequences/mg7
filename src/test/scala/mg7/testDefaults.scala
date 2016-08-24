@@ -3,7 +3,7 @@
 */
 package ohnosequences.test.mg7
 
-import ohnosequences.mg7._, loquats._, dataflows._
+import ohnosequences.mg7._, loquats._
 import ohnosequences.datasets._, illumina._
 import ohnosequences.cosas._, types._, klists._
 import ohnosequences.loquat._
@@ -22,13 +22,15 @@ case object testDefaults {
   lazy val mg7 = ohnosequences.generated.metadata.mg7
 
   /* Output test data *is* scoped by version */
-  lazy val outputS3Folder =
-    S3Folder("resources.ohnosequences.com", mg7.organization)/mg7.artifact/mg7.version
+  lazy val commonS3Prefix = S3Folder("resources.ohnosequences.com", mg7.organization) /
+    mg7.artifact /
+    mg7.version /
+    "test" /
 
-  lazy val defaultOutput: (SampleID, StepName) => S3Folder =
-    (sampleID, step) => outputS3Folder/sampleID/step/
+  def outputS3FolderFor(pipeline: String): (SampleID, StepName) => S3Folder = { (sampleID, step) =>
+    commonS3Prefix / pipeline / sampleID / step /
+  }
 
-  lazy val referenceDBs: Set[AnyReferenceDB] = Set(rna16sRefDB)
   /*
     ## Default Illumina parameters
 
@@ -44,37 +46,14 @@ case object testDefaults {
         max_target_seqs(10000)      ::
         perc_identity(98.0)         ::
         *[AnyDenotation]
-      )
-      .value
-
-    lazy val readLength = illumina.bp250
+      ).value
 
     case object parameters extends MG7Parameters(
-      outputS3Folder  = testDefaults.defaultOutput,
-      readsLength     = readLength,
       splitChunkSize  = 1000,
       blastCommand    = blastn,
       blastOutRec     = defaults.blastnOutputRecord,
       blastOptions    = blastnOptions,
-      referenceDBs    = testDefaults.referenceDBs
-    )
-
-    lazy val blastWorkers: AnyWorkersConfig = WorkersConfig(
-      instanceSpecs = InstanceSpecs(defaultAMI, c3.large),
-      purchaseModel = Spot(maxPrice = Some(0.025)),
-      groupSize = AutoScalingGroupSize(0, 100, 100)
-    )
-
-    lazy val assignWorkers: AnyWorkersConfig = WorkersConfig(
-      instanceSpecs = InstanceSpecs(defaultAMI, m3.xlarge),
-      purchaseModel = Spot(maxPrice = Some(0.05)),
-      groupSize = AutoScalingGroupSize(0, 6, 6)
-    )
-
-    lazy val mergeWorkers: AnyWorkersConfig = WorkersConfig(
-      instanceSpecs = InstanceSpecs(defaultAMI, m3.xlarge),
-      purchaseModel = Spot(maxPrice = Some(0.05)),
-      groupSize = AutoScalingGroupSize(0, 1, 10)
+      referenceDBs    = Set(rna16sRefDB)
     )
   }
 
@@ -92,68 +71,28 @@ case object testDefaults {
       ).value
 
     case object parameters extends MG7Parameters(
-      outputS3Folder    = testDefaults.defaultOutput,
-      readsLength       = illumina.bp250, // totally inoffensive
       splitInputFormat  = FastQInput,
       splitChunkSize    = 100,
       blastCommand      = blastn,
       blastOptions      = blastnOptions,
       blastOutRec       = defaults.blastnOutputRecord,
-      referenceDBs      = testDefaults.referenceDBs
-    )
-
-    lazy val blastWorkers: AnyWorkersConfig = WorkersConfig(
-      instanceSpecs = InstanceSpecs(defaultAMI, c3.large),
-      purchaseModel = Spot(maxPrice = Some(0.025)),
-      groupSize = AutoScalingGroupSize(0, 100, 100)
-    )
-
-    lazy val assignWorkers: AnyWorkersConfig = WorkersConfig(
-      instanceSpecs = InstanceSpecs(defaultAMI, m3.xlarge),
-      purchaseModel = Spot(maxPrice = Some(0.05)),
-      groupSize = AutoScalingGroupSize(0, 6, 6)
-    )
-
-    lazy val mergeWorkers: AnyWorkersConfig = WorkersConfig(
-      instanceSpecs = InstanceSpecs(defaultAMI, m3.xlarge),
-      purchaseModel = Spot(maxPrice = Some(0.05)),
-      groupSize = AutoScalingGroupSize(0, 1, 10)
+      referenceDBs      = Set(rna16sRefDB)
     )
   }
 
 
-  lazy val defaultAMI = AmazonLinuxAMI(Ireland, HVM, InstanceStore)
+  trait MG7PipelineDefaults extends AnyMG7Pipeline {
 
-  trait AnyTestLoquatConfig extends AnyLoquatConfig { config =>
-
-    lazy val metadata: AnyArtifactMetadata = ohnosequences.generated.metadata.mg7
-
+    val metadata = ohnosequences.generated.metadata.mg7
     val iamRoleName = "loquat.testing"
     val logsBucketName = "loquat.testing"
 
-    lazy val  managerConfig = ManagerConfig(
-      InstanceSpecs(defaultAMI, m3.medium),
-      purchaseModel = Spot(maxPrice = Some(0.1))
-    )
-
-    lazy val workersConfig: AnyWorkersConfig = WorkersConfig(
-      instanceSpecs = InstanceSpecs(defaultAMI, m3.medium),
-      purchaseModel = Spot(maxPrice = Some(0.1)),
-      groupSize = AutoScalingGroupSize(0, 1, 10)
-    )
-
-    lazy val terminationConfig = TerminationConfig(
-      terminateAfterInitialDataMappings = true
-    )
-
-    val dataMappings: List[AnyDataMapping]
+    override val splitConfig  = SplitConfig(1)
+    override val blastConfig  = BlastConfig(100)
+    override val assignConfig = AssignConfig(6)
+    override val mergeConfig  = MergeConfig(1)
+    override val countConfig  = CountConfig(1)
   }
-
-  abstract class TestLoquatConfig(
-    val loquatName: String,
-    val dataMappings: List[AnyDataMapping]
-  )
-  extends AnyTestLoquatConfig
 
   lazy val loquatUser = LoquatUser(
     email = "aalekhin@ohnosequences.com",
