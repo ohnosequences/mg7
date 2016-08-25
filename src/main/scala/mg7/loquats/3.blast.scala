@@ -52,14 +52,10 @@ extends DataProcessingBundle(
         val prefilteredHits: Seq[csv.Row[md.BlastOutRecKeys]] = allHits.filter(md.blastFilter)
 
         /* Here we pick the first pident value, which will be the maximum one, if present. Afterwards, we keep only those hits with the same pident. It is important to apply this filter *after* the one based on query coverage. */
-        import md._
-        val maxPident: Option[String] =
-          prefilteredHits.headOption map { r => r select outputFields.pident }
-
-        val pidentFilter: csv.Row[md.BlastOutRecKeys] => Boolean =
-          row => maxPident.fold(false)(m => (row select outputFields.pident) == m)
-
-        val filteredHits: Seq[csv.Row[md.BlastOutRecKeys]] = prefilteredHits filter pidentFilter
+        import md.has_pident
+        val filteredHits: Seq[csv.Row[md.BlastOutRecKeys]] = prefilteredHits.maximumsBy { row =>
+          parseDouble( row.select(outputFields.pident) )
+        }
 
         println(s"- After filtering there are ${filteredHits.length} hits")
 
