@@ -15,7 +15,7 @@ import com.amazonaws.auth._, profile._
 
 case object BeiMockPipeline {
 
-  val commonS3Prefix = S3Folder("era7p", "mg7-test/data")
+  val commonS3Prefix = S3Folder("resources.ohnosequences.com", "ohnosequences/mg7/mock-communities-data/illumina/")
 
   // TODO move all this to the testData object
   /* For now we are only testing one sample */
@@ -31,8 +31,8 @@ case object BeiMockPipeline {
   val inputSamples: Map[SampleID, (S3Resource, S3Resource)] = sampleIDs.map {
     id =>
       id -> ((
-        S3Resource(commonS3Prefix/"out"/"reads-preprocessing"/s"${id}_1_val_1.fq.gz"),
-        S3Resource(commonS3Prefix/"out"/"reads-preprocessing"/s"${id}_2_val_2.fq.gz")
+        S3Resource(commonS3Prefix / s"${id}_1_val_1.fq.gz"),
+        S3Resource(commonS3Prefix / s"${id}_2_val_2.fq.gz")
       ))
     }
     .toMap
