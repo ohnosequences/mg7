@@ -15,8 +15,10 @@ import com.amazonaws.auth._, profile._
 
 case object pacbioTestPipeline {
 
-  // TODO update this to the current conventions
-  val commonS3Prefix = S3Folder("era7p", "pacbio/data/")
+
+
+
+  val commonS3Prefix = S3Folder("resources.ohnosequences.com", "ohnosequences/mg7/mock-communities-data/pacbio/")
   //
   // val sampleIds: List[ID] = List(
   //   "BEI_even",
@@ -29,15 +31,17 @@ case object pacbioTestPipeline {
   //   id -> S3Resource(commonS3Prefix / "in" / s"${id}_16S.fastq")
   // }.toMap
   //
+
+
   val cleanSampleIds: List[ID] = List(
-    //"stagg",
-    //"even"
+    "stagg",
+    "even"
     //this sample name corresponds to the blast results @rtobes filtered manually
-    "even-filtered"
+    //"even-filtered"
   )
 
   val cleanInputs: Map[ID, S3Resource] = cleanSampleIds.map { id =>
-    id -> S3Resource(commonS3Prefix / "in" / s"${id}.subreads_ccs_99.fastq.filter.fastq")
+    id -> S3Resource(commonS3Prefix  / s"${id}.subreads_ccs_99.fastq.filter.fastq")
   }.toMap
 
   val dataflow = NoFlashDataflow(testDefaults.PacBio.parameters)(cleanInputs)
