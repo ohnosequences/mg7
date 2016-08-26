@@ -34,12 +34,12 @@ trait AnyMG7Pipeline { pipeline =>
   case class  MergeConfig(val size: Int) extends AnyMergeConfig  with CommonConfigDefaults
   case class  CountConfig(val size: Int) extends AnyCountConfig  with CommonConfigDefaults
 
-  /* You can override these values to customize configuration for each step */
-  val splitConfig:  AnySplitConfig  = SplitConfig(inputSamples.size)
-  val blastConfig:  AnyBlastConfig  = BlastConfig(inputSamples.size)
-  val assignConfig: AnyAssignConfig = AssignConfig(inputSamples.size)
-  val mergeConfig:  AnyMergeConfig  = MergeConfig(inputSamples.size)
-  val countConfig:  AnyCountConfig  = CountConfig(inputSamples.size)
+  /* You have to set these values to customize configuration for each step */
+  val splitConfig:  AnySplitConfig
+  val blastConfig:  AnyBlastConfig
+  val assignConfig: AnyAssignConfig
+  val mergeConfig:  AnyMergeConfig
+  val countConfig:  AnyCountConfig
 
   // Boilerplate definitions that are derived from the ones above:
 
