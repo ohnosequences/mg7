@@ -51,11 +51,22 @@ extends DataProcessingBundle(
         val prefilteredHits: Seq[csv.Row[md.BlastOutRecKeys]] = allHits.filter(md.blastFilter)
 
         /* We keep only those hits with the maximum pident. It is important to apply this filter *after* the one based on query coverage. */
-        import md.has_pident
-        // TODO: at the moment this filter is fixed, but it should be configurable (see #71)
-        val filteredHits: Seq[csv.Row[md.BlastOutRecKeys]] = prefilteredHits.maximumsBy { row =>
-          parseDouble( row.select(outputFields.pident) )
-        }
+
+        val filteredHits: Seq[csv.Row[md.BlastOutRecKeys]] =
+          if (prefilteredHits.isEmpty) Seq()
+          else {
+            import md.has_pident
+
+            val maxPident: Double = prefilteredHits.flatMap { row =>
+              parseDouble( row.select(outputFields.pident) )
+            }.max
+
+            prefilteredHits.filter { row =>
+              parseDouble( row.select(outputFields.pident) ).map { p =>
+                (maxPident - p) <= md.pidentMaxVariation
+              }.getOrElse(false)
+            }
+          }
 
         println(s"- After filtering there are ${filteredHits.length} hits")
 
