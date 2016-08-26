@@ -9,7 +9,7 @@ import ohnosequences.datasets._
 import better.files._
 
 
-case class flashDataProcessing[P <: AnyFlashParameters](val parameters: P)
+case class flashDataProcessing(val parameters: AnyFlashParameters)
 extends DataProcessingBundle(
   deps = bundles.flash
 )(input  = data.flashInput,

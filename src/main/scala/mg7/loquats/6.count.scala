@@ -9,7 +9,7 @@ import ohnosequences.datasets._
 import better.files._
 import com.bio4j.titan.model.ncbiTaxonomy.TitanNCBITaxonomyGraph
 
-case object countDataProcessing extends DataProcessingBundle(
+case class countDataProcessing() extends DataProcessingBundle(
   deps = ncbiTaxonomyBundle
 )(input  = data.countInput,
   output = data.countOutput

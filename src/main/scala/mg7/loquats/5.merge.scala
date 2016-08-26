@@ -7,7 +7,7 @@ import ohnosequences.cosas._, types._, klists._
 import ohnosequences.datasets._
 import better.files._
 
-case object mergeDataProcessing extends DataProcessingBundle()(
+case class mergeDataProcessing() extends DataProcessingBundle()(
   input  = data.mergeInput,
   output = data.mergeOutput
 ) {

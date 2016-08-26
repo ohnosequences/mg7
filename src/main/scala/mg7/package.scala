@@ -1,6 +1,7 @@
 package ohnosequences
 
 import ohnosequences.cosas._, types._, klists._, typeUnions._
+import ohnosequences.loquat._
 import ohnosequences.blast.api._
 
 package object mg7 {
@@ -18,6 +19,8 @@ package object mg7 {
 
   type SampleID = ID
   type StepName = String
+
+  type DataMappings[DP <: AnyDataProcessingBundle] = List[DataMapping[DP]]
 
   def parseInt(str: String): Option[Int] = util.Try(str.toInt).toOption
   def parseLong(str: String): Option[Long] = util.Try(str.toLong).toOption
