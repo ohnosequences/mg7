@@ -19,7 +19,7 @@ libraryDependencies ++= Seq(
   // generic tools:
   "ohnosequences" %% "cosas"        % "0.8.0",
   "ohnosequences" %% "datasets"     % "0.3.0",
-  "ohnosequences" %% "loquat"       % "2.0.0-M8",
+  "ohnosequences" %% "loquat"       % "2.0.0-M8-11-g820cfe6",
   "ohnosequences" %% "statika"      % "2.0.0-M5",
   // bundles:
   "ohnosequences-bundles" %% "flash"      % "0.2.0",

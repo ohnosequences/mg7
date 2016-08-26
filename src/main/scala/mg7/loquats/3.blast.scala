@@ -13,15 +13,15 @@ import sys.process._
 
 
 
-case class blastDataProcessing[MD <: AnyMG7Parameters](val md: MD)
+case class blastDataProcessing[P <: AnyMG7Parameters](val parameters: P)
 extends DataProcessingBundle(
-  (bundles.blast +: md.referenceDBs.toSeq): _*
-)(
-  input  = data.blastInput,
+  deps = (bundles.blast +: parameters.referenceDBs.toSeq): _*
+)(input  = data.blastInput,
   output = data.blastOutput
 ) {
-
   def instructions: AnyInstructions = say("Let the blasting begin!")
+
+  type BlastRow = csv.Row[parameters.blastOutRec.Keys]
 
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
 
@@ -31,7 +31,7 @@ extends DataProcessingBundle(
     LazyTry {
       // NOTE: once we update to better-files 2.15.+, use `file.lineIterator` here (it's autoclosing):
       val source = io.Source.fromFile( context.inputFile(data.fastaChunk).toJava )
-      val totalOutputWriter = csv.Writer(md.blastOutRec.keys)(totalOutput)
+      val totalOutputWriter = csv.Writer(parameters.blastOutRec.keys)(totalOutput)
 
       fasta.parseFastaDropErrors(source.getLines) foreach { read =>
         println(s"\nRunning BLAST for the read ${read.getV(header).id}")
@@ -39,23 +39,23 @@ extends DataProcessingBundle(
         val inFile = (context / "read.fa").overwrite(read.asString)
         val outFile = (context / "blastRead.csv").clear()
 
-        val expr = md.blastExpr(inFile, outFile)
+        val expr = parameters.blastExpr(inFile, outFile)
         println(expr.toSeq.mkString(" "))
         expr.toSeq.!!
 
-        val blastReader = csv.Reader(md.blastOutRec.keys)(outFile)
-        val allHits: Seq[csv.Row[md.BlastOutRecKeys]] = blastReader.rows.toSeq
+        val blastReader = csv.Reader(parameters.blastOutRec.keys)(outFile)
+        val allHits: Seq[BlastRow] = blastReader.rows.toSeq
 
         println(s"- There are ${allHits.length} hits")
 
-        val prefilteredHits: Seq[csv.Row[md.BlastOutRecKeys]] = allHits.filter(md.blastFilter)
+        val prefilteredHits: Seq[BlastRow] = allHits.filter(parameters.blastFilter)
 
         /* We keep only those hits with the maximum pident. It is important to apply this filter *after* the one based on query coverage. */
 
-        val filteredHits: Seq[csv.Row[md.BlastOutRecKeys]] =
+        val filteredHits: Seq[BlastRow] =
           if (prefilteredHits.isEmpty) Seq()
           else {
-            import md.has_pident
+            import parameters.has_pident
 
             val maxPident: Double = prefilteredHits.flatMap { row =>
               parseDouble( row.select(outputFields.pident) )
@@ -63,7 +63,7 @@ extends DataProcessingBundle(
 
             prefilteredHits.filter { row =>
               parseDouble( row.select(outputFields.pident) ).map { p =>
-                (maxPident - p) <= md.pidentMaxVariation
+                (maxPident - p) <= parameters.pidentMaxVariation
               }.getOrElse(false)
             }
           }

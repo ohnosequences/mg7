@@ -1,33 +1,18 @@
 package ohnosequences.mg7
 
 import ohnosequences.cosas._, types._, klists._, typeUnions._
-
 import ohnosequences.awstools.s3._
 import ohnosequences.datasets._
 import ohnosequences.flash.api._
-import ohnosequences.blast.api._
-import ohnosequences.blast.api.{ outputFields => out }
-
+import ohnosequences.blast.api.{ outputFields => out, _ }
 import better.files._
+
 
 sealed trait SplitInputFormat
 case object FastaInput extends SplitInputFormat
 case object FastQInput extends SplitInputFormat
 
 trait AnyMG7Parameters {
-
-  val outputS3Folder: (SampleID, StepName) => S3Folder
-
-  /* Flash parameters */
-  val readsLength: illumina.Length
-
-  // TODO: should it be configurable?
-  lazy val flashOptions = flash.defaults.update(
-    read_len(readsLength.toInt) ::
-    max_overlap(readsLength.toInt) ::
-    *[AnyDenotation]
-  )
-
 
   /* Split parameters */
   /* This is the number of reads in each chunk after the `split` step */
@@ -82,7 +67,7 @@ trait AnyMG7Parameters {
 
   // NOTE: this default is defined here to have has_qcovs implicit in the scope
   final def defaultBlastFilter(row: csv.Row[BlastOutRecKeys]): Boolean =
-    row.select(outputFields.qcovs) == "100"
+    row.select(out.qcovs) == "100"
 
   def pidentMaxVariation: Double = 0.0
 }
@@ -95,10 +80,8 @@ abstract class MG7Parameters[
       type Union <: BC#ValidOutputFields#Types#Union
     }
   }
-](val outputS3Folder: (SampleID, StepName) => S3Folder,
-  val readsLength: illumina.Length,
-  val splitInputFormat: SplitInputFormat = FastQInput,
-  val splitChunkSize: Int = 10,
+](val splitInputFormat: SplitInputFormat,
+  val splitChunkSize: Int,
   val blastCommand: BC,
   val blastOutRec: BlastOutputRecord[BK],
   val blastOptions: BC#OptionsVals,
@@ -118,49 +101,18 @@ abstract class MG7Parameters[
   type BlastOutRecKeys = BK
 }
 
-case object defaults {
 
-  // We set here all options explicitly
-  val blastnOptions: blastn.Options := blastn.OptionsVals =
-    blastn.options(
-      /* This actually depends on the workers instance type */
-      num_threads(4)              ::
-      blastn.task(blastn.blastn)  ::
-      evalue(BigDecimal(1E-100))  ::
-      /* We're going to use all hits to do global sample-coherent assignment. But not now, so no reason for this to be huge */
-      max_target_seqs(150)        ::
-      strand(Strands.both)        ::
-      word_size(46)               ::
-      show_gis(false)             ::
-      ungapped(false)             ::
-      penalty(-2)                 ::
-      reward(1)                   ::
-      /* 95% is a reasonable minimum. If it does not work, be more stringent with read preprocessing */
-      perc_identity(95.0) ::
-      *[AnyDenotation]
-    )
+/* Additional parameters for Flash */
+trait AnyFlashParameters {
 
-  case object blastnOutputRecord extends BlastOutputRecord(
-    // query
-    out.qseqid      :×:
-    out.qstart      :×:
-    out.qend        :×:
-    out.qlen        :×:
-    // reference
-    out.sseqid      :×:
-    out.sstart      :×:
-    out.send        :×:
-    out.slen        :×:
-    // alignment
-    out.evalue      :×:
-    out.score       :×:
-    out.bitscore    :×:
-    out.length      :×:
-    out.pident      :×:
-    out.mismatch    :×:
-    out.gaps        :×:
-    out.gapopen     :×:
-    out.qcovs       :×:
-    |[AnyOutputField]
+  val readsLength: illumina.Length
+
+  // TODO: should it be configurable?
+  lazy val flashOptions = flash.defaults.update(
+    read_len(readsLength.toInt) ::
+    max_overlap(readsLength.toInt) ::
+    *[AnyDenotation]
   )
 }
+
+case class FlashParameters(val readsLength: illumina.Length) extends AnyFlashParameters

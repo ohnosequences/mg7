@@ -12,25 +12,27 @@ import com.bio4j.titan.model.ncbiTaxonomy.TitanNCBITaxonomyGraph
 import java.io.{ BufferedWriter, FileWriter, File }
 import scala.util.Try
 
-case class assignDataProcessing[MD <: AnyMG7Parameters](val md: MD) extends DataProcessingBundle(
-  (ncbiTaxonomyBundle :: md.referenceDBs.toList): _*
+case class assignDataProcessing[P <: AnyMG7Parameters](val parameters: P) extends DataProcessingBundle(
+  (ncbiTaxonomyBundle +: parameters.referenceDBs.toList): _*
 )(
   input  = data.assignInput,
   output = data.assignOutput
 ) {
+  def instructions: AnyInstructions = say("Let's see who is who!")
+
   // For the output fields implicits
-  import md._
+  import parameters._
 
   private lazy val taxonomyGraph: TitanNCBITaxonomyGraph =
     ncbiTaxonomyBundle.graph
 
-  type BlastRow = csv.Row[md.blastOutRec.Keys]
+  type BlastRow = csv.Row[parameters.blastOutRec.Keys]
 
   // This iterates over reference DBs and merges their id2taxa tables in one Map
   private lazy val referenceMap: Map[ID, Taxa] = {
     val refMap: scala.collection.mutable.Map[ID, Taxa] = scala.collection.mutable.Map()
 
-    md.referenceDBs.foreach { refDB =>
+    parameters.referenceDBs.foreach { refDB =>
       val reader = csv.Reader(csv.refDB.columns)(refDB.id2taxas)
       reader.rows.foreach { row =>
         refMap.update(
@@ -80,12 +82,10 @@ case class assignDataProcessing[MD <: AnyMG7Parameters](val md: MD) extends Data
   }
 
 
-  def instructions: AnyInstructions = say("Let's see who is who!")
-
   // TODO this is too big. Factor BBH and LCA into methods
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
 
-    val blastReader = csv.Reader(md.blastOutRec.keys)(context.inputFile(data.blastChunk))
+    val blastReader = csv.Reader(parameters.blastOutRec.keys)(context.inputFile(data.blastChunk))
 
     // Outs:
     val lcaFile = (context / "output" / "lca.csv").createIfNotExists()

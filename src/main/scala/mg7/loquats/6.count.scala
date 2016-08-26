@@ -9,18 +9,15 @@ import ohnosequences.datasets._
 import better.files._
 import com.bio4j.titan.model.ncbiTaxonomy.TitanNCBITaxonomyGraph
 
-case object countDataProcessing extends DataProcessingBundle(
-  ncbiTaxonomyBundle
-)(
-  input   = data.countInput,
-  output  = data.countOutput
-)
-{
+case class countDataProcessing() extends DataProcessingBundle(
+  deps = ncbiTaxonomyBundle
+)(input  = data.countInput,
+  output = data.countOutput
+) {
+  def instructions: AnyInstructions = say("I'm counting you!")
 
   lazy val taxonomyGraph: TitanNCBITaxonomyGraph =
     ncbiTaxonomyBundle.graph
-
-  def instructions: AnyInstructions = say("I'm counting you!")
 
   // returns count of the given element and a filtered list (without that element)
   def count[X](x: X, list: List[X]): (Int, List[X]) =
