@@ -28,6 +28,7 @@ package object mg7 {
 
   implicit class TraversableOps[T](val col: Traversable[T]) extends AnyVal {
 
+    /* This method is like standard maxBy, but accumulates _all_ maximum elements */
     def maximumsBy[X](f: T => X)(implicit cmp: Ordering[X]): List[T] =
       col.foldLeft(List[T]()) {
         case (a :: acc, t) if (    cmp.lt(f(t), f(a)) ) => a :: acc
@@ -35,6 +36,8 @@ package object mg7 {
         // either acc is empty or t is the new maximum
         case (_, t) => List(t)
       }
+
+    def  maximums(implicit cmp: Ordering[T]): List[T] = maximumsBy(identity[T])
   }
 
   implicit class SeqDoubleOps(val seq: Seq[Double]) extends AnyVal {

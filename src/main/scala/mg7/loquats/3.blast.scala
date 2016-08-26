@@ -21,6 +21,8 @@ extends DataProcessingBundle(
 ) {
   def instructions: AnyInstructions = say("Let the blasting begin!")
 
+  type BlastRow = csv.Row[parameters.blastOutRec.Keys]
+
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
 
     val totalOutput = (context / "blastAll.csv").createIfNotExists()
@@ -42,22 +44,29 @@ extends DataProcessingBundle(
         expr.toSeq.!!
 
         val blastReader = csv.Reader(parameters.blastOutRec.keys)(outFile)
-        val allHits: Seq[csv.Row[parameters.BlastOutRecKeys]] = blastReader.rows.toSeq
+        val allHits: Seq[BlastRow] = blastReader.rows.toSeq
 
         println(s"- There are ${allHits.length} hits")
 
-        // TODO: at the moment this filter is fixed, but it should be configurable (see #71)
-        val prefilteredHits: Seq[csv.Row[parameters.BlastOutRecKeys]] = allHits.filter(parameters.blastFilter)
+        val prefilteredHits: Seq[BlastRow] = allHits.filter(parameters.blastFilter)
 
-        /* Here we pick the first pident value, which will be the maximum one, if present. Afterwards, we keep only those hits with the same pident. It is important to apply this filter *after* the one based on query coverage. */
-        import parameters._
-        val maxPident: Option[String] =
-          prefilteredHits.headOption map { r => r select outputFields.pident }
+        /* We keep only those hits with the maximum pident. It is important to apply this filter *after* the one based on query coverage. */
 
-        val pidentFilter: csv.Row[parameters.BlastOutRecKeys] => Boolean =
-          row => maxPident.fold(false)(m => (row select outputFields.pident) == m)
+        val filteredHits: Seq[BlastRow] =
+          if (prefilteredHits.isEmpty) Seq()
+          else {
+            import parameters.has_pident
 
-        val filteredHits: Seq[csv.Row[parameters.BlastOutRecKeys]] = prefilteredHits filter pidentFilter
+            val maxPident: Double = prefilteredHits.flatMap { row =>
+              parseDouble( row.select(outputFields.pident) )
+            }.max
+
+            prefilteredHits.filter { row =>
+              parseDouble( row.select(outputFields.pident) ).map { p =>
+                (maxPident - p) <= parameters.pidentMaxVariation
+              }.getOrElse(false)
+            }
+          }
 
         println(s"- After filtering there are ${filteredHits.length} hits")
 
