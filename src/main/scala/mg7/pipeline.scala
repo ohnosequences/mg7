@@ -114,6 +114,10 @@ trait AnyMG7Pipeline { pipeline =>
 
   lazy val mergeDataMappings: DataMappings[mergeDataProcessing] = inputSamples.keys.toList.map { case sampleId =>
 
+    def outputFor(d: FileData): (FileData, S3Resource) = {
+      d -> S3Resource(outputS3Folder(sampleId, "merge") / s"${sampleId}.${d.label}")
+    }
+
     DataMapping(sampleId, mergeDataProcessing())(
       remoteInput = Map(
         data.blastChunksFolder -> S3Resource(blastChunksS3Prefix(sampleId)),
@@ -122,10 +126,10 @@ trait AnyMG7Pipeline { pipeline =>
         data.bbhChunksFolder   -> S3Resource(bbhAssignS3Prefix(sampleId))
       ),
       remoteOutput = Map(
-        data.blastResult -> S3Resource(outputS3Folder(sampleId, "merge") / s"${sampleId}.blast.csv"),
-        data.blastNoHits -> S3Resource(outputS3Folder(sampleId, "merge") / s"${sampleId}.no-hits.fa"),
-        data.lcaCSV      -> S3Resource(outputS3Folder(sampleId, "merge") / s"${sampleId}.lca.csv"),
-        data.bbhCSV      -> S3Resource(outputS3Folder(sampleId, "merge") / s"${sampleId}.bbh.csv")
+        outputFor(data.blastResult),
+        outputFor(data.blastNoHits),
+        outputFor(data.lcaCSV),
+        outputFor(data.bbhCSV)
       )
     )
   }
@@ -176,16 +180,20 @@ trait AnyFlashMG7Pipeline extends AnyMG7Pipeline {
 
   lazy val flashDataMappings: DataMappings[flashDataProcessing] = inputPairedReads.toList.map { case (sampleId, (reads1S3Resource, reads2S3Resource)) =>
 
+    def outputFor(d: FileData): (FileData, S3Resource) = {
+      d -> S3Resource(outputS3Folder(sampleId, "flash") / s"${sampleId}.${d.label}")
+    }
+
     DataMapping(sampleId, flashDataProcessing(flashParameters))(
       remoteInput = Map(
         data.pairedReads1 -> reads1S3Resource,
         data.pairedReads2 -> reads2S3Resource
       ),
       remoteOutput = Map(
-        data.mergedReads    -> S3Resource(outputS3Folder(sampleId, "flash") / s"${sampleId}.merged.fastq"),
-        data.pair1NotMerged -> S3Resource(outputS3Folder(sampleId, "flash") / s"${sampleId}.pair1.not-merged.fastq"),
-        data.pair2NotMerged -> S3Resource(outputS3Folder(sampleId, "flash") / s"${sampleId}.pair2.not-merged.fastq"),
-        data.flashHistogram -> S3Resource(outputS3Folder(sampleId, "flash") / s"${sampleId}.hist")
+        outputFor(data.mergedReads),
+        outputFor(data.pair1NotMerged),
+        outputFor(data.pair2NotMerged),
+        outputFor(data.flashHistogram)
       )
     )
   }
