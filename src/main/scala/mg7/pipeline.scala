@@ -159,11 +159,17 @@ trait AnyMG7Pipeline { pipeline =>
     )
   }
 
-  case object split  extends Loquat(splitConfig,   splitDataProcessing(parameters))(splitDataMappings)
-  case object blast  extends Loquat(blastConfig,   blastDataProcessing(parameters))(blastDataMappings)
-  case object assign extends Loquat(assignConfig, assignDataProcessing(parameters))(assignDataMappings)
-  case object merge  extends Loquat(mergeConfig,   mergeDataProcessing())(mergeDataMappings)
-  case object count  extends Loquat(countConfig,   countDataProcessing())(countDataMappings)
+  lazy val fullName: String = this.getClass.getName.split("\\$").mkString(".")
+  trait FixedName extends AnyLoquat {
+
+    override lazy val fullName: String = s"${pipeline.fullName}.${this.toString}"
+  }
+
+  case object split  extends Loquat(splitConfig,   splitDataProcessing(parameters))(splitDataMappings)  with FixedName
+  case object blast  extends Loquat(blastConfig,   blastDataProcessing(parameters))(blastDataMappings)  with FixedName
+  case object assign extends Loquat(assignConfig, assignDataProcessing(parameters))(assignDataMappings) with FixedName
+  case object merge  extends Loquat(mergeConfig,   mergeDataProcessing())(mergeDataMappings)            with FixedName
+  case object count  extends Loquat(countConfig,   countDataProcessing())(countDataMappings)            with FixedName
 }
 
 
@@ -203,7 +209,7 @@ trait AnyFlashMG7Pipeline extends AnyMG7Pipeline {
     flashDM.label -> flashDM.remoteOutput(data.mergedReads)
   }.toMap
 
-  case object flash extends Loquat(flashConfig, flashDataProcessing(flashParameters))(flashDataMappings)
+  case object flash extends Loquat(flashConfig, flashDataProcessing(flashParameters))(flashDataMappings) with FixedName
 }
 
 /* With the constructor it is just easier to bind the Parameters type member. The rest of the members can be set inside */
