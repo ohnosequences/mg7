@@ -40,5 +40,7 @@ case object BeiMock {
     val outputS3Folder = testDefaults.outputS3FolderFor("BeiMock")
 
     val flashParameters = FlashParameters(illumina.bp250)
+
+    val flashConfig: AnyFlashConfig = FlashConfig(1)
   }
 }

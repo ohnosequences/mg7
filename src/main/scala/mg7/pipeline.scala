@@ -175,7 +175,7 @@ trait AnyFlashMG7Pipeline extends AnyMG7Pipeline {
 
   case class FlashConfig(val size: Int) extends AnyFlashConfig  with CommonConfigDefaults
 
-  val flashConfig: AnyFlashConfig = FlashConfig(inputPairedReads.size)
+  val flashConfig: AnyFlashConfig
 
 
   lazy val flashDataMappings: DataMappings[flashDataProcessing] = inputPairedReads.toList.map { case (sampleId, (reads1S3Resource, reads2S3Resource)) =>
