@@ -38,11 +38,11 @@ case object testDefaults {
     val iamRoleName = "loquat.testing"
     val logsBucketName = "loquat.testing"
 
-    override val splitConfig  = SplitConfig(1)
-    override val blastConfig  = BlastConfig(100)
-    override val assignConfig = AssignConfig(6)
-    override val mergeConfig  = MergeConfig(1)
-    override val countConfig  = CountConfig(1)
+    val splitConfig  = SplitConfig(1)
+    val blastConfig  = BlastConfig(100)
+    val assignConfig = AssignConfig(6)
+    val mergeConfig  = MergeConfig(1)
+    val countConfig  = CountConfig(1)
   }
 
   lazy val loquatUser = LoquatUser(
