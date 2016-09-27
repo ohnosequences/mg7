@@ -20,10 +20,10 @@ case class countDataProcessing() extends DataProcessingBundle(
     ncbiTaxonomyBundle.graph
 
   // returns count of the given element and a filtered list (without that element)
-  def count[X](x: X, list: List[X]): (Int, List[X]) =
-    list.foldLeft( (0, List[X]()) ) { case ((count, rest), next) =>
+  def count[X](x: X, list: Seq[X]): (Int, Seq[X]) =
+    list.foldLeft( (0, Seq[X]()) ) { case ((count, rest), next) =>
       if (next == x) (count + 1, rest)
-      else (count, next :: rest)
+      else (count, next +: rest)
     }
 
   def directCounts(
@@ -37,7 +37,7 @@ case class countDataProcessing() extends DataProcessingBundle(
       acc: Map[Taxon, (Int, Taxa)]
     ): Map[Taxon, (Int, Taxa)] = list match {
       case Nil => acc
-      case h :: t => {
+      case h +: t => {
         val (n, rest) = count(h, t)
         rec(rest, acc.updated(h, (n + 1, getLineage(h))))
       }
