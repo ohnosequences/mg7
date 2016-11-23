@@ -8,16 +8,16 @@ class QFNTest extends org.scalatest.FunSuite {
 
   test("Fully-qualified names") {
 
-    info(s"beimock: ${BeiMock.pipeline.fullName}")
+    info(s"beimock: ${mock.illumina.pipeline.fullName}")
 
     assert {
-       ohnosequences.test.mg7.BeiMock.pipeline.flash.fullName ==
-      "ohnosequences.test.mg7.BeiMock.pipeline.flash"
+       ohnosequences.test.mg7.mock.illumina.pipeline.flash.fullName ==
+      "ohnosequences.test.mg7.mock.illumina.pipeline.flash"
     }
 
     assert {
-       ohnosequences.test.mg7.BeiMock.pipeline.flash.manager.fullName ==
-      "ohnosequences.test.mg7.BeiMock.pipeline.flash.manager"
+       ohnosequences.test.mg7.mock.illumina.pipeline.flash.manager.fullName ==
+      "ohnosequences.test.mg7.mock.illumina.pipeline.flash.manager"
     }
   }
 }

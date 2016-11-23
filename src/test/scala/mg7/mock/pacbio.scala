@@ -1,6 +1,6 @@
-package ohnosequences.test.mg7
+package ohnosequences.test.mg7.mock
 
-import ohnosequences.test.mg7.testDefaults._
+import ohnosequences.test.mg7._, testDefaults._
 import ohnosequences.mg7._, loquats._
 import ohnosequences.datasets._, illumina._
 import ohnosequences.cosas._, types._, klists._
@@ -13,9 +13,9 @@ import ohnosequences.awstools.autoscaling._
 import ohnosequences.awstools.regions.Region._
 import com.amazonaws.auth._, profile._
 
-case object Pacbio {
+case object pacbio {
 
-  case object pipeline extends MG7Pipeline(testDefaults.PacBioParameters) with MG7PipelineDefaults {
+  case object pipeline extends MG7Pipeline(PacBioParameters) with MG7PipelineDefaults {
 
     val sampleIDs: List[ID] = List(
       "stagg",
