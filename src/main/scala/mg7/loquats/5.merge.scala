@@ -7,12 +7,10 @@ import ohnosequences.cosas._, types._, klists._
 import ohnosequences.datasets._
 import better.files._
 
-case object mergeDataProcessing extends DataProcessingBundle()(
-  input   = data.mergeInput,
-  output  = data.mergeOutput
-)
-{
-
+case class mergeDataProcessing() extends DataProcessingBundle()(
+  input  = data.mergeInput,
+  output = data.mergeOutput
+) {
   def instructions: AnyInstructions = say("Merging, joining, amalgamating!")
 
   // TODO: use streams, file-writers, etc. stuff

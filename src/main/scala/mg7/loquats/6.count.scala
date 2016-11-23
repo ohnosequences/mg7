@@ -9,24 +9,21 @@ import ohnosequences.datasets._
 import better.files._
 import com.bio4j.titan.model.ncbiTaxonomy.TitanNCBITaxonomyGraph
 
-case object countDataProcessing extends DataProcessingBundle(
-  ncbiTaxonomyBundle
-)(
-  input   = data.countInput,
-  output  = data.countOutput
-)
-{
+case class countDataProcessing() extends DataProcessingBundle(
+  deps = ncbiTaxonomyBundle
+)(input  = data.countInput,
+  output = data.countOutput
+) {
+  def instructions: AnyInstructions = say("I'm counting you!")
 
   lazy val taxonomyGraph: TitanNCBITaxonomyGraph =
     ncbiTaxonomyBundle.graph
 
-  def instructions: AnyInstructions = say("I'm counting you!")
-
   // returns count of the given element and a filtered list (without that element)
-  def count[X](x: X, list: List[X]): (Int, List[X]) =
-    list.foldLeft( (0, List[X]()) ) { case ((count, rest), next) =>
+  def count[X](x: X, list: Seq[X]): (Int, Seq[X]) =
+    list.foldLeft( (0, Seq[X]()) ) { case ((count, rest), next) =>
       if (next == x) (count + 1, rest)
-      else (count, next :: rest)
+      else (count, next +: rest)
     }
 
   def directCounts(
@@ -40,7 +37,7 @@ case object countDataProcessing extends DataProcessingBundle(
       acc: Map[Taxon, (Int, Taxa)]
     ): Map[Taxon, (Int, Taxa)] = list match {
       case Nil => acc
-      case h :: t => {
+      case h +: t => {
         val (n, rest) = count(h, t)
         rec(rest, acc.updated(h, (n + 1, getLineage(h))))
       }
