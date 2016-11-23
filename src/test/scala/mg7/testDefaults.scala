@@ -22,13 +22,10 @@ case object testDefaults {
   lazy val mg7 = ohnosequences.generated.metadata.mg7
 
   /* Output test data *is* scoped by version */
-  lazy val commonS3Prefix = S3Folder("resources.ohnosequences.com", mg7.organization) /
-    mg7.artifact /
-    mg7.version /
-    "test" /
+  lazy val outputS3Prefix = S3Folder("resources.ohnosequences.com", mg7.organization) / mg7.artifact / mg7.version / "test" /
 
   def outputS3FolderFor(pipeline: String): (SampleID, StepName) => S3Folder = { (sampleID, step) =>
-    commonS3Prefix / pipeline / sampleID / step /
+    outputS3Prefix / pipeline / sampleID / step /
   }
 
 

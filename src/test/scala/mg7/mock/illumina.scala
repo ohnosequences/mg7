@@ -17,8 +17,6 @@ case object BeiMock {
 
   case object pipeline extends FlashMG7Pipeline(testDefaults.IlluminaParameters) with MG7PipelineDefaults {
 
-    // val commonS3Prefix = S3Folder("era7p", "mg7-test/data")
-
     // TODO move all this to the testData object
     /* For now we are only testing one sample */
     val sampleIDs: List[SampleID] = List(
@@ -32,12 +30,12 @@ case object BeiMock {
 
     val inputPairedReads: Map[SampleID, (S3Resource, S3Resource)] = sampleIDs.map { id =>
       id -> ((
-        S3Resource(commonS3Prefix / s"${id}_1_val_1.fq.gz"),
-        S3Resource(commonS3Prefix / s"${id}_2_val_2.fq.gz")
+        S3Resource(testData.s3 / "illumina" / s"${id}_1_val_1.fq.gz"),
+        S3Resource(testData.s3 / "illumina" / s"${id}_2_val_2.fq.gz")
       ))
     }.toMap
 
-    val outputS3Folder = testDefaults.outputS3FolderFor("BeiMock")
+    val outputS3Folder = testDefaults.outputS3FolderFor("illumina")
 
     val flashParameters = FlashParameters(illumina.bp250)
 
