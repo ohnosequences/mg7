@@ -18,7 +18,7 @@ libraryDependencies ++= Seq(
   "ohnosequences" %% "ncbitaxonomy" % "0.1.0",
   // generic tools:
   "ohnosequences" %% "cosas"        % "0.8.0",
-  "ohnosequences" %% "loquat"       % "2.0.0-M8-55-g65c2979",
+  "ohnosequences" %% "loquat"       % "2.0.0-M8-57-g72f0183",
   "ohnosequences" %% "statika"      % "2.0.0-RC1",
   "ohnosequences" %% "datasets"          % "0.4.0",
   "ohnosequences" %% "datasets-illumina" % "0.0.0-5-g811df8d",
@@ -31,7 +31,6 @@ libraryDependencies ++= Seq(
 )
 
 dependencyOverrides ++= Set(
-  // "ohnosequences" %% "loquat"       % "2.0.0-M8-55-g65c2979",
   "ohnosequences" %% "statika" % "2.0.0-RC1",
   "ohnosequences" %% "aws-scala-tools" % "0.18.0-6-g26137be",
   "com.github.pathikrit" %% "better-files" % "2.16.0",
