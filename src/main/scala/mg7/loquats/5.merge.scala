@@ -43,10 +43,10 @@ case class mergeDataProcessing() extends DataProcessingBundle()(
       mergeChunks( context.inputFile(data.bbhChunksFolder), bbhMerged )
     } -&-
     success(s"Everything is merged",
-      data.blastResult(blastMerged)   ::
-      data.blastNoHits(noHitsMerged)  ::
-      data.lcaCSV(lcaMerged)          ::
-      data.bbhCSV(bbhMerged)          ::
+      data.blastResult(blastMerged.toJava)   ::
+      data.blastNoHits(noHitsMerged.toJava)  ::
+      data.lcaCSV(lcaMerged.toJava)          ::
+      data.bbhCSV(bbhMerged.toJava)          ::
       *[AnyDenotation { type Value <: FileResource }]
     )
   }

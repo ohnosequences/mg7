@@ -50,10 +50,10 @@ extends DataProcessingBundle(
     seqToInstructions(flashExpr.cmd)      -&-
     success(
       "FLASh merged reads, much success so fast",
-      data.mergedReads(flashOutput.mergedReads) ::
-      data.pair1NotMerged(flashOutput.pair1NotMerged) ::
-      data.pair2NotMerged(flashOutput.pair2NotMerged) ::
-      data.flashHistogram(flashOutput.lengthNumericHistogram) ::
+      data.mergedReads(flashOutput.mergedReads.toJava) ::
+      data.pair1NotMerged(flashOutput.pair1NotMerged.toJava) ::
+      data.pair2NotMerged(flashOutput.pair2NotMerged.toJava) ::
+      data.flashHistogram(flashOutput.lengthNumericHistogram.toJava) ::
       *[AnyDenotation { type Value <: FileResource }]
     )
   }

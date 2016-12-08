@@ -121,8 +121,8 @@ case class assignDataProcessing[P <: AnyMG7Parameters](val parameters: P) extend
     bbhWriter.close()
 
     success(s"Results are ready",
-      data.lcaChunk(lcaFile) ::
-      data.bbhChunk(bbhFile) ::
+      data.lcaChunk(lcaFile.toJava) ::
+      data.bbhChunk(bbhFile.toJava) ::
       *[AnyDenotation { type Value <: FileResource }]
     )
   }

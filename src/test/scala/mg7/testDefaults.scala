@@ -10,10 +10,7 @@ import ohnosequences.loquat._
 import ohnosequences.statika._, aws._
 import ohnosequences.blast.api._
 import ohnosequences.db.rna16s
-import ohnosequences.awstools.ec2._, InstanceType._
-import ohnosequences.awstools.s3._
-import ohnosequences.awstools.autoscaling._
-import ohnosequences.awstools.regions.Region._
+import ohnosequences.awstools._, ec2._ , s3._, autoscaling._, regions._
 import com.amazonaws.auth._, profile._
 import ohnosequences.datasets.illumina._
 
@@ -33,7 +30,7 @@ case object testDefaults {
 
     val metadata = ohnosequences.generated.metadata.mg7
     val iamRoleName = "loquat.testing"
-    val logsBucketName = "loquat.testing"
+    val logsS3Prefix = s3"loquat.testing" /
 
     val splitConfig  = SplitConfig(1)
     val blastConfig  = BlastConfig(100)

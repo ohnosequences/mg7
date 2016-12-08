@@ -18,18 +18,24 @@ libraryDependencies ++= Seq(
   "ohnosequences" %% "ncbitaxonomy" % "0.1.0",
   // generic tools:
   "ohnosequences" %% "cosas"        % "0.8.0",
-  "ohnosequences" %% "datasets"     % "0.3.0",
-  "ohnosequences" %% "loquat"       % "2.0.0-M8-11-g820cfe6",
-  "ohnosequences" %% "statika"      % "2.0.0-M5",
+  "ohnosequences" %% "loquat"       % "2.0.0-M8-55-g65c2979",
+  "ohnosequences" %% "statika"      % "2.0.0-RC1",
+  "ohnosequences" %% "datasets"          % "0.4.0",
+  "ohnosequences" %% "datasets-illumina" % "0.0.0-5-g811df8d",
   // bundles:
-  "ohnosequences-bundles" %% "flash"      % "0.2.0",
-  "ohnosequences-bundles" %% "blast"      % "0.3.0",
+  "ohnosequences-bundles" %% "flash" % "0.2.0",
+  "ohnosequences-bundles" %% "blast" % "0.3.0",
   // testing:
-  "ohnosequences" %% "db-rna16s" % "0.10.0" % Test,
+  "ohnosequences" %% "db-rna16s" % "0.12.0" % Test,
   "org.scalatest" %% "scalatest" % "2.2.6"  % Test
 )
 
 dependencyOverrides ++= Set(
+  // "ohnosequences" %% "loquat"       % "2.0.0-M8-55-g65c2979",
+  "ohnosequences" %% "statika" % "2.0.0-RC1",
+  "ohnosequences" %% "aws-scala-tools" % "0.18.0-6-g26137be",
+  "com.github.pathikrit" %% "better-files" % "2.16.0",
+  /////
   "org.apache.httpcomponents" % "httpclient" % "4.5.1",
   "org.slf4j"                 % "slf4j-api"  % "1.7.7"
 )
@@ -38,7 +44,7 @@ dependencyOverrides ++= Set(
 wartremoverErrors in (Test, compile) := Seq()
 wartremoverErrors in (Compile, compile) := Seq()
 
-mergeStrategy in assembly ~= { old => {
+assemblyMergeStrategy in assembly ~= { old => {
     case "log4j.properties"                       => MergeStrategy.filterDistinctLines
     case PathList("org", "apache", "commons", _*) => MergeStrategy.first
     case x                                        => old(x)

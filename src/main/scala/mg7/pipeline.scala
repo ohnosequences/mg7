@@ -4,7 +4,7 @@ import ohnosequences.mg7.loquats._
 import ohnosequences.loquat._
 import ohnosequences.statika._, aws._
 import ohnosequences.datasets._
-import ohnosequences.awstools.s3._
+import ohnosequences.awstools._, s3._
 import com.amazonaws.auth._, profile._
 
 
@@ -18,14 +18,14 @@ trait AnyMG7Pipeline { pipeline =>
 
   val metadata: AnyArtifactMetadata
   val iamRoleName: String
-  val logsBucketName: String
+  val logsS3Prefix: S3Folder
 
   /* This trait helps to set these common values */
   trait CommonConfigDefaults {
 
     val metadata: AnyArtifactMetadata = pipeline.metadata
     val iamRoleName: String           = pipeline.iamRoleName
-    val logsBucketName: String        = pipeline.logsBucketName
+    val logsS3Prefix: S3Folder        = pipeline.logsS3Prefix
   }
 
   case class  SplitConfig(val size: Int) extends AnySplitConfig  with CommonConfigDefaults
@@ -55,15 +55,13 @@ trait AnyMG7Pipeline { pipeline =>
     )
   }
 
-  private def instanceS3client: S3 = S3.create(
-    new AWSCredentialsProviderChain(
-      new InstanceProfileCredentialsProvider(),
-      new ProfileCredentialsProvider()
-    )
-  )
+  private lazy val instanceS3client = S3Client()
 
-  private def listChunks(s3prefix: AnyS3Address): List[S3Object] = {
-    instanceS3client.listObjects(s3prefix.bucket, s3prefix.key)
+  private def listChunks(s3prefix: AnyS3Address): List[(S3Object, Int)] = {
+    instanceS3client
+      .listObjects(S3Folder(s3prefix.toURI))
+      .getOrElse(List())
+      .zipWithIndex
   }
 
   // These prefixes will be used several times, so they factored in methods:
@@ -75,7 +73,6 @@ trait AnyMG7Pipeline { pipeline =>
     val sampleId = splitDM.label
 
     listChunks( splitDM.remoteOutput(data.fastaChunks).resource )
-      .zipWithIndex
       .map { case (chunkS3Obj, n) =>
 
         DataMapping(s"${sampleId}.${n}", blastDataProcessing(parameters))(
@@ -97,7 +94,6 @@ trait AnyMG7Pipeline { pipeline =>
   lazy val assignDataMappings: DataMappings[assignDataProcessing[Parameters]] = inputSamples.keys.toList.flatMap { case sampleId =>
 
     listChunks( blastChunksS3Prefix(sampleId) )
-      .zipWithIndex
       .map { case (chunkS3Obj, n) =>
 
         DataMapping(sampleId, assignDataProcessing(parameters))(

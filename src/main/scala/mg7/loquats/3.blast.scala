@@ -87,8 +87,8 @@ extends DataProcessingBundle(
     } -&-
     success(
       "much blast, very success!",
-      data.blastChunk(totalOutput) ::
-      data.noHitsChunk(noHits) ::
+      data.blastChunk(totalOutput.toJava) ::
+      data.noHitsChunk(noHits.toJava) ::
       *[AnyDenotation { type Value <: FileResource }]
     )
 

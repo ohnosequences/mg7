@@ -6,10 +6,7 @@ import ohnosequences.cosas._, types._, klists._
 import ohnosequences.loquat._
 import ohnosequences.statika._, aws._
 import ohnosequences.blast.api._
-import ohnosequences.awstools.ec2._, InstanceType._
-import ohnosequences.awstools.s3._
-import ohnosequences.awstools.autoscaling._
-import ohnosequences.awstools.regions.Region._
+import ohnosequences.awstools._, ec2._ , s3._, autoscaling._, regions._
 import com.amazonaws.auth._, profile._
 
 // TODO this is a gut sample after all, see what we are going to do with this
