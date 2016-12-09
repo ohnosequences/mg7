@@ -84,10 +84,13 @@ case class assignDataProcessing[P <: AnyMG7Parameters](val parameters: P) extend
 
   // TODO this is too big. Factor BBH and LCA into methods
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
+    println(s"Started data processing with context: ${context.workingDir}")
+    println(s"Input files: ${context.inputFiles}")
 
     lazy val blastReader = csv.Reader(parameters.blastOutRec.keys)(context.inputFile(data.blastChunk))
 
     // Outs:
+    println(s"Creating output files...")
     lazy val lcaFile = (context / "output" / "lca.csv").createIfNotExists()
     println(s"Created output file [${lcaFile}]")
     lazy val bbhFile = (context / "output" / "bbh.csv").createIfNotExists()
