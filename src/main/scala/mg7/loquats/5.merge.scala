@@ -24,10 +24,10 @@ case class mergeDataProcessing() extends DataProcessingBundle()(
 
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
 
-    val blastMerged  = (context / "blast.csv").createIfNotExists()
-    val noHitsMerged = (context / "blast.no-hits").createIfNotExists()
-    val lcaMerged    = (context / "lca.csv").createIfNotExists()
-    val bbhMerged    = (context / "bbh.csv").createIfNotExists()
+    val blastMerged  = (context / "blast.csv").createIfNotExists(createParents = true)
+    val noHitsMerged = (context / "blast.no-hits").createIfNotExists(createParents = true)
+    val lcaMerged    = (context / "lca.csv").createIfNotExists(createParents = true)
+    val bbhMerged    = (context / "bbh.csv").createIfNotExists(createParents = true)
 
     // TODO: write header for Blast output
     LazyTry { mergeChunks( context.inputFile(data.blastChunksFolder), blastMerged)  } -&-

@@ -91,9 +91,9 @@ case class assignDataProcessing[P <: AnyMG7Parameters](val parameters: P) extend
 
     // Outs:
     println(s"Creating output files...")
-    lazy val lcaFile = (context / "output" / "lca.csv").createIfNotExists()
+    lazy val lcaFile = (context / "output" / "lca.csv").createIfNotExists(createParents = true)
     println(s"Created output file [${lcaFile}]")
-    lazy val bbhFile = (context / "output" / "bbh.csv").createIfNotExists()
+    lazy val bbhFile = (context / "output" / "bbh.csv").createIfNotExists(createParents = true)
     println(s"Created output file [${bbhFile}]")
 
     lazy val lcaWriter = csv.Writer(csv.assignment.columns)(lcaFile)
