@@ -18,7 +18,7 @@ libraryDependencies ++= Seq(
   "ohnosequences" %% "ncbitaxonomy" % "0.1.0",
   // generic tools:
   "ohnosequences" %% "cosas"        % "0.8.0",
-  "ohnosequences" %% "loquat"       % "2.0.0-M8-58-g0c05b21",
+  "ohnosequences" %% "loquat"       % "2.0.0-M8-61-g27d4930",
   "ohnosequences" %% "statika"      % "2.0.0-RC1",
   "ohnosequences" %% "datasets"          % "0.4.0",
   "ohnosequences" %% "datasets-illumina" % "0.0.0-5-g811df8d",
