@@ -84,17 +84,12 @@ case class assignDataProcessing[P <: AnyMG7Parameters](val parameters: P) extend
 
   // TODO this is too big. Factor BBH and LCA into methods
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
-    println(s"Started data processing with context: ${context.workingDir}")
-    println(s"Input files: ${context.inputFiles}")
 
     lazy val blastReader = csv.Reader(parameters.blastOutRec.keys)(context.inputFile(data.blastChunk))
 
     // Outs:
-    println(s"Creating output files...")
     lazy val lcaFile = (context / "output" / "lca.csv").createIfNotExists(createParents = true)
-    println(s"Created output file [${lcaFile}]")
     lazy val bbhFile = (context / "output" / "bbh.csv").createIfNotExists(createParents = true)
-    println(s"Created output file [${bbhFile}]")
 
     lazy val lcaWriter = csv.Writer(csv.assignment.columns)(lcaFile)
     lazy val bbhWriter = csv.Writer(csv.assignment.columns)(bbhFile)
@@ -105,7 +100,6 @@ case class assignDataProcessing[P <: AnyMG7Parameters](val parameters: P) extend
       // for each read evaluate LCA and BBH and write the output files
       .foreach { case (readId: ID, hits: Stream[BlastRow]) =>
 
-        println(s"${hits.length} hits for the ${readId} read")
         // for each hit row we take the column with ID and lookup corresponding Taxas
         val allAssignments: List[(BlastRow, Taxa)] = hits.toList.map { row =>
           row -> taxIDsFor(row.select(sseqid))
@@ -122,7 +116,6 @@ case class assignDataProcessing[P <: AnyMG7Parameters](val parameters: P) extend
           allAssignments.maximumsBy { case (row, _) => parseLong(row.select(bitscore)).getOrElse(0L) },
           // BBH node is the lowest common ancestor of the most rank-specific nodes
           { nodes => nodes.maximumsBy(_.rankNumber) })
-        println("Written results")
       }
 
     blastReader.close()
