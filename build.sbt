@@ -18,21 +18,21 @@ libraryDependencies ++= Seq(
   "ohnosequences" %% "ncbitaxonomy" % "0.1.0",
   // generic tools:
   "ohnosequences" %% "cosas"        % "0.8.0",
-  "ohnosequences" %% "loquat"       % "2.0.0-M8-61-g27d4930",
-  "ohnosequences" %% "statika"      % "2.0.0-RC1",
-  "ohnosequences" %% "datasets"          % "0.4.0",
-  "ohnosequences" %% "datasets-illumina" % "0.0.0-5-g811df8d",
+  "ohnosequences" %% "loquat"       % "2.0.0-M8-63-g3a8874c",
+  "ohnosequences" %% "statika"      % "2.0.0-RC2",
+  "ohnosequences" %% "datasets"          % "0.4.1",
+  "ohnosequences" %% "datasets-illumina" % "0.1.0",
   // bundles:
   "ohnosequences-bundles" %% "flash" % "0.2.0",
   "ohnosequences-bundles" %% "blast" % "0.3.0",
   // testing:
-  "ohnosequences" %% "db-rna16s" % "0.12.0" % Test,
-  "org.scalatest" %% "scalatest" % "2.2.6"  % Test
+  "ohnosequences" %% "db-rna16s" % "0.12.0" % Test
 )
 
 dependencyOverrides ++= Set(
-  "ohnosequences" %% "statika" % "2.0.0-RC1",
-  "ohnosequences" %% "aws-scala-tools" % "0.18.0-6-g26137be",
+  // FIXME: this has to be updated in the other dependencies
+  "ohnosequences" %% "statika" % "2.0.0-RC2",
+  "ohnosequences" %% "aws-scala-tools" % "0.18.1",
   "com.github.pathikrit" %% "better-files" % "2.16.0",
   /////
   "org.apache.httpcomponents" % "httpclient" % "4.5.1",
