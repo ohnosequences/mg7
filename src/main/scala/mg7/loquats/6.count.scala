@@ -182,15 +182,15 @@ case class countDataProcessing() extends DataProcessingBundle(
 
     success(s"Done",
       // LCA
-      data.lca.direct.absolute(lcaCounts.direct.absolute.file) ::
-      data.lca.accum.absolute (lcaCounts.accum.absolute.file) ::
-      data.lca.direct.relative(lcaCounts.direct.relative.file) ::
-      data.lca.accum.relative (lcaCounts.accum.relative.file) ::
+      data.lca.direct.absolute(lcaCounts.direct.absolute.file.toJava) ::
+      data.lca.accum.absolute (lcaCounts.accum.absolute.file.toJava) ::
+      data.lca.direct.relative(lcaCounts.direct.relative.file.toJava) ::
+      data.lca.accum.relative (lcaCounts.accum.relative.file.toJava) ::
       // BBH
-      data.bbh.direct.absolute(bbhCounts.direct.absolute.file) ::
-      data.bbh.accum.absolute (bbhCounts.accum.absolute.file) ::
-      data.bbh.direct.relative(bbhCounts.direct.relative.file) ::
-      data.bbh.accum.relative (bbhCounts.accum.relative.file) ::
+      data.bbh.direct.absolute(bbhCounts.direct.absolute.file.toJava) ::
+      data.bbh.accum.absolute (bbhCounts.accum.absolute.file.toJava) ::
+      data.bbh.direct.relative(bbhCounts.direct.relative.file.toJava) ::
+      data.bbh.accum.relative (bbhCounts.accum.relative.file.toJava) ::
       *[AnyDenotation { type Value <: FileResource }]
     )
   }

@@ -85,13 +85,14 @@ case class assignDataProcessing[P <: AnyMG7Parameters](val parameters: P) extend
   // TODO this is too big. Factor BBH and LCA into methods
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
 
-    val blastReader = csv.Reader(parameters.blastOutRec.keys)(context.inputFile(data.blastChunk))
+    lazy val blastReader = csv.Reader(parameters.blastOutRec.keys)(context.inputFile(data.blastChunk))
 
     // Outs:
-    val lcaFile = (context / "output" / "lca.csv").createIfNotExists()
-    val bbhFile = (context / "output" / "bbh.csv").createIfNotExists()
-    val lcaWriter = csv.Writer(csv.assignment.columns)(lcaFile)
-    val bbhWriter = csv.Writer(csv.assignment.columns)(bbhFile)
+    lazy val lcaFile = (context / "output" / "lca.csv").createIfNotExists(createParents = true)
+    lazy val bbhFile = (context / "output" / "bbh.csv").createIfNotExists(createParents = true)
+
+    lazy val lcaWriter = csv.Writer(csv.assignment.columns)(lcaFile)
+    lazy val bbhWriter = csv.Writer(csv.assignment.columns)(bbhFile)
 
     blastReader.rows
       // grouping rows by the read id
@@ -103,6 +104,8 @@ case class assignDataProcessing[P <: AnyMG7Parameters](val parameters: P) extend
         val allAssignments: List[(BlastRow, Taxa)] = hits.toList.map { row =>
           row -> taxIDsFor(row.select(sseqid))
         }
+
+        println(s"${allAssignments.length} assignments for the ${readId} read")
 
         // LCA of all
         writeResult(lcaWriter)(readId, allAssignments, identity)
@@ -121,8 +124,8 @@ case class assignDataProcessing[P <: AnyMG7Parameters](val parameters: P) extend
     bbhWriter.close()
 
     success(s"Results are ready",
-      data.lcaChunk(lcaFile) ::
-      data.bbhChunk(bbhFile) ::
+      data.lcaChunk(lcaFile.toJava) ::
+      data.bbhChunk(bbhFile.toJava) ::
       *[AnyDenotation { type Value <: FileResource }]
     )
   }

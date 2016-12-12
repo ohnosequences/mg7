@@ -23,7 +23,7 @@ case class splitDataProcessing(parameters: AnyMG7Parameters) extends DataProcess
 
       outputDir.createDirectories()
 
-      val lines: Iterator[String] = context.inputFile(data.mergedReads).lines
+      val lines: Iterator[String] = context.inputFile(data.mergedReads).lineIterator
 
       val fastasIterator: Iterator[String] = parameters.splitInputFormat match {
         // if input is FastQ, we parse it, convert it to FASTA and get String version
@@ -44,7 +44,7 @@ case class splitDataProcessing(parameters: AnyMG7Parameters) extends DataProcess
     } -&-
     success(
       "chunk-chunk-chunk!",
-      data.fastaChunks(outputDir) ::
+      data.fastaChunks(outputDir.toJava) ::
       *[AnyDenotation { type Value <: FileResource }]
     )
   }

@@ -25,8 +25,8 @@ extends DataProcessingBundle(
 
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
 
-    val totalOutput = (context / "blastAll.csv").createIfNotExists()
-    val noHits = (context / "no.hits").createIfNotExists()
+    val totalOutput = (context / "blastAll.csv").createIfNotExists(createParents = true)
+    val noHits = (context / "no.hits").createIfNotExists(createParents = true)
 
     LazyTry {
       // NOTE: once we update to better-files 2.15.+, use `file.lineIterator` here (it's autoclosing):
@@ -87,8 +87,8 @@ extends DataProcessingBundle(
     } -&-
     success(
       "much blast, very success!",
-      data.blastChunk(totalOutput) ::
-      data.noHitsChunk(noHits) ::
+      data.blastChunk(totalOutput.toJava) ::
+      data.noHitsChunk(noHits.toJava) ::
       *[AnyDenotation { type Value <: FileResource }]
     )
 
