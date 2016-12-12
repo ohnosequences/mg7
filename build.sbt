@@ -51,10 +51,13 @@ assemblyMergeStrategy in assembly ~= { old => {
 }
 
 
-generateStatikaMetadataIn(Test)
-
-// This includes tests sources in the assembled fat-jar:
-fullClasspath in assembly := (fullClasspath in Test).value
+generateStatikaMetadataIn(Compile)
 
 // This turns on fat-jar publishing during release process:
 publishFatArtifact in Release := true
+
+// // These settings are only for manual testing:
+// generateStatikaMetadataIn(Test)
+//
+// // This includes tests sources in the assembled fat-jar:
+// fullClasspath in assembly := (fullClasspath in Test).value
