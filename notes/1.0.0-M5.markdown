@@ -10,4 +10,4 @@ This milestone doesn't add many new features, but rather focuses on the internal
 
 ----
 
-See the full list of pull requests merged in this release in the [v1.0-M4 milestone](https://github.com/ohnosequences/mg7/issues?q=milestone%3Av1.0-M4).
+See the full list of pull requests merged in this release in the [v1.0-M5 milestone](https://github.com/ohnosequences/mg7/milestone/5?closed=1).
