@@ -14,6 +14,8 @@ case object pacbio {
 
   case object pipeline extends MG7Pipeline(PacBioParameters) with MG7PipelineDefaults {
 
+    val logsS3Prefix = s3"loquat.testing" / "mg7" / "pacbio" /
+
     val sampleIDs: List[ID] = List(
       "stagg",
       "even"

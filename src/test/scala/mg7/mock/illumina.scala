@@ -15,6 +15,8 @@ case object illumina {
 
   case object pipeline extends FlashMG7Pipeline(IlluminaParameters) with MG7PipelineDefaults {
 
+    val logsS3Prefix = s3"loquat.testing" / "mg7" / "illumina" /
+
     // TODO move all this to the testData object
     /* For now we are only testing one sample */
     val sampleIDs: List[SampleID] = List(
