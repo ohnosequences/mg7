@@ -140,7 +140,7 @@ case class countDataProcessing() extends DataProcessingBundle(
             columns.AveragePident(averagePidents.get(taxa).getOrElse("-")) ::
             *[AnyDenotation]
           )
-          val percentage: Double = absoluteCount / totalAssignedReads * 100
+          val percentage: Double = (absoluteCount: Double) / totalAssignedReads * 100
 
           absolute.writer.addRow(row( absoluteCount.toString ))
           relative.writer.addRow(row( f"${percentage}%.4f" ))
