@@ -45,7 +45,4 @@ case object testDefaults {
     localCredentials = new ProfileCredentialsProvider("default"),
     keypairName = "aalekhin"
   )
-
-  val IlluminaParameters = defaults.Illumina.parameters(rna16sRefDB)
-  val PacBioParameters = defaults.PacBio.parameters(rna16sRefDB)
 }

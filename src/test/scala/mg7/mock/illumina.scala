@@ -13,7 +13,7 @@ import com.amazonaws.auth._, profile._
 
 case object illumina {
 
-  case object pipeline extends FlashMG7Pipeline(IlluminaParameters) with MG7PipelineDefaults {
+  case object pipeline extends FlashMG7Pipeline(defaults.Illumina(rna16sRefDB)) with MG7PipelineDefaults {
 
     override lazy val name = "illumina"
 

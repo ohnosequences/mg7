@@ -12,7 +12,7 @@ import com.amazonaws.auth._, profile._
 
 case object pacbio {
 
-  case object pipeline extends MG7Pipeline(PacBioParameters) with MG7PipelineDefaults {
+  case object pipeline extends MG7Pipeline(defaults.PacBio(rna16sRefDB)) with MG7PipelineDefaults {
 
     override lazy val name = "pacbio"
 
