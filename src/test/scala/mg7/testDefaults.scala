@@ -30,7 +30,8 @@ case object testDefaults {
 
     val metadata = ohnosequences.generated.metadata.mg7
     val iamRoleName = "loquat.testing"
-    val logsS3Prefix = s3"loquat.testing" /
+    val logsS3Prefix = s3"loquat.testing" / "mg7" / name /
+    val outputS3Folder = testDefaults.outputS3FolderFor(name)
 
     val splitConfig  = SplitConfig(1)
     val blastConfig  = BlastConfig(100)

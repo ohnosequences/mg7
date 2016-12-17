@@ -14,7 +14,7 @@ case object pacbio {
 
   case object pipeline extends MG7Pipeline(PacBioParameters) with MG7PipelineDefaults {
 
-    override val logsS3Prefix = s3"loquat.testing" / "mg7" / "pacbio" /
+    override lazy val name = "pacbio"
 
     val sampleIDs: List[ID] = List(
       "stagg",
@@ -26,7 +26,5 @@ case object pacbio {
     val inputSamples: Map[ID, S3Resource] = sampleIDs.map { id =>
       id -> S3Resource(testData.s3 / "pacbio" / s"${id}.subreads_ccs_99.fastq.filter.fastq")
     }.toMap
-
-    val outputS3Folder = testDefaults.outputS3FolderFor("pacbio")
   }
 }
