@@ -15,7 +15,7 @@ case object illumina {
 
   case object pipeline extends FlashMG7Pipeline(IlluminaParameters) with MG7PipelineDefaults {
 
-    override val logsS3Prefix = s3"loquat.testing" / "mg7" / "illumina" /
+    override lazy val name = "illumina"
 
     // TODO move all this to the testData object
     /* For now we are only testing one sample */
@@ -34,8 +34,6 @@ case object illumina {
         S3Resource(testData.s3 / "illumina" / s"${id}_2_val_2.fq.gz")
       ))
     }.toMap
-
-    val outputS3Folder = testDefaults.outputS3FolderFor("illumina")
 
     val flashParameters = FlashParameters(bp250)
 

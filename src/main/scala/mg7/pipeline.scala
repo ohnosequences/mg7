@@ -10,19 +10,24 @@ import com.amazonaws.auth._, profile._
 
 trait AnyMG7Pipeline { pipeline =>
 
+
   type Parameters <: AnyMG7Parameters
   val  parameters: Parameters
 
   val inputSamples: Map[SampleID, S3Resource]
   val outputS3Folder: (SampleID, StepName) => S3Folder
 
+  lazy val fullName: String = this.getClass.getName.split("\\$").mkString(".")
+
+  lazy val name: String = fullName
   val metadata: AnyArtifactMetadata
   val iamRoleName: String
   val logsS3Prefix: S3Folder
 
   /* This trait helps to set these common values */
-  trait CommonConfigDefaults {
+  trait CommonConfigDefaults extends AnyMG7LoquatConfig {
 
+    val pipelineName: String          = pipeline.name
     val metadata: AnyArtifactMetadata = pipeline.metadata
     val iamRoleName: String           = pipeline.iamRoleName
     val logsS3Prefix: S3Folder        = pipeline.logsS3Prefix
@@ -155,7 +160,6 @@ trait AnyMG7Pipeline { pipeline =>
     )
   }
 
-  lazy val fullName: String = this.getClass.getName.split("\\$").mkString(".")
   trait FixedName extends AnyLoquat {
 
     override lazy val fullName: String = s"${pipeline.fullName}.${this.toString}"
