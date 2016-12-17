@@ -65,7 +65,7 @@ case object defaults {
         *[AnyDenotation]
       )
 
-    case class parameters(val refDBs: AnyReferenceDB*) extends MG7Parameters(
+    class Parameters(val refDBs: AnyReferenceDB*) extends MG7Parameters(
       splitInputFormat = FastQInput,
       splitChunkSize   = 1000,
       blastCommand     = blastn,
@@ -73,6 +73,8 @@ case object defaults {
       blastOptions     = blastnOptions.value,
       referenceDBs     = refDBs.toSet
     )
+
+    def apply(refDBs: AnyReferenceDB*): Parameters = new Parameters(refDBs: _*)
   }
 
   case object PacBio {
@@ -87,7 +89,7 @@ case object defaults {
         *[AnyDenotation]
       )
 
-    case class parameters(val refDBs: AnyReferenceDB*) extends MG7Parameters(
+    class Parameters(val refDBs: AnyReferenceDB*) extends MG7Parameters(
       splitInputFormat = FastQInput,
       splitChunkSize   = 100,
       blastCommand     = blastn,
@@ -95,6 +97,8 @@ case object defaults {
       blastOutRec      = defaults.blastnOutputRecord,
       referenceDBs     = refDBs.toSet
     )
+
+    def apply(refDBs: AnyReferenceDB*): Parameters = new Parameters(refDBs: _*)
   }
 
 }
