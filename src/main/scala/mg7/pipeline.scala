@@ -18,8 +18,8 @@ trait AnyMG7Pipeline { pipeline =>
   val outputS3Folder: (SampleID, StepName) => S3Folder
 
   lazy val fullName: String = this.getClass.getName.split("\\$").mkString(".")
-
   lazy val name: String = fullName
+
   val metadata: AnyArtifactMetadata
   val iamRoleName: String
   val logsS3Prefix: S3Folder

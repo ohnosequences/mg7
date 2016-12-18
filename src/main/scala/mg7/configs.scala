@@ -12,7 +12,7 @@ trait AnyMG7LoquatConfig extends AnyLoquatConfig {
 
   val pipelineName: String
   val stepName: String
-  val loquatName: String = s"${pipelineName}-${stepName}"
+  lazy val loquatName: String = s"${pipelineName}-${stepName}"
 
   lazy val defaultAMI = AmazonLinuxAMI(Ireland, HVM, InstanceStore)
 
