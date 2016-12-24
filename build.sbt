@@ -24,9 +24,9 @@ libraryDependencies ++= Seq(
   "ohnosequences" %% "datasets-illumina" % "0.1.0",
   // bundles:
   "ohnosequences-bundles" %% "flash" % "0.3.0",
-  "ohnosequences-bundles" %% "blast" % "0.4.0",
+  "ohnosequences-bundles" %% "blast" % "0.4.0"
   // testing:
-  "ohnosequences" %% "db-rna16s" % "0.12.0" % Test
+  // "ohnosequences" %% "db-rna16s" % "0.12.0" % Test
 )
 
 dependencyOverrides ++= Set(
