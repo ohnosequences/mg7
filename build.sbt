@@ -22,6 +22,7 @@ libraryDependencies ++= Seq(
   "ohnosequences" %% "statika"      % "2.0.0",
   "ohnosequences" %% "datasets"          % "0.4.1",
   "ohnosequences" %% "datasets-illumina" % "0.1.0",
+  "com.github.tototoshi" %% "scala-csv" % "1.3.4",
   // bundles:
   "ohnosequences-bundles" %% "flash" % "0.3.0",
   "ohnosequences-bundles" %% "blast" % "0.4.0"
