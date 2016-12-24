@@ -13,7 +13,6 @@ case object defaults {
     blastn.options(
       /* This actually depends on the workers instance type */
       num_threads(4)              ::
-      blastn.task(blastn.blastn)  ::
       evalue(BigDecimal(1E-100))  ::
       max_target_seqs(10000)      ::
       strand(Strands.both)        ::

@@ -46,9 +46,9 @@ trait AnyMG7Parameters {
     BlastExpression(blastCommand)(
       outputRecord = blastOutRec,
       argumentValues =
-        db(referenceDBs.map(_.blastDBName)) ::
-        query(inFile) ::
-        ohnosequences.blast.api.out(outFile) ::
+        db(referenceDBs.map(_.blastDBName.toJava)) ::
+        query(inFile.toJava) ::
+        ohnosequences.blast.api.out(outFile.toJava) ::
         *[AnyDenotation],
       optionValues = blastOptions
     )(argValsToSeq, optValsToSeq)

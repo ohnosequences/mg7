@@ -29,7 +29,7 @@ case class splitDataProcessing(parameters: AnyMG7Parameters) extends DataProcess
         // if input is FastQ, we parse it, convert it to FASTA and get String version
         case FastQInput => fastq.parseFastqDropErrors(lines).map(_.toFASTA.asString)
         // if it's Fasta, we parse it and get String version
-        case FastaInput => fasta.parseFastaDropErrors(lines).map(_.asString)
+        case FastaInput => lines.buffered.parseFastaDropErrors().map(_.asString)
       }
 
       // group it

@@ -33,7 +33,7 @@ extends DataProcessingBundle(
       val source = io.Source.fromFile( context.inputFile(data.fastaChunk).toJava )
       val totalOutputWriter = csv.Writer(parameters.blastOutRec.keys)(totalOutput)
 
-      fasta.parseFastaDropErrors(source.getLines) foreach { read =>
+      source.getLines.buffered.parseFastaDropErrors() foreach { read =>
         println(s"\nRunning BLAST for the read ${read.getV(header).id}")
 
         val inFile = (context / "read.fa").overwrite(read.asString)
