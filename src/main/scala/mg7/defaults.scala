@@ -59,15 +59,13 @@ case object defaults {
 
     lazy val blastnOptions =
       defaults.blastnOptions.update(
-        word_size(46)               ::
-        evalue(BigDecimal(1E-100))  ::
-        perc_identity(98.0)         ::
+        perc_identity(98.0) ::
         *[AnyDenotation]
       )
 
     class Parameters(val refDBs: AnyReferenceDB*) extends MG7Parameters(
       splitInputFormat = FastQInput,
-      splitChunkSize   = 1000,
+      splitChunkSize   = 100,
       blastCommand     = blastn,
       blastOutRec      = defaults.blastnOutputRecord,
       blastOptions     = blastnOptions.value,
@@ -81,22 +79,23 @@ case object defaults {
 
     lazy val blastnOptions =
       defaults.blastnOptions.update(
-        reward(1)                   ::
-        penalty(-2)                 ::
-        word_size(72)               ::
-        evalue(BigDecimal(1e-100))  ::
-        perc_identity(98.5)         ::
+        perc_identity(98.5) ::
         *[AnyDenotation]
       )
 
     class Parameters(val refDBs: AnyReferenceDB*) extends MG7Parameters(
       splitInputFormat = FastQInput,
-      splitChunkSize   = 100,
+      splitChunkSize   = 10,
       blastCommand     = blastn,
       blastOptions     = blastnOptions.value,
       blastOutRec      = defaults.blastnOutputRecord,
       referenceDBs     = refDBs.toSet
-    )
+    ) {
+
+      override def blastFilter(row: csv.Row[BlastOutRecKeys]): Boolean = {
+        row.select(out.qcovs).toDouble >= 99.0
+      }
+    }
 
     def apply(refDBs: AnyReferenceDB*): Parameters = new Parameters(refDBs: _*)
   }
