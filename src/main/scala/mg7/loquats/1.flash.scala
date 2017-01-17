@@ -28,12 +28,12 @@ extends DataProcessingBundle(
 
     // define input
     lazy val flashInput = FlashInputAt(
-      reads1fastq,
-      reads2fastq
+      reads1fastq.toJava,
+      reads2fastq.toJava
     )
 
     // define output
-    lazy val flashOutput = FlashOutputAt((context / "output"), prefix = "")
+    lazy val flashOutput = FlashOutputAt((context / "output").toJava, prefix = "")
 
     // the FLASh cmd we are going to run
     lazy val flashExpr = FlashExpression(
@@ -50,10 +50,10 @@ extends DataProcessingBundle(
     seqToInstructions(flashExpr.cmd)      -&-
     success(
       "FLASh merged reads, much success so fast",
-      data.mergedReads(flashOutput.mergedReads.toJava) ::
-      data.pair1NotMerged(flashOutput.pair1NotMerged.toJava) ::
-      data.pair2NotMerged(flashOutput.pair2NotMerged.toJava) ::
-      data.flashHistogram(flashOutput.lengthNumericHistogram.toJava) ::
+      data.mergedReads(flashOutput.mergedReads) ::
+      data.pair1NotMerged(flashOutput.pair1NotMerged) ::
+      data.pair2NotMerged(flashOutput.pair2NotMerged) ::
+      data.flashHistogram(flashOutput.lengthNumericHistogram) ::
       *[AnyDenotation { type Value <: FileResource }]
     )
   }
