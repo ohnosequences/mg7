@@ -19,7 +19,6 @@ This actually depends on the workers instance type
 
 ```scala
       num_threads(4)              ::
-      blastn.task(blastn.blastn)  ::
       evalue(BigDecimal(1E-100))  ::
       max_target_seqs(10000)      ::
       strand(Strands.both)        ::
@@ -68,42 +67,45 @@ These parameters are a sensible default for Illumina reads.
 
     lazy val blastnOptions =
       defaults.blastnOptions.update(
-        word_size(46)               ::
-        evalue(BigDecimal(1E-100))  ::
-        perc_identity(98.0)         ::
+        perc_identity(98.0) ::
         *[AnyDenotation]
       )
 
-    case class parameters(val refDBs: AnyReferenceDB*) extends MG7Parameters(
+    class Parameters(val refDBs: AnyReferenceDB*) extends MG7Parameters(
       splitInputFormat = FastQInput,
-      splitChunkSize   = 1000,
+      splitChunkSize   = 100,
       blastCommand     = blastn,
       blastOutRec      = defaults.blastnOutputRecord,
       blastOptions     = blastnOptions.value,
       referenceDBs     = refDBs.toSet
     )
+
+    def apply(refDBs: AnyReferenceDB*): Parameters = new Parameters(refDBs: _*)
   }
 
   case object PacBio {
 
     lazy val blastnOptions =
       defaults.blastnOptions.update(
-        reward(1)                   ::
-        penalty(-2)                 ::
-        word_size(72)               ::
-        evalue(BigDecimal(1e-100))  ::
-        perc_identity(98.5)         ::
+        perc_identity(98.5) ::
         *[AnyDenotation]
       )
 
-    case class parameters(val refDBs: AnyReferenceDB*) extends MG7Parameters(
+    class Parameters(val refDBs: AnyReferenceDB*) extends MG7Parameters(
       splitInputFormat = FastQInput,
-      splitChunkSize   = 100,
+      splitChunkSize   = 10,
       blastCommand     = blastn,
       blastOptions     = blastnOptions.value,
       blastOutRec      = defaults.blastnOutputRecord,
       referenceDBs     = refDBs.toSet
-    )
+    ) {
+
+      override def blastFilter(row: csv.Row[BlastOutRecKeys]): Boolean = {
+        row.select(out.qcovs).toDouble >= 99.0
+      }
+    }
+
+    def apply(refDBs: AnyReferenceDB*): Parameters = new Parameters(refDBs: _*)
   }
 
 }

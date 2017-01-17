@@ -31,16 +31,15 @@ case object PRJEB6592 {
   }
 
   case object pipeline extends MG7Pipeline(parameters) with MG7PipelineDefaults {
+    override lazy val name = "PRJEB6592"
 
     val sampleIds: List[ID] = List("ERR567374")
 
-    val commonS3Prefix = S3Folder("resources.ohnosequences.com", "16s/public-datasets/PRJEB6592")
+    val commonS3Prefix = s3"resources.ohnosequences.com/16s/public-datasets/PRJEB6592"/
 
     lazy val inputSamples: Map[SampleID, S3Resource] = sampleIds.map { sampleId =>
       sampleId -> S3Resource(commonS3Prefix / "flash-test" / s"${sampleId}.merged.fastq")
     }.toMap
-
-    lazy val outputS3Folder = testDefaults.outputS3FolderFor("PRJEB6592")
 
     override val splitConfig  = SplitConfig(1)
     override val blastConfig  = BlastConfig(10)

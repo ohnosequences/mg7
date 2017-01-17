@@ -12,6 +12,10 @@ import ohnosequences.blast.api.{ outputFields => out, _ }
 
 trait AnyMG7LoquatConfig extends AnyLoquatConfig {
 
+  val pipelineName: String
+  val stepName: String
+  lazy val loquatName: String = s"${pipelineName}-${stepName}"
+
   lazy val defaultAMI = AmazonLinuxAMI(Ireland, HVM, InstanceStore)
 
   lazy val managerConfig = ManagerConfig(
@@ -34,7 +38,7 @@ trait AnyMG7LoquatConfig extends AnyLoquatConfig {
   )
 }
 
-abstract class MG7LoquatConfig(val loquatName: String) extends AnyMG7LoquatConfig
+abstract class MG7LoquatConfig(val stepName: String) extends AnyMG7LoquatConfig
 
 
 abstract class AnyFlashConfig extends MG7LoquatConfig("flash")
