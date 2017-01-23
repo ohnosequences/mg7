@@ -31,7 +31,8 @@ case object testData {
 
     These are physical mock communities from BEI from which samples have been sequenced in our test data.
 
-    The difference between `HM-782D` and `HM-783D` is that `HM-782D` has **even** concentration of **RNA operon counts** per species, while `HM-783D` contains **staggered RNA operon counts**, with a difference of at most a `10^3` factor.
+    The difference between `HM-782D` and `HM-783D` is that `HM-782D` has **even** concentration of **RNA operon counts** per species, while `HM-783D` contains **staggered RNA operon counts**, with a difference of at most a `10^3` factor. The same difference is found between `HM-278D` and `HM-279D` where `HM-278D` has an even concentration of the operon while `HM-279D` has staggered RNA operon units.
+
   */
   val HM_782D =
     MockCommunity (
@@ -148,14 +149,80 @@ case object testData {
   /*
     ## Illumina mock communities
 
-    These are several mock community samples sequenced with Illumina.
+    16S V3-V4 region from the samples taken from the communities `HM-782D` and `HM-783D` were sequenced with Illumina MiSeq 2x300 as described in the article [http://www.ncbi.nlm.nih.gov/pmc/articles/PMC4636327/](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC4636327/). For each sample 3 technical replicas were obtained. The following table shows the correspondence between the datasets IDs (ERR IDs from SRA database) and the mock community where the sequences come from.
+
+    | ERR ID | BEI ID | Comment |
+    | :--- | ---: | ---: |
+    | ERR1049996 | HM-782D | BEI Mock even community HM-782D - rep1 |
+    | ERR1049997 | HM-782D | BEI Mock even community HM-782D - rep2 |
+    | ERR1049998 | HM-782D | BEI Mock even community HM-782D - rep3 |
+    | ERR1049999 | HM-783D | BEI Mock staggered community HM-783D - rep1 |
+    | ERR1050000 | HM-783D | BEI Mock staggered community HM-783D - rep2 |
+    | ERR1050001 | HM-783D | BEI Mock staggered community HM-783D - rep3 |
+
   */
-  // TODO check the IDs for Illumina even/staggered and add them here
   val ERR1049996 =
     MockCommunitySample (
       id        = "ERR1049996",
       community = HM_782D
     )
+
+  val ERR1049997 =
+    MockCommunitySample (
+      id        = "ERR1049997",
+      community = HM_782D
+    )
+
+    val ERR1049998 =
+      MockCommunitySample (
+        id        = "ERR1049998",
+        community = HM_782D
+      )
+
+    val ERR1049999 =
+      MockCommunitySample (
+        id        = "ERR1049999",
+        community = HM_783D
+      )
+
+    val ERR1050000 =
+      MockCommunitySample (
+        id        = "ERR1050000",
+        community = HM_783D
+      )
+
+    val ERR1050001 =
+      MockCommunitySample (
+        id        = "ERR1050001",
+        community = HM_783D
+      )
+
+      /*
+        ## PacBio mock communities
+
+        The full 16S gene from the samples coming from the `HM-278D` and `HM-279D` communities was sequenced with PacBio using circular consensus sequences (CCS). One dataset per comunity was obtained. The following table shows the correspondence between the datasets and the communities the data comes from.
+
+        | Sample ID | BEI ID | Comment |
+        | :--- | ---: | ---: |
+        | even | HM-278D | BEI:HM-278D |
+        | stagg | HM-279D | BEI:HM-279D staggered |
+
+      */
+
+      val even =
+        MockCommunitySample (
+          id        = "even",
+          community = HM_278D
+        )
+
+      val stagg =
+        MockCommunitySample (
+          id        = "stagg",
+          community = HM_279D 
+        )
+
+
+
 
   /* In the composition map, the values are the taxon name and the relative count of RNA operon copies */
   case class MockCommunity(val id: String, val description: URL, val composition: Map[Int,(String,Int)])
