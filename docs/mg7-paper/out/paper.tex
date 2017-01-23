@@ -218,7 +218,7 @@ These are some of the more innovative MG7 features:
   values considering the hierarchic structure of taxonomy tree
 \item
   Exhaustive per-read taxonomic assignment using two complementary
-  assignment algorithms Lowest Common Ancestor and Best BLAST Hit
+  assignment algorithms: Lowest Common Ancestor (LCA) and Best BLAST Hit
 \item
   Using a new 16S database of reference sequences (16S-DB7) with a
   flexible and sustainable system of updating and project-driven
@@ -484,19 +484,18 @@ sequences.
 
 The second step is to search for similar 16S sequences in our 16S-DB7
 database. The taxonomic assignment for each read is based on BLASTN of
-each read against the 16S database.Assignment based on direct similarity
-of each read one by one compared against a sufficiently wide database is
-considered in different reviews of metagenomics analysis methodologies
-\citep{segata2013computational} \citep{morgan2012chapter} as a very
-exhaustive method for assignment. Some methods of assignment compare the
-sequences only against the 16S genes from available complete bacterial
-genomes or avoid computational cost clustering or binning the sequences
-first, and then doing the assignments only for the representative
-sequence of each cluster. MG7 carries out an exhaustive comparison of
-all the reads under analysis and it does not applies any binning
-strategy. Every read is specifically compared with all the sequences of
-the 16S database. We select the best BLAST hits (10 hits by default)
-obtained for each read to do the taxonomic assignment.
+each read against the 16S database. Assignment based on direct
+similarity of each read one by one compared against a sufficiently wide
+database is considered in different reviews of metagenomics analysis
+methodologies \citep{segata2013computational} \citep{morgan2012chapter}
+as a very exhaustive method for assignment. Some methods of assignment
+compare the sequences only against the 16S genes from available complete
+bacterial genomes or avoid computational cost clustering or binning the
+sequences first, and then doing the assignments only for the
+representative sequence of each cluster. MG7 carries out an exhaustive
+comparison of all the reads under analysis and it does not apply any
+binning strategy. Every read is specifically compared with all the
+sequences of the 16S database.
 
 \subsubsection{Taxonomic Assignment
 Algorithms}\label{taxonomic-assignment-algorithms}
@@ -504,63 +503,50 @@ Algorithms}\label{taxonomic-assignment-algorithms}
 All the reads are assigned under two different algorithms of assignment:
 i. Lowest Common Ancestor based taxonomic assignment (LCA) and ii. Best
 BLAST Hit based taxonomic assignment (BBH). Figure 2 displays
-schematically the LCA algorithm applied sensu stricto (left panel) and
-the called `in line' exception (right panel) designed in order to gain
-specificity in the assignments in the cases in which the topology of the
-taxonomical nodes corresponding to the BLAST hits support sufficiently
-the assignment to the most specific taxon.
+schematically the LCA algorithm.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics{./Figure-2.jpg}
 \caption{\textbf{Lowest Common Ancestor algorithm for taxonomic
-assignment.} The Left panel displays an example of the application of
-LCA algorithm in a \emph{sensu stricto} mode. A, B, C and D represent
-taxonomy tree nodes with assigned reads. Right panel displays the
-\emph{in line} mode of assignment which is an exception for the
-\emph{sensu stricto} mode of application of LCA algorithm. The \emph{in
-line} mode is used when all the nodes are located in a line without
-bifurcations. In that case the taxon assigned is the most specific (the
-most distant from the root).}
+assignment.} \textbf{TODO UPDATE THIS FIGURE!} The Left panel displays
+an example of the application of LCA algorithm in a \emph{sensu stricto}
+mode. A, B, C and D represent taxonomy tree nodes with assigned reads.
+Right panel displays the \emph{in line} mode of assignment which is an
+exception for the \emph{sensu stricto} mode of application of LCA
+algorithm. The \emph{in line} mode is used when all the nodes are
+located in a line without bifurcations. In that case the taxon assigned
+is the most specific (the most distant from the root).}
 \end{figure}
 
-\paragraph{Lowest Common Ancestor based Taxonomic
-Assignment}\label{lowest-common-ancestor-based-taxonomic-assignment}
+All the assignment procedures work by default with input the set of
+BLAST hits which have maximum bitscore among those covering the whole
+query sequence; we will call this the set of valid hits of a query. Note
+that the criteria which determines this set of valid hits is fully
+configurable, and should be adjusted to conform to its meaning in each
+particular dataset: those hits which we should take into account as
+valid for assignment. This is of course experiment-dependent, and the
+criteria for valid hits should account for read quality or
+technology-specific error profiles.
 
-For each read, first, we select the BEST BLAST HITs (by default 10 Hits)
-over a threshold of similarity. To evaluate similarity for this first
-filtering of hits we use the Expect value (by default
-\(evalue \leq e^{-15}\)) that describes the number of hits one can
-``expect'' to see by chance when searching a database of a particular
-size. In a second filtering step we filtering those hits that are not
-sufficiently good comparing them with the best one. We select the best
-HSP (High Similarity Pair) per reference sequence and then choose the
-best HSP (that with lowest E-value) between all the selected ones. The
-bitscore of this best HSP (called S) is used as reference to filter the
-rest of HSPs. All the HSPs with bitscore below the product \(p S\) are
-filtered. p is a coefficient fixed by the user to define the bitscore
-required, e.g.~if \(p=0.9\) and \(S=700\) the required bitscore
-threshold would be \(630\). Once we have the definitive HSPs selected,
-we obtain their corresponding taxonomic nodes using the taxonomic
-assignments that NCBI provides for all the nt database sequences. Now we
-have to analyze the topological distribution of these nodes in the
-taxonomy tree: i. If all the nodes forms a line in the taxonomy tree
-(are located in a not branched lineage to the tree root) we should
-choose the most specific taxID as the final assignment for that read. We
-call to this kind of assignment the `in line' exception (see Figure 2
-right panel). ii. If not, we should search for the \emph{sensu stricto}
-Lowest Common Ancestor (LCA) of all the selected taxonomic nodes (See
-Figure 2 left panel). In this approach we decided to use the bitscore
-for evaluating the similarity because it is a value that increases when
-similarity is higher and depends a lot on the length of the HSP. Some
-reads could not find sequences with enough similarity in the database
-and then they would be classified as reads with no hits. Advanced
-metagenomics analysis approaches \citep{huson2012microbial} have adopted
-LCA-based assignment algorithms because it provides fine and trusted
-taxonomical assignment.
+\paragraph{LCA assignment}\label{lca-assignment}
 
-\paragraph{Best BLAST hit taxonomic
-assignment}\label{best-blast-hit-taxonomic-assignment}
+The LCA assignment simply computes the lowest common ancestor of the set
+of valid hits. Other metagenomics analysis approaches
+\citep{huson2012microbial} have adopted LCA-based assignment algorithms,
+as it provides the most precise assignment for a set of taxa, with no
+further information available\footnote{the lowest common ancestor of a
+  set of nodes in a tree is just their product in the tree viewed as a
+  poset, with the ``parent of'' partial order}; as our reference
+database is already heavily preprocessed and checked for internal
+consistency, there is no need for altering the lowest common ancestor in
+any way, as is customarily done in other cases. MG7 operates under the
+assumption that hits which fulfill the user-defined criteria for being
+valid hits should be treated on an equal footing, and in that case
+taking their LCA is the coherent assignment choice with minimum
+information loss.
+
+\paragraph{Best BLAST hit assignment}\label{best-blast-hit-assignment}
 
 We decided to maintain the simpler method of Best BLAST Hit (BBH) for
 taxonomic assignment because, in some cases, it can provide information
