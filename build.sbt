@@ -12,21 +12,22 @@ resolvers := Seq(
 
 libraryDependencies ++= Seq(
   // APIs:
-  "ohnosequences" %% "flash"        % "0.3.0",
-  "ohnosequences" %% "fastarious"   % "0.6.0",
-  "ohnosequences" %% "blast-api"    % "0.7.0",
-  "ohnosequences" %% "ncbitaxonomy" % "0.1.0",
+  "ohnosequences" %% "ncbitaxonomy" % "0.2.0",
+  "ohnosequences" %% "fastarious"   % "0.8.0",
+  "ohnosequences" %% "blast-api"    % "0.8.0",
+  "ohnosequences" %% "flash-api"    % "0.4.0",
   // generic tools:
   "ohnosequences" %% "cosas"        % "0.8.0",
-  "ohnosequences" %% "datasets"     % "0.3.0",
-  "ohnosequences" %% "loquat"       % "2.0.0-M8",
-  "ohnosequences" %% "statika"      % "2.0.0-M5",
+  "ohnosequences" %% "loquat"       % "2.0.0-RC1",
+  "ohnosequences" %% "statika"      % "2.0.0",
+  "ohnosequences" %% "datasets"          % "0.4.1",
+  "ohnosequences" %% "datasets-illumina" % "0.1.0",
+  "com.github.tototoshi" %% "scala-csv" % "1.3.4",
   // bundles:
-  "ohnosequences-bundles" %% "flash"      % "0.2.0",
-  "ohnosequences-bundles" %% "blast"      % "0.3.0",
+  "ohnosequences-bundles" %% "flash" % "0.3.0",
+  "ohnosequences-bundles" %% "blast" % "0.4.0",
   // testing:
-  "ohnosequences" %% "db-rna16s" % "0.9.0-60-g5090204"  % Test,
-  "org.scalatest" %% "scalatest" % "2.2.6"              % Test
+  "ohnosequences" %% "db-rna16s" % "1.0.0-RC1" % Test
 )
 
 dependencyOverrides ++= Set(
@@ -38,7 +39,7 @@ dependencyOverrides ++= Set(
 wartremoverErrors in (Test, compile) := Seq()
 wartremoverErrors in (Compile, compile) := Seq()
 
-mergeStrategy in assembly ~= { old => {
+assemblyMergeStrategy in assembly ~= { old => {
     case "log4j.properties"                       => MergeStrategy.filterDistinctLines
     case PathList("org", "apache", "commons", _*) => MergeStrategy.first
     case x                                        => old(x)
@@ -46,10 +47,13 @@ mergeStrategy in assembly ~= { old => {
 }
 
 
+// generateStatikaMetadataIn(Compile)
+//
+// // This turns on fat-jar publishing during release process:
+// publishFatArtifact in Release := true
+
+// These settings are only for manual testing:
 generateStatikaMetadataIn(Test)
 
 // This includes tests sources in the assembled fat-jar:
 fullClasspath in assembly := (fullClasspath in Test).value
-
-// This turns on fat-jar publishing during release process:
-publishFatArtifact in Release := true

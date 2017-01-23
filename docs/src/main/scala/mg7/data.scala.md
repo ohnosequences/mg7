@@ -7,14 +7,13 @@ import ohnosequences.cosas._, types._, klists._
 
 case object data {
 
-  // Flash:
   case object pairedReads1 extends FileData("reads1")("fastq.gz")
   case object pairedReads2 extends FileData("reads2")("fastq.gz")
 
-  case object mergedReads    extends FileData("reads")("fastq")
+  case object mergedReads    extends FileData("merged")("fastq")
   case object pair1NotMerged extends FileData("pair1.not-merged")("fastq")
   case object pair2NotMerged extends FileData("pair2.not-merged")("fastq")
-  case object flashHistogram extends FileData("stats")("txt")
+  case object flashHistogram extends FileData("stats")("hist")
 
   case object flashInput  extends DataSet(
     pairedReads1 :×:
@@ -29,13 +28,11 @@ case object data {
     |[AnyData]
   )
 
-
   // Reads after splitting (multiple files in a virtual S3 folder):
   case object fastaChunks extends Data("reads-chunks")
 
-  case object splitInput extends DataSet(mergedReads :×: |[AnyData])
+  case object splitInput  extends DataSet(mergedReads :×: |[AnyData])
   case object splitOutput extends DataSet(fastaChunks :×: |[AnyData])
-
 
   // Blast input:
   case object fastaChunk extends FileData("reads")("fastq")
@@ -67,8 +64,6 @@ case object data {
     |[AnyData]
   )
 
-
-
   // all output chunks together:
   case object blastChunksFolder extends Data("blast-chunks")
   case object blastNoHitsFolder extends Data("blast-no-hits")
@@ -76,36 +71,42 @@ case object data {
   case object bbhChunksFolder   extends Data("bbh-chunks")
   // after merging chunks:
   case object blastResult extends FileData("blast")("csv")
-  case object blastNoHits extends Data("blast.no-hits.fasta")
+  case object blastNoHits extends FileData("blast.no-hits")("fasta")
   case object lcaCSV      extends FileData("lca")("csv")
   case object bbhCSV      extends FileData("bbh")("csv")
 
   case object mergeInput extends DataSet(
     blastChunksFolder :×:
     blastNoHitsFolder :×:
-    lcaChunksFolder :×:
-    bbhChunksFolder :×:
+    lcaChunksFolder   :×:
+    bbhChunksFolder   :×:
     |[AnyData]
   )
   case object mergeOutput extends DataSet(
     blastResult :×:
     blastNoHits :×:
-    lcaCSV :×:
-    bbhCSV :×:
+    lcaCSV      :×:
+    bbhCSV      :×:
     |[AnyData]
   )
 
-
   // Counting output:
-  case object lcaDirectCountsCSV     extends FileData("lca.direct.counts")("csv")
-  case object lcaAccumCountsCSV      extends FileData("lca.accum.counts")("csv")
-  case object lcaDirectFreqCountsCSV extends FileData("lca.direct.frequency.counts")("csv")
-  case object lcaAccumFreqCountsCSV  extends FileData("lca.accum.frequency.counts")("csv")
+  class DataCounts(prefix: String) {
 
-  case object bbhDirectCountsCSV     extends FileData("bbh.direct.counts")("csv")
-  case object bbhAccumCountsCSV      extends FileData("bbh.accum.counts")("csv")
-  case object bbhDirectFreqCountsCSV extends FileData("bbh.direct.frequency.counts")("csv")
-  case object bbhAccumFreqCountsCSV  extends FileData("bbh.accum.frequency.counts")("csv")
+    case object direct extends DirectAccum("direct")
+    case object accum  extends DirectAccum("accumulated")
+
+    class DirectAccum(directaccum: String) {
+
+      case object absolute extends AbsRel("absolute.counts")
+      case object relative extends AbsRel("frequency.percentage")
+
+      class AbsRel(absrel: String)
+        extends FileData(s"${prefix}.${directaccum}.${absrel}")("csv")
+    }
+  }
+  case object lca extends DataCounts("lca")
+  case object bbh extends DataCounts("bbh")
 
   case object countInput extends DataSet(
     lcaCSV :×:
@@ -113,17 +114,16 @@ case object data {
     |[AnyData]
   )
   case object countOutput extends DataSet(
-    lcaDirectCountsCSV :×:
-    lcaAccumCountsCSV :×:
-    lcaDirectFreqCountsCSV :×:
-    lcaAccumFreqCountsCSV :×:
-    bbhDirectCountsCSV :×:
-    bbhAccumCountsCSV :×:
-    bbhDirectFreqCountsCSV :×:
-    bbhAccumFreqCountsCSV :×:
+    lca.direct.absolute :×:
+    lca.accum.absolute  :×:
+    lca.direct.relative :×:
+    lca.accum.relative  :×:
+    bbh.direct.absolute :×:
+    bbh.accum.absolute  :×:
+    bbh.direct.relative :×:
+    bbh.accum.relative  :×:
     |[AnyData]
   )
-
 
   case object sampleID extends FileData("sample-id")("txt")
   case object sampleStatsCSV extends FileData("sample.stats")("csv")
@@ -141,7 +141,6 @@ case object data {
     |[AnyData]
   )
 
-
   case object sampleStatsFolder extends Data("stats")
   case object summaryStatsCSV extends FileData("summary.stats")("csv")
 
@@ -153,8 +152,6 @@ case object data {
     summaryStatsCSV :×:
     |[AnyData]
   )
-
-
 }
 
 ```
@@ -162,26 +159,27 @@ case object data {
 
 
 
-[main/scala/mg7/bio4j/bundle.scala]: bio4j/bundle.scala.md
-[main/scala/mg7/bio4j/taxonomyTree.scala]: bio4j/taxonomyTree.scala.md
-[main/scala/mg7/bio4j/titanTaxonomyTree.scala]: bio4j/titanTaxonomyTree.scala.md
+[main/scala/mg7/bundles.scala]: bundles.scala.md
+[main/scala/mg7/configs.scala]: configs.scala.md
 [main/scala/mg7/csv.scala]: csv.scala.md
 [main/scala/mg7/data.scala]: data.scala.md
-[main/scala/mg7/dataflow.scala]: dataflow.scala.md
-[main/scala/mg7/dataflows/full.scala]: dataflows/full.scala.md
-[main/scala/mg7/dataflows/noFlash.scala]: dataflows/noFlash.scala.md
+[main/scala/mg7/defaults.scala]: defaults.scala.md
 [main/scala/mg7/loquats/1.flash.scala]: loquats/1.flash.scala.md
 [main/scala/mg7/loquats/2.split.scala]: loquats/2.split.scala.md
 [main/scala/mg7/loquats/3.blast.scala]: loquats/3.blast.scala.md
 [main/scala/mg7/loquats/4.assign.scala]: loquats/4.assign.scala.md
 [main/scala/mg7/loquats/5.merge.scala]: loquats/5.merge.scala.md
 [main/scala/mg7/loquats/6.count.scala]: loquats/6.count.scala.md
-[main/scala/mg7/loquats/7.stats.scala]: loquats/7.stats.scala.md
-[main/scala/mg7/loquats/8.summary.scala]: loquats/8.summary.scala.md
 [main/scala/mg7/package.scala]: package.scala.md
 [main/scala/mg7/parameters.scala]: parameters.scala.md
+[main/scala/mg7/pipeline.scala]: pipeline.scala.md
 [main/scala/mg7/referenceDB.scala]: referenceDB.scala.md
 [test/scala/mg7/counts.scala]: ../../../test/scala/mg7/counts.scala.md
-[test/scala/mg7/lca.scala]: ../../../test/scala/mg7/lca.scala.md
-[test/scala/mg7/pipeline.scala]: ../../../test/scala/mg7/pipeline.scala.md
+[test/scala/mg7/fqnames.scala]: ../../../test/scala/mg7/fqnames.scala.md
+[test/scala/mg7/mock/illumina.scala]: ../../../test/scala/mg7/mock/illumina.scala.md
+[test/scala/mg7/mock/pacbio.scala]: ../../../test/scala/mg7/mock/pacbio.scala.md
+[test/scala/mg7/PRJEB6592/PRJEB6592.scala]: ../../../test/scala/mg7/PRJEB6592/PRJEB6592.scala.md
+[test/scala/mg7/referenceDBs.scala]: ../../../test/scala/mg7/referenceDBs.scala.md
 [test/scala/mg7/taxonomy.scala]: ../../../test/scala/mg7/taxonomy.scala.md
+[test/scala/mg7/testData.scala]: ../../../test/scala/mg7/testData.scala.md
+[test/scala/mg7/testDefaults.scala]: ../../../test/scala/mg7/testDefaults.scala.md

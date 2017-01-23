@@ -2,41 +2,56 @@
 ```scala
 package ohnosequences
 
-import ohnosequences.mg7.bio4j.taxonomyTree._
 import ohnosequences.cosas._, types._, klists._, typeUnions._
+import ohnosequences.loquat._
 import ohnosequences.blast.api._
-
-import better.files._
 
 package object mg7 {
 
   type ID = String
-  type TaxID = ID
+  type Taxon  = ID
+  type Taxa   = Seq[Taxon]
   type ReadID = ID
   type NodeID = ID
 
-  type LCA = AnyTaxonNode
-  type BBH = AnyTaxonNode
+  type TitanTaxon = ncbitaxonomy.TitanNode
+
+  type LCA = ncbitaxonomy.titan.ncbiTitanTaxon
+  type BBH = ncbitaxonomy.titan.ncbiTitanTaxon
 
   type SampleID = ID
   type StepName = String
+
+  type DataMappings[DP <: AnyDataProcessingBundle] = List[DataMapping[DP]]
 
   def parseInt(str: String): Option[Int] = util.Try(str.toInt).toOption
   def parseLong(str: String): Option[Long] = util.Try(str.toLong).toOption
   def parseDouble(str: String): Option[Double] = util.Try(str.toDouble).toOption
 
+  // Used in dataMappings to get value pairs from another maps
   def lookup[A, B](a: A, m: Map[A, B]): (A, B) = a -> m.apply(a)
 
-  def maximums[T, X](s: Iterable[T])(f: T => X)
-    (implicit cmp: Ordering[X]): List[T] =
-      s.foldLeft(List[T]()) {
+  implicit class TraversableOps[T](val col: Traversable[T]) extends AnyVal {
+```
+
+This method is like standard maxBy, but accumulates _all_ maximum elements
+
+```scala
+    def maximumsBy[X](f: T => X)(implicit cmp: Ordering[X]): List[T] =
+      col.foldLeft(List[T]()) {
         case (a :: acc, t) if (    cmp.lt(f(t), f(a)) ) => a :: acc
         case (a :: acc, t) if ( cmp.equiv(f(t), f(a)) ) => t :: a :: acc
         // either acc is empty or t is the new maximum
         case (_, t) => List(t)
       }
 
-  def averageOf(vals: Seq[Double]): Double = vals.sum / vals.length
+    def  maximums(implicit cmp: Ordering[T]): List[T] = maximumsBy(identity[T])
+  }
+
+  implicit class SeqDoubleOps(val seq: Seq[Double]) extends AnyVal {
+
+    def average: Double = seq.sum / seq.length
+  }
 
 
   type BlastArgumentsVals =
@@ -44,39 +59,6 @@ package object mg7 {
     (query.type := query.Raw) ::
     (out.type   := out.Raw)   ::
     *[AnyDenotation]
-
-
-  // We set here all options explicitly
-  val defaultBlastnOptions: blastn.Options := blastn.OptionsVals =
-    blastn.options(
-```
-
-This actually depends on the workers instance type
-
-```scala
-      num_threads(4) ::
-      blastn.task(blastn.blastn) ::
-      evalue(BigDecimal(1E-100)) ::
-```
-
-We're going to use all hits to do global sample-coherent assignment. But not now, so no reason for this to be huge
-
-```scala
-      max_target_seqs(150) ::
-      strand(Strands.both) ::
-      word_size(46) ::
-      show_gis(false) ::
-      ungapped(false) ::
-      penalty(-2)  ::
-      reward(1) ::
-```
-
-95% is a reasonable minimum. If it does not work, be more stringent with read preprocessing
-
-```scala
-      perc_identity(95.0) ::
-      *[AnyDenotation]
-    )
 }
 
 ```
@@ -84,26 +66,27 @@ We're going to use all hits to do global sample-coherent assignment. But not now
 
 
 
-[main/scala/mg7/bio4j/bundle.scala]: bio4j/bundle.scala.md
-[main/scala/mg7/bio4j/taxonomyTree.scala]: bio4j/taxonomyTree.scala.md
-[main/scala/mg7/bio4j/titanTaxonomyTree.scala]: bio4j/titanTaxonomyTree.scala.md
+[main/scala/mg7/bundles.scala]: bundles.scala.md
+[main/scala/mg7/configs.scala]: configs.scala.md
 [main/scala/mg7/csv.scala]: csv.scala.md
 [main/scala/mg7/data.scala]: data.scala.md
-[main/scala/mg7/dataflow.scala]: dataflow.scala.md
-[main/scala/mg7/dataflows/full.scala]: dataflows/full.scala.md
-[main/scala/mg7/dataflows/noFlash.scala]: dataflows/noFlash.scala.md
+[main/scala/mg7/defaults.scala]: defaults.scala.md
 [main/scala/mg7/loquats/1.flash.scala]: loquats/1.flash.scala.md
 [main/scala/mg7/loquats/2.split.scala]: loquats/2.split.scala.md
 [main/scala/mg7/loquats/3.blast.scala]: loquats/3.blast.scala.md
 [main/scala/mg7/loquats/4.assign.scala]: loquats/4.assign.scala.md
 [main/scala/mg7/loquats/5.merge.scala]: loquats/5.merge.scala.md
 [main/scala/mg7/loquats/6.count.scala]: loquats/6.count.scala.md
-[main/scala/mg7/loquats/7.stats.scala]: loquats/7.stats.scala.md
-[main/scala/mg7/loquats/8.summary.scala]: loquats/8.summary.scala.md
 [main/scala/mg7/package.scala]: package.scala.md
 [main/scala/mg7/parameters.scala]: parameters.scala.md
+[main/scala/mg7/pipeline.scala]: pipeline.scala.md
 [main/scala/mg7/referenceDB.scala]: referenceDB.scala.md
 [test/scala/mg7/counts.scala]: ../../../test/scala/mg7/counts.scala.md
-[test/scala/mg7/lca.scala]: ../../../test/scala/mg7/lca.scala.md
-[test/scala/mg7/pipeline.scala]: ../../../test/scala/mg7/pipeline.scala.md
+[test/scala/mg7/fqnames.scala]: ../../../test/scala/mg7/fqnames.scala.md
+[test/scala/mg7/mock/illumina.scala]: ../../../test/scala/mg7/mock/illumina.scala.md
+[test/scala/mg7/mock/pacbio.scala]: ../../../test/scala/mg7/mock/pacbio.scala.md
+[test/scala/mg7/PRJEB6592/PRJEB6592.scala]: ../../../test/scala/mg7/PRJEB6592/PRJEB6592.scala.md
+[test/scala/mg7/referenceDBs.scala]: ../../../test/scala/mg7/referenceDBs.scala.md
 [test/scala/mg7/taxonomy.scala]: ../../../test/scala/mg7/taxonomy.scala.md
+[test/scala/mg7/testData.scala]: ../../../test/scala/mg7/testData.scala.md
+[test/scala/mg7/testDefaults.scala]: ../../../test/scala/mg7/testDefaults.scala.md

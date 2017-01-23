@@ -9,24 +9,21 @@ import ohnosequences.datasets._
 import better.files._
 import com.bio4j.titan.model.ncbiTaxonomy.TitanNCBITaxonomyGraph
 
-case object countDataProcessing extends DataProcessingBundle(
-  ncbiTaxonomyBundle
-)(
-  input   = data.countInput,
-  output  = data.countOutput
-)
-{
+case class countDataProcessing() extends DataProcessingBundle(
+  deps = ncbiTaxonomyBundle
+)(input  = data.countInput,
+  output = data.countOutput
+) {
+  def instructions: AnyInstructions = say("I'm counting you!")
 
   lazy val taxonomyGraph: TitanNCBITaxonomyGraph =
     ncbiTaxonomyBundle.graph
 
-  def instructions: AnyInstructions = say("I'm counting you!")
-
   // returns count of the given element and a filtered list (without that element)
-  def count[X](x: X, list: List[X]): (Int, List[X]) =
-    list.foldLeft( (0, List[X]()) ) { case ((count, rest), next) =>
+  def count[X](x: X, list: Seq[X]): (Int, Seq[X]) =
+    list.foldLeft( (0, Seq[X]()) ) { case ((count, rest), next) =>
       if (next == x) (count + 1, rest)
-      else (count, next :: rest)
+      else (count, next +: rest)
     }
 
   def directCounts(
@@ -40,7 +37,7 @@ case object countDataProcessing extends DataProcessingBundle(
       acc: Map[Taxon, (Int, Taxa)]
     ): Map[Taxon, (Int, Taxa)] = list match {
       case Nil => acc
-      case h :: t => {
+      case h +: t => {
         val (n, rest) = count(h, t)
         rec(rest, acc.updated(h, (n + 1, getLineage(h))))
       }
@@ -143,7 +140,7 @@ case object countDataProcessing extends DataProcessingBundle(
             columns.AveragePident(averagePidents.get(taxa).getOrElse("-")) ::
             *[AnyDenotation]
           )
-          val percentage: Double = absoluteCount / totalAssignedReads * 100
+          val percentage: Double = (absoluteCount: Double) / totalAssignedReads * 100
 
           absolute.writer.addRow(row( absoluteCount.toString ))
           relative.writer.addRow(row( f"${percentage}%.4f" ))
@@ -185,15 +182,15 @@ case object countDataProcessing extends DataProcessingBundle(
 
     success(s"Done",
       // LCA
-      data.lca.direct.absolute(lcaCounts.direct.absolute.file) ::
-      data.lca.accum.absolute (lcaCounts.accum.absolute.file) ::
-      data.lca.direct.relative(lcaCounts.direct.relative.file) ::
-      data.lca.accum.relative (lcaCounts.accum.relative.file) ::
+      data.lca.direct.absolute(lcaCounts.direct.absolute.file.toJava) ::
+      data.lca.accum.absolute (lcaCounts.accum.absolute.file.toJava) ::
+      data.lca.direct.relative(lcaCounts.direct.relative.file.toJava) ::
+      data.lca.accum.relative (lcaCounts.accum.relative.file.toJava) ::
       // BBH
-      data.bbh.direct.absolute(bbhCounts.direct.absolute.file) ::
-      data.bbh.accum.absolute (bbhCounts.accum.absolute.file) ::
-      data.bbh.direct.relative(bbhCounts.direct.relative.file) ::
-      data.bbh.accum.relative (bbhCounts.accum.relative.file) ::
+      data.bbh.direct.absolute(bbhCounts.direct.absolute.file.toJava) ::
+      data.bbh.accum.absolute (bbhCounts.accum.absolute.file.toJava) ::
+      data.bbh.direct.relative(bbhCounts.direct.relative.file.toJava) ::
+      data.bbh.accum.relative (bbhCounts.accum.relative.file.toJava) ::
       *[AnyDenotation { type Value <: FileResource }]
     )
   }

@@ -2,7 +2,7 @@ package ohnosequences.mg7
 
 import ohnosequences.statika._
 import ohnosequences.loquat.utils._
-import ohnosequences.awstools.s3._
+import ohnosequences.awstools._, s3._
 
 import com.amazonaws.auth._
 import com.amazonaws.services.s3.transfer._
@@ -23,10 +23,10 @@ trait AnyReferenceDB extends AnyBundle {
   def instructions: AnyInstructions = {
 
     LazyTry {
-      val transferManager = new TransferManager(new InstanceProfileCredentialsProvider())
+      val transferManager = new TransferManager(new DefaultAWSCredentialsProviderChain())
 
-      transferManager.download(blastDBS3, file".")
-      transferManager.download(id2taxasS3, id2taxas)
+      transferManager.download(blastDBS3, file".".toJava)
+      transferManager.download(id2taxasS3, id2taxas.toJava)
     } -&-
     say(s"Reference database ${name} was dowloaded to ${blastDB.path}")
   }

@@ -9,15 +9,12 @@ import ohnosequences.datasets._
 import better.files._
 
 
-case class flashDataProcessing[MD <: AnyMG7Parameters](val md: MD)
+case class flashDataProcessing(val parameters: AnyFlashParameters)
 extends DataProcessingBundle(
-  bundles.flash
-)(
-  input   = data.flashInput,
-  output  = data.flashOutput
-)
-{
-
+  deps = bundles.flash
+)(input  = data.flashInput,
+  output = data.flashOutput
+) {
   def instructions: AnyInstructions = say("I'll be fast as a flash!")
 
   // TODO FLASh stuff change options, derived from reads type
@@ -31,12 +28,12 @@ extends DataProcessingBundle(
 
     // define input
     lazy val flashInput = FlashInputAt(
-      reads1fastq,
-      reads2fastq
+      reads1fastq.toJava,
+      reads2fastq.toJava
     )
 
     // define output
-    lazy val flashOutput = FlashOutputAt((context / "output"), prefix = "")
+    lazy val flashOutput = FlashOutputAt((context / "output").toJava, prefix = "")
 
     // the FLASh cmd we are going to run
     lazy val flashExpr = FlashExpression(
@@ -45,7 +42,7 @@ extends DataProcessingBundle(
         f.api.output(flashOutput) ::
         *[AnyDenotation]
       ),
-      md.flashOptions
+      parameters.flashOptions
     )
 
     cmd("gunzip")(reads1gz.path.toString) -&-
