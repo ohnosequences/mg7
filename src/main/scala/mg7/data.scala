@@ -8,10 +8,10 @@ case object data {
   case object pairedReads1 extends FileData("reads1")("fastq.gz")
   case object pairedReads2 extends FileData("reads2")("fastq.gz")
 
-  case object mergedReads    extends FileData("reads")("fastq")
+  case object mergedReads    extends FileData("merged")("fastq")
   case object pair1NotMerged extends FileData("pair1.not-merged")("fastq")
   case object pair2NotMerged extends FileData("pair2.not-merged")("fastq")
-  case object flashHistogram extends FileData("stats")("txt")
+  case object flashHistogram extends FileData("stats")("hist")
 
   case object flashInput  extends DataSet(
     pairedReads1 :×:
@@ -69,7 +69,7 @@ case object data {
   case object bbhChunksFolder   extends Data("bbh-chunks")
   // after merging chunks:
   case object blastResult extends FileData("blast")("csv")
-  case object blastNoHits extends Data("blast.no-hits.fasta")
+  case object blastNoHits extends FileData("blast.no-hits")("fasta")
   case object lcaCSV      extends FileData("lca")("csv")
   case object bbhCSV      extends FileData("bbh")("csv")
 

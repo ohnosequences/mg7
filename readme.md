@@ -1,10 +1,9 @@
 ## MG7
 
 [![](https://travis-ci.org/ohnosequences/mg7.svg?branch=master)](https://travis-ci.org/ohnosequences/mg7)
-[![](https://img.shields.io/codacy/96ad3cc701a54c548deb4ef0d5564655.svg)](https://www.codacy.com/app/era7/mg7)
+[![](https://img.shields.io/codacy/96ad3cc701a54c548deb4ef0d5564655.svg)](https://www.codacy.com/app/ohnosequences/mg7)
 [![](http://github-release-version.herokuapp.com/github/ohnosequences/mg7/release.svg)](https://github.com/ohnosequences/mg7/releases/latest)
 [![](https://img.shields.io/badge/license-AGPLv3-blue.svg)](https://tldrlegal.com/license/gnu-affero-general-public-license-v3-%28agpl-3.0%29)
-[![](https://img.shields.io/badge/progress-waffle_board-75BCF4.svg)](https://waffle.io/ohnosequences/mg7)
 [![](https://img.shields.io/badge/contact-gitter_chat-dd1054.svg)](https://gitter.im/ohnosequences/mg7)
 
 A tool for 16S metagenomics data analysis using [Scala](http://scala-lang.org) and [Amazon Web Services](https://aws.amazon.com).

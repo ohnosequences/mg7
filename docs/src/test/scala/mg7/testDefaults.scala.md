@@ -1,38 +1,56 @@
 
+# Default MG7 test configuration and parameters
+
+
 ```scala
-// package ohnosequences.mg7.tests
-//
-// import ohnosequences.ncbitaxonomy._, api._
-//
-// case object taxonomy {
-//
-//   sealed abstract class AnyNode(val parent: Option[AnyNode]) extends AnyTaxonNode {
-//
-//     val id = this.toString
-//     val name = id
-//     val rankName = ""
-//   }
-//
-//   abstract class Node(p: AnyNode) extends AnyNode(Some(p))
-//
-//   case object root extends AnyNode(None)
-//   // common part
-//   case object c1 extends Node(root)
-//   case object c2 extends Node(c1)
-//   // left branch
-//   case object l1 extends Node(c2)
-//   case object l2 extends Node(l1)
-//   // right branch
-//   case object r1 extends Node(c2)
-//   case object r2 extends Node(r1)
-//   case object r3 extends Node(r2)
-//
-//   val common = Seq(root, c1, c2)
-//
-//   val allNodes: Set[AnyNode] = Set(root, c1, c2, l1, l2, r1, r2, r3)
-//
-//   val id2node: Map[String, AnyNode] = allNodes.map{ n => (n.id -> n) }.toMap
-// }
+package ohnosequences.test.mg7
+
+import ohnosequences.mg7._, loquats._
+import ohnosequences.datasets._, illumina._
+import ohnosequences.cosas._, types._, klists._
+import ohnosequences.loquat._
+import ohnosequences.statika._, aws._
+import ohnosequences.blast.api._
+import ohnosequences.db.rna16s
+import ohnosequences.awstools._, ec2._ , s3._, autoscaling._, regions._
+import com.amazonaws.auth._, profile._
+import ohnosequences.datasets.illumina._
+
+case object testDefaults {
+
+  lazy val mg7 = ohnosequences.generated.metadata.mg7
+```
+
+Output test data *is* scoped by version
+
+```scala
+  lazy val outputS3Prefix = S3Folder("resources.ohnosequences.com", mg7.organization) / mg7.artifact / mg7.version / "test" /
+
+  def outputS3FolderFor(pipeline: String): (SampleID, StepName) => S3Folder = { (sampleID, step) =>
+    outputS3Prefix / pipeline / sampleID / step /
+  }
+
+
+  trait MG7PipelineDefaults extends AnyMG7Pipeline {
+
+    val metadata = ohnosequences.generated.metadata.mg7
+    val iamRoleName = "loquat.testing"
+    val logsS3Prefix = s3"loquat.testing" / "mg7" / name /
+    val outputS3Folder = testDefaults.outputS3FolderFor(name)
+
+    val splitConfig  = SplitConfig(1)
+    val blastConfig  = BlastConfig(100)
+    val assignConfig = AssignConfig(6)
+    val mergeConfig  = MergeConfig(1)
+    val countConfig  = CountConfig(1)
+  }
+
+  lazy val loquatUser = LoquatUser(
+    email = "aalekhin@ohnosequences.com",
+    localCredentials = new ProfileCredentialsProvider("default"),
+    keypairName = "aalekhin"
+  )
+}
 
 ```
 
