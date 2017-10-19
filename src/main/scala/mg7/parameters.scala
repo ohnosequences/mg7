@@ -5,7 +5,7 @@ import ohnosequences.awstools.s3._
 import ohnosequences.datasets._
 import ohnosequences.flash.api._
 import ohnosequences.blast.api.{ outputFields => out, _ }
-import better.files._
+import java.io.File
 
 
 sealed trait SplitInputFormat
@@ -46,9 +46,9 @@ trait AnyMG7Parameters {
     BlastExpression(blastCommand)(
       outputRecord = blastOutRec,
       argumentValues =
-        db(referenceDBs.map(_.blastDBName.toJava)) ::
-        query(inFile.toJava) ::
-        ohnosequences.blast.api.out(outFile.toJava) ::
+        db(referenceDBs.map(_.blastDBName)) ::
+        query(inFile) ::
+        ohnosequences.blast.api.out(outFile) ::
         *[AnyDenotation],
       optionValues = blastOptions
     )(argValsToSeq, optValsToSeq)
@@ -109,7 +109,7 @@ trait AnyFlashParameters {
 
   // TODO: should it be configurable?
   lazy val flashOptions = flash.defaults.update(
-    read_len(readsLength.toInt) ::
+    // read_len(readsLength.toInt) ::
     max_overlap(readsLength.toInt) ::
     *[AnyDenotation]
   )

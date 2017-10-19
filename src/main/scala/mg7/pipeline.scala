@@ -60,10 +60,8 @@ trait AnyMG7Pipeline { pipeline =>
     )
   }
 
-  private lazy val instanceS3client = S3Client()
-
   private def listChunks(s3prefix: AnyS3Address): List[(S3Object, Int)] = {
-    instanceS3client
+    s3.defaultClient
       .listObjects(S3Folder(s3prefix.toURI))
       .getOrElse(List())
       .zipWithIndex

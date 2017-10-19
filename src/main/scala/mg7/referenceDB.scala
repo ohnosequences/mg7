@@ -1,13 +1,13 @@
 package ohnosequences.mg7
 
 import ohnosequences.statika._
-import ohnosequences.loquat.utils._
+import ohnosequences.loquat._, utils._, files._
 import ohnosequences.awstools._, s3._
 
 import com.amazonaws.auth._
 import com.amazonaws.services.s3.transfer._
 
-import better.files._
+import java.io.File
 
 // TODO: the non-bundle part of the trait could be put in the blast-api lib
 trait AnyReferenceDB extends AnyBundle {
@@ -16,17 +16,16 @@ trait AnyReferenceDB extends AnyBundle {
   val blastDBS3:  S3Folder
   val id2taxasS3: S3Object
 
-  lazy val blastDB:     File = blastDBS3.key.toFile
+  lazy val blastDB:     File = file(blastDBS3.key)
   lazy val blastDBName: File = blastDB / s"${name.stripSuffix(".fasta")}.fasta"
-  lazy val id2taxas:    File = file"${name}.id2taxas.tsv"
+  lazy val id2taxas:    File = file(s"${name}.id2taxas.tsv")
 
   def instructions: AnyInstructions = {
+    lazy val s3client = s3.defaultClient
 
     LazyTry {
-      val transferManager = new TransferManager(new DefaultAWSCredentialsProviderChain())
-
-      transferManager.download(blastDBS3, file".".toJava)
-      transferManager.download(id2taxasS3, id2taxas.toJava)
+      s3client.download(blastDBS3, file("."))
+      s3client.download(id2taxasS3, id2taxas)
     } -&-
     say(s"Reference database ${name} was dowloaded to ${blastDB.path}")
   }

@@ -3,7 +3,7 @@ package ohnosequences.mg7.loquats
 import ohnosequences.mg7._
 import ohnosequences.ncbitaxonomy._, api.{ Taxa => TaxaOps, Taxon => _, _ }, titan._
 import ohnosequences.mg7._, csv._
-import ohnosequences.loquat._
+import ohnosequences.loquat._, utils.files._
 import ohnosequences.statika._
 import ohnosequences.cosas._, types._, klists._
 import ohnosequences.datasets._
@@ -88,8 +88,8 @@ case class assignDataProcessing[P <: AnyMG7Parameters](val parameters: P) extend
     lazy val blastReader = csv.Reader(parameters.blastOutRec.keys)(context.inputFile(data.blastChunk))
 
     // Outs:
-    lazy val lcaFile = (context / "output" / "lca.csv").createIfNotExists(createParents = true)
-    lazy val bbhFile = (context / "output" / "bbh.csv").createIfNotExists(createParents = true)
+    lazy val lcaFile = (context / "output" / "lca.csv").createFile
+    lazy val bbhFile = (context / "output" / "bbh.csv").createFile
 
     lazy val lcaWriter = csv.Writer(csv.assignment.columns)(lcaFile)
     lazy val bbhWriter = csv.Writer(csv.assignment.columns)(bbhFile)
@@ -124,8 +124,8 @@ case class assignDataProcessing[P <: AnyMG7Parameters](val parameters: P) extend
     bbhWriter.close()
 
     success(s"Results are ready",
-      data.lcaChunk(lcaFile.toJava) ::
-      data.bbhChunk(bbhFile.toJava) ::
+      data.lcaChunk(lcaFile) ::
+      data.bbhChunk(bbhFile) ::
       *[AnyDenotation { type Value <: FileResource }]
     )
   }

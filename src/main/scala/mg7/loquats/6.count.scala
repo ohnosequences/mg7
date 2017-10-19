@@ -2,11 +2,11 @@ package ohnosequences.mg7.loquats
 
 import ohnosequences.mg7._, csv._
 import ohnosequences.ncbitaxonomy._, api.{ Taxa => TaxaOps, Taxon => _, _ }, titan._
-import ohnosequences.loquat._
+import ohnosequences.loquat._, utils.files._
 import ohnosequences.statika._
 import ohnosequences.cosas._, types._, klists._
 import ohnosequences.datasets._
-import better.files._
+import java.io.File
 import com.bio4j.titan.model.ncbiTaxonomy.TitanNCBITaxonomyGraph
 
 case class countDataProcessing() extends DataProcessingBundle(
@@ -118,7 +118,7 @@ case class countDataProcessing() extends DataProcessingBundle(
         lazy val writer: csv.Writer[csv.counts.Columns] = csv.Writer(csv.counts.columns)(file)
 
         def writeCsvHeader(): Unit =
-          writer.addVals( csv.counts.header( file.name.replaceAll("\\.", "-") ) )
+          writer.addVals( csv.counts.header( file.getName.replaceAll("\\.", "-") ) )
       }
 
       /* This method writes two tables (absolute and relative) with the given counts */
@@ -182,15 +182,15 @@ case class countDataProcessing() extends DataProcessingBundle(
 
     success(s"Done",
       // LCA
-      data.lca.direct.absolute(lcaCounts.direct.absolute.file.toJava) ::
-      data.lca.accum.absolute (lcaCounts.accum.absolute.file.toJava) ::
-      data.lca.direct.relative(lcaCounts.direct.relative.file.toJava) ::
-      data.lca.accum.relative (lcaCounts.accum.relative.file.toJava) ::
+      data.lca.direct.absolute(lcaCounts.direct.absolute.file) ::
+      data.lca.accum.absolute (lcaCounts.accum.absolute.file) ::
+      data.lca.direct.relative(lcaCounts.direct.relative.file) ::
+      data.lca.accum.relative (lcaCounts.accum.relative.file) ::
       // BBH
-      data.bbh.direct.absolute(bbhCounts.direct.absolute.file.toJava) ::
-      data.bbh.accum.absolute (bbhCounts.accum.absolute.file.toJava) ::
-      data.bbh.direct.relative(bbhCounts.direct.relative.file.toJava) ::
-      data.bbh.accum.relative (bbhCounts.accum.relative.file.toJava) ::
+      data.bbh.direct.absolute(bbhCounts.direct.absolute.file) ::
+      data.bbh.accum.absolute (bbhCounts.accum.absolute.file) ::
+      data.bbh.direct.relative(bbhCounts.direct.relative.file) ::
+      data.bbh.accum.relative (bbhCounts.accum.relative.file) ::
       *[AnyDenotation { type Value <: FileResource }]
     )
   }

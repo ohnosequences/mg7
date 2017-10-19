@@ -30,10 +30,6 @@ trait AnyMG7LoquatConfig extends AnyLoquatConfig {
     PurchaseModel.spot(0.1),
     AutoScalingGroupSize(0, size, size)
   )
-
-  lazy val terminationConfig = TerminationConfig(
-    terminateAfterInitialDataMappings = true
-  )
 }
 
 abstract class MG7LoquatConfig(val stepName: String) extends AnyMG7LoquatConfig

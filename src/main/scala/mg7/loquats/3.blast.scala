@@ -1,17 +1,14 @@
 package ohnosequences.mg7.loquats
 
 import ohnosequences.mg7._
-import ohnosequences.loquat._
+import ohnosequences.loquat._, utils.files._
 import ohnosequences.statika._
 import ohnosequences.blast.api._
 import ohnosequences.cosas._, types._, klists._
 import ohnosequences.datasets._
 import ohnosequences.fastarious._, fasta._
-
-import better.files._
 import sys.process._
-
-
+import java.io.File
 
 case class blastDataProcessing[P <: AnyMG7Parameters](val parameters: P)
 extends DataProcessingBundle(
@@ -25,19 +22,20 @@ extends DataProcessingBundle(
 
   def process(context: ProcessingContext[Input]): AnyInstructions { type Out <: OutputFiles } = {
 
-    val totalOutput = (context / "blastAll.csv").createIfNotExists(createParents = true)
-    val noHits = (context / "no.hits").createIfNotExists(createParents = true)
+    val totalOutput = (context / "blastAll.csv").createFile
+    val noHits = (context / "no.hits").createFile
 
     LazyTry {
       // NOTE: once we update to better-files 2.15.+, use `file.lineIterator` here (it's autoclosing):
-      val source = io.Source.fromFile( context.inputFile(data.fastaChunk).toJava )
+      val source = io.Source.fromFile( context.inputFile(data.fastaChunk) )
       val totalOutputWriter = csv.Writer(parameters.blastOutRec.keys)(totalOutput)
 
-      source.getLines.buffered.parseFastaDropErrors() foreach { read =>
-        println(s"\nRunning BLAST for the read ${read.getV(header).id}")
+      source.getLines.buffered.parseFastaSkipCrap.foreach { read =>
+        println(s"\nRunning BLAST for the read ${read.header.id}")
 
         val inFile = (context / "read.fa").overwrite(read.asString)
-        val outFile = (context / "blastRead.csv").clear()
+        val outFile = (context / "blastRead.csv")
+        if (outFile.exists) outFile.delete()
 
         val expr = parameters.blastExpr(inFile, outFile)
         println(expr.toSeq.mkString(" "))
@@ -71,8 +69,9 @@ extends DataProcessingBundle(
         println(s"- After filtering there are ${filteredHits.length} hits")
 
         if (filteredHits.isEmpty) {
-          println(s"- Recording read ${read.getV(header).id} in no-hits")
-          noHits.appendLine(read.asString)
+          println(s"- Recording read ${read.header.id} in no-hits")
+          // TODO: check that it append lines correctly
+          noHits.append(read.asString)
         } else {
           println(s"- Appending filtered results to the total chunk output")
           filteredHits.foreach { row => totalOutputWriter.addRow(row) }
@@ -87,8 +86,8 @@ extends DataProcessingBundle(
     } -&-
     success(
       "much blast, very success!",
-      data.blastChunk(totalOutput.toJava) ::
-      data.noHitsChunk(noHits.toJava) ::
+      data.blastChunk(totalOutput) ::
+      data.noHitsChunk(noHits) ::
       *[AnyDenotation { type Value <: FileResource }]
     )
 
