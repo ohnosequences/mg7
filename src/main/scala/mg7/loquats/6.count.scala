@@ -1,7 +1,7 @@
 package ohnosequences.mg7.loquats
 
 import ohnosequences.mg7._, csv._
-import ohnosequences.ncbitaxonomy._, api.{ Taxa => TaxaOps, Taxon => _, _ }, titan._
+import ohnosequences.ncbitaxonomy._, titan._
 import ohnosequences.loquat._, utils.files._
 import ohnosequences.statika._
 import ohnosequences.cosas._, types._, klists._

@@ -2,11 +2,9 @@ package ohnosequences.mg7
 
 import ohnosequences.mg7.loquats._
 import ohnosequences.loquat._
-import ohnosequences.statika._, aws._
+import ohnosequences.statika._
 import ohnosequences.datasets._
 import ohnosequences.awstools._, s3._
-import com.amazonaws.auth._, profile._
-
 
 trait AnyMG7Pipeline { pipeline =>
 

@@ -2,11 +2,7 @@ package ohnosequences.mg7
 
 import ohnosequences.loquat._
 import ohnosequences.statika._, aws._
-import ohnosequences.cosas._, types._, klists._, typeUnions._
 import ohnosequences.awstools._, ec2._, autoscaling._, regions._
-import ohnosequences.datasets._
-import ohnosequences.flash.api._
-import ohnosequences.blast.api.{ outputFields => out, _ }
 
 trait AnyMG7LoquatConfig extends AnyLoquatConfig {
 

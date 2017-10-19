@@ -6,8 +6,6 @@ import ohnosequences.statika._
 import ohnosequences.cosas._, types._, klists._
 import ohnosequences.datasets._
 import ohnosequences.fastarious._, fasta._, fastq._
-import collection.JavaConversions._
-import java.io.File
 
 case class splitDataProcessing(parameters: AnyMG7Parameters) extends DataProcessingBundle()(
   input  = data.splitInput,

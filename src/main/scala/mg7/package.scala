@@ -1,6 +1,6 @@
 package ohnosequences
 
-import ohnosequences.cosas._, types._, klists._, typeUnions._
+import ohnosequences.cosas._, types._, klists._
 import ohnosequences.loquat._
 import ohnosequences.blast.api._
 

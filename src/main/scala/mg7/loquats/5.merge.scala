@@ -5,7 +5,7 @@ import ohnosequences.loquat._, utils.files._
 import ohnosequences.statika._
 import ohnosequences.cosas._, types._, klists._
 import ohnosequences.datasets._
-import java.nio.file.{ Files, Path, Paths, StandardOpenOption }
+import java.nio.file.{ Files, StandardOpenOption }
 import java.io.File
 
 case class mergeDataProcessing() extends DataProcessingBundle()(
@@ -20,7 +20,7 @@ case class mergeDataProcessing() extends DataProcessingBundle()(
     dir.listFiles.foreach { chunkFile =>
       Files.write(
         out.path,
-        Files.readAllBytes(chunkFile.path), 
+        Files.readAllBytes(chunkFile.path),
         StandardOpenOption.APPEND
       )
       chunkFile.delete()

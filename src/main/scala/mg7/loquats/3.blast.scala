@@ -8,7 +8,6 @@ import ohnosequences.cosas._, types._, klists._
 import ohnosequences.datasets._
 import ohnosequences.fastarious._, fasta._
 import sys.process._
-import java.io.File
 
 case class blastDataProcessing[P <: AnyMG7Parameters](val parameters: P)
 extends DataProcessingBundle(

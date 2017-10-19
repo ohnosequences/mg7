@@ -3,10 +3,6 @@ package ohnosequences.mg7
 import ohnosequences.statika._
 import ohnosequences.loquat._, utils._, files._
 import ohnosequences.awstools._, s3._
-
-import com.amazonaws.auth._
-import com.amazonaws.services.s3.transfer._
-
 import java.io.File
 
 // TODO: the non-bundle part of the trait could be put in the blast-api lib
