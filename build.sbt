@@ -26,7 +26,10 @@ libraryDependencies ++= Seq(
 )
 
 dependencyOverrides ++= Seq(
-  "ohnosequences" %% "cosas" % "0.10.1",
+  // TODO: remove these overrides and make a new round of deps-updates:
+  "ohnosequences" %% "datasets" % "0.5.2",         // update datasets-illumina
+  "ohnosequences" %% "aws-scala-tools" % "0.20.0", // update bio4j-dist
+  "ohnosequences" %% "cosas" % "0.10.1",           // update blast-api
   "org.slf4j" % "slf4j-api" % "1.7.25"
 )
 
