@@ -13,7 +13,7 @@ libraryDependencies ++= Seq(
   "ohnosequences" %% "blast-api"    % "0.11.1",
   "ohnosequences" %% "flash-api"    % "0.5.1",
   // generic tools:
-  "ohnosequences" %% "loquat" % "2.0.0-RC3-2-ga70ed2f",
+  "ohnosequences" %% "loquat" % "2.0.0-RC3-3-g2bbedeb",
   "ohnosequences" %% "datasets-illumina" % "0.2.0",
   "com.github.tototoshi" %% "scala-csv" % "1.3.5",
   // bundles:
