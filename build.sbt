@@ -3,7 +3,7 @@ organization  := "ohnosequences"
 description   := "Configurable, scalable 16S metagenomics data analysis"
 bucketSuffix  := "era7.com"
 
-crossScalaVersions := Seq("2.11.11", "2.12.3")
+crossScalaVersions := Seq("2.11.12", "2.12.4")
 scalaVersion := crossScalaVersions.value.max
 
 libraryDependencies ++= Seq(
