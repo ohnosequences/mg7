@@ -3,16 +3,10 @@
 */
 package ohnosequences.test.mg7
 
-import ohnosequences.mg7._, loquats._
-import ohnosequences.datasets._, illumina._
-import ohnosequences.cosas._, types._, klists._
+import ohnosequences.mg7._
 import ohnosequences.loquat._
-import ohnosequences.statika._, aws._
-import ohnosequences.blast.api._
-import ohnosequences.db.rna16s
-import ohnosequences.awstools._, ec2._ , s3._, autoscaling._, regions._
+import ohnosequences.awstools._, s3._
 import com.amazonaws.auth._, profile._
-import ohnosequences.datasets.illumina._
 
 case object testDefaults {
 
