@@ -1,43 +1,35 @@
 name          := "mg7"
 organization  := "ohnosequences"
 description   := "Configurable, scalable 16S metagenomics data analysis"
-
 bucketSuffix  := "era7.com"
 
-scalaVersion := "2.11.8"
-
-resolvers := Seq(
-  "Era7 public maven releases"  at s3("releases.era7.com").toHttps(s3region.value.toString)
-) ++ resolvers.value
+crossScalaVersions := Seq("2.11.12", "2.12.6")
+scalaVersion := crossScalaVersions.value.max
 
 libraryDependencies ++= Seq(
   // APIs:
-  "ohnosequences" %% "ncbitaxonomy" % "0.2.0",
-  "ohnosequences" %% "fastarious"   % "0.8.0",
-  "ohnosequences" %% "blast-api"    % "0.8.0",
-  "ohnosequences" %% "flash-api"    % "0.4.0",
+  "ohnosequences" %% "ncbitaxonomy" % "0.3.1",
+  "ohnosequences" %% "fastarious"   % "0.12.0",
+  "ohnosequences" %% "blast-api"    % "0.11.1",
+  "ohnosequences" %% "flash-api"    % "0.5.2",
   // generic tools:
-  "ohnosequences" %% "cosas"        % "0.8.0",
-  "ohnosequences" %% "loquat"       % "2.0.0-RC1",
-  "ohnosequences" %% "statika"      % "2.0.0",
-  "ohnosequences" %% "datasets"          % "0.4.1",
-  "ohnosequences" %% "datasets-illumina" % "0.1.0",
-  "com.github.tototoshi" %% "scala-csv" % "1.3.4",
+  "ohnosequences" %% "loquat" % "2.0.0-RC4-37-g8f6a972",
+  "ohnosequences" %% "datasets-illumina" % "0.2.1",
+  "com.github.tototoshi" %% "scala-csv" % "1.3.5",
   // bundles:
-  "ohnosequences-bundles" %% "flash" % "0.3.0",
-  "ohnosequences-bundles" %% "blast" % "0.4.0",
+  "ohnosequences-bundles" %% "flash" % "0.4.0",
+  "ohnosequences-bundles" %% "blast" % "0.5.0",
   // testing:
-  "ohnosequences" %% "db-rna16s" % "1.0.0-RC1" % Test
+  "org.scalatest" %% "scalatest" % "3.0.5" % Test,
+  // TODO: update db-rna16s
+  "ohnosequences" %% "db-rna16s" % "1.1.0" % Test
 )
 
-dependencyOverrides ++= Set(
-  "org.apache.httpcomponents" % "httpclient" % "4.5.1",
-  "org.slf4j"                 % "slf4j-api"  % "1.7.7"
+dependencyOverrides ++= Seq(
+  "ohnosequences" %% "aws-scala-tools" % "0.21.0", // db-rna16s depends on 0.20.0
+  "org.slf4j" % "slf4j-api" % "1.7.25",
+  "com.google.guava" % "guava" % "14.0.1",
 )
-
-// NOTE should be reestablished
-wartremoverErrors in (Test, compile) := Seq()
-wartremoverErrors in (Compile, compile) := Seq()
 
 assemblyMergeStrategy in assembly ~= { old => {
     case "log4j.properties"                       => MergeStrategy.filterDistinctLines
@@ -46,14 +38,7 @@ assemblyMergeStrategy in assembly ~= { old => {
   }
 }
 
-
-// generateStatikaMetadataIn(Compile)
-//
-// // This turns on fat-jar publishing during release process:
-// publishFatArtifact in Release := true
-
 // These settings are only for manual testing:
 generateStatikaMetadataIn(Test)
-
 // This includes tests sources in the assembled fat-jar:
 fullClasspath in assembly := (fullClasspath in Test).value

@@ -2,7 +2,7 @@ package ohnosequences.mg7
 
 import ohnosequences.cosas._, types._, klists._, typeUnions._
 import com.github.tototoshi.csv._
-import better.files._
+import java.io.File
 
 // Some minimal CSV utils, will be replaced by a specialized library based on cosas
 case object csv {
@@ -144,7 +144,7 @@ case object csv {
   // NOTE: this is a simple wrapper for the tototoshi CSVReader to work with the Row type
   case class Reader[Cs <: AnyProductType](val columns: Cs)(val file: File) {
 
-    private lazy val csvReader = CSVReader.open(file.toJava)(UnixCSVFormat)
+    private lazy val csvReader = CSVReader.open(file)(UnixCSVFormat)
     def close(): Unit = csvReader.close()
 
     def rows: Iterator[Row[Cs]] = csvReader.iterator.map { vs => Row(columns, vs) }
@@ -153,7 +153,7 @@ case object csv {
   // NOTE: this is a simple wrapper for the tototoshi CSVWriter to work with the Row type
   case class Writer[Cs <: AnyProductType](val columns: Cs)(val file: File, val append: Boolean = true) {
 
-    private lazy val csvWriter = CSVWriter.open(file.toJava, append)(UnixCSVFormat)
+    private lazy val csvWriter = CSVWriter.open(file, append)(UnixCSVFormat)
     def close(): Unit = csvWriter.close()
 
     def addRow(row: Row[Cs]): Unit = csvWriter.writeRow(row.values)

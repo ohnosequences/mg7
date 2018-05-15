@@ -2,11 +2,9 @@ package ohnosequences.mg7
 
 import ohnosequences.mg7.loquats._
 import ohnosequences.loquat._
-import ohnosequences.statika._, aws._
+import ohnosequences.statika._
 import ohnosequences.datasets._
 import ohnosequences.awstools._, s3._
-import com.amazonaws.auth._, profile._
-
 
 trait AnyMG7Pipeline { pipeline =>
 
@@ -60,10 +58,8 @@ trait AnyMG7Pipeline { pipeline =>
     )
   }
 
-  private lazy val instanceS3client = S3Client()
-
   private def listChunks(s3prefix: AnyS3Address): List[(S3Object, Int)] = {
-    instanceS3client
+    s3.defaultClient
       .listObjects(S3Folder(s3prefix.toURI))
       .getOrElse(List())
       .zipWithIndex

@@ -1,13 +1,11 @@
 package ohnosequences.mg7.loquats
 
 import ohnosequences.mg7._
-import ohnosequences.loquat._
+import ohnosequences.loquat._, utils.files._
 import ohnosequences.statika._
 import ohnosequences.cosas._, types._, klists._
 import ohnosequences.datasets._
-import ohnosequences.fastarious._, fasta._
-import better.files._
-import collection.JavaConversions._
+import ohnosequences.fastarious._, fasta._, fastq._
 
 case class splitDataProcessing(parameters: AnyMG7Parameters) extends DataProcessingBundle()(
   input  = data.splitInput,
@@ -20,16 +18,15 @@ case class splitDataProcessing(parameters: AnyMG7Parameters) extends DataProcess
     val outputDir = context / "chunks"
 
     LazyTry {
+      outputDir.createDirectory
 
-      outputDir.createDirectories()
-
-      val lines: Iterator[String] = context.inputFile(data.mergedReads).lineIterator
+      val lines: Iterator[String] = context.inputFile(data.mergedReads).lines
 
       val fastasIterator: Iterator[String] = parameters.splitInputFormat match {
         // if input is FastQ, we parse it, convert it to FASTA and get String version
-        case FastQInput => fastq.parseFastqDropErrors(lines).map(_.toFASTA.asString)
+        case FastQInput => lines.parseFastqPhred33DropErrors.map(_.toFASTA.asString)
         // if it's Fasta, we parse it and get String version
-        case FastaInput => lines.buffered.parseFastaDropErrors().map(_.asString)
+        case FastaInput => lines.buffered.parseFastaSkipCrap.map(_.asString)
       }
 
       // group it
@@ -44,7 +41,7 @@ case class splitDataProcessing(parameters: AnyMG7Parameters) extends DataProcess
     } -&-
     success(
       "chunk-chunk-chunk!",
-      data.fastaChunks(outputDir.toJava) ::
+      data.fastaChunks(outputDir) ::
       *[AnyDenotation { type Value <: FileResource }]
     )
   }

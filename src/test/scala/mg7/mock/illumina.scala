@@ -1,15 +1,9 @@
 package ohnosequences.test.mg7.mock
 
 import ohnosequences.test.mg7._, testDefaults._
-import ohnosequences.mg7._, loquats._
+import ohnosequences.mg7._
 import ohnosequences.datasets._
 import ohnosequences.datasets.illumina._
-import ohnosequences.cosas._, types._, klists._
-import ohnosequences.loquat._
-import ohnosequences.statika._, aws._
-import ohnosequences.blast.api._
-import ohnosequences.awstools._, ec2._, s3._, autoscaling._, regions._
-import com.amazonaws.auth._, profile._
 
 case object illumina {
 

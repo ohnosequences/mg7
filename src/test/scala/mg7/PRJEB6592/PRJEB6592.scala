@@ -1,13 +1,9 @@
 package ohnosequences.test.mg7
 import ohnosequences.test.mg7.testDefaults._
-import ohnosequences.mg7._, loquats._
-import ohnosequences.datasets._, illumina._
-import ohnosequences.cosas._, types._, klists._
-import ohnosequences.loquat._
-import ohnosequences.statika._, aws._
+import ohnosequences.mg7._
+import ohnosequences.datasets._
 import ohnosequences.blast.api._
-import ohnosequences.awstools._, ec2._ , s3._, autoscaling._, regions._
-import com.amazonaws.auth._, profile._
+import ohnosequences.awstools._, s3._
 
 // TODO this is a gut sample after all, see what we are going to do with this
 case object PRJEB6592 {
