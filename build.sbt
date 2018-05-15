@@ -8,10 +8,10 @@ scalaVersion := crossScalaVersions.value.max
 
 libraryDependencies ++= Seq(
   // APIs:
-  "ohnosequences" %% "ncbitaxonomy" % "0.3.0",
+  "ohnosequences" %% "ncbitaxonomy" % "0.3.1",
   "ohnosequences" %% "fastarious"   % "0.12.0",
   "ohnosequences" %% "blast-api"    % "0.11.1",
-  "ohnosequences" %% "flash-api"    % "0.5.1",
+  "ohnosequences" %% "flash-api"    % "0.5.2",
   // generic tools:
   "ohnosequences" %% "loquat" % "2.0.0-RC4-37-g8f6a972",
   "ohnosequences" %% "datasets-illumina" % "0.2.1",
@@ -26,10 +26,9 @@ libraryDependencies ++= Seq(
 )
 
 dependencyOverrides ++= Seq(
-  // TODO: remove these overrides and make a new round of deps-updates:
-  "ohnosequences" %% "aws-scala-tools" % "0.20.0", // update bio4j-dist
-  "ohnosequences" %% "cosas" % "0.10.1",           // update blast-api
-  "org.slf4j" % "slf4j-api" % "1.7.25"
+  "ohnosequences" %% "aws-scala-tools" % "0.21.0", // db-rna16s depends on 0.20.0
+  "org.slf4j" % "slf4j-api" % "1.7.25",
+  "com.google.guava" % "guava" % "14.0.1",
 )
 
 assemblyMergeStrategy in assembly ~= { old => {
